@@ -16,13 +16,13 @@
     "logs": "firebase functions:log"
   },
   "dependencies": {
-    "@googleapis/calendar": "^1.0.2",
+    "@googleapis/calendar": "^2.0.0",
     "@slack/web-api": "^6.7.1",
     "axios": "^0.27.2",
     "cron-parser": "^4.4.0",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.18.0",
-    "luxon": "^2.4.0"
+    "luxon": "^3.0.1"
   },
   "devDependencies": {
     "@types/luxon": "^2.3.2",
