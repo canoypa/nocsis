@@ -1,13 +1,10 @@
-import dynamic from "next/dynamic";
+import { NoSsr } from "@mui/material";
 import Head from "next/head";
-import { FC } from "react";
+import { FC, Suspense } from "react";
+import { AuthProvider } from "../components/auth_provider";
+import { Main } from "../components/main";
+import { SignIn } from "../components/signin";
 import "../core/messaging";
-
-// SSR 回避
-const Main = dynamic(() => import("../components/app"), {
-  ssr: false,
-  loading: () => <p>Wait a second...</p>,
-});
 
 const Home: FC = () => {
   return (
@@ -16,7 +13,13 @@ const Home: FC = () => {
         <title>Nocsis</title>
       </Head>
 
-      <Main />
+      <NoSsr>
+        <Suspense fallback={<p>Loading something...</p>}>
+          <AuthProvider signIn={<SignIn />}>
+            <Main />
+          </AuthProvider>
+        </Suspense>
+      </NoSsr>
     </>
   );
 };
