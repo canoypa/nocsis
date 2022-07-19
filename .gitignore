@@ -1,0 +1,12 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+firebase-debug.log*
+firebase-debug.*.log*
+
+# Firebase cache
+.firebase/
+
+# Firebase config
+.firebaserc

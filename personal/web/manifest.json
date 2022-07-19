@@ -1,0 +1,43 @@
+{
+  "name": "Nocsis",
+  "short_name": "Nocsis",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1c1b1f",
+  "theme_color": "#1c1b1f",
+  "description": "Nocsis Personal",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icons/Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/Icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/Icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/Icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "screenshots/0.png",
+      "sizes": "320x320",
+      "type": "image/png"
+    }
+  ]
+}

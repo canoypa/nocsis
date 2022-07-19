@@ -1,0 +1,44 @@
+name: nocsis_personal
+description: Nocsis Personal
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  firebase_core: ^1.16.0
+  firebase_auth: ^3.3.17
+  cloud_functions: ^3.2.14
+  go_router: ^3.1.0
+  flutter_riverpod: ^1.0.3
+  freezed: ^2.0.3
+  freezed_annotation: ^2.0.3
+  json_serializable: ^6.2.0
+  intl: ^0.17.0
+  collection: ^1.16.0
+  animations: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/Icon-192.png
+
+  fonts:
+    - family: Noto Sans JP
+      fonts:
+        - asset: assets/fonts/NotoSansJP-Regular.otf
+        - asset: assets/fonts/NotoSansJP-Bold.otf
+          weight: 700
