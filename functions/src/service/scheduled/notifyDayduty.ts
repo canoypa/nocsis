@@ -20,7 +20,7 @@ const notifyDayDuty: CrontabHandler = async (timestamp) => {
     const options: ChatPostMessageArguments = {
       channel: slackUserId,
       text: `今日の日直は、${dayduty.lastName}${dayduty.firstName}さんです。`,
-      // icon_emoji: ":date:", // TODO: いい絵文字あったら追加
+      icon_emoji: ":bust_in_silhouette:",
       username: "今日の日直",
       // blocks: [],
     };
