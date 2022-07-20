@@ -2,13 +2,15 @@ import { DateTime } from "luxon";
 import { CalendarEvent } from "../../models/event";
 import { isAllDay } from "./utils";
 
-// 表示用の時刻情報を取得する
-// e.g. "9:00 ~ 10:00", "9:00 ~", "~ 10:00"
+/**
+ * 表示用の時刻情報を取得する
+ * e.g. "9:00 ~ 10:00", "9:00 ~", "~ 10:00"
+ */
 export const getDisplayTimeRange = (
   event: CalendarEvent,
   date: DateTime
 ): string | null => {
-  // 時間指定のあるイベントのみ表示
+  // 時間指定のあるイベントの場合のみ返す
   if (isAllDay(event)) {
     return null;
   }
@@ -19,8 +21,16 @@ export const getDisplayTimeRange = (
   const isStartDay = event.startAt.hasSame(date, "day");
   const isEndDay = event.endAt.hasSame(date, "day");
 
-  const startAt = isStartDay ? event.startAt.toFormat("H:mm") : "";
-  const endAt = isEndDay ? event.endAt.toFormat("H:mm") : "";
+  const startAt = event.startAt.toFormat("H:mm");
+  const endAt = event.endAt.toFormat("H:mm");
+
+  if (isStartDay && !isEndDay) {
+    return `${startAt} ~`;
+  }
+
+  if (!isStartDay && isEndDay) {
+    return `~ ${endAt}`;
+  }
 
   return `${startAt} ~ ${endAt}`;
 };
