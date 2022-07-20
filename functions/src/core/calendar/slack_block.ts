@@ -10,6 +10,8 @@ import {
 } from "@slack/web-api";
 import { DateTime } from "luxon";
 import { CalendarEvent } from "../../models/event";
+import { getDisplayTimeRange } from "./get_display_time_range";
+import { getDisplayTitle } from "./get_display_title";
 
 export const eventsToSlackBlock = (events: CalendarEvent[], date: DateTime) => {
   const result: (KnownBlock | Block)[] = [];
@@ -19,7 +21,7 @@ export const eventsToSlackBlock = (events: CalendarEvent[], date: DateTime) => {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*${e.getDisplayTitle(date)}*`,
+        text: `*${getDisplayTitle(e, date)}*`,
       },
     };
     result.push(title);
@@ -38,10 +40,10 @@ export const eventsToSlackBlock = (events: CalendarEvent[], date: DateTime) => {
     // Contexts
     const contexts: (ImageElement | PlainTextElement | MrkdwnElement)[] = [];
 
-    if (e.getDisplayTimeRange(date)) {
+    if (getDisplayTimeRange(e, date)) {
       const time: MrkdwnElement = {
         type: "mrkdwn",
-        text: `:clock3: ${e.getDisplayTimeRange(date)}`,
+        text: `:clock3: ${getDisplayTimeRange(e, date)}`,
       };
       contexts.push(time);
     }

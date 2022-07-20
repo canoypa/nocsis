@@ -1,6 +1,7 @@
 import { ChatPostMessageArguments } from "@slack/web-api";
 import { slackClient } from "../../api/slackClient";
 import { fetchCalendar } from "../../core/calendar";
+import { getDisplayTitle } from "../../core/calendar/get_display_title";
 import { parseEvents } from "../../core/calendar/parseEvents";
 import { eventsToSlackBlock } from "../../core/calendar/slack_block";
 import { CrontabHandler } from "../../core/crontab";
@@ -40,7 +41,7 @@ const notifyEvent: CrontabHandler = async (timestamp) => {
     throw new Error("Can not read SLACK_EVENT_CHANNEL_ID");
   }
 
-  const eventTitles = events.map((e) => e.getDisplayTitle(from)).join(", ");
+  const eventTitles = events.map((e) => getDisplayTitle(e, from)).join(", ");
 
   const options: ChatPostMessageArguments = {
     channel: targetChannelId,
