@@ -1,6 +1,15 @@
 import { DateTime } from "luxon";
 import { EventData } from "../types/events";
 
+export type NEW_CalendarEvent = {
+  startAt: DateTime;
+  endAt: DateTime;
+  title: string;
+  description: string;
+  location: string;
+  isAllDay: boolean;
+};
+
 // TODO: 命名
 // Event が既にあるので使えない
 

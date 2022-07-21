@@ -1,6 +1,13 @@
 import { DateTime } from "luxon";
 import { ClassData } from "../types/classes";
 
+export type NEW_CalendarClass = {
+  startAt: DateTime;
+  endAt: DateTime;
+  title: string;
+  period: number;
+};
+
 // TODO: 命名
 // CalendarEvent に揃えてる
 
