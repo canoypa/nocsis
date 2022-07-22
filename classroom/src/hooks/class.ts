@@ -21,20 +21,23 @@ export const useDuringClass = (): DuringClassState => {
 
   // 進行中の授業があるかチェック
   const checkCurrentClass = useCallback(() => {
-    if (!classes.isEmpty) {
-      const date = getNewDate();
+    if (classes.isEmpty) {
+      setState({ during: false, classData: null });
+      return;
+    }
 
-      const currentClass = classes.items.find((v) =>
-        // date が授業時間内かのチェック
-        // endAt は排他的なので -1 しとく
-        Interval.fromDateTimes(v.startAt, v.endAt.minus(1)).contains(date)
-      );
+    const date = getNewDate();
 
-      if (currentClass) {
-        setState({ during: true, classData: currentClass });
-      } else {
-        setState({ during: false, classData: null });
-      }
+    const currentClass = classes.items.find((v) =>
+      // date が授業時間内かのチェック
+      // endAt は排他的なので -1 しとく
+      Interval.fromDateTimes(v.startAt, v.endAt.minus(1)).contains(date)
+    );
+
+    if (currentClass) {
+      setState({ during: true, classData: currentClass });
+    } else {
+      setState({ during: false, classData: null });
     }
   }, [classes]);
 
