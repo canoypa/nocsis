@@ -1,6 +1,7 @@
 import { HttpsError } from "firebase-functions/v1/https";
 import { DateTime } from "luxon";
 import { fetchCalendar } from "../../../core/calendar";
+import { encodeCalendarEvent } from "../../../core/calendar/encode";
 import { parseEvents } from "../../../core/calendar/parseEvents";
 import { EventData } from "../../../types/events";
 import { OnCallHandler } from "../../../types/functions";
@@ -44,7 +45,7 @@ const monthly: OnCallHandler<MonthlyEventsResponse> = async (data, context) => {
     const key = event.startAt.month.toString();
 
     const current = work.get(key) || [];
-    current.push(event.toJSON());
+    current.push(encodeCalendarEvent(event));
 
     work.set(key, current);
   });
