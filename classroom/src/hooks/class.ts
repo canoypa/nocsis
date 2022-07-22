@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useRecoilValueLoadable } from "recoil";
+import { useRecoilValue } from "recoil";
 import { ClassesSelector } from "../atoms/classes";
 import { getNewDate } from "../core/date";
 import { ClassData } from "../types/classes";
@@ -11,7 +11,7 @@ export type DuringClassState =
 
 /** 進行中の授業があるか管理する hook */
 export const useDuringClass = (): DuringClassState => {
-  const { state, contents: classes } = useRecoilValueLoadable(ClassesSelector);
+  const classes = useRecoilValue(ClassesSelector);
 
   const [_state, setState] = useState<DuringClassState>({
     during: false,
@@ -20,10 +20,6 @@ export const useDuringClass = (): DuringClassState => {
 
   // 進行中の授業があるかチェック
   const checkCurrentClass = useCallback(() => {
-    if (state !== "hasValue") {
-      return;
-    }
-
     if (!classes.isEmpty) {
       const date = getNewDate();
 
