@@ -10,7 +10,7 @@ export type DuringClassState =
   | { during: true; classData: ClassData }
   | { during: false; classData: null };
 
-/** 進行中の授業があるか管理する hook */
+/** 進行中の授業を確認する hook */
 export const useDuringClass = (): DuringClassState => {
   const classes = useRecoilValue(ClassesSelector);
 
