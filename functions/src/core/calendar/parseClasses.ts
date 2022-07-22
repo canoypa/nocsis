@@ -1,5 +1,5 @@
 import { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
-import { CalendarClass } from "../../models/class";
+import { CalendarClass } from "../../types/calendar";
 import { parseEventDate } from "./parseEventDate";
 
 export const parseClasses = (
@@ -8,11 +8,11 @@ export const parseClasses = (
   return items.map((v, i) => {
     const date = parseEventDate(v);
 
-    return new CalendarClass({
+    return {
       startAt: date.start,
       endAt: date.end,
       title: v.summary || "(No title)",
       period: i + 1,
-    });
+    };
   });
 };
