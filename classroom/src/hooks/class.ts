@@ -1,3 +1,4 @@
+import { Interval } from "luxon";
 import { useCallback, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { ClassesSelector } from "../atoms/classes";
@@ -23,11 +24,10 @@ export const useDuringClass = (): DuringClassState => {
     if (!classes.isEmpty) {
       const date = getNewDate();
 
-      // 進行中の授業を取得、なければ null
-      const currentClass = classes.items.find(
-        (v) =>
-          0 <= date.diff(v.startAt).as("milliseconds") &&
-          date.diff(v.endAt).as("milliseconds") <= 0
+      const currentClass = classes.items.find((v) =>
+        // date が授業時間内かのチェック
+        // endAt は排他的なので -1 しとく
+        Interval.fromDateTimes(v.startAt, v.endAt.minus(1)).contains(date)
       );
 
       if (currentClass) {
