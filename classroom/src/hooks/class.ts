@@ -14,7 +14,7 @@ export type DuringClassState =
 export const useDuringClass = (): DuringClassState => {
   const classes = useRecoilValue(ClassesSelector);
 
-  const [_state, setState] = useState<DuringClassState>({
+  const [state, setState] = useState<DuringClassState>({
     during: false,
     classData: null,
   });
@@ -40,5 +40,5 @@ export const useDuringClass = (): DuringClassState => {
 
   useIntervalEffect(checkCurrentClass, "minute", [checkCurrentClass]);
 
-  return _state;
+  return state;
 };
