@@ -1,6 +1,7 @@
 import { HttpsError } from "firebase-functions/v1/https";
 import { DateTime } from "luxon";
 import { fetchCalendar, FetchCalendarParams } from "../../../core/calendar";
+import { encodeCalendarClass } from "../../../core/calendar/encode";
 import { parseClasses } from "../../../core/calendar/parseClasses";
 import { Classes } from "../../../types/classes";
 import { OnCallHandler } from "../../../types/functions";
@@ -45,7 +46,7 @@ const get: OnCallHandler<Classes, Args> = async (data, context) => {
 
   return {
     isEmpty: classes.length === 0,
-    items: classes.map((v) => v.toJSON()),
+    items: classes.map((v) => encodeCalendarClass(v)),
   };
 };
 export default get;
