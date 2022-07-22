@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
-import { NEW_CalendarClass } from "../../models/class";
+import { NEW_CalendarClass } from "../../types/calendar";
 import { parseEventDate } from "./parseEventDate";
 
 export const parseClasses = (

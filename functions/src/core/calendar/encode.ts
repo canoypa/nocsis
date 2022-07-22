@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
-import { NEW_CalendarClass } from "../../models/class";
-import { NEW_CalendarEvent } from "../../models/event";
+import { NEW_CalendarClass, NEW_CalendarEvent } from "../../types/calendar";
 
 // TODO: 統一するとか...
 // firebase-functions でもエンコードされるのが気になる
