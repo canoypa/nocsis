@@ -1,5 +1,4 @@
-/* eslint-disable camelcase */
-import { NEW_CalendarClass, NEW_CalendarEvent } from "../../types/calendar";
+import { CalendarClass, CalendarEvent } from "../../types/calendar";
 
 // TODO: 統一するとか...
 // firebase-functions でもエンコードされるのが気になる
@@ -7,12 +6,12 @@ import { NEW_CalendarClass, NEW_CalendarEvent } from "../../types/calendar";
 
 // JSON 形式にエンコードする
 
-type EncodedCalendarClass = Omit<NEW_CalendarClass, "startAt" | "endAt"> & {
+type EncodedCalendarClass = Omit<CalendarClass, "startAt" | "endAt"> & {
   startAt: string;
   endAt: string;
 };
 export const encodeCalendarClass = (
-  event: NEW_CalendarClass
+  event: CalendarClass
 ): EncodedCalendarClass => {
   return {
     startAt: event.startAt.toISO(),
@@ -22,12 +21,12 @@ export const encodeCalendarClass = (
   };
 };
 
-type EncodedCalendarEvent = Omit<NEW_CalendarEvent, "startAt" | "endAt"> & {
+type EncodedCalendarEvent = Omit<CalendarEvent, "startAt" | "endAt"> & {
   startAt: string;
   endAt: string;
 };
 export const encodeCalendarEvent = (
-  event: NEW_CalendarEvent
+  event: CalendarEvent
 ): EncodedCalendarEvent => {
   return {
     startAt: event.startAt.toISO(),

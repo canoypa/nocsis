@@ -1,11 +1,10 @@
-/* eslint-disable camelcase */
 import { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
-import { NEW_CalendarClass } from "../../types/calendar";
+import { CalendarClass } from "../../types/calendar";
 import { parseEventDate } from "./parseEventDate";
 
 export const parseClasses = (
   items: CalendarV3.Schema$Event[]
-): NEW_CalendarClass[] => {
+): CalendarClass[] => {
   return items.map((v, i) => {
     const date = parseEventDate(v);
 

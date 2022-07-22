@@ -3,14 +3,14 @@ import { DateTime } from "luxon";
 // TODO: 命名
 // Class も Event も使いにくいので Calendar と付けてる
 
-export type NEW_CalendarClass = {
+export type CalendarClass = {
   startAt: DateTime;
   endAt: DateTime;
   title: string;
   period: number;
 };
 
-export type NEW_CalendarEvent = {
+export type CalendarEvent = {
   startAt: DateTime;
   endAt: DateTime;
   title: string;
