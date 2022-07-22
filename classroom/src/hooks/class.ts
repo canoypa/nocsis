@@ -13,8 +13,10 @@ export type DuringClassState =
 export const useDuringClass = (): DuringClassState => {
   const { state, contents: classes } = useRecoilValueLoadable(ClassesSelector);
 
-  const [during, setDuring] = useState<boolean>(false);
-  const [current, setCurrent] = useState<ClassData | null>(null);
+  const [_state, setState] = useState<DuringClassState>({
+    during: false,
+    classData: null,
+  });
 
   // 進行中の授業があるかチェック
   const checkCurrentClass = useCallback(() => {
@@ -33,18 +35,14 @@ export const useDuringClass = (): DuringClassState => {
       );
 
       if (currentClass) {
-        setCurrent(currentClass);
-        setDuring(true);
+        setState({ during: true, classData: currentClass });
       } else {
-        setDuring(false);
+        setState({ during: false, classData: null });
       }
     }
   }, [classes]);
 
   useIntervalEffect(checkCurrentClass, "minute", [checkCurrentClass]);
 
-  return {
-    during,
-    current,
-  };
+  return _state;
 };
