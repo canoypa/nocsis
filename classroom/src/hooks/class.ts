@@ -5,15 +5,12 @@ import { getNewDate } from "../core/date";
 import { ClassData } from "../types/classes";
 import { useIntervalEffect } from "./date";
 
-type UseClasses = () => {
-  /** 授業中か */
-  during: boolean;
-  /** 現行の授業 */
-  current: ClassData | null;
-};
+export type DuringClassState =
+  | { during: true; classData: ClassData }
+  | { during: false; classData: null };
 
 /** 進行中の授業があるか管理する hook */
-export const useDuringClass: UseClasses = () => {
+export const useDuringClass = (): DuringClassState => {
   const { state, contents: classes } = useRecoilValueLoadable(ClassesSelector);
 
   const [during, setDuring] = useState<boolean>(false);
