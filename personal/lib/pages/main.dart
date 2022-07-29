@@ -37,14 +37,6 @@ enum Navigation {
       orElse: () => Navigation.home,
     );
   }
-
-  NavigationDestination toNavigationDestination() {
-    return NavigationDestination(
-      label: label,
-      icon: Icon(icon),
-      selectedIcon: Icon(selectedIcon),
-    );
-  }
 }
 
 class MainPage extends StatelessWidget {
@@ -107,7 +99,13 @@ class MainPage extends StatelessWidget {
               ? NavigationBar(
                   selectedIndex: nav.index,
                   destinations: Navigation.values
-                      .map((e) => e.toNavigationDestination())
+                      .map(
+                        (e) => NavigationDestination(
+                          label: e.label,
+                          icon: Icon(e.icon),
+                          selectedIcon: Icon(e.selectedIcon),
+                        ),
+                      )
                       .toList(),
                   onDestinationSelected: (value) {
                     GoRouter.of(context)
