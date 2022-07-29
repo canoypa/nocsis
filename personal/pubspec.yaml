@@ -23,6 +23,7 @@ dependencies:
   intl: ^0.17.0
   collection: ^1.16.0
   animations: ^2.0.2
+  google_fonts: ^3.0.1
 
 dev_dependencies:
   flutter_test:
