@@ -79,18 +79,12 @@ class MainPage extends StatelessWidget {
                   labelType: NavigationRailLabelType.all,
                 ),
               Expanded(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 800),
-                    child: IndexedStack(
-                      index: nav.index,
-                      children: const [
-                        MainView(),
-                        EventsView(),
-                      ],
-                    ),
-                  ),
+                child: IndexedStack(
+                  index: nav.index,
+                  children: const [
+                    MainView(),
+                    EventsView(),
+                  ],
                 ),
               ),
             ],
