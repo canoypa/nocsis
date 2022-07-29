@@ -59,28 +59,64 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final nav = Navigation.fromPagePath(loc);
 
-    return Scaffold(
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: IndexedStack(
-            index: nav.index,
-            children: const [
-              MainView(),
-              EventsView(),
+    return LayoutBuilder(
+      builder: ((context, constraints) {
+        final bool isLargeScreen = constraints.minWidth >= 1200;
+
+        return Scaffold(
+          body: Row(
+            children: [
+              if (isLargeScreen)
+                NavigationRail(
+                  // top padding, but it doesn't look like it
+                  leading: const SizedBox(height: 8),
+                  selectedIndex: nav.index,
+                  destinations: Navigation.values
+                      .map(
+                        (e) => NavigationRailDestination(
+                          label: Text(e.label),
+                          icon: Icon(e.icon),
+                          selectedIcon: Icon(e.selectedIcon),
+                        ),
+                      )
+                      .toList(),
+                  onDestinationSelected: (value) {
+                    GoRouter.of(context)
+                        .go(Navigation.values[value].pagePath.path);
+                  },
+                  labelType: NavigationRailLabelType.all,
+                ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 800),
+                    child: IndexedStack(
+                      index: nav.index,
+                      children: const [
+                        MainView(),
+                        EventsView(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: nav.index,
-        destinations:
-            Navigation.values.map((e) => e.toNavigationDestination()).toList(),
-        onDestinationSelected: (value) {
-          GoRouter.of(context).go(Navigation.values[value].pagePath.path);
-        },
-      ),
+          bottomNavigationBar: !isLargeScreen
+              ? NavigationBar(
+                  selectedIndex: nav.index,
+                  destinations: Navigation.values
+                      .map((e) => e.toNavigationDestination())
+                      .toList(),
+                  onDestinationSelected: (value) {
+                    GoRouter.of(context)
+                        .go(Navigation.values[value].pagePath.path);
+                  },
+                )
+              : null,
+        );
+      }),
     );
   }
 }
