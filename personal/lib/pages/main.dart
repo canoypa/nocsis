@@ -100,6 +100,7 @@ class MainPage extends StatelessWidget {
               if (isLargeScreen) buildNavRail(context, nav),
               Expanded(
                 child: IndexedStack(
+                  key: ValueKey(nav.pagePath),
                   index: nav.index,
                   children: const [
                     MainView(),
