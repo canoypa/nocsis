@@ -21,7 +21,7 @@ class _MainViewState extends State<MainView> {
 
   _MainViewState() {
     // 日本時間のエポック日を取得するため +9 時間
-    final nowEpoch = DateTime.now().add(zoneDiff).millisecondsSinceEpoch;
+    final nowEpoch = DateTime(2022, 7, 22).add(zoneDiff).millisecondsSinceEpoch;
 
     _epochDay = (nowEpoch / Duration.millisecondsPerDay).floor();
 
@@ -38,39 +38,52 @@ class _MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 800),
-          child: ToggleDay(
-            label: DateFormat("M月d日 (E)", "ja_JP").format(
-              _parseEpochDay(_epochDay),
+        Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: ToggleDay(
+              label: DateFormat("M月d日 (E)", "ja_JP").format(
+                _parseEpochDay(_epochDay),
+              ),
+              onClickLeft: () {
+                controller.previousPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                );
+              },
+              onClickRight: () {
+                controller.nextPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                );
+              },
             ),
-            onClickLeft: () {
-              controller.previousPage(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutCubic,
-              );
-            },
-            onClickRight: () {
-              controller.nextPage(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOutCubic,
-              );
-            },
           ),
         ),
         Expanded(
-          flex: 1,
           child: PageView.builder(
             controller: controller,
             itemBuilder: (context, index) {
               // スワイプ範囲は表示範囲全体にするため、子要素のみサイズ制限
-              return Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  child: DaySchedule(epochDay: index),
-                ),
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: 800,
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: DaySchedule(epochDay: index),
+                      ),
+                    ),
+                  );
+                },
               );
             },
             onPageChanged: (value) {
