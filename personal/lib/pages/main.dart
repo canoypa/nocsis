@@ -47,7 +47,7 @@ class MainPage extends StatelessWidget {
     required this.loc,
   });
 
-  Widget buildNavRail(BuildContext context, Navigation navigation) {
+  Widget _buildNavRail(BuildContext context, Navigation navigation) {
     return NavigationRail(
       // top padding, but it doesn't look like it
       leading: const SizedBox(height: 8),
@@ -68,7 +68,7 @@ class MainPage extends StatelessWidget {
     );
   }
 
-  Widget buildNavBar(BuildContext context, Navigation navigation) {
+  Widget _buildNavBar(BuildContext context, Navigation navigation) {
     return NavigationBar(
       selectedIndex: navigation.index,
       destinations: Navigation.values
@@ -97,7 +97,7 @@ class MainPage extends StatelessWidget {
         return Scaffold(
           body: Row(
             children: [
-              if (isLargeScreen) buildNavRail(context, nav),
+              if (isLargeScreen) _buildNavRail(context, nav),
               Expanded(
                 child: IndexedStack(
                   key: ValueKey(nav.pagePath),
@@ -111,7 +111,7 @@ class MainPage extends StatelessWidget {
             ],
           ),
           bottomNavigationBar:
-              !isLargeScreen ? buildNavBar(context, nav) : null,
+              !isLargeScreen ? _buildNavBar(context, nav) : null,
         );
       }),
     );
