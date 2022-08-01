@@ -21,7 +21,7 @@ class _MainViewState extends State<MainView> {
 
   _MainViewState() {
     // 日本時間のエポック日を取得するため +9 時間
-    final nowEpoch = DateTime(2022, 7, 22).add(zoneDiff).millisecondsSinceEpoch;
+    final nowEpoch = DateTime.now().add(zoneDiff).millisecondsSinceEpoch;
 
     _epochDay = (nowEpoch / Duration.millisecondsPerDay).floor();
 
