@@ -1,5 +1,5 @@
 import { DateTime, Interval } from "luxon";
-import { CalendarEvent } from "../../models/event";
+import { CalendarEvent } from "../../types/calendar";
 import { isMultipleDays } from "./utils";
 
 /**

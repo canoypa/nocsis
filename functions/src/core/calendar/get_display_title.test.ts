@@ -1,17 +1,20 @@
 import { DateTime } from "luxon";
-import { CalendarEvent } from "../../models/event";
+import { CalendarEvent } from "../../types/calendar";
 import { getDisplayTitle } from "./get_display_title";
 
 const d = DateTime.fromObject;
-const c = (startAt: DateTime, endAt: DateTime, isAllDay?: boolean) =>
-  new CalendarEvent({
-    startAt: startAt,
-    endAt: endAt,
-    title: "TITLE",
-    description: "",
-    location: "",
-    isAllDay: isAllDay ?? false,
-  });
+const c = (
+  startAt: DateTime,
+  endAt: DateTime,
+  isAllDay?: boolean
+): CalendarEvent => ({
+  startAt: startAt,
+  endAt: endAt,
+  title: "TITLE",
+  description: "",
+  location: "",
+  isAllDay: isAllDay ?? false,
+});
 
 describe("getDisplayTitle", () => {
   test("通常イベント", () => {
