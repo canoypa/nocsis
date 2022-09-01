@@ -106,14 +106,12 @@ class DaySchedule extends ConsumerWidget {
             );
           }
 
-          return SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                if (!data.classes.isEmpty) ClassList(items: data.classes.items),
-                if (!data.events.isEmpty) EventList(items: data.events.items),
-              ],
-            ),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!data.classes.isEmpty) ClassList(items: data.classes.items),
+              if (!data.events.isEmpty) EventList(items: data.events.items),
+            ],
           );
         }
 
