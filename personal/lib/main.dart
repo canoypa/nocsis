@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
       color: const Color(0x001c1b1f),
       theme: lightTheme,
       darkTheme: darkTheme,
+      routeInformationProvider: router.routeInformationProvider,
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
     );
