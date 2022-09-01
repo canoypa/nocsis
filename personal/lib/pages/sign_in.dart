@@ -42,7 +42,7 @@ class SignInPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 48),
-              OutlinedButton(
+              FilledButton(
                 onPressed: () => _signIn(context),
                 style: ButtonStyle(
                   padding: MaterialStateProperty.all<EdgeInsets>(
