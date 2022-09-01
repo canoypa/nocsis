@@ -47,6 +47,45 @@ class MainPage extends StatelessWidget {
     required this.loc,
   });
 
+  Widget _buildNavRail(BuildContext context, Navigation navigation) {
+    return NavigationRail(
+      // top padding, but it doesn't look like it
+      leading: const SizedBox(height: 8),
+      selectedIndex: navigation.index,
+      destinations: Navigation.values
+          .map(
+            (e) => NavigationRailDestination(
+              label: Text(e.label),
+              icon: Icon(e.icon),
+              selectedIcon: Icon(e.selectedIcon),
+            ),
+          )
+          .toList(),
+      onDestinationSelected: (value) {
+        GoRouter.of(context).go(Navigation.values[value].pagePath.path);
+      },
+      labelType: NavigationRailLabelType.all,
+    );
+  }
+
+  Widget _buildNavBar(BuildContext context, Navigation navigation) {
+    return NavigationBar(
+      selectedIndex: navigation.index,
+      destinations: Navigation.values
+          .map(
+            (e) => NavigationDestination(
+              label: e.label,
+              icon: Icon(e.icon),
+              selectedIcon: Icon(e.selectedIcon),
+            ),
+          )
+          .toList(),
+      onDestinationSelected: (value) {
+        GoRouter.of(context).go(Navigation.values[value].pagePath.path);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final nav = Navigation.fromPagePath(loc);
@@ -58,61 +97,21 @@ class MainPage extends StatelessWidget {
         return Scaffold(
           body: Row(
             children: [
-              if (isLargeScreen)
-                NavigationRail(
-                  // top padding, but it doesn't look like it
-                  leading: const SizedBox(height: 8),
-                  selectedIndex: nav.index,
-                  destinations: Navigation.values
-                      .map(
-                        (e) => NavigationRailDestination(
-                          label: Text(e.label),
-                          icon: Icon(e.icon),
-                          selectedIcon: Icon(e.selectedIcon),
-                        ),
-                      )
-                      .toList(),
-                  onDestinationSelected: (value) {
-                    GoRouter.of(context)
-                        .go(Navigation.values[value].pagePath.path);
-                  },
-                  labelType: NavigationRailLabelType.all,
-                ),
+              if (isLargeScreen) _buildNavRail(context, nav),
               Expanded(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 800),
-                    child: IndexedStack(
-                      index: nav.index,
-                      children: const [
-                        MainView(),
-                        EventsView(),
-                      ],
-                    ),
-                  ),
+                child: IndexedStack(
+                  key: ValueKey(nav.pagePath),
+                  index: nav.index,
+                  children: const [
+                    MainView(),
+                    EventsView(),
+                  ],
                 ),
               ),
             ],
           ),
-          bottomNavigationBar: !isLargeScreen
-              ? NavigationBar(
-                  selectedIndex: nav.index,
-                  destinations: Navigation.values
-                      .map(
-                        (e) => NavigationDestination(
-                          label: e.label,
-                          icon: Icon(e.icon),
-                          selectedIcon: Icon(e.selectedIcon),
-                        ),
-                      )
-                      .toList(),
-                  onDestinationSelected: (value) {
-                    GoRouter.of(context)
-                        .go(Navigation.values[value].pagePath.path);
-                  },
-                )
-              : null,
+          bottomNavigationBar:
+              !isLargeScreen ? _buildNavBar(context, nav) : null,
         );
       }),
     );
