@@ -9,7 +9,7 @@ import {
   SectionBlock,
 } from "@slack/web-api";
 import { DateTime } from "luxon";
-import { CalendarEvent } from "../../models/event";
+import { CalendarEvent } from "../../types/calendar";
 import { getDisplayTimeRange } from "./get_display_time_range";
 import { getDisplayTitle } from "./get_display_title";
 
