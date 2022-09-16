@@ -86,7 +86,7 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = RouteState.of(context).route.path;
+    final loc = RouteState.of(context).activeChild!.path;
     final nav = Navigation.fromPagePath(loc);
 
     return LayoutBuilder(
