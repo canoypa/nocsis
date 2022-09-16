@@ -1,8 +1,7 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:go_router_prototype/go_router_prototype.dart';
 import 'package:nocsis_personal/core/router.dart';
-import 'package:nocsis_personal/widget/events_view.dart';
-import 'package:nocsis_personal/widget/main_view.dart';
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {
@@ -40,11 +39,11 @@ enum Navigation {
 }
 
 class MainPage extends StatelessWidget {
-  final String loc;
+  final Widget child;
 
   const MainPage({
     super.key,
-    required this.loc,
+    required this.child,
   });
 
   Widget _buildNavRail(BuildContext context, Navigation navigation) {
@@ -62,7 +61,7 @@ class MainPage extends StatelessWidget {
           )
           .toList(),
       onDestinationSelected: (value) {
-        GoRouter.of(context).go(Navigation.values[value].pagePath.path);
+        RouteState.of(context).goTo(Navigation.values[value].pagePath.path);
       },
       labelType: NavigationRailLabelType.all,
     );
@@ -81,13 +80,14 @@ class MainPage extends StatelessWidget {
           )
           .toList(),
       onDestinationSelected: (value) {
-        GoRouter.of(context).go(Navigation.values[value].pagePath.path);
+        RouteState.of(context).goTo(Navigation.values[value].pagePath.path);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final loc = RouteState.of(context).activeChild!.path;
     final nav = Navigation.fromPagePath(loc);
 
     return LayoutBuilder(
@@ -99,13 +99,15 @@ class MainPage extends StatelessWidget {
             children: [
               if (isLargeScreen) _buildNavRail(context, nav),
               Expanded(
-                child: IndexedStack(
-                  key: ValueKey(nav.pagePath),
-                  index: nav.index,
-                  children: const [
-                    MainView(),
-                    EventsView(),
-                  ],
+                child: PageTransitionSwitcher(
+                  transitionBuilder: (child, animation, secondaryAnimation) {
+                    return FadeThroughTransition(
+                      animation: animation,
+                      secondaryAnimation: secondaryAnimation,
+                      child: child,
+                    );
+                  },
+                  child: child,
                 ),
               ),
             ],
