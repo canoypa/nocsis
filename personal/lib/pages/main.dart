@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router_prototype/go_router_prototype.dart';
 import 'package:nocsis_personal/core/router.dart';
@@ -97,7 +98,18 @@ class MainPage extends StatelessWidget {
           body: Row(
             children: [
               if (isLargeScreen) _buildNavRail(context, nav),
-              Expanded(child: child),
+              Expanded(
+                child: PageTransitionSwitcher(
+                  transitionBuilder: (child, animation, secondaryAnimation) {
+                    return FadeThroughTransition(
+                      animation: animation,
+                      secondaryAnimation: secondaryAnimation,
+                      child: child,
+                    );
+                  },
+                  child: child,
+                ),
+              ),
             ],
           ),
           bottomNavigationBar:
