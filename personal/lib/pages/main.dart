@@ -99,10 +99,21 @@ class MainPage extends StatelessWidget {
               if (isLargeScreen) _buildNavRail(context, nav),
               Expanded(
                 child: PageTransitionSwitcher(
+                  reverse: !isLargeScreen &&
+                      nav.index < 1, // TODO: 以前の index から判定するようにする
                   transitionBuilder: (child, animation, secondaryAnimation) {
-                    return FadeThroughTransition(
+                    if (isLargeScreen) {
+                      return FadeThroughTransition(
+                        animation: animation,
+                        secondaryAnimation: secondaryAnimation,
+                        child: child,
+                      );
+                    }
+
+                    return SharedAxisTransition(
                       animation: animation,
                       secondaryAnimation: secondaryAnimation,
+                      transitionType: SharedAxisTransitionType.horizontal,
                       child: child,
                     );
                   },
