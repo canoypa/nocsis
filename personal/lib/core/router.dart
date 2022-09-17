@@ -8,16 +8,6 @@ import 'package:nocsis_personal/pages/sign_in.dart';
 import 'package:nocsis_personal/widget/events_view.dart';
 import 'package:nocsis_personal/widget/main_view.dart';
 
-enum PagePath {
-  home("home"),
-  events("events"),
-  signin("/signin");
-
-  final String path;
-
-  const PagePath(this.path);
-}
-
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _subscription;
 
@@ -47,8 +37,8 @@ final router = GoRouter(
 
         final loc = state.path;
 
-        if (!isSignIn && loc != PagePath.signin.path) {
-          return PagePath.signin.path;
+        if (!isSignIn && loc != "/signin") {
+          return "/signin";
         }
 
         return null;
@@ -58,13 +48,13 @@ final router = GoRouter(
       },
       routes: [
         StackedRoute(
-          path: PagePath.home.path,
+          path: "home",
           builder: (context) {
             return const MainView();
           },
         ),
         StackedRoute(
-          path: PagePath.events.path,
+          path: "events",
           builder: (context) {
             return const EventsView();
           },
@@ -72,14 +62,14 @@ final router = GoRouter(
       ],
     ),
     StackedRoute(
-      path: PagePath.signin.path,
+      path: "/signin",
       redirect: (state) async {
         final user = await FirebaseAuth.instance.authStateChanges().first;
         final isSignIn = user != null;
 
         final loc = state.path;
 
-        if (isSignIn && loc == PagePath.signin.path) {
+        if (isSignIn && loc == "/signin") {
           return "/";
         }
 

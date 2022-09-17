@@ -1,7 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router_prototype/go_router_prototype.dart';
-import 'package:nocsis_personal/core/router.dart';
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {
@@ -9,19 +8,19 @@ enum Navigation {
     label: "ホーム",
     icon: Icons.school_outlined,
     selectedIcon: Icons.school,
-    pagePath: PagePath.home,
+    pagePath: "home",
   ),
   events(
     label: "イベント",
     icon: Icons.event_outlined,
     selectedIcon: Icons.event,
-    pagePath: PagePath.events,
+    pagePath: "events",
   );
 
   final String label;
   final IconData icon;
   final IconData selectedIcon;
-  final PagePath pagePath;
+  final String pagePath;
 
   const Navigation({
     required this.label,
@@ -32,7 +31,7 @@ enum Navigation {
 
   factory Navigation.fromPagePath(String location) {
     return values.firstWhere(
-      (element) => element.pagePath.path == location,
+      (element) => element.pagePath == location,
       orElse: () => Navigation.home,
     );
   }
@@ -61,7 +60,7 @@ class MainPage extends StatelessWidget {
           )
           .toList(),
       onDestinationSelected: (value) {
-        RouteState.of(context).goTo(Navigation.values[value].pagePath.path);
+        RouteState.of(context).goTo(Navigation.values[value].pagePath);
       },
       labelType: NavigationRailLabelType.all,
     );
@@ -80,7 +79,7 @@ class MainPage extends StatelessWidget {
           )
           .toList(),
       onDestinationSelected: (value) {
-        RouteState.of(context).goTo(Navigation.values[value].pagePath.path);
+        RouteState.of(context).goTo(Navigation.values[value].pagePath);
       },
     );
   }
