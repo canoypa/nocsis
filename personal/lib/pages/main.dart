@@ -99,8 +99,6 @@ class MainPage extends StatelessWidget {
               if (isLargeScreen) _buildNavRail(context, nav),
               Expanded(
                 child: PageTransitionSwitcher(
-                  reverse: !isLargeScreen &&
-                      nav.index < 1, // TODO: 以前の index から判定するようにする
                   transitionBuilder: (child, animation, secondaryAnimation) {
                     if (isLargeScreen) {
                       return FadeThroughTransition(
@@ -113,7 +111,7 @@ class MainPage extends StatelessWidget {
                     return SharedAxisTransition(
                       animation: animation,
                       secondaryAnimation: secondaryAnimation,
-                      transitionType: SharedAxisTransitionType.horizontal,
+                      transitionType: SharedAxisTransitionType.vertical,
                       child: child,
                     );
                   },
