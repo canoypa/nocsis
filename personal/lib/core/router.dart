@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router_prototype/go_router_prototype.dart';
-import 'package:nocsis_personal/pages/main.dart';
-import 'package:nocsis_personal/pages/sign_in.dart';
-import 'package:nocsis_personal/widget/events_view.dart';
-import 'package:nocsis_personal/widget/main_view.dart';
+import 'package:nocsis_personal/pages/main/events/page.dart';
+import 'package:nocsis_personal/pages/main/home/page.dart';
+import 'package:nocsis_personal/pages/main/layout.dart';
+import 'package:nocsis_personal/pages/signin/page.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _subscription;
