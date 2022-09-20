@@ -2,8 +2,8 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:nocsis_personal/components/basic_card.dart';
 import 'package:nocsis_personal/models/monthly_events/monthly_events.dart';
-import 'package:nocsis_personal/widget/basic_card.dart';
 
 final eventsProvider = FutureProvider<MonthlyEvents>((ref) async {
   final DateTime now = DateTime.now();

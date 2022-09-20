@@ -3,20 +3,10 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router_prototype/go_router_prototype.dart';
-import 'package:nocsis_personal/pages/main.dart';
-import 'package:nocsis_personal/pages/sign_in.dart';
-import 'package:nocsis_personal/widget/events_view.dart';
-import 'package:nocsis_personal/widget/main_view.dart';
-
-enum PagePath {
-  home("home"),
-  events("events"),
-  signin("/signin");
-
-  final String path;
-
-  const PagePath(this.path);
-}
+import 'package:nocsis_personal/pages/main/events/page.dart';
+import 'package:nocsis_personal/pages/main/home/page.dart';
+import 'package:nocsis_personal/pages/main/layout.dart';
+import 'package:nocsis_personal/pages/signin/page.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _subscription;
@@ -45,10 +35,8 @@ final router = GoRouter(
         final user = await FirebaseAuth.instance.authStateChanges().first;
         final isSignIn = user != null;
 
-        final loc = state.path;
-
-        if (!isSignIn && loc != PagePath.signin.path) {
-          return PagePath.signin.path;
+        if (!isSignIn) {
+          return "/signin?continue=${state.path}";
         }
 
         return null;
@@ -58,13 +46,13 @@ final router = GoRouter(
       },
       routes: [
         StackedRoute(
-          path: PagePath.home.path,
+          path: "home",
           builder: (context) {
             return const MainView();
           },
         ),
         StackedRoute(
-          path: PagePath.events.path,
+          path: "events",
           builder: (context) {
             return const EventsView();
           },
@@ -72,14 +60,19 @@ final router = GoRouter(
       ],
     ),
     StackedRoute(
-      path: PagePath.signin.path,
+      path: "/signin",
       redirect: (state) async {
         final user = await FirebaseAuth.instance.authStateChanges().first;
         final isSignIn = user != null;
 
-        final loc = state.path;
+        final continueUri = state.parameters.query["continue"];
+        final validUriPattern = RegExp(r"^/.+$");
 
-        if (isSignIn && loc == PagePath.signin.path) {
+        if (isSignIn) {
+          if (continueUri is String && validUriPattern.hasMatch(continueUri)) {
+            return continueUri;
+          }
+
           return "/";
         }
 

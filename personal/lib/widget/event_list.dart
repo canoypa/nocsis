@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:nocsis_personal/components/basic_card.dart';
 import 'package:nocsis_personal/models/calendar_event/calendar_event.dart';
-import 'package:nocsis_personal/widget/basic_card.dart';
 
 class EventList extends StatelessWidget {
   final List<CalendarEvent> items;

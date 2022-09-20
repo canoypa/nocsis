@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 
+final _baseTheme = ThemeData(
+  // フォントに Noto Sans JP を使用
+  fontFamily: "Noto Sans JP",
+
+  // Material 3
+  useMaterial3: true,
+  colorSchemeSeed: const Color(0x005c6bc0),
+);
+
 ThemeData _createTheme({
   required ThemeMode mode,
 }) {
-  return ThemeData(
+  return _baseTheme.copyWith(
     // テーマ
     brightness: mode == ThemeMode.dark ? Brightness.dark : Brightness.light,
-    // フォントに Noto Sans JP を使用
-    fontFamily: "Noto Sans JP",
-
-    // Material 3
-    useMaterial3: true,
-    colorSchemeSeed: const Color(0x005c6bc0),
   );
 }
 
