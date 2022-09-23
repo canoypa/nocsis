@@ -1,6 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router_prototype/go_router_prototype.dart';
+import 'package:go_router/go_router.dart';
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {
@@ -8,13 +8,13 @@ enum Navigation {
     label: "ホーム",
     icon: Icons.school_outlined,
     selectedIcon: Icons.school,
-    pagePath: "home",
+    pagePath: "/",
   ),
   events(
     label: "イベント",
     icon: Icons.event_outlined,
     selectedIcon: Icons.event,
-    pagePath: "events",
+    pagePath: "/events",
   );
 
   final String label;
@@ -39,10 +39,12 @@ enum Navigation {
 
 class MainPage extends StatelessWidget {
   final Widget child;
+  final String location;
 
   const MainPage({
     super.key,
     required this.child,
+    required this.location,
   });
 
   Widget _buildNavRail(BuildContext context, Navigation navigation) {
@@ -60,7 +62,7 @@ class MainPage extends StatelessWidget {
           )
           .toList(),
       onDestinationSelected: (value) {
-        RouteState.of(context).goTo(Navigation.values[value].pagePath);
+        GoRouter.of(context).go(Navigation.values[value].pagePath);
       },
       labelType: NavigationRailLabelType.all,
     );
@@ -79,15 +81,14 @@ class MainPage extends StatelessWidget {
           )
           .toList(),
       onDestinationSelected: (value) {
-        RouteState.of(context).goTo(Navigation.values[value].pagePath);
+        GoRouter.of(context).go(Navigation.values[value].pagePath);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final loc = RouteState.of(context).activeChild!.path;
-    final nav = Navigation.fromPagePath(loc);
+    final nav = Navigation.fromPagePath(location);
 
     return LayoutBuilder(
       builder: ((context, constraints) {
