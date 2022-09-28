@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -99,25 +98,26 @@ class MainPage extends StatelessWidget {
             children: [
               if (isLargeScreen) _buildNavRail(context, nav),
               Expanded(
-                child: PageTransitionSwitcher(
-                  transitionBuilder: (child, animation, secondaryAnimation) {
-                    if (isLargeScreen) {
-                      return FadeThroughTransition(
-                        animation: animation,
-                        secondaryAnimation: secondaryAnimation,
-                        child: child,
-                      );
-                    }
+                child: child,
+                // child: PageTransitionSwitcher(
+                //   transitionBuilder: (child, animation, secondaryAnimation) {
+                //     if (isLargeScreen) {
+                //       return FadeThroughTransition(
+                //         animation: animation,
+                //         secondaryAnimation: secondaryAnimation,
+                //         child: child,
+                //       );
+                //     }
 
-                    return SharedAxisTransition(
-                      animation: animation,
-                      secondaryAnimation: secondaryAnimation,
-                      transitionType: SharedAxisTransitionType.vertical,
-                      child: child,
-                    );
-                  },
-                  child: child,
-                ),
+                //     return SharedAxisTransition(
+                //       animation: animation,
+                //       secondaryAnimation: secondaryAnimation,
+                //       transitionType: SharedAxisTransitionType.vertical,
+                //       child: child,
+                //     );
+                //   },
+                //   child: child,
+                // ),
               ),
             ],
           ),

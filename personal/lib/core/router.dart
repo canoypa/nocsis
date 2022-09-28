@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -50,31 +51,60 @@ final router = GoRouter(
   },
   routes: [
     ShellRoute(
-      builder: (context, state, child) {
-        return MainPage(
-          location: state.subloc,
-          child: child,
+      pageBuilder: (context, state, child) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: MainPage(
+            location: state.subloc,
+            child: child,
+          ),
         );
       },
       routes: [
         GoRoute(
           path: "/",
-          builder: (context, state) {
-            return const MainView();
+          pageBuilder: (context, state) {
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const MainView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return SharedAxisTransition(
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  transitionType: SharedAxisTransitionType.vertical,
+                  child: child,
+                );
+              },
+            );
           },
         ),
         GoRoute(
           path: "/events",
-          builder: (context, state) {
-            return const EventsView();
+          pageBuilder: (context, state) {
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const EventsView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return SharedAxisTransition(
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  transitionType: SharedAxisTransitionType.vertical,
+                  child: child,
+                );
+              },
+            );
           },
         )
       ],
     ),
     GoRoute(
       path: "/signin",
-      builder: (context, state) {
-        return const SignInPage();
+      pageBuilder: (context, state) {
+        return const MaterialPage(
+          child: SignInPage(),
+        );
       },
     ),
   ],
