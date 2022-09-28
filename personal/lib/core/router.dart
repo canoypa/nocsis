@@ -64,15 +64,25 @@ final router = GoRouter(
         GoRoute(
           path: "/",
           pageBuilder: (context, state) {
+            final isMobile = MediaQuery.of(context).size.width < 1200;
+
             return CustomTransitionPage(
               key: state.pageKey,
               child: const MainView(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return SharedAxisTransition(
+                if (isMobile) {
+                  return SharedAxisTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.vertical,
+                    child: child,
+                  );
+                }
+
+                return FadeThroughTransition(
                   animation: animation,
                   secondaryAnimation: secondaryAnimation,
-                  transitionType: SharedAxisTransitionType.vertical,
                   child: child,
                 );
               },
@@ -82,15 +92,25 @@ final router = GoRouter(
         GoRoute(
           path: "/events",
           pageBuilder: (context, state) {
+            final isMobile = MediaQuery.of(context).size.width < 1200;
+
             return CustomTransitionPage(
               key: state.pageKey,
               child: const EventsView(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return SharedAxisTransition(
+                if (isMobile) {
+                  return SharedAxisTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.vertical,
+                    child: child,
+                  );
+                }
+
+                return FadeThroughTransition(
                   animation: animation,
                   secondaryAnimation: secondaryAnimation,
-                  transitionType: SharedAxisTransitionType.vertical,
                   child: child,
                 );
               },

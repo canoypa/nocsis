@@ -97,28 +97,7 @@ class MainPage extends StatelessWidget {
           body: Row(
             children: [
               if (isLargeScreen) _buildNavRail(context, nav),
-              Expanded(
-                child: child,
-                // child: PageTransitionSwitcher(
-                //   transitionBuilder: (child, animation, secondaryAnimation) {
-                //     if (isLargeScreen) {
-                //       return FadeThroughTransition(
-                //         animation: animation,
-                //         secondaryAnimation: secondaryAnimation,
-                //         child: child,
-                //       );
-                //     }
-
-                //     return SharedAxisTransition(
-                //       animation: animation,
-                //       secondaryAnimation: secondaryAnimation,
-                //       transitionType: SharedAxisTransitionType.vertical,
-                //       child: child,
-                //     );
-                //   },
-                //   child: child,
-                // ),
-              ),
+              Expanded(child: child),
             ],
           ),
           bottomNavigationBar:
