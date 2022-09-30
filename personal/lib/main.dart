@@ -28,8 +28,7 @@ class MyApp extends StatelessWidget {
       color: const Color(0x001c1b1f),
       theme: lightTheme,
       darkTheme: darkTheme,
-      routeInformationParser: router.parser,
-      routerDelegate: router.delegate,
+      routerConfig: router,
       builder: (_, child) => AppLayout(child: child!),
     );
   }

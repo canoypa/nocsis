@@ -1,89 +1,133 @@
 import 'dart:async';
 
+import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router_prototype/go_router_prototype.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nocsis_personal/pages/main/events/page.dart';
 import 'package:nocsis_personal/pages/main/home/page.dart';
 import 'package:nocsis_personal/pages/main/layout.dart';
 import 'package:nocsis_personal/pages/signin/page.dart';
 
-class GoRouterRefreshStream extends ChangeNotifier {
-  late final StreamSubscription<dynamic> _subscription;
+class GoRouterRefresher extends ChangeNotifier {
+  late final StreamSubscription<dynamic> _auth;
 
-  GoRouterRefreshStream(Stream<dynamic> stream) {
+  GoRouterRefresher() {
     notifyListeners();
 
-    _subscription = stream.asBroadcastStream().listen(
-          (dynamic _) => notifyListeners(),
-        );
+    _auth = FirebaseAuth.instance
+        .authStateChanges()
+        .asBroadcastStream()
+        .listen((_) => notifyListeners());
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _auth.cancel();
     super.dispose();
   }
 }
 
 final router = GoRouter(
+  redirect: (context, state) async {
+    final user = await FirebaseAuth.instance.authStateChanges().first;
+    final isSignIn = user != null;
+
+    if (!isSignIn && state.subloc != "/signin") {
+      return "/signin?continue=${state.path}";
+    }
+
+    if (isSignIn && state.subloc == "/signin") {
+      final continueUri = state.queryParams["continue"];
+      final validUriPattern = RegExp(r"^/.+$");
+
+      if (continueUri is String && validUriPattern.hasMatch(continueUri)) {
+        return continueUri;
+      }
+
+      return "/";
+    }
+
+    return null;
+  },
   routes: [
     ShellRoute(
-      path: "/",
-      defaultRoute: "home",
-      redirect: (state) async {
-        final user = await FirebaseAuth.instance.authStateChanges().first;
-        final isSignIn = user != null;
-
-        if (!isSignIn) {
-          return "/signin?continue=${state.path}";
-        }
-
-        return null;
-      },
-      builder: (context, child) {
-        return MainPage(child: child);
+      pageBuilder: (context, state, child) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: MainPage(
+            location: state.subloc,
+            child: child,
+          ),
+        );
       },
       routes: [
-        StackedRoute(
-          path: "home",
-          builder: (context) {
-            return const MainView();
+        GoRoute(
+          path: "/",
+          pageBuilder: (context, state) {
+            final isMobile = MediaQuery.of(context).size.width < 1200;
+
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const MainView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                if (isMobile) {
+                  return SharedAxisTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.vertical,
+                    child: child,
+                  );
+                }
+
+                return FadeThroughTransition(
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  child: child,
+                );
+              },
+            );
           },
         ),
-        StackedRoute(
-          path: "events",
-          builder: (context) {
-            return const EventsView();
+        GoRoute(
+          path: "/events",
+          pageBuilder: (context, state) {
+            final isMobile = MediaQuery.of(context).size.width < 1200;
+
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const EventsView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                if (isMobile) {
+                  return SharedAxisTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.vertical,
+                    child: child,
+                  );
+                }
+
+                return FadeThroughTransition(
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  child: child,
+                );
+              },
+            );
           },
         )
       ],
     ),
-    StackedRoute(
+    GoRoute(
       path: "/signin",
-      redirect: (state) async {
-        final user = await FirebaseAuth.instance.authStateChanges().first;
-        final isSignIn = user != null;
-
-        final continueUri = state.parameters.query["continue"];
-        final validUriPattern = RegExp(r"^/.+$");
-
-        if (isSignIn) {
-          if (continueUri is String && validUriPattern.hasMatch(continueUri)) {
-            return continueUri;
-          }
-
-          return "/";
-        }
-
-        return null;
+      pageBuilder: (context, state) {
+        return const MaterialPage(
+          child: SignInPage(),
+        );
       },
-      builder: (context) {
-        return const SignInPage();
-      },
-    )
+    ),
   ],
-  refreshListenable: GoRouterRefreshStream(
-    FirebaseAuth.instance.authStateChanges(),
-  ),
+  refreshListenable: GoRouterRefresher(),
 );
