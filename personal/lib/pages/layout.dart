@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -20,6 +21,8 @@ class AppLayout extends StatelessWidget {
           [
             // DateTime の日本語フォーマット初期化
             initializeDateFormatting("ja_JP"),
+            // 最初の認証を待つ
+            FirebaseAuth.instance.authStateChanges().first,
           ],
         ),
         builder: (context, snapshot) {
