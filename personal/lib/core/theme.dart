@@ -4,14 +4,14 @@ ThemeData _createTheme({
   required ThemeMode mode,
 }) {
   return ThemeData(
-    // テーマ
-    brightness: mode == ThemeMode.dark ? Brightness.dark : Brightness.light,
     // フォントに Noto Sans JP を使用
     fontFamily: "Noto Sans JP",
 
     // Material 3
     useMaterial3: true,
     colorSchemeSeed: const Color(0x005c6bc0),
+
+    brightness: mode == ThemeMode.dark ? Brightness.dark : Brightness.light,
   );
 }
 

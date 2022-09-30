@@ -1,11 +1,16 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:nocsis_personal/core/router.dart';
 import 'package:nocsis_personal/core/theme.dart';
 import 'package:nocsis_personal/firebase_options.dart';
+import 'package:nocsis_personal/pages/layout.dart';
 
 void main() async {
+  // url をパス形式にする
+  usePathUrlStrategy();
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -23,8 +28,8 @@ class MyApp extends StatelessWidget {
       color: const Color(0x001c1b1f),
       theme: lightTheme,
       darkTheme: darkTheme,
-      routeInformationParser: router.routeInformationParser,
-      routerDelegate: router.routerDelegate,
+      routerConfig: router,
+      builder: (_, child) => AppLayout(child: child!),
     );
   }
 }
