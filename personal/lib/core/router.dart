@@ -9,20 +9,21 @@ import 'package:nocsis_personal/pages/main/home/page.dart';
 import 'package:nocsis_personal/pages/main/layout.dart';
 import 'package:nocsis_personal/pages/signin/page.dart';
 
-class GoRouterRefreshStream extends ChangeNotifier {
-  late final StreamSubscription<dynamic> _subscription;
+class GoRouterRefresher extends ChangeNotifier {
+  late final StreamSubscription<dynamic> _auth;
 
-  GoRouterRefreshStream(Stream<dynamic> stream) {
+  GoRouterRefresher() {
     notifyListeners();
 
-    _subscription = stream.asBroadcastStream().listen(
-          (dynamic _) => notifyListeners(),
-        );
+    _auth = FirebaseAuth.instance
+        .authStateChanges()
+        .asBroadcastStream()
+        .listen((_) => notifyListeners());
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _auth.cancel();
     super.dispose();
   }
 }
@@ -128,7 +129,5 @@ final router = GoRouter(
       },
     ),
   ],
-  refreshListenable: GoRouterRefreshStream(
-    FirebaseAuth.instance.authStateChanges(),
-  ),
+  refreshListenable: GoRouterRefresher(),
 );
