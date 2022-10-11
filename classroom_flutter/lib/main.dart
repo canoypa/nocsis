@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -9,15 +10,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Nocsis',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        useMaterial3: true,
-        colorSchemeSeed: const Color(0x006750a4),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    return ScreenUtilInit(
+      designSize: const Size(560, 315),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        ThemeData baseTheme = ThemeData(
+          brightness: Brightness.dark,
+          useMaterial3: true,
+          colorSchemeSeed: const Color(0x006750a4),
+        );
+
+        ThemeData appTheme = baseTheme.copyWith(
+          textTheme: Theme.of(context)
+              .textTheme
+              .merge(baseTheme.textTheme)
+              .apply(fontSizeFactor: 1.sp),
+        );
+
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Nocsis',
+          theme: appTheme,
+          home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        );
+      },
     );
   }
 }
