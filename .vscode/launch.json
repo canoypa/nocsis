@@ -6,6 +6,12 @@
       "cwd": "personal",
       "request": "launch",
       "type": "dart"
+    },
+    {
+      "name": "Launch Classroom",
+      "cwd": "classroom_flutter",
+      "request": "launch",
+      "type": "dart"
     }
   ]
 }
