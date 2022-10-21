@@ -31,6 +31,7 @@ const monthly: OnCallHandler<MonthlyEventsResponse> = async (data, context) => {
     timeMax: date.plus({ years: 1 }).startOf("day"),
     singleEvents: true,
     orderBy: "startTime",
+    fields: "items(start,end,summary,description,location)",
   });
   if (!snapshot.items) {
     throw new HttpsError("internal", "Internal error");
