@@ -39,6 +39,7 @@ const get: OnCallHandler<Events, Args> = async (data, context) => {
     singleEvents: true,
     orderBy: "startTime",
     maxResults: data.limit,
+    fields: "items(start,end,title,description,location)",
   };
 
   const snapshot = await fetchCalendar(calendarId, options);
