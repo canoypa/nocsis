@@ -6,7 +6,6 @@ PWA として、個人のスマホやパソコンから、授業やイベント�
 ## スクリーンショット
 
 ![](/docs/images/personal_home.png)
-
 ![](/docs/images/personal_events.png)
 
 ## 使用している技術

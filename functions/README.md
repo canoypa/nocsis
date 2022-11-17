@@ -6,7 +6,6 @@ Nocsis のバックエンド関数です
 ## スクリーンショット
 
 ![](/docs/images/slack_event.png)
-
 ![](/docs/images/slack_dayduty.png)
 
 ## 機能一覧

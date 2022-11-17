@@ -7,7 +7,6 @@
 ## スクリーンショット
 
 ![](/docs/images/classroom_normal.png)
-
 ![](/docs/images/classroom_during.png)
 
 ## 使用している技術
