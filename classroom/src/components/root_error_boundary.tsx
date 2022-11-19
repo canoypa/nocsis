@@ -15,7 +15,7 @@ class RootErrorBoundary extends Component<PropsWithChildren> {
 
   componentDidCatch() {
     // reload page after 10s
-    setTimeout(window.location.reload, 10000);
+    setTimeout(() => window.location.reload(), 10000);
   }
 
   render() {
