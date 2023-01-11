@@ -1,10 +1,7 @@
-const withTM = require("next-transpile-modules")([
-  "@material/material-color-utilities",
-]);
-
 /** @type {import('next').NextConfig} */
-const nextConfig = withTM({
+module.exports = {
   reactStrictMode: true,
-});
-
-module.exports = nextConfig;
+  transpilePackages: [
+    "@material/material-color-utilities"
+  ]
+}
