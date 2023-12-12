@@ -39,10 +39,3 @@ flutter:
 
   assets:
     - assets/images/Icon-192.png
-
-  fonts:
-    - family: Noto Sans JP
-      fonts:
-        - asset: assets/fonts/NotoSansJP-Regular.otf
-        - asset: assets/fonts/NotoSansJP-Bold.otf
-          weight: 700
