@@ -17,7 +17,7 @@ dependencies:
   firebase_core: ^2.4.1
   firebase_auth: ^4.2.2
   cloud_functions: ^4.0.7
-  go_router: ^6.0.1
+  go_router: ^12.1.3
   go_router_prototype: ^0.1.0
   flutter_riverpod: ^2.1.3
   freezed: ^2.0.3
@@ -26,23 +26,16 @@ dependencies:
   intl: ^0.18.0
   collection: ^1.16.0
   animations: ^2.0.2
-  google_fonts: ^3.0.1
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/images/Icon-192.png
-
-  fonts:
-    - family: Noto Sans JP
-      fonts:
-        - asset: assets/fonts/NotoSansJP-Regular.otf
-        - asset: assets/fonts/NotoSansJP-Bold.otf
-          weight: 700

@@ -33,12 +33,12 @@ final router = GoRouter(
     final user = await FirebaseAuth.instance.authStateChanges().first;
     final isSignIn = user != null;
 
-    if (!isSignIn && state.subloc != "/signin") {
+    if (!isSignIn && state.matchedLocation != "/signin") {
       return "/signin?continue=${state.path}";
     }
 
-    if (isSignIn && state.subloc == "/signin") {
-      final continueUri = state.queryParams["continue"];
+    if (isSignIn && state.matchedLocation == "/signin") {
+      final continueUri = state.uri.queryParameters["continue"];
       final validUriPattern = RegExp(r"^/.+$");
 
       if (continueUri is String && validUriPattern.hasMatch(continueUri)) {
@@ -56,7 +56,7 @@ final router = GoRouter(
         return MaterialPage(
           key: state.pageKey,
           child: MainPage(
-            location: state.subloc,
+            location: state.matchedLocation,
             child: child,
           ),
         );
