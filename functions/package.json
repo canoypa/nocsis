@@ -3,9 +3,6 @@
   "name": "nocsis-functions",
   "main": "lib/index.js",
   "packageManager": "pnpm@8.7.6",
-  "engines": {
-    "node": "16"
-  },
   "scripts": {
     "lint": "tsc --noEmit && eslint --ext .js,.ts .",
     "test": "jest",
