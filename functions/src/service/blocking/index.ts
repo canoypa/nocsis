@@ -3,7 +3,7 @@ import { region } from "firebase-functions";
 
 export const beforeCreate = region("asia-northeast1")
   .auth.user()
-  .beforeCreate(async (user, _context) => {
+  .beforeCreate(async (user) => {
     const snapshot = await getFirestore()
       .doc("environment/allowed_emails")
       .get();

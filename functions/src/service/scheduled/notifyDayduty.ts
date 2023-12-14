@@ -1,5 +1,5 @@
 import { ChatPostMessageArguments } from "@slack/web-api";
-import { slackClient } from "../../api/slackClient";
+import { slackClient } from "../../client/slackClient";
 import { getTeacher } from "../../core/classmates/getTeacher";
 import { CrontabHandler } from "../../core/crontab";
 import { getDayduty } from "../../core/dayduty/getDayduty";

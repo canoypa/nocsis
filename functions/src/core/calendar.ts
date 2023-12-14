@@ -1,6 +1,6 @@
 import { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
 import { DateTime } from "luxon";
-import { getCalendarClient } from "../api/googleCalendarClient";
+import { getCalendarClient } from "../client/googleCalendarClient";
 
 export type FetchCalendarParams = Partial<{
   maxResults: number;

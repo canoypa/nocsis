@@ -1,5 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { firebaseApp } from "../../api/firebaseApp";
+import { firebaseApp } from "../../client/firebaseApp";
 import { Teacher } from "../../types/classmates";
 
 /**
