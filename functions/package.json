@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "nocsis-functions",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "packageManager": "pnpm@8.7.6",
   "scripts": {
     "lint": "tsc --noEmit && eslint --ext .js,.ts .",
