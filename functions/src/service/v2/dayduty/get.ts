@@ -1,7 +1,7 @@
 import { HttpsError } from "firebase-functions/v1/https";
 import { DateTime } from "luxon";
-import { getDayduty } from "../../../core/dayduty/getDayduty";
-import { OnCallHandler } from "../../../types/functions";
+import { getDayduty } from "../../../core/dayduty/getDayduty.js";
+import { OnCallHandler } from "../../../types/functions.js";
 
 type DayDuty = {
   stuNo: number;

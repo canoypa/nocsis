@@ -9,9 +9,9 @@ import {
   SectionBlock,
 } from "@slack/web-api";
 import { DateTime } from "luxon";
-import { CalendarEvent } from "../../types/calendar";
-import { getDisplayTimeRange } from "./get_display_time_range";
-import { getDisplayTitle } from "./get_display_title";
+import { CalendarEvent } from "../../types/calendar.js";
+import { getDisplayTimeRange } from "./get_display_time_range.js";
+import { getDisplayTitle } from "./get_display_title.js";
 
 export const eventsToSlackBlock = (events: CalendarEvent[], date: DateTime) => {
   const result: (KnownBlock | Block)[] = [];

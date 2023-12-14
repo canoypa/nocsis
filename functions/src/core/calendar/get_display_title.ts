@@ -1,6 +1,6 @@
 import { DateTime, Interval } from "luxon";
-import { CalendarEvent } from "../../types/calendar";
-import { isMultipleDays } from "./utils";
+import { CalendarEvent } from "../../types/calendar.js";
+import { isMultipleDays } from "./utils.js";
 
 /**
  * 日付情報付きのタイトルを取得する

@@ -6,5 +6,5 @@ export const now = region("asia-northeast1")
     secrets: ["OPENWEATHERMAP_TOKEN", "SWITCHBOT_TOKEN"],
   })
   .https.onCall(async (...args) => {
-    return (await import("./now")).default(...args).catch(console.error);
+    return (await import("./now.js")).default(...args).catch(console.error);
   });

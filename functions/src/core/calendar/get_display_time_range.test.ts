@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
-import { CalendarEvent } from "../../types/calendar";
-import { getDisplayTimeRange } from "./get_display_time_range";
+import { CalendarEvent } from "../../types/calendar.js";
+import { getDisplayTimeRange } from "./get_display_time_range.js";
 
 const d = DateTime.fromObject;
 const c = (

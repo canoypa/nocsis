@@ -1,4 +1,4 @@
-import { CalendarClass, CalendarEvent } from "../../types/calendar";
+import { CalendarClass, CalendarEvent } from "../../types/calendar.js";
 
 // TODO: 統一するとか...
 // firebase-functions でもエンコードされるのが気になる

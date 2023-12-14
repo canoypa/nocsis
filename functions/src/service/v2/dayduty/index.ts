@@ -5,5 +5,5 @@ export const get = region("asia-northeast1")
     memory: "512MB",
   })
   .https.onCall(async (...args) => {
-    return (await import("./get")).default(...args).catch(console.error);
+    return (await import("./get.js")).default(...args).catch(console.error);
   });

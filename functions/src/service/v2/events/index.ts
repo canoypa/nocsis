@@ -6,7 +6,7 @@ export const get = region("asia-northeast1")
     secrets: ["CALENDAR_ACCOUNT_KEY"],
   })
   .https.onCall(async (...args) => {
-    return (await import("./get")).default(...args).catch(console.error);
+    return (await import("./get.js")).default(...args).catch(console.error);
   });
 
 export const monthly = region("asia-northeast1")
@@ -15,5 +15,5 @@ export const monthly = region("asia-northeast1")
     secrets: ["CALENDAR_ACCOUNT_KEY"],
   })
   .https.onCall(async (...args) => {
-    return (await import("./monthly")).default(...args).catch(console.error);
+    return (await import("./monthly.js")).default(...args).catch(console.error);
   });
