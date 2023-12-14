@@ -3,14 +3,13 @@ import {
   calendar,
   calendar_v3 as CalendarV3,
 } from "@googleapis/calendar";
-import { JWT } from "google-auth-library";
 
 let instance: CalendarV3.Calendar;
 
 /**
  * サービスアカウントの認証処理
  */
-const authorize = async (): Promise<JWT> => {
+const authorize = async () => {
   const keyEnv = process.env.CALENDAR_ACCOUNT_KEY;
 
   if (!keyEnv) {
