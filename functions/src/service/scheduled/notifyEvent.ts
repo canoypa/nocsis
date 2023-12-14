@@ -1,5 +1,5 @@
 import { ChatPostMessageArguments } from "@slack/web-api";
-import { slackClient } from "../../api/slackClient";
+import { slackClient } from "../../client/slackClient";
 import { fetchCalendar } from "../../core/calendar";
 import { getDisplayTitle } from "../../core/calendar/get_display_title";
 import { parseEvents } from "../../core/calendar/parseEvents";

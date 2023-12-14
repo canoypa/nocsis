@@ -1,5 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { firebaseApp } from "../../api/firebaseApp";
+import { firebaseApp } from "../../client/firebaseApp";
 
 /**
  * 登録されているクラスメイトの数を返す
