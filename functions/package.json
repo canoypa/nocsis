@@ -9,10 +9,10 @@
     "lint": "tsc --noEmit && eslint --ext .js,.ts .",
     "test": "jest",
     "build": "tsc",
-    "serve": "tsc-watch --onFirstSuccess \"npm run serve-emulator\"",
+    "serve": "tsc-watch --onFirstSuccess \"pnpm run serve-emulator\"",
     "serve-emulator": "firebase emulators:start --only functions",
-    "shell": "npm run build && firebase functions:shell",
-    "start": "npm run shell",
+    "shell": "pnpm run build && firebase functions:shell",
+    "start": "pnpm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
