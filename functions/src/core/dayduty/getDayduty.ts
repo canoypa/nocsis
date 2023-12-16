@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
-import { Student } from "../../types/classmates";
-import { getStudentByStuNo } from "../classmates/getStudentByStuNo";
-import { getDaydutyStuNo } from "./getDaydutyStuNo";
+import { Student } from "../../types/classmates.js";
+import { getStudentByStuNo } from "../classmates/getStudentByStuNo.js";
+import { getDaydutyStuNo } from "./getDaydutyStuNo.js";
 
 /**
  * 入力された日時の日直を取得する

@@ -1,10 +1,10 @@
 import { HttpsError } from "firebase-functions/v1/https";
 import { DateTime } from "luxon";
-import { fetchCalendar } from "../../../core/calendar";
-import { encodeCalendarEvent } from "../../../core/calendar/encode";
-import { parseEvents } from "../../../core/calendar/parseEvents";
-import { EventData } from "../../../types/events";
-import { OnCallHandler } from "../../../types/functions";
+import { fetchCalendar } from "../../../core/calendar.js";
+import { encodeCalendarEvent } from "../../../core/calendar/encode.js";
+import { parseEvents } from "../../../core/calendar/parseEvents.js";
+import { EventData } from "../../../types/events.js";
+import { OnCallHandler } from "../../../types/functions.js";
 
 type MonthlyEventsResponse = { month: string; items: EventData[] }[];
 

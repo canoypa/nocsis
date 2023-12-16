@@ -1,6 +1,6 @@
 import { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
-import { CalendarEvent } from "../../types/calendar";
-import { parseEventDate } from "./parseEventDate";
+import { CalendarEvent } from "../../types/calendar.js";
+import { parseEventDate } from "./parseEventDate.js";
 
 export const parseEvents = (
   items: CalendarV3.Schema$Event[]

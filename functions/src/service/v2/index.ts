@@ -1,4 +1,4 @@
-export * as classes from "./classes";
-export * as dayduty from "./dayduty";
-export * as events from "./events";
-export * as weather from "./weather";
+export * as classes from "./classes/index.js";
+export * as dayduty from "./dayduty/index.js";
+export * as events from "./events/index.js";
+export * as weather from "./weather/index.js";

@@ -1,4 +1,4 @@
-import { CalendarEvent } from "../../types/calendar";
+import { CalendarEvent } from "../../types/calendar.js";
 
 /** 終日イベントかどうか */
 export const isAllDay = (e: CalendarEvent): boolean => {

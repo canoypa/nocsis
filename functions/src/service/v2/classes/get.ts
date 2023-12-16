@@ -1,10 +1,10 @@
 import { HttpsError } from "firebase-functions/v1/https";
 import { DateTime } from "luxon";
-import { fetchCalendar, FetchCalendarParams } from "../../../core/calendar";
-import { encodeCalendarClass } from "../../../core/calendar/encode";
-import { parseClasses } from "../../../core/calendar/parseClasses";
-import { Classes } from "../../../types/classes";
-import { OnCallHandler } from "../../../types/functions";
+import { fetchCalendar, FetchCalendarParams } from "../../../core/calendar.js";
+import { encodeCalendarClass } from "../../../core/calendar/encode.js";
+import { parseClasses } from "../../../core/calendar/parseClasses.js";
+import { Classes } from "../../../types/classes.js";
+import { OnCallHandler } from "../../../types/functions.js";
 
 type Args = {
   from: string;

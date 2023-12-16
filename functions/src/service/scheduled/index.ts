@@ -11,5 +11,5 @@ export const main = region("asia-northeast1")
   .pubsub.schedule("* * * * *")
   .timeZone("Asia/Tokyo")
   .onRun(async (...args) => {
-    return (await import("./main")).default(...args).catch(console.error);
+    return (await import("./main.js")).default(...args).catch(console.error);
   });

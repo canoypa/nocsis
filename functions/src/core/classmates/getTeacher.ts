@@ -1,6 +1,6 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { firebaseApp } from "../../client/firebaseApp";
-import { Teacher } from "../../types/classmates";
+import { firebaseApp } from "../../client/firebaseApp.js";
+import { Teacher } from "../../types/classmates.js";
 
 /**
  * 先生を取得する

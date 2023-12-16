@@ -6,5 +6,5 @@ export const get = region("asia-northeast1")
     secrets: ["CALENDAR_ACCOUNT_KEY"],
   })
   .https.onCall(async (...args) => {
-    return (await import("./get")).default(...args).catch(console.error);
+    return (await import("./get.js")).default(...args).catch(console.error);
   });

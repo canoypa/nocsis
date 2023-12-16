@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { getStudentCount } from "../classmates/getStudentCount";
+import { getStudentCount } from "../classmates/getStudentCount.js";
 
 /**
  * 入力された日時の日直の出席番号を取得する

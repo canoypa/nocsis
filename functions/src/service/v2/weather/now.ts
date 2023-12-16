@@ -1,12 +1,12 @@
 import { HttpsError } from "firebase-functions/v1/https";
-import { fetchWeather } from "../../../core/weather/fetchWeather";
 import {
   fetchSwitchbotStatus,
   SwitchbotStatusBody,
-} from "../../../core/weather/fetch_switchbot_status";
-import { getWeatherNameById } from "../../../core/weather/getWeatherNameById";
-import { OnCallHandler } from "../../../types/functions";
-import { WeatherName } from "../../../types/weather";
+} from "../../../core/weather/fetch_switchbot_status.js";
+import { fetchWeather } from "../../../core/weather/fetchWeather.js";
+import { getWeatherNameById } from "../../../core/weather/getWeatherNameById.js";
+import { OnCallHandler } from "../../../types/functions.js";
+import { WeatherName } from "../../../types/weather.js";
 
 export type WeathersResponse = {
   /**

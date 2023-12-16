@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
-import { CalendarEvent } from "../../types/calendar";
-import { getDisplayTitle } from "./get_display_title";
+import { CalendarEvent } from "../../types/calendar.js";
+import { getDisplayTitle } from "./get_display_title.js";
 
 const d = DateTime.fromObject;
 const c = (

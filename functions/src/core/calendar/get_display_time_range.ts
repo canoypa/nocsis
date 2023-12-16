@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
-import { CalendarEvent } from "../../types/calendar";
-import { isAllDay } from "./utils";
+import { CalendarEvent } from "../../types/calendar.js";
+import { isAllDay } from "./utils.js";
 
 /**
  * 表示用の時刻情報を取得する

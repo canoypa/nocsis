@@ -1,4 +1,4 @@
-import { WeatherName } from "../../types/weather";
+import { WeatherName } from "../../types/weather.js";
 
 /**
  * 天候 ID に対応した天候名のマップ
