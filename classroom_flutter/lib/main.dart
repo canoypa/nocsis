@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:nocsis_classroom/core/theme.dart';
 import 'package:nocsis_classroom/screens/home.dart';
 
 import 'firebase_options.dart';
@@ -22,18 +23,7 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        ThemeData baseTheme = ThemeData(
-          brightness: Brightness.dark,
-          useMaterial3: true,
-          colorSchemeSeed: const Color(0x006750a4),
-        );
-
-        ThemeData appTheme = baseTheme.copyWith(
-          textTheme: Theme.of(context)
-              .textTheme
-              .merge(baseTheme.textTheme)
-              .apply(fontSizeFactor: 1.sp),
-        );
+        final appTheme = createAppTheme(context);
 
         return MaterialApp(
           debugShowCheckedModeBanner: false,
