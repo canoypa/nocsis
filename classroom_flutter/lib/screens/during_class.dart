@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nocsis_classroom/components/during_class_progress.dart';
 
 class DuringClassScreen extends StatelessWidget {
   const DuringClassScreen({
@@ -8,21 +9,26 @@ class DuringClassScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
+      body: Stack(
+        children: [
+          DuringClassProgress(),
+          Center(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text("1時間目", style: Theme.of(context).textTheme.titleLarge),
-                Text("・"),
-                Text("授業名", style: Theme.of(context).textTheme.titleLarge),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("1時間目", style: Theme.of(context).textTheme.titleSmall),
+                    const Text("・"),
+                    Text("授業名", style: Theme.of(context).textTheme.titleSmall),
+                  ],
+                ),
+                Text("90分", style: Theme.of(context).textTheme.displayLarge),
               ],
             ),
-            Text("90分", style: Theme.of(context).textTheme.displayLarge),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
