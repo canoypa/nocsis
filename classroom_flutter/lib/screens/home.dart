@@ -13,11 +13,11 @@ class HomeScreen extends StatelessWidget {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.all(16.r),
+            padding: EdgeInsets.all(24.r),
             child: Row(
               children: [
                 const Expanded(child: HomeInfo()),
-                SizedBox(width: 16.r),
+                SizedBox(width: 24.r),
                 const Expanded(child: HomeSchedules()),
               ],
             ),
@@ -87,11 +87,11 @@ class HomeInfo extends StatelessWidget {
             children: [
               Text(
                 "笹園 丈一朗",
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
               Text(
                 "10:50",
-                style: Theme.of(context).textTheme.displayMedium,
+                style: Theme.of(context).textTheme.displayLarge,
               ),
             ],
           ),
@@ -114,8 +114,8 @@ class HomeSchedules extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              "テスト",
-              style: Theme.of(context).textTheme.titleLarge,
+              "まるまるの日",
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
         ),

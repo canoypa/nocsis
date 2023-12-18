@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 ThemeData _baseTheme = ThemeData(
   brightness: Brightness.dark,
@@ -8,10 +9,11 @@ ThemeData _baseTheme = ThemeData(
 );
 
 ThemeData createAppTheme(BuildContext context) {
+  final theme = Theme.of(context);
+
   return _baseTheme.copyWith(
-    textTheme: Theme.of(context)
-        .textTheme
+    textTheme: GoogleFonts.notoSansJpTextTheme(theme.textTheme
         .merge(_baseTheme.textTheme)
-        .apply(fontSizeFactor: 1.sp),
+        .apply(fontSizeFactor: 3.sp)),
   );
 }
