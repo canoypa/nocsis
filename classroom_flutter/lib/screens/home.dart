@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nocsis_classroom/components/weather_graph.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -12,6 +13,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
+          const WeatherGraph(),
           Padding(
             padding: EdgeInsets.all(24.r),
             child: Row(
