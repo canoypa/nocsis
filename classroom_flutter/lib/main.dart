@@ -20,8 +20,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(960, 540),
-      minTextAdapt: true,
-      splitScreenMode: true,
       builder: (context, child) {
         final appTheme = createAppTheme(context);
 
@@ -29,9 +27,10 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Nocsis',
           theme: appTheme,
-          home: const HomeScreen(),
+          home: child,
         );
       },
+      child: const HomeScreen(),
     );
   }
 }
