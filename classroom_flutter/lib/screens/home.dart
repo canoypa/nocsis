@@ -10,22 +10,20 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          const WeatherGraph(),
-          Padding(
-            padding: EdgeInsets.all(24.r),
-            child: Row(
-              children: [
-                const Expanded(child: HomeInfo()),
-                SizedBox(width: 24.r),
-                const Expanded(child: HomeSchedules()),
-              ],
-            ),
+    return Stack(
+      children: [
+        const WeatherGraph(),
+        Padding(
+          padding: EdgeInsets.all(24.r),
+          child: Row(
+            children: [
+              const Expanded(child: HomeInfo()),
+              SizedBox(width: 24.r),
+              const Expanded(child: HomeSchedules()),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
