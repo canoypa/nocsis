@@ -86,7 +86,7 @@ class HomeInfo extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "笹園 丈一朗",
+                "田中 太郎",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               Text(
