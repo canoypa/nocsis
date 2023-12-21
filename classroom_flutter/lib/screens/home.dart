@@ -90,9 +90,7 @@ class HomeInfo extends StatelessWidget {
                 "田中 太郎",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              Clock(
-                time: DateTime.now(),
-              ),
+              const Clock(),
             ],
           ),
         ),

@@ -1,20 +1,35 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Clock extends StatefulWidget {
-  final DateTime time;
+final _timeProvider = StreamProvider(
+  (_) async* {
+    while (true) {
+      yield DateTime.now();
 
-  const Clock({
-    super.key,
-    required this.time,
-  });
+      final now = DateTime.now();
+      final next = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        now.hour,
+        now.minute,
+      ).add(const Duration(minutes: 1));
+
+      await Future.delayed(next.difference(now));
+    }
+  },
+);
+
+class Clock extends ConsumerStatefulWidget {
+  const Clock({super.key});
 
   @override
   _ClockState createState() => _ClockState();
 }
 
-class _ClockState extends State<Clock> {
+class _ClockState extends ConsumerState<Clock> {
   bool _visible = true;
 
   late Timer _timer;
@@ -30,20 +45,25 @@ class _ClockState extends State<Clock> {
 
   @override
   Widget build(BuildContext context) {
+    final time = ref.watch(_timeProvider).maybeWhen(
+          data: (time) => time,
+          orElse: () => DateTime.now(),
+        );
+
     final baseStyle = Theme.of(context).textTheme.displayLarge;
 
     return RichText(
       text: TextSpan(
         style: baseStyle,
         children: [
-          TextSpan(text: widget.time.hour.toString().padLeft(2, "0")),
+          TextSpan(text: time.hour.toString().padLeft(2, "0")),
           TextSpan(
             text: ":",
             style: TextStyle(
               color: !_visible ? baseStyle?.color?.withAlpha(127) : null,
             ),
           ),
-          TextSpan(text: widget.time.minute.toString().padLeft(2, "0")),
+          TextSpan(text: time.minute.toString().padLeft(2, "0")),
         ],
       ),
     );
