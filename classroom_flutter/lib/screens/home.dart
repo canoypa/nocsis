@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nocsis_classroom/components/clock.dart';
 import 'package:nocsis_classroom/components/weather_graph.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -89,9 +90,8 @@ class HomeInfo extends StatelessWidget {
                 "田中 太郎",
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              Text(
-                "10:50",
-                style: Theme.of(context).textTheme.displayLarge,
+              Clock(
+                time: DateTime.now(),
               ),
             ],
           ),
