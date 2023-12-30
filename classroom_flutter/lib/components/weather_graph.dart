@@ -5,11 +5,38 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis_classroom/models/weather.dart';
 import 'package:nocsis_classroom/providers/weather.dart';
 
-class WeatherGraph extends ConsumerWidget {
-  const WeatherGraph({super.key});
+class WeatherGraph extends ConsumerStatefulWidget {
+  const WeatherGraph({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  WeatherGraphState createState() => WeatherGraphState();
+}
+
+class WeatherGraphState extends ConsumerState
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  WeatherGraphState();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final weatherData = ref.watch(weatherProvider).maybeWhen(
           data: (data) => data.hourly,
           orElse: () => const WeatherHourly(temp: [0, 0], pop: [0, 0]),
@@ -34,9 +61,21 @@ class WeatherGraph extends ConsumerWidget {
       );
     }).toList();
 
+    _animationController.reset();
+    _animationController.forward();
+
     return SizedBox.expand(
-      child: CustomPaint(
-        painter: _WeatherGraphPainter(temp: temp, pop: pop),
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, _) {
+          return CustomPaint(
+            painter: _WeatherGraphPainter(
+              temp: temp,
+              pop: pop,
+              animationProgress: _animationController.value,
+            ),
+          );
+        },
       ),
     );
   }
@@ -60,36 +99,45 @@ class _WeatherGraphPainter extends CustomPainter {
   final List<Offset> temp;
   final List<Offset> pop;
 
-  _WeatherGraphPainter({required this.temp, required this.pop});
+  final double animationProgress;
+  final curve = Curves.easeOutExpo;
+
+  _WeatherGraphPainter({
+    required this.temp,
+    required this.pop,
+    this.animationProgress = 1.0,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     // 表示範囲は全体で 50%、それぞれ 25% とする
 
+    final progress = curve.transform(animationProgress);
+
     final tempOffsets = temp.map((v) {
       return Offset(
         v.dx * size.width,
-        size.height - v.dy * size.height * 0.25,
+        size.height -
+            (v.dy * size.height * 0.25 + size.height * 0.25) * progress,
       );
     }).toList();
     final popOffsets = pop.map((v) {
       return Offset(
         v.dx * size.width,
-        size.height - v.dy * size.height * 0.25,
+        size.height - v.dy * (size.height * 0.25) * progress,
       );
     }).toList();
 
     final tempLinePath = Path();
-    tempLinePath.moveTo(
-        tempOffsets[0].dx, tempOffsets[0].dy - size.height * 0.25);
+    tempLinePath.moveTo(tempOffsets[0].dx, tempOffsets[0].dy);
     for (var v in tempOffsets) {
-      tempLinePath.lineTo(v.dx, v.dy - size.height * 0.25);
+      tempLinePath.lineTo(v.dx, v.dy);
     }
 
     final tempFillPath = Path();
     tempFillPath.moveTo(tempOffsets[0].dx, tempOffsets[0].dy);
     for (var v in tempOffsets) {
-      tempFillPath.lineTo(v.dx, v.dy - size.height * 0.25);
+      tempFillPath.lineTo(v.dx, v.dy);
     }
 
     // 降水確率のグラフに被らないようにする
