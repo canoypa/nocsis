@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -25,29 +26,27 @@ class SignInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Nocsis",
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
-            const SizedBox(height: 48),
-            FilledButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all<EdgeInsets>(
-                  const EdgeInsets.symmetric(vertical: 32, horizontal: 64),
-                ),
+    return Container(
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(48),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "Nocsis",
+            style: Theme.of(context).textTheme.displaySmall,
+          ),
+          const SizedBox(height: 48),
+          FilledButton(
+            style: ButtonStyle(
+              padding: MaterialStateProperty.all<EdgeInsets>(
+                EdgeInsets.symmetric(vertical: 32.sp, horizontal: 64.sp),
               ),
-              child: const Text("サインイン"),
-              onPressed: () => _signIn(context),
             ),
-          ],
-        ),
+            child: const Text("サインイン"),
+            onPressed: () => _signIn(context),
+          ),
+        ],
       ),
     );
   }
