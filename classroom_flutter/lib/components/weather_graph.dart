@@ -5,29 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis_classroom/models/weather.dart';
 import 'package:nocsis_classroom/providers/weather.dart';
 
-const _exampleData = {
-  "tempPoints": [
-    {"x": 1 / 7 * 0, "y": 1.0},
-    {"x": 1 / 7 * 1, "y": 0.8},
-    {"x": 1 / 7 * 2, "y": 0.5},
-    {"x": 1 / 7 * 3, "y": 0.0},
-    {"x": 1 / 7 * 4, "y": 0.0},
-    {"x": 1 / 7 * 5, "y": 0.5},
-    {"x": 1 / 7 * 6, "y": 0.8},
-    {"x": 1 / 7 * 7, "y": 1.0},
-  ],
-  "popPoints": [
-    {"x": 1 / 7 * 0, "y": 0.0},
-    {"x": 1 / 7 * 1, "y": 0.5},
-    {"x": 1 / 7 * 2, "y": 0.8},
-    {"x": 1 / 7 * 3, "y": 0.9},
-    {"x": 1 / 7 * 4, "y": 0.9},
-    {"x": 1 / 7 * 5, "y": 0.8},
-    {"x": 1 / 7 * 6, "y": 0.5},
-    {"x": 1 / 7 * 7, "y": 0.0},
-  ]
-};
-
 class WeatherGraph extends ConsumerWidget {
   const WeatherGraph({super.key});
 
