@@ -44,18 +44,14 @@ class WeatherGraph extends ConsumerWidget {
 
 class _WeatherGraphPainter extends CustomPainter {
   static const _tempColor = Color(0xFFFFD54F);
-
   static const _popColor = Color(0xFF64B5F6);
 
   static final _tempFillPaint = Paint()..color = _tempColor.withAlpha(51);
-
   static final _tempLinePaint = Paint()
     ..color = _tempColor
     ..strokeWidth = 4
     ..style = PaintingStyle.stroke;
-
   static final _popFillPaint = Paint()..color = _popColor.withAlpha(51);
-
   static final _popLinePaint = Paint()
     ..color = _popColor
     ..strokeWidth = 4
@@ -76,7 +72,6 @@ class _WeatherGraphPainter extends CustomPainter {
         size.height - v.dy * size.height * 0.25,
       );
     }).toList();
-
     final popOffsets = pop.map((v) {
       return Offset(
         v.dx * size.width,
@@ -85,58 +80,42 @@ class _WeatherGraphPainter extends CustomPainter {
     }).toList();
 
     final tempLinePath = Path();
-
     tempLinePath.moveTo(
         tempOffsets[0].dx, tempOffsets[0].dy - size.height * 0.25);
-
     for (var v in tempOffsets) {
       tempLinePath.lineTo(v.dx, v.dy - size.height * 0.25);
     }
 
     final tempFillPath = Path();
-
     tempFillPath.moveTo(tempOffsets[0].dx, tempOffsets[0].dy);
-
     for (var v in tempOffsets) {
       tempFillPath.lineTo(v.dx, v.dy - size.height * 0.25);
     }
 
     // 降水確率のグラフに被らないようにする
-
     for (var v in popOffsets.reversed) {
       tempFillPath.lineTo(v.dx, v.dy);
     }
-
     tempFillPath.close();
 
     final popLinePath = Path();
-
     popLinePath.moveTo(popOffsets[0].dx, popOffsets[0].dy);
-
     for (var v in popOffsets) {
       popLinePath.lineTo(v.dx, v.dy);
     }
 
     final popFillPath = Path();
-
     popFillPath.moveTo(popOffsets[0].dx, popOffsets[0].dy);
-
     for (var v in popOffsets) {
       popFillPath.lineTo(v.dx, v.dy);
     }
-
     popFillPath.lineTo(size.width, size.height);
-
     popFillPath.lineTo(0, size.height);
-
     popFillPath.close();
 
     canvas.drawPath(tempFillPath, _WeatherGraphPainter._tempFillPaint);
-
     canvas.drawPath(tempLinePath, _WeatherGraphPainter._tempLinePaint);
-
     canvas.drawPath(popFillPath, _WeatherGraphPainter._popFillPaint);
-
     canvas.drawPath(popLinePath, _WeatherGraphPainter._popLinePaint);
   }
 
