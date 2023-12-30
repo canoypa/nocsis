@@ -2,25 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nocsis_classroom/core/cron.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final _timeProvider = StreamProvider(
-  (_) async* {
-    while (true) {
-      yield DateTime.now();
+part 'clock.g.dart';
 
-      final now = DateTime.now();
-      final next = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        now.hour,
-        now.minute,
-      ).add(const Duration(minutes: 1));
+@riverpod
+Stream<DateTime> _time(_) async* {
+  final schedule = Cron.parse("* * * * *");
 
-      await Future.delayed(next.difference(now));
-    }
-  },
-);
+  while (true) {
+    final now = DateTime.now();
+
+    yield now;
+
+    await Future.delayed(schedule.next(now).difference(now));
+  }
+}
 
 class Clock extends ConsumerStatefulWidget {
   const Clock({super.key});
