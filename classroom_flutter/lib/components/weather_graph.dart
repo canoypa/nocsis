@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nocsis_classroom/models/weather.dart';
 import 'package:nocsis_classroom/providers/weather.dart';
 
 const _exampleData = {
@@ -30,13 +33,33 @@ class WeatherGraph extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weatherData = ref.watch(weatherProvider);
+    final weatherData = ref.watch(weatherProvider).maybeWhen(
+          data: (data) => data.hourly,
+          orElse: () => const WeatherHourly(temp: [0, 0], pop: [0, 0]),
+        );
 
-    print(weatherData.asData?.value);
+    final tempData = weatherData.temp;
+    final tempMax = tempData.reduce(max);
+    final tempMin = tempData.reduce(min);
+
+    final popData = weatherData.pop;
+
+    final temp = tempData.asMap().entries.map((e) {
+      return Offset(
+        e.key / (tempData.length - 1),
+        (e.value - tempMin) / (tempMax - tempMin),
+      );
+    }).toList();
+    final pop = popData.asMap().entries.map((e) {
+      return Offset(
+        e.key / (popData.length - 1),
+        e.value.toDouble(),
+      );
+    }).toList();
 
     return SizedBox.expand(
       child: CustomPaint(
-        painter: _WeatherGraphPainter(),
+        painter: _WeatherGraphPainter(temp: temp, pop: pop),
       ),
     );
   }
@@ -61,25 +84,26 @@ class _WeatherGraphPainter extends CustomPainter {
     ..strokeWidth = 4
     ..style = PaintingStyle.stroke;
 
+  final List<Offset> temp;
+  final List<Offset> pop;
+
+  _WeatherGraphPainter({required this.temp, required this.pop});
+
   @override
   void paint(Canvas canvas, Size size) {
     // 表示範囲は全体で 50%、それぞれ 25% とする
 
-    final tempExample = _exampleData["tempPoints"]!;
-
-    final popExample = _exampleData["popPoints"]!;
-
-    final tempOffsets = tempExample.map((v) {
+    final tempOffsets = temp.map((v) {
       return Offset(
-        v["x"]! * size.width,
-        size.height - v["y"]! * size.height * 0.25,
+        v.dx * size.width,
+        size.height - v.dy * size.height * 0.25,
       );
     }).toList();
 
-    final popOffsets = popExample.map((v) {
+    final popOffsets = pop.map((v) {
       return Offset(
-        v["x"]! * size.width,
-        size.height - v["y"]! * size.height * 0.25,
+        v.dx * size.width,
+        size.height - v.dy * size.height * 0.25,
       );
     }).toList();
 
