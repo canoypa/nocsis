@@ -6,11 +6,11 @@ part of 'weather.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$weatherHash() => r'a953c9815155d3073688d3bd172ef7d61ffde9c1';
+String _$weatherHash() => r'd1101b7bdd089ea66515bc0ca1cc2799c3e74ab6';
 
 /// See also [weather].
 @ProviderFor(weather)
-final weatherProvider = AutoDisposeFutureProvider<Weather>.internal(
+final weatherProvider = AutoDisposeStreamProvider<Weather>.internal(
   weather,
   name: r'weatherProvider',
   debugGetCreateSourceHash:
@@ -19,6 +19,6 @@ final weatherProvider = AutoDisposeFutureProvider<Weather>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef WeatherRef = AutoDisposeFutureProviderRef<Weather>;
+typedef WeatherRef = AutoDisposeStreamProviderRef<Weather>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
