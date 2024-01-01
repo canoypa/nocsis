@@ -6,11 +6,11 @@ part of 'events.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$eventsHash() => r'8a3a5cecf43c2e3a61cb4cd47bc5a887f94a96f4';
+String _$eventsHash() => r'1fb91a6d515ab4dac8ff7813a1a949c03538ce34';
 
 /// See also [events].
 @ProviderFor(events)
-final eventsProvider = AutoDisposeStreamProvider<EventList>.internal(
+final eventsProvider = AutoDisposeFutureProvider<EventList>.internal(
   events,
   name: r'eventsProvider',
   debugGetCreateSourceHash:
@@ -19,6 +19,6 @@ final eventsProvider = AutoDisposeStreamProvider<EventList>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef EventsRef = AutoDisposeStreamProviderRef<EventList>;
+typedef EventsRef = AutoDisposeFutureProviderRef<EventList>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

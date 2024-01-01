@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis_classroom/providers/classes.dart';
+import 'package:nocsis_classroom/providers/cron.dart';
 import 'package:nocsis_classroom/providers/events.dart';
 
 class HomeSchedules extends ConsumerWidget {
@@ -10,6 +11,9 @@ class HomeSchedules extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 毎分更新
+    ref.watch(CronProvider("* * * * *"));
+
     final classes = ref.watch(classesProvider).whenOrNull(data: (data) => data);
     final events = ref.watch(eventsProvider).whenOrNull(data: (data) => data);
 

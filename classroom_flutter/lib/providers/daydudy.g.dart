@@ -6,11 +6,11 @@ part of 'daydudy.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$daydudyHash() => r'89bf6b25fd99fbddfcaa3689a0be4309d2cb463b';
+String _$daydudyHash() => r'd07dec699521a2f4e9eaf742324be052d63f2714';
 
 /// See also [daydudy].
 @ProviderFor(daydudy)
-final daydudyProvider = AutoDisposeStreamProvider<Daydudy>.internal(
+final daydudyProvider = AutoDisposeFutureProvider<Daydudy>.internal(
   daydudy,
   name: r'daydudyProvider',
   debugGetCreateSourceHash:
@@ -19,6 +19,6 @@ final daydudyProvider = AutoDisposeStreamProvider<Daydudy>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef DaydudyRef = AutoDisposeStreamProviderRef<Daydudy>;
+typedef DaydudyRef = AutoDisposeFutureProviderRef<Daydudy>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

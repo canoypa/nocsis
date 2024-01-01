@@ -2,23 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nocsis_classroom/core/cron.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-part 'clock.g.dart';
-
-@riverpod
-Stream<DateTime> _time(_) async* {
-  final schedule = Cron.parse("* * * * *");
-
-  while (true) {
-    final now = DateTime.now();
-
-    yield now;
-
-    await Future.delayed(schedule.next(now).difference(now));
-  }
-}
+import 'package:nocsis_classroom/providers/cron.dart';
 
 class Clock extends ConsumerStatefulWidget {
   const Clock({super.key});
@@ -43,10 +27,10 @@ class _ClockState extends ConsumerState<Clock> {
 
   @override
   Widget build(BuildContext context) {
-    final time = ref.watch(_timeProvider).maybeWhen(
-          data: (time) => time,
-          orElse: () => DateTime.now(),
-        );
+    // 毎分更新
+    ref.watch(cronProvider("* * * * *"));
+
+    final time = DateTime.now();
 
     final baseStyle = Theme.of(context).textTheme.displayLarge;
 

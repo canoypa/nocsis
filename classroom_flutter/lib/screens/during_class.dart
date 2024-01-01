@@ -1,21 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis_classroom/components/during_class_progress.dart';
-import 'package:nocsis_classroom/core/cron.dart';
 import 'package:nocsis_classroom/models/classes.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-part 'during_class.g.dart';
-
-@riverpod
-Stream<void> updatePerMinutes(_) async* {
-  final schedule = Cron.parse("* * * * *");
-
-  while (true) {
-    final now = DateTime.now();
-    await Future.delayed(schedule.next(now).difference(now));
-  }
-}
+import 'package:nocsis_classroom/providers/cron.dart';
 
 class DuringClassScreen extends ConsumerWidget {
   final ClassData? data;
@@ -27,7 +14,8 @@ class DuringClassScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(updatePerMinutesProvider);
+    // 毎分更新
+    ref.watch(cronProvider("* * * * *"));
 
     final classData = data;
 
