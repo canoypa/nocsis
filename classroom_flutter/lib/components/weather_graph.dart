@@ -1,131 +1,141 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis_classroom/models/weather.dart';
+import 'package:nocsis_classroom/providers/weather.dart';
 
-class WeatherGraph extends ConsumerStatefulWidget {
-  const WeatherGraph({Key? key}) : super(key: key);
+class WeatherGraph extends ConsumerWidget {
+  const WeatherGraph({super.key});
 
   @override
-  WeatherGraphState createState() => WeatherGraphState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final weather = ref.watch(weatherProvider).maybeWhen(
+          data: (data) => data.hourly,
+          orElse: () => WeatherHourly(
+            temp: List.generate(9, (index) => 0),
+            pop: List.generate(9, (index) => 0),
+          ),
+        );
+
+    return SizedBox.expand(
+      child: LayoutBuilder(builder: (context, constraints) {
+        return _Canvas(
+          constraints: constraints,
+          temp: weather.temp,
+          pop: weather.pop,
+        );
+      }),
+    );
+  }
 }
 
-class WeatherGraphState extends ConsumerState
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
+class _Canvas extends ConsumerStatefulWidget {
+  final BoxConstraints constraints;
+  final List<num> temp;
+  final List<num> pop;
 
-  WeatherGraphState();
+  const _Canvas({
+    Key? key,
+    required this.constraints,
+    required this.temp,
+    required this.pop,
+  }) : super(key: key);
+
+  @override
+  _CanvasState createState() => _CanvasState();
+}
+
+class _CanvasState extends ConsumerState<_Canvas>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 500),
+  );
+  late final CurvedAnimation _animation =
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutExpo);
+
+  List<Tween<Offset>>? _tempTweens;
+  List<Tween<Offset>>? _popTweens;
 
   @override
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-
-    weatherData = _generateDummyWeatherData();
-    _animationController.forward();
+    _updateTweens();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _controller.dispose();
+    _animation.dispose();
 
     super.dispose();
   }
 
-  late WeatherHourly weatherData;
-  _generateDummyWeatherData() {
-    final temp = List.generate(9, (i) => Random().nextInt(10));
-    final pop = List.generate(9, (i) => Random().nextDouble());
+  @override
+  void didUpdateWidget(covariant _Canvas oldWidget) {
+    super.didUpdateWidget(oldWidget);
 
-    final tempMax = temp.reduce(max);
-    final tempMin = temp.reduce(min);
+    _updateTweens();
 
-    _tempTweens = temp.asMap().entries.map((e) {
-      return Tween(
-        begin: _tempTweens[e.key].evaluate(_animation),
-        end: Offset(e.key / (temp.length - 1),
-            (e.value - tempMin) / (tempMax - tempMin)),
-      );
-    }).toList();
-    _popTweens = pop.asMap().entries.map((e) {
-      return Tween(
-        begin: _popTweens[e.key].evaluate(_animation),
-        end: Offset(e.key / (pop.length - 1), e.value.toDouble()),
-      );
-    }).toList();
-
-    return WeatherHourly(temp: temp, pop: pop);
+    _controller
+      ..reset()
+      ..forward();
   }
 
-  late final CurvedAnimation _animation =
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutExpo);
-  List<Tween<Offset>> _tempTweens =
-      List.generate(9, (_) => Tween(begin: Offset.zero));
-  List<Tween<Offset>> _popTweens =
-      List.generate(9, (_) => Tween(begin: Offset.zero));
+  _updateTweens() {
+    final width = widget.constraints.maxWidth;
+    final height = widget.constraints.maxHeight;
+
+    final tempMax = widget.temp.reduce(max);
+    final tempMin = widget.temp.reduce(min);
+    final tempRange = tempMax - tempMin;
+    final isInitial = widget.temp.every((e) => e == 0);
+
+    _tempTweens = widget.temp.mapIndexed<Tween<Offset>>((i, e) {
+      final h = (e - tempMin) / (tempRange == 0 ? 1 : tempRange);
+      final target = Offset(
+        i / (widget.temp.length - 1) * width,
+        height - (h * height * 0.25 + (isInitial ? 0 : height * 0.25)),
+      );
+
+      return Tween(
+        begin: _tempTweens?[i].evaluate(_animation) ?? target,
+        end: target,
+      );
+    }).toList();
+    _popTweens = widget.pop.mapIndexed<Tween<Offset>>((i, e) {
+      final target = Offset(
+        i / (widget.pop.length - 1) * width,
+        height - e.toDouble() * (height * 0.25),
+      );
+      return Tween(
+        begin: _popTweens?[i].evaluate(_animation) ?? target,
+        end: target,
+      );
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // final weatherData = ref.watch(weatherProvider).maybeWhen(
-    //       data: (data) => data.hourly,
-    //       orElse: () => const WeatherHourly(temp: [0, 0], pop: [0, 0]),
-    //     );
-
-    // final tempData = weatherData.temp;
-    // final tempMax = tempData.reduce(max);
-    // final tempMin = tempData.reduce(min);
-
-    // final popData = weatherData.pop;
-
-    // final temp = tempData.asMap().entries.map((e) {
-    //   return Offset(
-    //     e.key / (tempData.length - 1),
-    //     (e.value - tempMin) / (tempMax - tempMin),
-    //   );
-    // }).toList();
-    // final pop = popData.asMap().entries.map((e) {
-    //   return Offset(
-    //     e.key / (popData.length - 1),
-    //     e.value.toDouble(),
-    //   );
-    // }).toList();
-
-    // _animationController.reset();
-
-    return SizedBox.expand(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            weatherData = _generateDummyWeatherData();
-            _animationController
-              ..reset()
-              ..forward();
-          });
-        },
-        child: AnimatedBuilder(
-          animation: _animationController,
-          builder: (context, _) {
-            return CustomPaint(
-              painter: _WeatherGraphPainter(
-                temp: _tempTweens,
-                pop: _popTweens,
-                controller: _animationController,
-                animation: _animation,
-              ),
-            );
-          },
-        ),
-      ),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        return CustomPaint(
+          painter: _Painter(
+            temp: _tempTweens!,
+            pop: _popTweens!,
+            animation: _animation,
+          ),
+        );
+      },
     );
   }
 }
 
-class _WeatherGraphPainter extends CustomPainter {
+class _Painter extends CustomPainter {
   static const _tempColor = Color(0xFFFFD54F);
   static const _popColor = Color(0xFF64B5F6);
 
@@ -143,13 +153,11 @@ class _WeatherGraphPainter extends CustomPainter {
   final List<Tween<Offset>> temp;
   final List<Tween<Offset>> pop;
 
-  final AnimationController controller;
   final Animation<double> animation;
 
-  _WeatherGraphPainter({
+  _Painter({
     required this.temp,
     required this.pop,
-    required this.controller,
     required this.animation,
   });
 
@@ -157,22 +165,8 @@ class _WeatherGraphPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // 表示範囲は全体で 50%、それぞれ 25% とする
 
-    // final progress = curve.transform(animationProgress);
-
-    final tempOffsets = temp.map((v) {
-      final value = v.evaluate(animation);
-      return Offset(
-        value.dx * size.width,
-        size.height - (value.dy * size.height * 0.25 + size.height * 0.25),
-      );
-    }).toList();
-    final popOffsets = pop.map((v) {
-      final value = v.evaluate(animation);
-      return Offset(
-        value.dx * size.width,
-        size.height - value.dy * (size.height * 0.25),
-      );
-    }).toList();
+    final tempOffsets = temp.map((e) => e.evaluate(animation)).toList();
+    final popOffsets = pop.map((e) => e.evaluate(animation)).toList();
 
     final tempLinePath = Path();
     tempLinePath.moveTo(tempOffsets[0].dx, tempOffsets[0].dy);
@@ -207,10 +201,10 @@ class _WeatherGraphPainter extends CustomPainter {
     popFillPath.lineTo(0, size.height);
     popFillPath.close();
 
-    canvas.drawPath(tempFillPath, _WeatherGraphPainter._tempFillPaint);
-    canvas.drawPath(tempLinePath, _WeatherGraphPainter._tempLinePaint);
-    canvas.drawPath(popFillPath, _WeatherGraphPainter._popFillPaint);
-    canvas.drawPath(popLinePath, _WeatherGraphPainter._popLinePaint);
+    canvas.drawPath(tempFillPath, _Painter._tempFillPaint);
+    canvas.drawPath(tempLinePath, _Painter._tempLinePaint);
+    canvas.drawPath(popFillPath, _Painter._popFillPaint);
+    canvas.drawPath(popLinePath, _Painter._popLinePaint);
   }
 
   @override
