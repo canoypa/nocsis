@@ -13,13 +13,58 @@ class HomeSchedules extends ConsumerWidget {
     final classes = ref.watch(classesProvider).whenOrNull(data: (data) => data);
     final events = ref.watch(eventsProvider).whenOrNull(data: (data) => data);
 
-    if (classes == null ||
-        events == null ||
-        classes.items.where((e) => e.endAt.isAfter(DateTime.now())).isEmpty) {
-      return const SizedBox();
+    if (classes != null && classes.items.isNotEmpty) {
+      final upcomingClasses =
+          classes.items.where((e) => e.endAt.isAfter(DateTime.now()));
+
+      if (upcomingClasses.isNotEmpty) {
+        return Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.sp),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(16.sp),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "今日の授業",
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+                ...upcomingClasses.map(
+                  (e) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          e.title,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                          "${e.period}時間目",
+                          style:
+                              Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
+                      ],
+                    );
+                  },
+                ).toList()
+              ],
+            ),
+          ),
+        );
+      }
     }
 
-    if (classes.items.isNotEmpty) {
+    if (events != null && events.items.isNotEmpty) {
+      final eventDateFormatter = DateFormat('M月dd日');
       return Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24.sp),
@@ -30,12 +75,12 @@ class HomeSchedules extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "今日の授業",
+                "今後のイベント",
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
               ),
-              ...classes.items.map(
+              ...events.items.map(
                 (e) {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
@@ -46,7 +91,7 @@ class HomeSchedules extends ConsumerWidget {
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       Text(
-                        "${e.period}時間目",
+                        eventDateFormatter.format(e.startAt),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -63,46 +108,6 @@ class HomeSchedules extends ConsumerWidget {
       );
     }
 
-    final eventDateFormatter = DateFormat('M月dd日');
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24.sp),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16.sp),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "今後のイベント",
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-            ),
-            ...events.items.map(
-              (e) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      e.title,
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    Text(
-                      eventDateFormatter.format(e.startAt),
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                    ),
-                  ],
-                );
-              },
-            ).toList()
-          ],
-        ),
-      ),
-    );
+    return const SizedBox();
   }
 }
