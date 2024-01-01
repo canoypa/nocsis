@@ -41,14 +41,24 @@ class WeatherInfo extends ConsumerWidget {
           children: [
             SvgPicture.asset(
               _getWeatherIconPath(weather.current.name),
-              width: 64.sp,
-              height: 64.sp,
+              width: 80.sp,
+              height: 80.sp,
             ),
             const SizedBox(width: 16),
-            Text(
-              "${weather.current.temp}°",
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  weather.current.temp.toString(),
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
+                Text(
+                  "℃",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            )
           ],
         ),
         Row(
