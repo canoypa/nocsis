@@ -13,7 +13,9 @@ class HomeSchedules extends ConsumerWidget {
     final classes = ref.watch(classesProvider).whenOrNull(data: (data) => data);
     final events = ref.watch(eventsProvider).whenOrNull(data: (data) => data);
 
-    if (classes == null || events == null) {
+    if (classes == null ||
+        events == null ||
+        classes.items.where((e) => e.endAt.isAfter(DateTime.now())).isEmpty) {
       return const SizedBox();
     }
 
