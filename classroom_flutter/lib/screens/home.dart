@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nocsis_classroom/components/clock.dart';
 import 'package:nocsis_classroom/components/weather_graph.dart';
+import 'package:nocsis_classroom/components/weather_info.dart';
 import 'package:nocsis_classroom/providers/auth.dart';
 import 'package:nocsis_classroom/screens/signin.dart';
 
@@ -65,47 +65,9 @@ class HomeInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Align(
+        const Align(
           alignment: Alignment.topLeft,
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    "assets/images/weather/clear.svg",
-                    width: 48.r,
-                    height: 48.r,
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    "20°",
-                    style: Theme.of(context).textTheme.displayMedium,
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    "assets/images/weather/clear.svg",
-                    width: 32.r,
-                    height: 32.r,
-                  ),
-                  const Icon(Icons.navigate_next),
-                  SvgPicture.asset(
-                    "assets/images/weather/clear.svg",
-                    width: 32.r,
-                    height: 32.r,
-                  ),
-                  const Icon(Icons.navigate_next),
-                  SvgPicture.asset(
-                    "assets/images/weather/clear.svg",
-                    width: 32.r,
-                    height: 32.r,
-                  ),
-                ],
-              )
-            ],
-          ),
+          child: WeatherInfo(),
         ),
         Align(
           alignment: Alignment.bottomLeft,
