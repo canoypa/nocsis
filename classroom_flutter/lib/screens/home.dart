@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nocsis_classroom/components/clock.dart';
+import 'package:nocsis_classroom/components/daydudy.dart';
 import 'package:nocsis_classroom/components/weather_graph.dart';
 import 'package:nocsis_classroom/components/weather_info.dart';
 import 'package:nocsis_classroom/providers/auth.dart';
@@ -63,9 +64,9 @@ class HomeInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return const Stack(
       children: [
-        const Align(
+        Align(
           alignment: Alignment.topLeft,
           child: WeatherInfo(),
         ),
@@ -75,11 +76,8 @@ class HomeInfo extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "田中 太郎",
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const Clock(),
+              Daydudy(),
+              Clock(),
             ],
           ),
         ),
