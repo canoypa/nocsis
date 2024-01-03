@@ -2,7 +2,7 @@
 .vercel
 
 # Flutter
-.fvm/
+.fvm/flutter_sdk
 
 # Miscellaneous
 *.class
