@@ -11,7 +11,7 @@ Future<ClassData?> duringClassData(DuringClassDataRef ref) async {
   // 毎分更新
   ref.watch(cronProvider("* * * * *"));
 
-  final classes = ref.watch(classesProvider).whenOrNull(data: (data) => data);
+  final classes = ref.watch(classesProvider).value;
 
   final now = DateTime.now();
 
