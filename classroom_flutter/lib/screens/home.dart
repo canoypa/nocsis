@@ -47,9 +47,7 @@ class HomeScreen extends ConsumerWidget {
 class _Home extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final duringClassData = ref.watch(duringClassDataProvider).whenOrNull(
-          data: (data) => data,
-        );
+    final duringClassData = ref.watch(duringClassDataProvider).value;
 
     return Stack(
       children: [
