@@ -1,9 +1,6 @@
-name: nocsis_personal
-description: Nocsis Personal
-
 publish_to: "none"
 
-version: 1.0.0+1
+name: nocsis_personal
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
