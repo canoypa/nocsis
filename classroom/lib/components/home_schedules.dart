@@ -95,7 +95,8 @@ class HomeSchedules extends ConsumerWidget {
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       Text(
-                        eventDateFormatter.format(e.startAt),
+                        // utc なので表示用にローカルに変換
+                        eventDateFormatter.format(e.startAt.toLocal()),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
