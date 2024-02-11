@@ -12,7 +12,7 @@ const monthly: OnCallHandler<MonthlyEventsResponse> = async (data, context) => {
   if (!context.auth) {
     throw new HttpsError(
       "unauthenticated",
-      "You must be authenticated to use this function"
+      "You must be authenticated to use this function",
     );
   }
 
@@ -53,7 +53,7 @@ const monthly: OnCallHandler<MonthlyEventsResponse> = async (data, context) => {
 
   // レスポンス形式への変換
   const result: MonthlyEventsResponse = Array.from(work.entries()).map(
-    ([month, items]) => ({ month, items })
+    ([month, items]) => ({ month, items }),
   );
 
   return result;

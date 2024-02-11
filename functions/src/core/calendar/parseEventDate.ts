@@ -5,7 +5,7 @@ import { DateTime } from "luxon";
  * イベントの日時を DateTime に変換する
  */
 export const parseEventDate = (
-  event: CalendarV3.Schema$Event
+  event: CalendarV3.Schema$Event,
 ): { start: DateTime; end: DateTime } => {
   const startDate = event.start?.dateTime || event.start?.date;
   const endDate = event.end?.dateTime || event.end?.date;

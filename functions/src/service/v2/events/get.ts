@@ -16,7 +16,7 @@ const get: OnCallHandler<Events, Args> = async (data, context) => {
   if (!context.auth) {
     throw new HttpsError(
       "unauthenticated",
-      "You must be authenticated to use this function"
+      "You must be authenticated to use this function",
     );
   }
 

@@ -8,7 +8,7 @@ import { isMultipleDays } from "./utils.js";
  */
 export const getDisplayTitle = (
   event: CalendarEvent,
-  date: DateTime
+  date: DateTime,
 ): string => {
   // 以下の場合何日目か付けて返す
   // 表示対象になる複数日のイベント
@@ -17,19 +17,19 @@ export const getDisplayTitle = (
     isMultipleDays(event) &&
     Interval.fromDateTimes(
       event.startAt.startOf("day"),
-      event.endAt.minus(1)
+      event.endAt.minus(1),
     ).contains(date)
   ) {
     // date が範囲内になるよう startOf("day") している
     const elapsedDays = Interval.fromDateTimes(
       event.startAt.startOf("day"),
-      date
+      date,
     ).count("days");
 
     // endAt の時刻は含まないので、とりあえず -1 しておく
     const eventDays = Interval.fromDateTimes(
       event.startAt,
-      event.endAt.minus(1)
+      event.endAt.minus(1),
     ).count("days");
 
     return `${event.title} (Day ${elapsedDays}/${eventDays})`;

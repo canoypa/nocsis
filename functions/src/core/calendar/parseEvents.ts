@@ -3,7 +3,7 @@ import { CalendarEvent } from "../../types/calendar.js";
 import { parseEventDate } from "./parseEventDate.js";
 
 export const parseEvents = (
-  items: CalendarV3.Schema$Event[]
+  items: CalendarV3.Schema$Event[],
 ): CalendarEvent[] => {
   return items.map((v) => {
     const date = parseEventDate(v);

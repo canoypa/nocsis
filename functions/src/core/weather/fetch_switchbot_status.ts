@@ -39,7 +39,7 @@ export const fetchSwitchbotStatus = async () => {
       .get<SwitchbotStatus>(getEndpoint(deviceId), {
         headers: { Authorization: SWITCHBOT_TOKEN },
       })
-      .then((v) => v.data)
+      .then((v) => v.data),
   );
 
   const res = await Promise.all(promises);

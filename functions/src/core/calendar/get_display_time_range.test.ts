@@ -6,7 +6,7 @@ const d = DateTime.fromObject;
 const c = (
   startAt: DateTime,
   endAt: DateTime,
-  isAllDay?: boolean
+  isAllDay?: boolean,
 ): CalendarEvent => ({
   startAt: startAt,
   endAt: endAt,

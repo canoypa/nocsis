@@ -14,7 +14,7 @@ export const getDaydutyStuNo = async (date: DateTime): Promise<number> => {
   const startDate = DateTime.fromISO(startDateEnv, { zone: "Asia/Tokyo" });
 
   const elapseDays = Math.floor(
-    date.setZone("asia/tokyo").diff(startDate).as("days")
+    date.setZone("asia/tokyo").diff(startDate).as("days"),
   );
 
   const classmatesCount = await getStudentCount();

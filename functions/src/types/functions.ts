@@ -4,12 +4,12 @@ import { CallableContext } from "firebase-functions/v1/https";
 
 export type OnCallHandler<R = any, D = any> = (
   data: D,
-  context: CallableContext
+  context: CallableContext,
 ) => Promise<R>;
 
 export type AuthOnCreateHandler = (
   user: UserRecord,
-  context: EventContext
+  context: EventContext,
 ) => Promise<void>;
 
 export type PubSubOnRunHandler = (context: EventContext) => Promise<void>;

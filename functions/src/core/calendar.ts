@@ -19,7 +19,7 @@ export type FetchCalendarParams = Partial<{
  */
 export const fetchCalendar = async (
   calendarId: string,
-  param: FetchCalendarParams
+  param: FetchCalendarParams,
 ): Promise<CalendarV3.Schema$Events> => {
   const calendar = await getCalendarClient();
 

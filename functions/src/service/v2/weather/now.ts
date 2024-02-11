@@ -37,7 +37,7 @@ const now: OnCallHandler<WeathersResponse> = async (_, context) => {
   if (!context.auth) {
     throw new HttpsError(
       "unauthenticated",
-      "You must be authenticated to use this function"
+      "You must be authenticated to use this function",
     );
   }
 
@@ -65,7 +65,7 @@ const now: OnCallHandler<WeathersResponse> = async (_, context) => {
 
       return p;
     },
-    { temp: [], pop: [] }
+    { temp: [], pop: [] },
   );
 
   return {

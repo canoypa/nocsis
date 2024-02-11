@@ -8,7 +8,7 @@ import { isAllDay } from "./utils.js";
  */
 export const getDisplayTimeRange = (
   event: CalendarEvent,
-  date: DateTime
+  date: DateTime,
 ): string | null => {
   // 時間指定のあるイベントの場合のみ返す
   if (isAllDay(event)) {

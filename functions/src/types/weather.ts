@@ -15,4 +15,4 @@ export const WeatherName = {
   /** 不明 */
   Unknown: "Unknown",
 } as const;
-export type WeatherName = typeof WeatherName[keyof typeof WeatherName];
+export type WeatherName = (typeof WeatherName)[keyof typeof WeatherName];

@@ -11,7 +11,7 @@ type EncodedCalendarClass = Omit<CalendarClass, "startAt" | "endAt"> & {
   endAt: string;
 };
 export const encodeCalendarClass = (
-  event: CalendarClass
+  event: CalendarClass,
 ): EncodedCalendarClass => {
   return {
     startAt: event.startAt.toISO(),
@@ -26,7 +26,7 @@ type EncodedCalendarEvent = Omit<CalendarEvent, "startAt" | "endAt"> & {
   endAt: string;
 };
 export const encodeCalendarEvent = (
-  event: CalendarEvent
+  event: CalendarEvent,
 ): EncodedCalendarEvent => {
   return {
     startAt: event.startAt.toISO(),
