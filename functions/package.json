@@ -5,7 +5,8 @@
   "main": "dist/main.js",
   "packageManager": "pnpm@8.7.6",
   "scripts": {
-    "lint": "tsc --noEmit && eslint --ext .js,.ts .",
+    "lint": "biome lint src",
+    "format": "biome format src",
     "test": "jest",
     "build": "swc src -d dist",
     "build:watch": "swc src -d dist --watch",
@@ -27,6 +28,7 @@
     "luxon": "^3.4.4"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.5.3",
     "@swc/cli": "^0.1.63",
     "@swc/core": "^1.3.103",
     "@types/jest": "^29.5.11",
