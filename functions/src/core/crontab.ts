@@ -1,4 +1,4 @@
-import { parseExpression } from "cron-parser";
+import parser from "cron-parser";
 import { DateTime } from "luxon";
 
 export type CrontabHandler = (timestamp: DateTime) => any | Promise<any>;
@@ -17,7 +17,7 @@ export const crontab = (
   }>
 ): ((date: DateTime) => void) => {
   // crontab の解析
-  const interval = parseExpression(expression, { tz: "asia/tokyo" });
+  const interval = parser.parseExpression(expression, { tz: "asia/tokyo" });
 
   return async (date: DateTime): Promise<void> => {
     // 現在時刻を分切り捨てで取得
