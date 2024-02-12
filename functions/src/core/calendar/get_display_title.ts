@@ -21,10 +21,13 @@ export const getDisplayTitle = (
     ).contains(date)
   ) {
     // date が範囲内になるよう startOf("day") している
-    const elapsedDays = Interval.fromDateTimes(
-      event.startAt.startOf("day"),
-      date,
-    ).count("days");
+    const elapsedDays =
+      Interval.fromDateTimes(event.startAt.startOf("day"), date).count("days") +
+      1;
+
+    console.log(event.startAt);
+    console.log(date);
+    console.log(elapsedDays);
 
     // endAt の時刻は含まないので、とりあえず -1 しておく
     const eventDays = Interval.fromDateTimes(
