@@ -15,7 +15,7 @@ export const crontab = (
   loadModule: () => Promise<{
     default: CrontabHandler;
   }>,
-): ((date: DateTime) => void) => {
+) => {
   // crontab の解析
   const interval = parser.parseExpression(expression, { tz: "asia/tokyo" });
 
