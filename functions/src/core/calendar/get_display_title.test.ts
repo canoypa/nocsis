@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { CalendarEvent } from "../../types/calendar.js";
 import { getDisplayTitle } from "./get_display_title.js";
 
-const d = DateTime.fromObject;
+const d = DateTime.fromISO;
 const c = (
   startAt: DateTime,
   endAt: DateTime,
@@ -19,13 +19,19 @@ const c = (
 
 describe("getDisplayTitle", () => {
   test("通常イベント", () => {
-    const start = d({ day: 1, hour: 22 });
-    const end = d({ day: 5, hour: 2 });
+    const start = d("2024-01-01T09:00:00.000+09:00");
+    const end = d("2024-01-02T09:00:00.000+09:00");
     const event = c(start, end);
 
-    expect(getDisplayTitle(event, d({ day: 1 }))).toBe("TITLE (Day 1/5)");
-    expect(getDisplayTitle(event, d({ day: 3 }))).toBe("TITLE (Day 3/5)");
-    expect(getDisplayTitle(event, d({ day: 5 }))).toBe("TITLE (Day 5/5)");
+    expect(getDisplayTitle(event, d("2024-01-01T08:00:00.000+09:00"))).toBe(
+      "TITLE (Day 1/2)",
+    );
+    expect(getDisplayTitle(event, d("2024-01-01T09:00:00.000+09:00"))).toBe(
+      "TITLE (Day 1/2)",
+    );
+    expect(getDisplayTitle(event, d("2024-01-01T10:00:00.000+09:00"))).toBe(
+      "TITLE (Day 1/2)",
+    );
 
     // 範囲外
     expect(getDisplayTitle(event, start.minus({ month: 1 }))).toBe("TITLE");
@@ -33,13 +39,16 @@ describe("getDisplayTitle", () => {
   });
 
   test("終日イベント", () => {
-    const start = d({ day: 1 });
-    const end = d({ day: 6 });
+    const start = d("2024-01-01T00:00:00.000+09:00");
+    const end = d("2024-01-03T00:00:00.000+09:00");
     const event = c(start, end, true);
 
-    expect(getDisplayTitle(event, d({ day: 1 }))).toBe("TITLE (Day 1/5)");
-    expect(getDisplayTitle(event, d({ day: 3 }))).toBe("TITLE (Day 3/5)");
-    expect(getDisplayTitle(event, d({ day: 5 }))).toBe("TITLE (Day 5/5)");
+    expect(getDisplayTitle(event, d("2024-01-01T00:00:00.000+09:00"))).toBe(
+      "TITLE (Day 1/2)",
+    );
+    expect(getDisplayTitle(event, d("2024-01-02T00:00:00.000+09:00"))).toBe(
+      "TITLE (Day 2/2)",
+    );
 
     // 範囲外
     expect(getDisplayTitle(event, start.minus({ month: 1 }))).toBe("TITLE");
