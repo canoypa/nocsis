@@ -3,7 +3,7 @@
   "name": "nocsis-functions",
   "type": "module",
   "main": "dist/main.js",
-  "packageManager": "pnpm@8.7.6",
+  "packageManager": "pnpm@8.15.2",
   "scripts": {
     "lint": "biome lint src",
     "format": "biome format src",
