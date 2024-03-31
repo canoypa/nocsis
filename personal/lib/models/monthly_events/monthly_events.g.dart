@@ -6,28 +6,28 @@ part of 'monthly_events.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_MonthEvents _$$_MonthEventsFromJson(Map<String, dynamic> json) =>
-    _$_MonthEvents(
+_$MonthEventsImpl _$$MonthEventsImplFromJson(Map<String, dynamic> json) =>
+    _$MonthEventsImpl(
       month: json['month'] as String,
       items: (json['items'] as List<dynamic>)
           .map((e) => CalendarEvent.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$$_MonthEventsToJson(_$_MonthEvents instance) =>
+Map<String, dynamic> _$$MonthEventsImplToJson(_$MonthEventsImpl instance) =>
     <String, dynamic>{
       'month': instance.month,
       'items': instance.items,
     };
 
-_$_MonthlyEvents _$$_MonthlyEventsFromJson(Map<String, dynamic> json) =>
-    _$_MonthlyEvents(
+_$MonthlyEventsImpl _$$MonthlyEventsImplFromJson(Map<String, dynamic> json) =>
+    _$MonthlyEventsImpl(
       items: (json['items'] as List<dynamic>)
           .map((e) => MonthEvents.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$$_MonthlyEventsToJson(_$_MonthlyEvents instance) =>
+Map<String, dynamic> _$$MonthlyEventsImplToJson(_$MonthlyEventsImpl instance) =>
     <String, dynamic>{
       'items': instance.items,
     };

@@ -6,15 +6,15 @@ part of 'calendar_event.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_CalendarEvent _$$_CalendarEventFromJson(Map<String, dynamic> json) =>
-    _$_CalendarEvent(
+_$CalendarEventImpl _$$CalendarEventImplFromJson(Map<String, dynamic> json) =>
+    _$CalendarEventImpl(
       title: json['title'] as String,
       isAllDay: json['isAllDay'] as bool,
       startAt: const DateTimeConverter().fromJson(json['startAt'] as String),
       endAt: const DateTimeConverter().fromJson(json['endAt'] as String),
     );
 
-Map<String, dynamic> _$$_CalendarEventToJson(_$_CalendarEvent instance) =>
+Map<String, dynamic> _$$CalendarEventImplToJson(_$CalendarEventImpl instance) =>
     <String, dynamic>{
       'title': instance.title,
       'isAllDay': instance.isAllDay,

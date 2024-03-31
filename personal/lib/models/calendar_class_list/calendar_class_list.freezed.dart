@@ -1,7 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'calendar_class_list.dart';
 
@@ -12,7 +12,7 @@ part of 'calendar_class_list.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 CalendarClassList _$CalendarClassListFromJson(Map<String, dynamic> json) {
   return _CalendarClassList.fromJson(json);
@@ -33,70 +33,72 @@ mixin _$CalendarClassList {
 abstract class $CalendarClassListCopyWith<$Res> {
   factory $CalendarClassListCopyWith(
           CalendarClassList value, $Res Function(CalendarClassList) then) =
-      _$CalendarClassListCopyWithImpl<$Res>;
+      _$CalendarClassListCopyWithImpl<$Res, CalendarClassList>;
+  @useResult
   $Res call({bool isEmpty, List<CalendarClass> items});
 }
 
 /// @nodoc
-class _$CalendarClassListCopyWithImpl<$Res>
+class _$CalendarClassListCopyWithImpl<$Res, $Val extends CalendarClassList>
     implements $CalendarClassListCopyWith<$Res> {
   _$CalendarClassListCopyWithImpl(this._value, this._then);
 
-  final CalendarClassList _value;
   // ignore: unused_field
-  final $Res Function(CalendarClassList) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isEmpty = freezed,
-    Object? items = freezed,
+    Object? isEmpty = null,
+    Object? items = null,
   }) {
     return _then(_value.copyWith(
-      isEmpty: isEmpty == freezed
+      isEmpty: null == isEmpty
           ? _value.isEmpty
           : isEmpty // ignore: cast_nullable_to_non_nullable
               as bool,
-      items: items == freezed
+      items: null == items
           ? _value.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<CalendarClass>,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$CalendarClassListCopyWith<$Res>
+abstract class _$$CalendarClassListImplCopyWith<$Res>
     implements $CalendarClassListCopyWith<$Res> {
-  factory _$CalendarClassListCopyWith(
-          _CalendarClassList value, $Res Function(_CalendarClassList) then) =
-      __$CalendarClassListCopyWithImpl<$Res>;
+  factory _$$CalendarClassListImplCopyWith(_$CalendarClassListImpl value,
+          $Res Function(_$CalendarClassListImpl) then) =
+      __$$CalendarClassListImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call({bool isEmpty, List<CalendarClass> items});
 }
 
 /// @nodoc
-class __$CalendarClassListCopyWithImpl<$Res>
-    extends _$CalendarClassListCopyWithImpl<$Res>
-    implements _$CalendarClassListCopyWith<$Res> {
-  __$CalendarClassListCopyWithImpl(
-      _CalendarClassList _value, $Res Function(_CalendarClassList) _then)
-      : super(_value, (v) => _then(v as _CalendarClassList));
+class __$$CalendarClassListImplCopyWithImpl<$Res>
+    extends _$CalendarClassListCopyWithImpl<$Res, _$CalendarClassListImpl>
+    implements _$$CalendarClassListImplCopyWith<$Res> {
+  __$$CalendarClassListImplCopyWithImpl(_$CalendarClassListImpl _value,
+      $Res Function(_$CalendarClassListImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _CalendarClassList get _value => super._value as _CalendarClassList;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isEmpty = freezed,
-    Object? items = freezed,
+    Object? isEmpty = null,
+    Object? items = null,
   }) {
-    return _then(_CalendarClassList(
-      isEmpty: isEmpty == freezed
+    return _then(_$CalendarClassListImpl(
+      isEmpty: null == isEmpty
           ? _value.isEmpty
           : isEmpty // ignore: cast_nullable_to_non_nullable
               as bool,
-      items: items == freezed
-          ? _value.items
+      items: null == items
+          ? _value._items
           : items // ignore: cast_nullable_to_non_nullable
               as List<CalendarClass>,
     ));
@@ -105,19 +107,20 @@ class __$CalendarClassListCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_CalendarClassList implements _CalendarClassList {
-  const _$_CalendarClassList(
+class _$CalendarClassListImpl implements _CalendarClassList {
+  const _$CalendarClassListImpl(
       {required this.isEmpty, required final List<CalendarClass> items})
       : _items = items;
 
-  factory _$_CalendarClassList.fromJson(Map<String, dynamic> json) =>
-      _$$_CalendarClassListFromJson(json);
+  factory _$CalendarClassListImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CalendarClassListImplFromJson(json);
 
   @override
   final bool isEmpty;
   final List<CalendarClass> _items;
   @override
   List<CalendarClass> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_items);
   }
@@ -128,46 +131,48 @@ class _$_CalendarClassList implements _CalendarClassList {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _CalendarClassList &&
-            const DeepCollectionEquality().equals(other.isEmpty, isEmpty) &&
-            const DeepCollectionEquality().equals(other.items, items));
+            other is _$CalendarClassListImpl &&
+            (identical(other.isEmpty, isEmpty) || other.isEmpty == isEmpty) &&
+            const DeepCollectionEquality().equals(other._items, _items));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(isEmpty),
-      const DeepCollectionEquality().hash(items));
+      runtimeType, isEmpty, const DeepCollectionEquality().hash(_items));
 
   @JsonKey(ignore: true)
   @override
-  _$CalendarClassListCopyWith<_CalendarClassList> get copyWith =>
-      __$CalendarClassListCopyWithImpl<_CalendarClassList>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$CalendarClassListImplCopyWith<_$CalendarClassListImpl> get copyWith =>
+      __$$CalendarClassListImplCopyWithImpl<_$CalendarClassListImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_CalendarClassListToJson(this);
+    return _$$CalendarClassListImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _CalendarClassList implements CalendarClassList {
   const factory _CalendarClassList(
       {required final bool isEmpty,
-      required final List<CalendarClass> items}) = _$_CalendarClassList;
+      required final List<CalendarClass> items}) = _$CalendarClassListImpl;
 
   factory _CalendarClassList.fromJson(Map<String, dynamic> json) =
-      _$_CalendarClassList.fromJson;
+      _$CalendarClassListImpl.fromJson;
 
   @override
-  bool get isEmpty => throw _privateConstructorUsedError;
+  bool get isEmpty;
   @override
-  List<CalendarClass> get items => throw _privateConstructorUsedError;
+  List<CalendarClass> get items;
   @override
   @JsonKey(ignore: true)
-  _$CalendarClassListCopyWith<_CalendarClassList> get copyWith =>
+  _$$CalendarClassListImplCopyWith<_$CalendarClassListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -1,7 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'monthly_events.dart';
 
@@ -12,7 +12,7 @@ part of 'monthly_events.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 MonthEvents _$MonthEventsFromJson(Map<String, dynamic> json) {
   return _MonthEvents.fromJson(json);
@@ -33,68 +33,72 @@ mixin _$MonthEvents {
 abstract class $MonthEventsCopyWith<$Res> {
   factory $MonthEventsCopyWith(
           MonthEvents value, $Res Function(MonthEvents) then) =
-      _$MonthEventsCopyWithImpl<$Res>;
+      _$MonthEventsCopyWithImpl<$Res, MonthEvents>;
+  @useResult
   $Res call({String month, List<CalendarEvent> items});
 }
 
 /// @nodoc
-class _$MonthEventsCopyWithImpl<$Res> implements $MonthEventsCopyWith<$Res> {
+class _$MonthEventsCopyWithImpl<$Res, $Val extends MonthEvents>
+    implements $MonthEventsCopyWith<$Res> {
   _$MonthEventsCopyWithImpl(this._value, this._then);
 
-  final MonthEvents _value;
   // ignore: unused_field
-  final $Res Function(MonthEvents) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? month = freezed,
-    Object? items = freezed,
+    Object? month = null,
+    Object? items = null,
   }) {
     return _then(_value.copyWith(
-      month: month == freezed
+      month: null == month
           ? _value.month
           : month // ignore: cast_nullable_to_non_nullable
               as String,
-      items: items == freezed
+      items: null == items
           ? _value.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<CalendarEvent>,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$MonthEventsCopyWith<$Res>
+abstract class _$$MonthEventsImplCopyWith<$Res>
     implements $MonthEventsCopyWith<$Res> {
-  factory _$MonthEventsCopyWith(
-          _MonthEvents value, $Res Function(_MonthEvents) then) =
-      __$MonthEventsCopyWithImpl<$Res>;
+  factory _$$MonthEventsImplCopyWith(
+          _$MonthEventsImpl value, $Res Function(_$MonthEventsImpl) then) =
+      __$$MonthEventsImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call({String month, List<CalendarEvent> items});
 }
 
 /// @nodoc
-class __$MonthEventsCopyWithImpl<$Res> extends _$MonthEventsCopyWithImpl<$Res>
-    implements _$MonthEventsCopyWith<$Res> {
-  __$MonthEventsCopyWithImpl(
-      _MonthEvents _value, $Res Function(_MonthEvents) _then)
-      : super(_value, (v) => _then(v as _MonthEvents));
+class __$$MonthEventsImplCopyWithImpl<$Res>
+    extends _$MonthEventsCopyWithImpl<$Res, _$MonthEventsImpl>
+    implements _$$MonthEventsImplCopyWith<$Res> {
+  __$$MonthEventsImplCopyWithImpl(
+      _$MonthEventsImpl _value, $Res Function(_$MonthEventsImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _MonthEvents get _value => super._value as _MonthEvents;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? month = freezed,
-    Object? items = freezed,
+    Object? month = null,
+    Object? items = null,
   }) {
-    return _then(_MonthEvents(
-      month: month == freezed
+    return _then(_$MonthEventsImpl(
+      month: null == month
           ? _value.month
           : month // ignore: cast_nullable_to_non_nullable
               as String,
-      items: items == freezed
-          ? _value.items
+      items: null == items
+          ? _value._items
           : items // ignore: cast_nullable_to_non_nullable
               as List<CalendarEvent>,
     ));
@@ -103,19 +107,20 @@ class __$MonthEventsCopyWithImpl<$Res> extends _$MonthEventsCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MonthEvents implements _MonthEvents {
-  const _$_MonthEvents(
+class _$MonthEventsImpl implements _MonthEvents {
+  const _$MonthEventsImpl(
       {required this.month, required final List<CalendarEvent> items})
       : _items = items;
 
-  factory _$_MonthEvents.fromJson(Map<String, dynamic> json) =>
-      _$$_MonthEventsFromJson(json);
+  factory _$MonthEventsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MonthEventsImplFromJson(json);
 
   @override
   final String month;
   final List<CalendarEvent> _items;
   @override
   List<CalendarEvent> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_items);
   }
@@ -126,47 +131,48 @@ class _$_MonthEvents implements _MonthEvents {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _MonthEvents &&
-            const DeepCollectionEquality().equals(other.month, month) &&
-            const DeepCollectionEquality().equals(other.items, items));
+            other is _$MonthEventsImpl &&
+            (identical(other.month, month) || other.month == month) &&
+            const DeepCollectionEquality().equals(other._items, _items));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(month),
-      const DeepCollectionEquality().hash(items));
+      runtimeType, month, const DeepCollectionEquality().hash(_items));
 
   @JsonKey(ignore: true)
   @override
-  _$MonthEventsCopyWith<_MonthEvents> get copyWith =>
-      __$MonthEventsCopyWithImpl<_MonthEvents>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$MonthEventsImplCopyWith<_$MonthEventsImpl> get copyWith =>
+      __$$MonthEventsImplCopyWithImpl<_$MonthEventsImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MonthEventsToJson(this);
+    return _$$MonthEventsImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _MonthEvents implements MonthEvents {
   const factory _MonthEvents(
       {required final String month,
-      required final List<CalendarEvent> items}) = _$_MonthEvents;
+      required final List<CalendarEvent> items}) = _$MonthEventsImpl;
 
   factory _MonthEvents.fromJson(Map<String, dynamic> json) =
-      _$_MonthEvents.fromJson;
+      _$MonthEventsImpl.fromJson;
 
   @override
-  String get month => throw _privateConstructorUsedError;
+  String get month;
   @override
-  List<CalendarEvent> get items => throw _privateConstructorUsedError;
+  List<CalendarEvent> get items;
   @override
   @JsonKey(ignore: true)
-  _$MonthEventsCopyWith<_MonthEvents> get copyWith =>
+  _$$MonthEventsImplCopyWith<_$MonthEventsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -188,60 +194,62 @@ mixin _$MonthlyEvents {
 abstract class $MonthlyEventsCopyWith<$Res> {
   factory $MonthlyEventsCopyWith(
           MonthlyEvents value, $Res Function(MonthlyEvents) then) =
-      _$MonthlyEventsCopyWithImpl<$Res>;
+      _$MonthlyEventsCopyWithImpl<$Res, MonthlyEvents>;
+  @useResult
   $Res call({List<MonthEvents> items});
 }
 
 /// @nodoc
-class _$MonthlyEventsCopyWithImpl<$Res>
+class _$MonthlyEventsCopyWithImpl<$Res, $Val extends MonthlyEvents>
     implements $MonthlyEventsCopyWith<$Res> {
   _$MonthlyEventsCopyWithImpl(this._value, this._then);
 
-  final MonthlyEvents _value;
   // ignore: unused_field
-  final $Res Function(MonthlyEvents) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? items = freezed,
+    Object? items = null,
   }) {
     return _then(_value.copyWith(
-      items: items == freezed
+      items: null == items
           ? _value.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<MonthEvents>,
-    ));
+    ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$MonthlyEventsCopyWith<$Res>
+abstract class _$$MonthlyEventsImplCopyWith<$Res>
     implements $MonthlyEventsCopyWith<$Res> {
-  factory _$MonthlyEventsCopyWith(
-          _MonthlyEvents value, $Res Function(_MonthlyEvents) then) =
-      __$MonthlyEventsCopyWithImpl<$Res>;
+  factory _$$MonthlyEventsImplCopyWith(
+          _$MonthlyEventsImpl value, $Res Function(_$MonthlyEventsImpl) then) =
+      __$$MonthlyEventsImplCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call({List<MonthEvents> items});
 }
 
 /// @nodoc
-class __$MonthlyEventsCopyWithImpl<$Res>
-    extends _$MonthlyEventsCopyWithImpl<$Res>
-    implements _$MonthlyEventsCopyWith<$Res> {
-  __$MonthlyEventsCopyWithImpl(
-      _MonthlyEvents _value, $Res Function(_MonthlyEvents) _then)
-      : super(_value, (v) => _then(v as _MonthlyEvents));
+class __$$MonthlyEventsImplCopyWithImpl<$Res>
+    extends _$MonthlyEventsCopyWithImpl<$Res, _$MonthlyEventsImpl>
+    implements _$$MonthlyEventsImplCopyWith<$Res> {
+  __$$MonthlyEventsImplCopyWithImpl(
+      _$MonthlyEventsImpl _value, $Res Function(_$MonthlyEventsImpl) _then)
+      : super(_value, _then);
 
-  @override
-  _MonthlyEvents get _value => super._value as _MonthlyEvents;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? items = freezed,
+    Object? items = null,
   }) {
-    return _then(_MonthlyEvents(
-      items: items == freezed
-          ? _value.items
+    return _then(_$MonthlyEventsImpl(
+      items: null == items
+          ? _value._items
           : items // ignore: cast_nullable_to_non_nullable
               as List<MonthEvents>,
     ));
@@ -250,16 +258,17 @@ class __$MonthlyEventsCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_MonthlyEvents implements _MonthlyEvents {
-  const _$_MonthlyEvents({required final List<MonthEvents> items})
+class _$MonthlyEventsImpl implements _MonthlyEvents {
+  const _$MonthlyEventsImpl({required final List<MonthEvents> items})
       : _items = items;
 
-  factory _$_MonthlyEvents.fromJson(Map<String, dynamic> json) =>
-      _$$_MonthlyEventsFromJson(json);
+  factory _$MonthlyEventsImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MonthlyEventsImplFromJson(json);
 
   final List<MonthEvents> _items;
   @override
   List<MonthEvents> get items {
+    if (_items is EqualUnmodifiableListView) return _items;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_items);
   }
@@ -270,40 +279,43 @@ class _$_MonthlyEvents implements _MonthlyEvents {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _MonthlyEvents &&
-            const DeepCollectionEquality().equals(other.items, items));
+            other is _$MonthlyEventsImpl &&
+            const DeepCollectionEquality().equals(other._items, _items));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(items));
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
 
   @JsonKey(ignore: true)
   @override
-  _$MonthlyEventsCopyWith<_MonthlyEvents> get copyWith =>
-      __$MonthlyEventsCopyWithImpl<_MonthlyEvents>(this, _$identity);
+  @pragma('vm:prefer-inline')
+  _$$MonthlyEventsImplCopyWith<_$MonthlyEventsImpl> get copyWith =>
+      __$$MonthlyEventsImplCopyWithImpl<_$MonthlyEventsImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_MonthlyEventsToJson(this);
+    return _$$MonthlyEventsImplToJson(
+      this,
+    );
   }
 }
 
 abstract class _MonthlyEvents implements MonthlyEvents {
   const factory _MonthlyEvents({required final List<MonthEvents> items}) =
-      _$_MonthlyEvents;
+      _$MonthlyEventsImpl;
 
   factory _MonthlyEvents.fromJson(Map<String, dynamic> json) =
-      _$_MonthlyEvents.fromJson;
+      _$MonthlyEventsImpl.fromJson;
 
   @override
-  List<MonthEvents> get items => throw _privateConstructorUsedError;
+  List<MonthEvents> get items;
   @override
   @JsonKey(ignore: true)
-  _$MonthlyEventsCopyWith<_MonthlyEvents> get copyWith =>
+  _$$MonthlyEventsImplCopyWith<_$MonthlyEventsImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
