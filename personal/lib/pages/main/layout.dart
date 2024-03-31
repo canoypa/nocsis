@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis_personal/components/user_avatar.dart';
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {
@@ -94,6 +95,14 @@ class MainPage extends StatelessWidget {
         final bool isLargeScreen = constraints.minWidth >= 1200;
 
         return Scaffold(
+          appBar: AppBar(
+            actions: [
+              IconButton(
+                icon: const UserAvatar(),
+                onPressed: () {},
+              )
+            ],
+          ),
           body: Row(
             children: [
               if (isLargeScreen) _buildNavRail(context, nav),
