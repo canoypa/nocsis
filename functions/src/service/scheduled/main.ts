@@ -7,7 +7,6 @@ const main: PubSubOnRunHandler = async (context) => {
   const timestamp = DateTime.fromISO(context.timestamp);
 
   await Promise.allSettled([
-    // 取り敢えずコメントアウトで通知止める
     crontab("0 7 * * *", () => import("./notifyDayduty.js"))(timestamp),
     crontab("0 7 * * *", () => import("./notifyEvent.js"))(timestamp),
   ]);
