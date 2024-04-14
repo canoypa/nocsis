@@ -8,8 +8,8 @@ const main: PubSubOnRunHandler = async (context) => {
 
   await Promise.allSettled([
     // 取り敢えずコメントアウトで通知止める
-    // crontab("0 7 * * *", () => import("./notifyDayduty.js"))(timestamp),
-    // crontab("0 7 * * *", () => import("./notifyEvent.js"))(timestamp),
+    crontab("0 7 * * *", () => import("./notifyDayduty.js"))(timestamp),
+    crontab("0 7 * * *", () => import("./notifyEvent.js"))(timestamp),
   ]);
 };
 export default main;
