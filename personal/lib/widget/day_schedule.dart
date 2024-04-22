@@ -53,7 +53,8 @@ class DaySchedulesState extends StateNotifier<Map<int, DaySchedules>> {
   Future<dynamic> _getClasses(String from, String to) async {
     final HttpsCallable getClasses =
         FirebaseFunctions.instanceFor(region: "asia-northeast1")
-            .httpsCallable("v2-classes-get");
+            .httpsCallableFromUri(
+                Uri.parse("https://v3-classes-get-6joklbidfa-an.a.run.app"));
 
     final res = await getClasses.call({"from": from, "to": to});
 
@@ -64,7 +65,8 @@ class DaySchedulesState extends StateNotifier<Map<int, DaySchedules>> {
   Future<dynamic> _getEvents(String from, String to) async {
     final HttpsCallable getClasses =
         FirebaseFunctions.instanceFor(region: "asia-northeast1")
-            .httpsCallable("v2-events-get");
+            .httpsCallableFromUri(
+                Uri.parse("https://v3-events-get-6joklbidfa-an.a.run.app"));
 
     final res = await getClasses.call({"from": from, "to": to});
 

@@ -11,7 +11,8 @@ final eventsProvider = FutureProvider<MonthlyEvents>((ref) async {
 
   final HttpsCallable getEvents =
       FirebaseFunctions.instanceFor(region: "asia-northeast1")
-          .httpsCallable("v2-events-monthly");
+          .httpsCallableFromUri(
+              Uri.parse("https://v3-events-monthly-6joklbidfa-an.a.run.app"));
 
   final res = await getEvents.call({
     "date": today.toIso8601String(),
