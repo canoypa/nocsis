@@ -1,9 +1,13 @@
 import { getFirestore } from "firebase-admin/firestore";
-import { region } from "firebase-functions";
+import { beforeUserCreated } from "firebase-functions/v2/identity";
 
-export const beforeCreate = region("asia-northeast1")
-  .auth.user()
-  .beforeCreate(async (user) => {
+export const beforeUserCreate = beforeUserCreated(
+  {
+    region: "asia-northeast1",
+  },
+  async (event) => {
+    const user = event.data;
+
     const snapshot = await getFirestore()
       .doc("environment/allowed_emails")
       .get();
@@ -19,4 +23,5 @@ export const beforeCreate = region("asia-northeast1")
     }
 
     return;
-  });
+  },
+);
