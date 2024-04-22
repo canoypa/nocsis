@@ -3,8 +3,8 @@ import { DateTime } from "luxon";
 import { fetchCalendar } from "../../../core/calendar.js";
 import { encodeCalendarEvent } from "../../../core/calendar/encode.js";
 import { parseEvents } from "../../../core/calendar/parseEvents.js";
-import { EventData } from "../../../types/events.js";
-import { OnCallHandler } from "../../../types/functions.js";
+import type { EventData } from "../../../types/events.js";
+import type { OnCallHandler } from "../../../types/functions.js";
 
 type MonthlyEventsResponse = { month: string; items: EventData[] }[];
 

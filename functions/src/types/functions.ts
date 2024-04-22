@@ -1,6 +1,6 @@
-import { EventContext } from "firebase-functions/v1";
-import { UserRecord } from "firebase-functions/v1/auth";
-import { CallableContext } from "firebase-functions/v1/https";
+import type { EventContext } from "firebase-functions/v1";
+import type { UserRecord } from "firebase-functions/v1/auth";
+import type { CallableContext } from "firebase-functions/v1/https";
 
 export type OnCallHandler<R = any, D = any> = (
   data: D,

@@ -1,7 +1,7 @@
-import { ChatPostMessageArguments } from "@slack/web-api";
+import type { ChatPostMessageArguments } from "@slack/web-api";
 import { slackClient } from "../../client/slackClient.js";
 import { getTeacher } from "../../core/classmates/getTeacher.js";
-import { CrontabHandler } from "../../core/crontab.js";
+import type { CrontabHandler } from "../../core/crontab.js";
 import { getDayduty } from "../../core/dayduty/getDayduty.js";
 
 /**

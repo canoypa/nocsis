@@ -1,10 +1,10 @@
-import { ChatPostMessageArguments } from "@slack/web-api";
+import type { ChatPostMessageArguments } from "@slack/web-api";
 import { slackClient } from "../../client/slackClient.js";
 import { fetchCalendar } from "../../core/calendar.js";
 import { getDisplayTitle } from "../../core/calendar/get_display_title.js";
 import { parseEvents } from "../../core/calendar/parseEvents.js";
 import { eventsToSlackBlock } from "../../core/calendar/slack_block.js";
-import { CrontabHandler } from "../../core/crontab.js";
+import type { CrontabHandler } from "../../core/crontab.js";
 
 /**
  * イベントの通知

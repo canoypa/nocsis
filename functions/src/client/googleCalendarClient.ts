@@ -1,7 +1,7 @@
 import {
   auth,
   calendar,
-  calendar_v3 as CalendarV3,
+  type calendar_v3 as CalendarV3,
 } from "@googleapis/calendar";
 
 let instance: CalendarV3.Calendar;

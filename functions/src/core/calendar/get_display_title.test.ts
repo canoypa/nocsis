@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { describe, expect, test } from "vitest";
-import { CalendarEvent } from "../../types/calendar.js";
+import type { CalendarEvent } from "../../types/calendar.js";
 import { getDisplayTitle } from "./get_display_title.js";
 
 const d = DateTime.fromISO;

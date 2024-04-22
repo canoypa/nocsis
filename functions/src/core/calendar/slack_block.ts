@@ -1,4 +1,4 @@
-import {
+import type {
   Block,
   ContextBlock,
   DividerBlock,
@@ -8,8 +8,8 @@ import {
   PlainTextElement,
   SectionBlock,
 } from "@slack/web-api";
-import { DateTime } from "luxon";
-import { CalendarEvent } from "../../types/calendar.js";
+import type { DateTime } from "luxon";
+import type { CalendarEvent } from "../../types/calendar.js";
 import { getDisplayTimeRange } from "./get_display_time_range.js";
 import { getDisplayTitle } from "./get_display_title.js";
 

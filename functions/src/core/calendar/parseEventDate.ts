@@ -1,4 +1,4 @@
-import { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
+import type { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
 import { DateTime } from "luxon";
 
 /**

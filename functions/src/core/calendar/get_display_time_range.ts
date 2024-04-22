@@ -1,5 +1,5 @@
-import { DateTime } from "luxon";
-import { CalendarEvent } from "../../types/calendar.js";
+import type { DateTime } from "luxon";
+import type { CalendarEvent } from "../../types/calendar.js";
 import { isAllDay } from "./utils.js";
 
 /**

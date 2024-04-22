@@ -1,5 +1,5 @@
-import { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
-import { CalendarClass } from "../../types/calendar.js";
+import type { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
+import type { CalendarClass } from "../../types/calendar.js";
 import { parseEventDate } from "./parseEventDate.js";
 
 export const parseClasses = (

@@ -1,6 +1,6 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { firebaseApp } from "../../client/firebaseApp.js";
-import { Student } from "../../types/classmates.js";
+import type { Student } from "../../types/classmates.js";
 
 /**
  * 入力された出席番号の生徒を取得する
