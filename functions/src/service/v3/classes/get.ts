@@ -1,24 +1,19 @@
-import { HttpsError } from "firebase-functions/v1/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { DateTime } from "luxon";
-import { fetchCalendar, type FetchCalendarParams } from "../../../core/calendar.js";
+import {
+  type FetchCalendarParams,
+  fetchCalendar,
+} from "../../../core/calendar.js";
 import { encodeCalendarClass } from "../../../core/calendar/encode.js";
 import { parseClasses } from "../../../core/calendar/parseClasses.js";
 import type { Classes } from "../../../types/classes.js";
-import type { OnCallHandler } from "../../../types/functions.js";
 
 type Args = {
   from: string;
   to: string;
 };
 
-const get: OnCallHandler<Classes, Args> = async (data, context) => {
-  if (!context.auth) {
-    throw new HttpsError(
-      "unauthenticated",
-      "You must be authenticated to use this function",
-    );
-  }
-
+const get = async (data: any): Promise<Classes> => {
   const calendarId = process.env.CLASSES_CALENDAR_ID;
   if (!calendarId) {
     throw new HttpsError("internal", "Internal error");

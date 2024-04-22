@@ -6,7 +6,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'classes.g.dart';
 
 final fn = FirebaseFunctions.instanceFor(region: "asia-northeast1")
-    .httpsCallable("v2-classes-get");
+    .httpsCallableFromUri(
+        Uri.parse("https://v3-classes-get-6joklbidfa-an.a.run.app"));
 
 @riverpod
 Future<ClassList> classes(ClassesRef ref) async {

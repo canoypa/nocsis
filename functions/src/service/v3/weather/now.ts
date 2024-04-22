@@ -1,11 +1,9 @@
-import { HttpsError } from "firebase-functions/v1/https";
-import {
-  fetchSwitchbotStatus,
-  type SwitchbotStatusBody,
-} from "../../../core/weather/fetch_switchbot_status.js";
 import { fetchWeather } from "../../../core/weather/fetchWeather.js";
+import {
+  type SwitchbotStatusBody,
+  fetchSwitchbotStatus,
+} from "../../../core/weather/fetch_switchbot_status.js";
 import { getWeatherNameById } from "../../../core/weather/getWeatherNameById.js";
-import type { OnCallHandler } from "../../../types/functions.js";
 import type { WeatherName } from "../../../types/weather.js";
 
 export type WeathersResponse = {
@@ -33,14 +31,7 @@ const calcSwitchbotTempAvg = (data: SwitchbotStatusBody[]): number => {
   return result;
 };
 
-const now: OnCallHandler<WeathersResponse> = async (_, context) => {
-  if (!context.auth) {
-    throw new HttpsError(
-      "unauthenticated",
-      "You must be authenticated to use this function",
-    );
-  }
-
+const now = async (): Promise<WeathersResponse> => {
   const [openWeatherData, switchbotData] = await Promise.all([
     fetchWeather(),
     fetchSwitchbotStatus(),

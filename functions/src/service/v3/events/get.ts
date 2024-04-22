@@ -1,10 +1,12 @@
-import { HttpsError } from "firebase-functions/v1/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { DateTime } from "luxon";
-import { fetchCalendar, type FetchCalendarParams } from "../../../core/calendar.js";
+import {
+  type FetchCalendarParams,
+  fetchCalendar,
+} from "../../../core/calendar.js";
 import { encodeCalendarEvent } from "../../../core/calendar/encode.js";
 import { parseEvents } from "../../../core/calendar/parseEvents.js";
 import type { Events } from "../../../types/events.js";
-import type { OnCallHandler } from "../../../types/functions.js";
 
 type Args = {
   from: string;
@@ -12,14 +14,7 @@ type Args = {
   limit: number;
 };
 
-const get: OnCallHandler<Events, Args> = async (data, context) => {
-  if (!context.auth) {
-    throw new HttpsError(
-      "unauthenticated",
-      "You must be authenticated to use this function",
-    );
-  }
-
+const get = async (data: any): Promise<Events> => {
   const calendarId = process.env.EVENTS_CALENDAR_ID;
   if (!calendarId) {
     throw new HttpsError("internal", "Internal error");

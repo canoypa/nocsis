@@ -1,7 +1,6 @@
-import { HttpsError } from "firebase-functions/v1/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { DateTime } from "luxon";
 import { getDayduty } from "../../../core/dayduty/getDayduty.js";
-import type { OnCallHandler } from "../../../types/functions.js";
 
 type DayDuty = {
   stuNo: number;
@@ -13,14 +12,7 @@ type Args = {
   date: string;
 };
 
-const get: OnCallHandler<DayDuty, Args> = async (data, context) => {
-  if (!context.auth) {
-    throw new HttpsError(
-      "unauthenticated",
-      "You must be authenticated to use this function",
-    );
-  }
-
+const get = async (data: any): Promise<DayDuty> => {
   const date = DateTime.fromISO(data.date, { zone: "asia/tokyo" });
   if (date === null) {
     throw new HttpsError("invalid-argument", "date is not ISO format");
