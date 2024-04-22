@@ -1,10 +1,10 @@
+import type { ScheduledEvent } from "firebase-functions/v2/scheduler";
 import { DateTime } from "luxon";
 import { crontab } from "../../core/crontab.js";
-import { PubSubOnRunHandler } from "../../types/functions.js";
 
 /** 定期実行 */
-const main: PubSubOnRunHandler = async (context) => {
-  const timestamp = DateTime.fromISO(context.timestamp);
+const main = async (event: ScheduledEvent) => {
+  const timestamp = DateTime.fromISO(event.scheduleTime);
 
   await Promise.allSettled([
     crontab("0 7 * * *", () => import("./notifyDayduty.js"))(timestamp),
