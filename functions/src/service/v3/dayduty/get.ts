@@ -1,4 +1,4 @@
-import { HttpsError } from "firebase-functions/v1/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { DateTime } from "luxon";
 import { getDayduty } from "../../../core/dayduty/getDayduty.js";
 
