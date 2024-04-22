@@ -6,7 +6,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'daydudy.g.dart';
 
 final fn = FirebaseFunctions.instanceFor(region: "asia-northeast1")
-    .httpsCallable("v2-dayduty-get");
+    .httpsCallableFromUri(
+        Uri.parse("https://v3-dayduty-get-6joklbidfa-an.a.run.app"));
 
 @riverpod
 Future<Daydudy> daydudy(DaydudyRef ref) async {
