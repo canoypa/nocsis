@@ -14,7 +14,7 @@ type Args = {
   limit: number;
 };
 
-const get = async (data: any): Promise<Events> => {
+const get = async (data: Args): Promise<Events> => {
   const calendarId = process.env.EVENTS_CALENDAR_ID;
   if (!calendarId) {
     throw new HttpsError("internal", "Internal error");

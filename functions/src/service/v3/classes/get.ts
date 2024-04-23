@@ -13,7 +13,7 @@ type Args = {
   to: string;
 };
 
-const get = async (data: any): Promise<Classes> => {
+const get = async (data: Args): Promise<Classes> => {
   const calendarId = process.env.CLASSES_CALENDAR_ID;
   if (!calendarId) {
     throw new HttpsError("internal", "Internal error");

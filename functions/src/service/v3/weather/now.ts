@@ -20,7 +20,7 @@ export type WeathersResponse = {
   hourly: {
     temp: number[];
     pop: number[];
-  }[];
+  };
 
   threeHour: [WeatherName, WeatherName, WeatherName];
 };
@@ -46,11 +46,15 @@ const now = async (): Promise<WeathersResponse> => {
   // 3 時間先までの天気
   const threeHour = openWeatherData.hourly
     .slice(1, 4)
-    .map((v: any) => getWeatherNameById(v.weather[0].id));
+    .map((v) => getWeatherNameById(v.weather[0].id)) as [
+    WeatherName,
+    WeatherName,
+    WeatherName,
+  ];
 
   // 8 時間先までの気温と降水確率
   const hourly = openWeatherData.hourly.slice(0, 9).reduce(
-    (p: any, v: any) => {
+    (p: { temp: number[]; pop: number[] }, v) => {
       p.temp.push(Math.round(v.temp));
       p.pop.push(v.pop);
 

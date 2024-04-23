@@ -12,10 +12,10 @@ export const beforeUserCreate = beforeUserCreated(
       .doc("environment/allowed_emails")
       .get();
 
+    const data = snapshot.data() as { value: string[] };
+
     // FIXME: wow
-    const isAllowedUser = (
-      snapshot.data as any as { value: string[] }
-    ).value.every((pattern) => {
+    const isAllowedUser = data.value.every((pattern) => {
       return user.email && RegExp(pattern).test(user.email);
     });
     if (!isAllowedUser) {

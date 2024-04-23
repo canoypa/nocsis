@@ -7,7 +7,11 @@ import type { EventData } from "../../../types/events.js";
 
 type MonthlyEventsResponse = { month: string; items: EventData[] }[];
 
-const monthly = async (data: any): Promise<MonthlyEventsResponse> => {
+type Args = {
+  date: string;
+};
+
+const monthly = async (data: Args): Promise<MonthlyEventsResponse> => {
   const date = DateTime.fromISO(data.date, { zone: "asia/tokyo" });
   if (date === null) {
     throw new HttpsError("invalid-argument", "date is not ISO format");

@@ -12,7 +12,7 @@ type Args = {
   date: string;
 };
 
-const get = async (data: any): Promise<DayDuty> => {
+const get = async (data: Args): Promise<DayDuty> => {
   const date = DateTime.fromISO(data.date, { zone: "asia/tokyo" });
   if (date === null) {
     throw new HttpsError("invalid-argument", "date is not ISO format");
