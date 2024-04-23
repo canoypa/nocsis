@@ -16,7 +16,7 @@ const notifyDayDuty: CrontabHandler = async (timestamp) => {
     ...teacher.map((v) => v.slackUserId),
   ];
 
-  sendTargets.forEach((slackUserId) => {
+  for (const slackUserId of sendTargets) {
     const options: ChatPostMessageArguments = {
       channel: slackUserId,
       text: `今日の日直は、${dayduty.lastName}${dayduty.firstName}さんです。`,
@@ -25,6 +25,6 @@ const notifyDayDuty: CrontabHandler = async (timestamp) => {
       // blocks: [],
     };
     slackClient.chat.postMessage(options);
-  });
+  }
 };
 export default notifyDayDuty;

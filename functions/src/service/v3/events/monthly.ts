@@ -34,14 +34,14 @@ const monthly = async (data: any): Promise<MonthlyEventsResponse> => {
   // 月別に格納する
   const work = new Map<string, EventData[]>();
 
-  events.forEach((event) => {
+  for (const event of events) {
     const key = event.startAt.month.toString();
 
     const current = work.get(key) || [];
     current.push(encodeCalendarEvent(event));
 
     work.set(key, current);
-  });
+  }
 
   // レスポンス形式への変換
   const result: MonthlyEventsResponse = Array.from(work.entries()).map(
