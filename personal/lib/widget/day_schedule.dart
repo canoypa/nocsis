@@ -97,10 +97,10 @@ class DaySchedule extends ConsumerWidget {
         if (snap.hasData) {
           final data = snap.data!;
           if (data.classes.isEmpty && data.events.isEmpty) {
-            return Center(
+            return const Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Icon(Icons.event_available_outlined),
                   Text("予定なし"),
                 ],

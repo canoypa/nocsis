@@ -45,7 +45,7 @@ class SignInPage extends StatelessWidget {
               FilledButton(
                 onPressed: () => _signIn(context),
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all<EdgeInsets>(
+                  padding: WidgetStateProperty.all<EdgeInsets>(
                     const EdgeInsets.symmetric(vertical: 32, horizontal: 64),
                   ),
                 ),

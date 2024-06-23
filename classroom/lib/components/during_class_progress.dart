@@ -49,7 +49,7 @@ class _DuringClassProgressState extends State<DuringClassProgress>
         painter: _DuringClassProgressPainter(
           progress: progress,
           primary: theme.colorScheme.primary,
-          secondary: theme.colorScheme.surfaceVariant,
+          secondary: theme.colorScheme.surfaceContainerHighest,
         ),
       ),
     );
