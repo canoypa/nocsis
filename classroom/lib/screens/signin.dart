@@ -15,12 +15,14 @@ class SignInScreen extends StatelessWidget {
         print(e);
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text("サインイン出来ませんでした"),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text("サインイン出来ませんでした"),
+          ),
+        );
+      }
     }
   }
 

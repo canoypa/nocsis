@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -34,7 +35,9 @@ class HomeScreen extends ConsumerWidget {
         );
       },
       error: (e, s) {
-        print(e);
+        if (kDebugMode) {
+          print(e);
+        }
 
         return const Center(
           child: Text("エラーが発生しました"),
