@@ -1,4 +1,3 @@
 {
-  "dart.flutterSdkPath": ".fvm/flutter_sdk",
-  "cSpell.words": ["nocsis", "riverpod"]
+  "dart.flutterSdkPath": ".fvm/flutter_sdk"
 }
