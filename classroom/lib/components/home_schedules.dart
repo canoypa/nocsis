@@ -59,7 +59,7 @@ class HomeSchedules extends ConsumerWidget {
                       ],
                     );
                   },
-                ).toList()
+                )
               ],
             ),
           ),
@@ -106,7 +106,7 @@ class HomeSchedules extends ConsumerWidget {
                     ],
                   );
                 },
-              ).toList()
+              )
             ],
           ),
         ),

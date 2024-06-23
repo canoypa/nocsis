@@ -8,7 +8,7 @@ class Clock extends ConsumerStatefulWidget {
   const Clock({super.key});
 
   @override
-  _ClockState createState() => _ClockState();
+  ConsumerState<Clock> createState() => _ClockState();
 }
 
 class _ClockState extends ConsumerState<Clock> {

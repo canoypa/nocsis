@@ -9,3 +9,6 @@ firebase-debug.*.log*
 
 # Firebase config
 .firebaserc
+
+# macOS
+.DS_Store

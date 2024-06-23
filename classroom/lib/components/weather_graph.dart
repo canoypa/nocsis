@@ -35,11 +35,10 @@ class _Canvas extends ConsumerStatefulWidget {
   final List<num> pop;
 
   const _Canvas({
-    Key? key,
     required this.constraints,
     required this.temp,
     required this.pop,
-  }) : super(key: key);
+  });
 
   @override
   _CanvasState createState() => _CanvasState();

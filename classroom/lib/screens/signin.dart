@@ -15,12 +15,14 @@ class SignInScreen extends StatelessWidget {
         print(e);
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text("サインイン出来ませんでした"),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text("サインイン出来ませんでした"),
+          ),
+        );
+      }
     }
   }
 
@@ -39,7 +41,7 @@ class SignInScreen extends StatelessWidget {
           const SizedBox(height: 48),
           FilledButton(
             style: ButtonStyle(
-              padding: MaterialStateProperty.all<EdgeInsets>(
+              padding: WidgetStateProperty.all<EdgeInsets>(
                 EdgeInsets.symmetric(vertical: 32.sp, horizontal: 64.sp),
               ),
             ),

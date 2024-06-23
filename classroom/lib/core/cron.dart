@@ -110,5 +110,5 @@ class Cron {
 }
 
 class ScheduleParseException extends FormatException {
-  ScheduleParseException([String message = '']) : super(message);
+  ScheduleParseException([super.message]);
 }

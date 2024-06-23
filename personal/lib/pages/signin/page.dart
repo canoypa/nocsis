@@ -14,12 +14,14 @@ class SignInPage extends StatelessWidget {
         print(e);
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text("サインイン出来ませんでした"),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text("サインイン出来ませんでした"),
+          ),
+        );
+      }
     }
   }
 
@@ -45,7 +47,7 @@ class SignInPage extends StatelessWidget {
               FilledButton(
                 onPressed: () => _signIn(context),
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all<EdgeInsets>(
+                  padding: WidgetStateProperty.all<EdgeInsets>(
                     const EdgeInsets.symmetric(vertical: 32, horizontal: 64),
                   ),
                 ),

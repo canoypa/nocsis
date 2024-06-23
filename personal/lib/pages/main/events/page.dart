@@ -31,10 +31,10 @@ class EventsView extends ConsumerWidget {
     return snap.when(
       data: (d) {
         if (d.items.isEmpty) {
-          return Center(
+          return const Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Icon(Icons.event_available_outlined),
                 Text("予定なし"),
               ],

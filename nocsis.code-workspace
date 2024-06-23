@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "name": "root",
+      "path": "."
+    },
+    {
+      "path": "functions"
+    },
+    {
+      "path": "personal"
+    },
+    {
+      "path": "classroom"
+    }
+  ],
+  "settings": {
+    "cSpell.words": ["nocsis", "riverpod", "luxon"]
+  }
+}
