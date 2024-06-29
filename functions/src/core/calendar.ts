@@ -12,6 +12,7 @@ export type FetchCalendarParams = Partial<{
   pageToken: string;
   orderBy: "startTime" | "updated";
   fields: string;
+  q: string;
 }>;
 
 /**
@@ -35,6 +36,7 @@ export const fetchCalendar = async (
     pageToken: param.pageToken,
     orderBy: param.orderBy,
     fields: param.fields,
+    q: param.q,
   };
 
   const res = await calendar.events.list(options);
