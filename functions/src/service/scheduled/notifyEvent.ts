@@ -5,6 +5,7 @@ import { getDisplayTitle } from "../../core/calendar/get_display_title.js";
 import { parseEvents } from "../../core/calendar/parseEvents.js";
 import { eventsToSlackBlock } from "../../core/calendar/slack_block.js";
 import type { CrontabHandler } from "../../core/crontab.js";
+import { fetchCountdownEvents, isCountdownTarget } from "./countdown_event.js";
 
 /**
  * イベントの通知
@@ -18,17 +19,23 @@ const notifyEvent: CrontabHandler = async (timestamp) => {
   const from = timestamp.startOf("day");
   const to = timestamp.plus({ day: 1 }).startOf("day");
 
-  const snapshot = await fetchCalendar(calendarId, {
+  const todaySnapshot = await fetchCalendar(calendarId, {
     timeMin: from,
     timeMax: to,
     singleEvents: true,
     orderBy: "startTime",
   });
-  if (!snapshot.items) {
+  if (!todaySnapshot.items) {
     throw new Error("items is not defined");
   }
 
-  const events = parseEvents(snapshot.items);
+  const countdownSnapshot = await fetchCountdownEvents();
+  const countdownSnapshotFiltered =
+    countdownSnapshot.items?.filter((e) => isCountdownTarget(e, timestamp)) ??
+    [];
+
+  const events = parseEvents(todaySnapshot.items);
+  const countdownEvents = parseEvents(countdownSnapshotFiltered);
 
   if (events.length === 0) {
     // イベントがない場合、終了
@@ -48,7 +55,7 @@ const notifyEvent: CrontabHandler = async (timestamp) => {
     username: "今日のイベント",
     icon_emoji: ":date:",
     text: eventTitles,
-    blocks: eventsToSlackBlock(events, from),
+    blocks: eventsToSlackBlock(events, countdownEvents, from),
     unfurl_links: false,
     unfurl_media: false,
   };
