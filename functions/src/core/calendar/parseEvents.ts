@@ -1,4 +1,5 @@
 import type { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
+import { removeCountdownPattern } from "~/service/scheduled/countdown_event.js";
 import type { CalendarEvent } from "../../types/calendar.js";
 import { parseEventDate } from "./parseEventDate.js";
 
@@ -12,7 +13,7 @@ export const parseEvents = (
       startAt: date.start,
       endAt: date.end,
       title: v.summary || "(No title)",
-      description: v.description || "",
+      description: removeCountdownPattern(v.description || ""),
       location: v.location || "",
       isAllDay: v.start?.dateTime === undefined,
     };
