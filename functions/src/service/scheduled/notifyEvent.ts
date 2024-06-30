@@ -52,7 +52,7 @@ const notifyEvent: CrontabHandler = async (timestamp) => {
 
   const options: ChatPostMessageArguments = {
     channel: targetChannelId,
-    username: "今日のイベント",
+    username: "イベントBot",
     icon_emoji: ":date:",
     text: eventTitles,
     blocks: eventsToSlackBlock(events, countdownEvents, from),
