@@ -1,5 +1,5 @@
 import type { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
-import { removeCountdownPattern } from "~/service/scheduled/countdown_event.js";
+import { removeCountdownPattern } from "../../service/scheduled/countdown_event.js";
 import type { CalendarEvent } from "../../types/calendar.js";
 import { parseEventDate } from "./parseEventDate.js";
 
