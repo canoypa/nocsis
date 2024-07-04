@@ -37,7 +37,7 @@ const notifyEvent: CrontabHandler = async (timestamp) => {
   const events = parseEvents(todaySnapshot.items);
   const countdownEvents = parseEvents(countdownSnapshotFiltered);
 
-  if (events.length === 0) {
+  if (events.length === 0 && countdownEvents.length === 0) {
     // イベントがない場合、終了
     return;
   }
