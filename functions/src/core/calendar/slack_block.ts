@@ -1,4 +1,3 @@
-import { cloudEvent } from "@google-cloud/functions-framework";
 import type {
   Block,
   ContextBlock,
@@ -22,80 +21,89 @@ export const eventsToSlackBlock = (
 ) => {
   const result: (KnownBlock | Block)[] = [];
 
-  // header
-  const dayFormat = date.toFormat("M月d日");
-  const header: HeaderBlock = {
-    type: "header",
-    text: { type: "plain_text", text: `${dayFormat}のイベント` },
-  };
-  result.push(header);
-
-  events.forEach((e, i, a) => {
-    const title: SectionBlock = {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `*${getDisplayTitle(e, date)}*`,
-      },
+  if (events.length > 0) {
+    // header
+    const dayFormat = date.toFormat("M月d日");
+    const header: HeaderBlock = {
+      type: "header",
+      text: { type: "plain_text", text: `${dayFormat}のイベント` },
     };
-    result.push(title);
+    result.push(header);
 
-    if (e.description) {
-      const description: SectionBlock = {
+    events.forEach((e, i, a) => {
+      const title: SectionBlock = {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: e.description,
+          text: `*${getDisplayTitle(e, date)}*`,
         },
       };
-      result.push(description);
-    }
+      result.push(title);
 
-    // Contexts
-    const contexts: (ImageElement | PlainTextElement | MrkdwnElement)[] = [];
+      if (e.description) {
+        const description: SectionBlock = {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: e.description,
+          },
+        };
+        result.push(description);
+      }
 
-    if (getDisplayTimeRange(e, date)) {
-      const time: MrkdwnElement = {
-        type: "mrkdwn",
-        text: `:clock3: ${getDisplayTimeRange(e, date)}`,
-      };
-      contexts.push(time);
-    }
+      // Contexts
+      const contexts: (ImageElement | PlainTextElement | MrkdwnElement)[] = [];
 
-    if (e.location) {
-      const location: MrkdwnElement = {
-        type: "mrkdwn",
-        text: `:round_pushpin: <https://map.google.com?q=${e.location}|${e.location}>`,
-      };
-      contexts.push(location);
-    }
+      if (getDisplayTimeRange(e, date)) {
+        const time: MrkdwnElement = {
+          type: "mrkdwn",
+          text: `:clock3: ${getDisplayTimeRange(e, date)}`,
+        };
+        contexts.push(time);
+      }
 
-    if (contexts.length > 0) {
-      const context: ContextBlock = {
-        type: "context",
-        elements: contexts,
-      };
-      result.push(context);
-    }
+      if (e.location) {
+        const location: MrkdwnElement = {
+          type: "mrkdwn",
+          text: `:round_pushpin: <https://map.google.com?q=${e.location}|${e.location}>`,
+        };
+        contexts.push(location);
+      }
 
-    // Divider
-    if (i !== a.length - 1) {
-      const divider: DividerBlock = { type: "divider" };
-      result.push(divider);
-    }
-  });
+      if (contexts.length > 0) {
+        const context: ContextBlock = {
+          type: "context",
+          elements: contexts,
+        };
+        result.push(context);
+      }
+
+      // Divider
+      if (i !== a.length - 1) {
+        const divider: DividerBlock = { type: "divider" };
+        result.push(divider);
+      }
+    });
+  }
+
+  if (result.length > 0 && countdownEvents.length > 0) {
+    const divider: DividerBlock = { type: "divider" };
+    result.push(divider);
+  }
 
   if (countdownEvents.length > 0) {
     // header
-    const divider: DividerBlock = { type: "divider" };
     const header: HeaderBlock = {
       type: "header",
       text: { type: "plain_text", text: "今後のイベント" },
     };
-    result.push(divider, header);
+    result.push(header);
 
     countdownEvents.forEach((e, i, a) => {
-      const diff = e.startAt.diff(date, "days").days;
+      const diff = e.startAt
+        .startOf("day")
+        .diff(date.startOf("day"), "days")
+        .days.toFixed(0);
       const title: SectionBlock = {
         type: "section",
         text: {

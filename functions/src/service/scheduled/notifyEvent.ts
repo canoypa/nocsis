@@ -16,9 +16,16 @@ const notifyEvent: CrontabHandler = async (timestamp) => {
     throw new Error("EVENTS_CALENDAR_ID is not defined");
   }
 
+  const targetChannelId = process.env.SLACK_EVENT_CHANNEL_ID;
+  if (!targetChannelId) {
+    throw new Error("Can not read SLACK_EVENT_CHANNEL_ID");
+  }
+
+  // 今日の範囲を取得
   const from = timestamp.startOf("day");
   const to = timestamp.plus({ day: 1 }).startOf("day");
 
+  // 今日のイベントを取得する
   const todaySnapshot = await fetchCalendar(calendarId, {
     timeMin: from,
     timeMax: to,
@@ -26,30 +33,29 @@ const notifyEvent: CrontabHandler = async (timestamp) => {
     orderBy: "startTime",
   });
   if (!todaySnapshot.items) {
+    // イベントがない場合は空の配列になるので、ありえないハズ
     throw new Error("items is not defined");
   }
 
+  // カウントダウンイベントを取得する
   const countdownSnapshot = await fetchCountdownEvents();
   const countdownSnapshotFiltered =
     countdownSnapshot.items?.filter((e) => isCountdownTarget(e, timestamp)) ??
     [];
 
+  // 内部用の形式に変換
   const events = parseEvents(todaySnapshot.items);
   const countdownEvents = parseEvents(countdownSnapshotFiltered);
 
-  if (events.length === 0) {
-    // イベントがない場合、終了
+  // イベントがない場合、終了
+  if (events.length === 0 && countdownEvents.length === 0) {
     return;
   }
 
-  // 通知処理
-  const targetChannelId = process.env.SLACK_EVENT_CHANNEL_ID;
-  if (!targetChannelId) {
-    throw new Error("Can not read SLACK_EVENT_CHANNEL_ID");
-  }
-
+  // os通知に表示される装飾なしの簡易的な内容
   const eventTitles = events.map((e) => getDisplayTitle(e, from)).join(", ");
 
+  // 通知処理
   const options: ChatPostMessageArguments = {
     channel: targetChannelId,
     username: "イベントBot",
