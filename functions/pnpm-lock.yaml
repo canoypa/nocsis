@@ -42,6 +42,9 @@ importers:
       '@types/luxon':
         specifier: ^3.4.2
         version: 3.4.2
+      '@types/node':
+        specifier: ^22.3.0
+        version: 22.3.0
       chokidar:
         specifier: ^3.6.0
         version: 3.6.0
