@@ -1,7 +1,9 @@
 import parser from "cron-parser";
 import { DateTime } from "luxon";
 
-export type CrontabHandler = <T>(timestamp: DateTime) => T | Promise<T>;
+export type CrontabHandler<T = void> = (
+  timestamp: DateTime<true>,
+) => T | Promise<T>;
 
 /**
  * 入力された時刻が指定した crontab に一致する場合に処理を実行する
