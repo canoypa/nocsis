@@ -62,10 +62,13 @@ export const isCountdownTarget = (
   // オプションがない場合
   if (!match.before || !match.unit) return true;
 
+  const startDate = event.start?.dateTime || event.start?.date;
+  if (!startDate) {
+    throw new Error("startDate or date is not found");
+  }
+
   // 現在日時がカウントダウン開始日~イベント開始日前日の間にあるか
-  const eventStartDate = DateTime.fromISO(event.start?.dateTime ?? "", {
-    zone: "Asia/Tokyo",
-  });
+  const eventStartDate = DateTime.fromISO(startDate, { zone: "Asia/Tokyo" });
   const countdownStartDate = eventStartDate.minus({
     [match.unit]: match.before,
   });
