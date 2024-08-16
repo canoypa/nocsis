@@ -59,25 +59,30 @@ export const isCountdownTarget = (
   const match = matchCountdownPattern(event.description);
   if (!match) return false;
 
-  // オプションがない場合
-  if (!match.before || !match.unit) return true;
-
   const startDate = event.start?.dateTime || event.start?.date;
   if (!startDate) {
     throw new Error("startDate or date is not found");
   }
 
-  // 現在日時がカウントダウン開始日~イベント開始日前日の間にあるか
   const eventStartDate = DateTime.fromISO(startDate, { zone: "Asia/Tokyo" });
+
+  // オプションが指定されていない場合
+  if (!match.before || !match.unit) {
+    const isBeforeEventStart =
+      Math.floor(eventStartDate.diff(timestamp, "days").days) > 0;
+    return isBeforeEventStart;
+  }
+
   const countdownStartDate = eventStartDate.minus({
     [match.unit]: match.before,
   });
 
   // 現在日時がカウントダウン開始日~イベント開始日前日の間にあるか
-  if (
-    countdownStartDate.diff(timestamp, "days").days <= 0 &&
-    eventStartDate.diff(timestamp, "days").days > 0
-  ) {
+  const isBeforeCountdownStart =
+    Math.floor(countdownStartDate.diff(timestamp, "days").days) <= 0;
+  const isBeforeEventStart =
+    Math.floor(eventStartDate.diff(timestamp, "days").days) > 0;
+  if (isBeforeCountdownStart && isBeforeEventStart) {
     return true;
   }
 
