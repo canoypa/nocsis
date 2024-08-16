@@ -7,77 +7,38 @@ import {
   removeCountdownPattern,
 } from "./countdown_event.js";
 
-const EXAMPLE_START_DATE = "2024-06-10T00:00:00+09:00";
-const EXAMPLE_END_DATE = "2024-06-20T00:00:00+09:00";
+type MakeEventOptions = {
+  summary?: string;
+  description?: string;
 
-const EXAMPLE_EVERYDAY: calendar_v3.Schema$Event = {
-  eventType: "default",
-  summary: "EVENT#1",
-  description: "countdown",
-  start: {
-    dateTime: EXAMPLE_START_DATE,
-    timeZone: "Asia/Tokyo",
-  },
-  end: {
-    dateTime: EXAMPLE_END_DATE,
-    timeZone: "Asia/Tokyo",
-  },
+  // e.g. "2024-06-10T00:00:00+09:00"
+  startDateTime?: string;
+  endDateTime?: string;
+
+  // 全日イベントの場合はこっちで日付だけ
+  // e.g. "2024-06-10"
+  startDate?: string;
+  endDate?: string;
 };
-
-const EXAMPLE_BEFORE_10DAYS: calendar_v3.Schema$Event = {
-  eventType: "default",
-  summary: "EVENT#2",
-  description: "countdown.before=10day",
-  start: {
-    dateTime: EXAMPLE_START_DATE,
-    timeZone: "Asia/Tokyo",
-  },
-  end: {
-    dateTime: EXAMPLE_END_DATE,
-    timeZone: "Asia/Tokyo",
-  },
-};
-
-const EXAMPLE_BEFORE_1MONTH: calendar_v3.Schema$Event = {
-  eventType: "default",
-  summary: "EVENT#2",
-  description: "countdown.before=1month",
-  start: {
-    dateTime: EXAMPLE_START_DATE,
-    timeZone: "Asia/Tokyo",
-  },
-  end: {
-    dateTime: EXAMPLE_END_DATE,
-    timeZone: "Asia/Tokyo",
-  },
-};
-
-const EXAMPLE_INVALID: calendar_v3.Schema$Event = {
-  eventType: "default",
-  summary: "EVENT#2",
-  description: "countdown.before=123invalid",
-  start: {
-    dateTime: EXAMPLE_START_DATE,
-    timeZone: "Asia/Tokyo",
-  },
-  end: {
-    dateTime: EXAMPLE_END_DATE,
-    timeZone: "Asia/Tokyo",
-  },
-};
-
-const EXAMPLE_NOT_COUNTDOWN: calendar_v3.Schema$Event = {
-  eventType: "default",
-  summary: "EVENT#3",
-  description: "not countdown",
-  start: {
-    dateTime: EXAMPLE_START_DATE,
-    timeZone: "Asia/Tokyo",
-  },
-  end: {
-    dateTime: EXAMPLE_END_DATE,
-    timeZone: "Asia/Tokyo",
-  },
+const makeEvent = ({
+  summary,
+  description,
+  ...options
+}: MakeEventOptions): calendar_v3.Schema$Event => {
+  return {
+    summary: summary ?? "SUMMARY",
+    description: description ?? "DESCRIPTION",
+    start: {
+      dateTime: options.startDateTime,
+      date: options.startDate,
+      timeZone: "Asia/Tokyo",
+    },
+    end: {
+      dateTime: options.endDateTime,
+      date: options.endDate,
+      timeZone: "Asia/Tokyo",
+    },
+  };
 };
 
 describe("matchCountdownPattern", () => {
@@ -100,52 +61,445 @@ describe("matchCountdownPattern", () => {
 });
 
 describe("isCountdownTarget", () => {
-  const date = DateTime.fromObject({ year: 2024, month: 6, day: 5 });
-
-  it("should return true if the event is a countdown event", () => {
-    expect(isCountdownTarget(EXAMPLE_EVERYDAY, date)).toBe(true);
-    expect(isCountdownTarget(EXAMPLE_BEFORE_10DAYS, date)).toBe(true);
-    expect(isCountdownTarget(EXAMPLE_BEFORE_1MONTH, date)).toBe(true);
-  });
-
-  it("should return false if the event is not a countdown event", () => {
-    expect(isCountdownTarget(EXAMPLE_NOT_COUNTDOWN, date)).toBe(false);
-    expect(isCountdownTarget(EXAMPLE_INVALID, date)).toBe(false);
-  });
-
-  describe("when the event has a countdown option", () => {
-    it("should return true if the current date is between the countdown start date and the event start date", () => {
-      const before10Days = DateTime.fromObject({
-        year: 2024,
-        month: 5,
-        day: 31,
+  describe("前日までカウントダウンの場合", () => {
+    describe("一日の全日イベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown",
+        startDate: "2024-06-15",
+        endDate: "2024-06-16",
       });
-      expect(isCountdownTarget(EXAMPLE_BEFORE_10DAYS, before10Days)).toBe(true);
 
-      const before1Day = DateTime.fromObject({ year: 2024, month: 6, day: 9 });
-      expect(isCountdownTarget(EXAMPLE_BEFORE_10DAYS, before1Day)).toBe(true);
+      it("5日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-10T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
     });
 
-    it("should return false if the current date is before the countdown start date", () => {
-      const before1Month = DateTime.fromObject({ year: 2024, month: 5 });
-      expect(isCountdownTarget(EXAMPLE_BEFORE_10DAYS, before1Month)).toBe(
-        false,
-      );
-
-      const before11Day = DateTime.fromObject({
-        year: 2024,
-        month: 5,
-        day: 30,
+    describe("日をまたぐ全日イベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown",
+        startDate: "2024-06-15",
+        endDate: "2024-06-17",
       });
-      expect(isCountdownTarget(EXAMPLE_BEFORE_10DAYS, before11Day)).toBe(false);
+
+      it("5日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-10T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
     });
 
-    it("should return false if the current date is after the event start date", () => {
-      const sameDay = DateTime.fromObject({ year: 2024, month: 6, day: 10 });
-      expect(isCountdownTarget(EXAMPLE_BEFORE_10DAYS, sameDay)).toBe(false);
+    describe("時間指定のイベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown",
+        startDateTime: "2024-06-15T10:00:00+09:00",
+        endDateTime: "2024-06-15T12:00:00+09:00",
+      });
 
-      const after1Day = DateTime.fromObject({ year: 2024, month: 6, day: 11 });
-      expect(isCountdownTarget(EXAMPLE_BEFORE_10DAYS, after1Day)).toBe(false);
+      it("5日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-10T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+    });
+
+    describe("日をまたぐ時間指定のイベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown",
+        startDateTime: "2024-06-15T10:00:00+09:00",
+        endDateTime: "2024-06-16T12:00:00+09:00",
+      });
+
+      it("5日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-10T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+    });
+  });
+
+  describe("10日前からカウントダウンの場合", () => {
+    describe("一日の全日イベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown.before=10day",
+        startDate: "2024-06-15",
+        endDate: "2024-06-16",
+      });
+
+      it("11日前は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-04T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("10日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-05T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+    });
+
+    describe("日をまたぐ全日イベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown.before=10day",
+        startDate: "2024-06-15",
+        endDate: "2024-06-17",
+      });
+
+      it("11日前は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-04T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("10日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-05T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+    });
+
+    describe("時間指定のイベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown.before=10day",
+        startDateTime: "2024-06-15T10:00:00+09:00",
+        endDateTime: "2024-06-15T12:00:00+09:00",
+      });
+
+      it("11日前は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-04T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("10日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-05T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+    });
+
+    describe("日をまたぐ時間指定のイベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown.before=10day",
+        startDateTime: "2024-06-15T10:00:00+09:00",
+        endDateTime: "2024-06-16T12:00:00+09:00",
+      });
+
+      it("11日前は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-04T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("10日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-05T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+    });
+  });
+
+  describe("1ヶ月前からカウントダウンの場合", () => {
+    describe("一日の全日イベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown.before=1month",
+        startDate: "2024-06-15",
+        endDate: "2024-06-16",
+      });
+
+      it("1ヶ月と1日前は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-05-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1ヶ月前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-05-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+    });
+
+    describe("日をまたぐ全日イベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown.before=1month",
+        startDate: "2024-06-15",
+        endDate: "2024-06-17",
+      });
+
+      it("1ヶ月と1日前は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-05-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1ヶ月前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-05-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+    });
+
+    describe("時間指定のイベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown.before=1month",
+        startDateTime: "2024-06-15T10:00:00+09:00",
+        endDateTime: "2024-06-15T12:00:00+09:00",
+      });
+
+      it("1ヶ月と1日前は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-05-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1ヶ月前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-05-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+    });
+
+    describe("日をまたぐ時間指定のイベントの場合", () => {
+      const event = makeEvent({
+        description: "countdown.before=1month",
+        startDateTime: "2024-06-15T10:00:00+09:00",
+        endDateTime: "2024-06-16T12:00:00+09:00",
+      });
+
+      it("1ヶ月と1日前は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-05-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1ヶ月前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-05-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("1日前は対象である", () => {
+        const timestamp = DateTime.fromISO("2024-06-14T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeTruthy();
+      });
+
+      it("当日は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-15T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("1日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-16T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
+
+      it("5日後は対象でない", () => {
+        const timestamp = DateTime.fromISO("2024-06-20T00:00:00+09:00");
+        expect(isCountdownTarget(event, timestamp)).toBeFalsy();
+      });
     });
   });
 });
