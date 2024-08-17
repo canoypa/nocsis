@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis_classroom/routes/router.dart';
+import 'package:nocsis_classroom/themes/app.dart';
 
 import 'firebase_options.dart';
 
@@ -22,6 +23,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Nocsis',
+      theme: lightTheme,
+      darkTheme: darkTheme,
       routerConfig: router,
       builder: (context, child) {
         return AppLayout(child: child);
