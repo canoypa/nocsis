@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis_classroom/routes/router.dart';
 import 'package:nocsis_classroom/themes/app.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'firebase_options.dart';
 
 void main() {
+  usePathUrlStrategy();
+
   runApp(
     const ProviderScope(
       child: MyApp(),
