@@ -11,7 +11,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -19,22 +23,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
-      child: ScreenUtilInit(
-        designSize: const Size(960, 540),
-        builder: (context, child) {
-          final appTheme = createAppTheme(context);
+    return ScreenUtilInit(
+      designSize: const Size(960, 540),
+      builder: (context, child) {
+        final appTheme = createAppTheme(context);
 
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Nocsis',
-            theme: appTheme,
-            home: child,
-          );
-        },
-        child: const Scaffold(
-          body: HomeScreen(),
-        ),
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Nocsis',
+          theme: appTheme,
+          home: child,
+        );
+      },
+      child: const Scaffold(
+        body: HomeScreen(),
       ),
     );
   }
