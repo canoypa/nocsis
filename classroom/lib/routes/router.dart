@@ -13,10 +13,10 @@ final router = GoRouter(
           child: ScreenUtilInit(
             designSize: const Size(960, 540),
             builder: (context, child) {
-              final appTheme = createAppTheme(context);
+              final theme = createDisplayTheme(context);
 
               return Theme(
-                data: appTheme,
+                data: theme,
                 child: const Scaffold(
                   body: HomeScreen(),
                 ),
