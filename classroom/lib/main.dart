@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,9 +6,7 @@ import 'package:nocsis_classroom/routes/router.dart';
 
 import 'firebase_options.dart';
 
-void main() async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+void main() {
   runApp(
     const ProviderScope(
       child: MyApp(),
@@ -24,6 +23,33 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Nocsis',
       routerConfig: router,
+      builder: (context, child) {
+        return AppLayout(child: child);
+      },
+    );
+  }
+}
+
+class AppLayout extends StatelessWidget {
+  final Widget? child;
+
+  const AppLayout({super.key, this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: Future.wait([
+        // Firebase の初期化と、初回の認証状態の取得を待つ
+        Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
+            .then((_) => FirebaseAuth.instance.authStateChanges().first),
+      ]),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return child ?? const SizedBox();
+        }
+
+        return const SizedBox();
+      },
     );
   }
 }
