@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis_classroom/core/theme.dart';
+import 'package:nocsis_classroom/pages/sign_in.dart';
 import 'package:nocsis_classroom/screens/home.dart';
 
 final router = GoRouter(
@@ -26,5 +28,38 @@ final router = GoRouter(
         );
       },
     ),
+    GoRoute(
+      path: "/signin",
+      pageBuilder: (context, state) {
+        return const MaterialPage(
+          child: SignInPage(),
+        );
+      },
+    ),
   ],
+  redirect: (context, state) async {
+    final user = await FirebaseAuth.instance.authStateChanges().first;
+    final isSignIn = user != null;
+
+    if (!isSignIn && state.matchedLocation != "/signin") {
+      if (state.path == null) {
+        return "/signin";
+      }
+
+      return "/signin?continue=${state.path}";
+    }
+
+    if (isSignIn && state.matchedLocation == "/signin") {
+      final continueUri = state.uri.queryParameters["continue"];
+      final validUriPattern = RegExp(r"^/.+$");
+
+      if (continueUri is String && validUriPattern.hasMatch(continueUri)) {
+        return continueUri;
+      }
+
+      return "/";
+    }
+
+    return null;
+  },
 );
