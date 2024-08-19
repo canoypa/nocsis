@@ -8,8 +8,13 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'firebase_options.dart';
 
-void main() {
+void main() async {
   usePathUrlStrategy();
+
+  // Firebase の初期化と、初回の認証状態の取得を待つ
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  ).then((_) => FirebaseAuth.instance.authStateChanges().first);
 
   runApp(
     const ProviderScope(
@@ -29,33 +34,6 @@ class MyApp extends StatelessWidget {
       theme: lightTheme,
       darkTheme: darkTheme,
       routerConfig: router,
-      builder: (context, child) {
-        return AppLayout(child: child);
-      },
-    );
-  }
-}
-
-class AppLayout extends StatelessWidget {
-  final Widget? child;
-
-  const AppLayout({super.key, this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Future.wait([
-        // Firebase の初期化と、初回の認証状態の取得を待つ
-        Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
-            .then((_) => FirebaseAuth.instance.authStateChanges().first),
-      ]),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return child ?? const SizedBox();
-        }
-
-        return const SizedBox();
-      },
     );
   }
 }
