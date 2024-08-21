@@ -178,7 +178,9 @@ ClassData _$ClassDataFromJson(Map<String, dynamic> json) {
 mixin _$ClassData {
   String get title => throw _privateConstructorUsedError;
   int get period => throw _privateConstructorUsedError;
+  @LocalDateTimeConverter()
   DateTime get startAt => throw _privateConstructorUsedError;
+  @LocalDateTimeConverter()
   DateTime get endAt => throw _privateConstructorUsedError;
 
   /// Serializes this ClassData to a JSON map.
@@ -196,7 +198,11 @@ abstract class $ClassDataCopyWith<$Res> {
   factory $ClassDataCopyWith(ClassData value, $Res Function(ClassData) then) =
       _$ClassDataCopyWithImpl<$Res, ClassData>;
   @useResult
-  $Res call({String title, int period, DateTime startAt, DateTime endAt});
+  $Res call(
+      {String title,
+      int period,
+      @LocalDateTimeConverter() DateTime startAt,
+      @LocalDateTimeConverter() DateTime endAt});
 }
 
 /// @nodoc
@@ -248,7 +254,11 @@ abstract class _$$ClassDataImplCopyWith<$Res>
       __$$ClassDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, int period, DateTime startAt, DateTime endAt});
+  $Res call(
+      {String title,
+      int period,
+      @LocalDateTimeConverter() DateTime startAt,
+      @LocalDateTimeConverter() DateTime endAt});
 }
 
 /// @nodoc
@@ -296,8 +306,8 @@ class _$ClassDataImpl implements _ClassData {
   const _$ClassDataImpl(
       {required this.title,
       required this.period,
-      required this.startAt,
-      required this.endAt});
+      @LocalDateTimeConverter() required this.startAt,
+      @LocalDateTimeConverter() required this.endAt});
 
   factory _$ClassDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$ClassDataImplFromJson(json);
@@ -307,8 +317,10 @@ class _$ClassDataImpl implements _ClassData {
   @override
   final int period;
   @override
+  @LocalDateTimeConverter()
   final DateTime startAt;
   @override
+  @LocalDateTimeConverter()
   final DateTime endAt;
 
   @override
@@ -349,10 +361,11 @@ class _$ClassDataImpl implements _ClassData {
 
 abstract class _ClassData implements ClassData {
   const factory _ClassData(
-      {required final String title,
-      required final int period,
-      required final DateTime startAt,
-      required final DateTime endAt}) = _$ClassDataImpl;
+          {required final String title,
+          required final int period,
+          @LocalDateTimeConverter() required final DateTime startAt,
+          @LocalDateTimeConverter() required final DateTime endAt}) =
+      _$ClassDataImpl;
 
   factory _ClassData.fromJson(Map<String, dynamic> json) =
       _$ClassDataImpl.fromJson;
@@ -362,8 +375,10 @@ abstract class _ClassData implements ClassData {
   @override
   int get period;
   @override
+  @LocalDateTimeConverter()
   DateTime get startAt;
   @override
+  @LocalDateTimeConverter()
   DateTime get endAt;
 
   /// Create a copy of ClassData

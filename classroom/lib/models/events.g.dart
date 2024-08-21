@@ -22,14 +22,15 @@ _$EventDataImpl _$$EventDataImplFromJson(Map<String, dynamic> json) =>
     _$EventDataImpl(
       title: json['title'] as String,
       isAllDay: json['isAllDay'] as bool,
-      startAt: DateTime.parse(json['startAt'] as String),
-      endAt: DateTime.parse(json['endAt'] as String),
+      startAt:
+          const LocalDateTimeConverter().fromJson(json['startAt'] as String),
+      endAt: const LocalDateTimeConverter().fromJson(json['endAt'] as String),
     );
 
 Map<String, dynamic> _$$EventDataImplToJson(_$EventDataImpl instance) =>
     <String, dynamic>{
       'title': instance.title,
       'isAllDay': instance.isAllDay,
-      'startAt': instance.startAt.toIso8601String(),
-      'endAt': instance.endAt.toIso8601String(),
+      'startAt': const LocalDateTimeConverter().toJson(instance.startAt),
+      'endAt': const LocalDateTimeConverter().toJson(instance.endAt),
     };

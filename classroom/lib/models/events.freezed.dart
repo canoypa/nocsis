@@ -178,7 +178,9 @@ EventData _$EventDataFromJson(Map<String, dynamic> json) {
 mixin _$EventData {
   String get title => throw _privateConstructorUsedError;
   bool get isAllDay => throw _privateConstructorUsedError;
+  @LocalDateTimeConverter()
   DateTime get startAt => throw _privateConstructorUsedError;
+  @LocalDateTimeConverter()
   DateTime get endAt => throw _privateConstructorUsedError;
 
   /// Serializes this EventData to a JSON map.
@@ -196,7 +198,11 @@ abstract class $EventDataCopyWith<$Res> {
   factory $EventDataCopyWith(EventData value, $Res Function(EventData) then) =
       _$EventDataCopyWithImpl<$Res, EventData>;
   @useResult
-  $Res call({String title, bool isAllDay, DateTime startAt, DateTime endAt});
+  $Res call(
+      {String title,
+      bool isAllDay,
+      @LocalDateTimeConverter() DateTime startAt,
+      @LocalDateTimeConverter() DateTime endAt});
 }
 
 /// @nodoc
@@ -248,7 +254,11 @@ abstract class _$$EventDataImplCopyWith<$Res>
       __$$EventDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String title, bool isAllDay, DateTime startAt, DateTime endAt});
+  $Res call(
+      {String title,
+      bool isAllDay,
+      @LocalDateTimeConverter() DateTime startAt,
+      @LocalDateTimeConverter() DateTime endAt});
 }
 
 /// @nodoc
@@ -296,8 +306,8 @@ class _$EventDataImpl implements _EventData {
   const _$EventDataImpl(
       {required this.title,
       required this.isAllDay,
-      required this.startAt,
-      required this.endAt});
+      @LocalDateTimeConverter() required this.startAt,
+      @LocalDateTimeConverter() required this.endAt});
 
   factory _$EventDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$EventDataImplFromJson(json);
@@ -307,8 +317,10 @@ class _$EventDataImpl implements _EventData {
   @override
   final bool isAllDay;
   @override
+  @LocalDateTimeConverter()
   final DateTime startAt;
   @override
+  @LocalDateTimeConverter()
   final DateTime endAt;
 
   @override
@@ -350,10 +362,11 @@ class _$EventDataImpl implements _EventData {
 
 abstract class _EventData implements EventData {
   const factory _EventData(
-      {required final String title,
-      required final bool isAllDay,
-      required final DateTime startAt,
-      required final DateTime endAt}) = _$EventDataImpl;
+          {required final String title,
+          required final bool isAllDay,
+          @LocalDateTimeConverter() required final DateTime startAt,
+          @LocalDateTimeConverter() required final DateTime endAt}) =
+      _$EventDataImpl;
 
   factory _EventData.fromJson(Map<String, dynamic> json) =
       _$EventDataImpl.fromJson;
@@ -363,8 +376,10 @@ abstract class _EventData implements EventData {
   @override
   bool get isAllDay;
   @override
+  @LocalDateTimeConverter()
   DateTime get startAt;
   @override
+  @LocalDateTimeConverter()
   DateTime get endAt;
 
   /// Create a copy of EventData

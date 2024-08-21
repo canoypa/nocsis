@@ -22,14 +22,15 @@ _$ClassDataImpl _$$ClassDataImplFromJson(Map<String, dynamic> json) =>
     _$ClassDataImpl(
       title: json['title'] as String,
       period: (json['period'] as num).toInt(),
-      startAt: DateTime.parse(json['startAt'] as String),
-      endAt: DateTime.parse(json['endAt'] as String),
+      startAt:
+          const LocalDateTimeConverter().fromJson(json['startAt'] as String),
+      endAt: const LocalDateTimeConverter().fromJson(json['endAt'] as String),
     );
 
 Map<String, dynamic> _$$ClassDataImplToJson(_$ClassDataImpl instance) =>
     <String, dynamic>{
       'title': instance.title,
       'period': instance.period,
-      'startAt': instance.startAt.toIso8601String(),
-      'endAt': instance.endAt.toIso8601String(),
+      'startAt': const LocalDateTimeConverter().toJson(instance.startAt),
+      'endAt': const LocalDateTimeConverter().toJson(instance.endAt),
     };

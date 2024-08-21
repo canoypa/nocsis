@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:nocsis_classroom/converters/local_date_time.dart';
 
 part 'events.freezed.dart';
 part 'events.g.dart';
@@ -18,8 +19,8 @@ class EventData with _$EventData {
   const factory EventData({
     required String title,
     required bool isAllDay,
-    required DateTime startAt,
-    required DateTime endAt,
+    @LocalDateTimeConverter() required DateTime startAt,
+    @LocalDateTimeConverter() required DateTime endAt,
   }) = _EventData;
 
   factory EventData.fromJson(Map<String, dynamic> json) =>
