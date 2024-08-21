@@ -1,9 +1,13 @@
 import 'dart:async';
 
+import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis_classroom/pages/main/events/page.dart';
+import 'package:nocsis_classroom/pages/main/home/page.dart';
+import 'package:nocsis_classroom/pages/main/layout.dart';
 import 'package:nocsis_classroom/themes/display.dart';
 import 'package:nocsis_classroom/pages/sign_in.dart';
 import 'package:nocsis_classroom/screens/home.dart';
@@ -48,6 +52,75 @@ final router = GoRouter(
           ),
         );
       },
+    ),
+    ShellRoute(
+      pageBuilder: (context, state, child) {
+        return MaterialPage(
+          key: state.pageKey,
+          child: MainPage(
+            location: state.matchedLocation,
+            child: child,
+          ),
+        );
+      },
+      routes: [
+        GoRoute(
+          path: "/personal",
+          pageBuilder: (context, state) {
+            final isMobile = MediaQuery.of(context).size.width < 1200;
+
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const MainView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                if (isMobile) {
+                  return SharedAxisTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.vertical,
+                    child: child,
+                  );
+                }
+
+                return FadeThroughTransition(
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  child: child,
+                );
+              },
+            );
+          },
+        ),
+        GoRoute(
+          path: "/personal/events",
+          pageBuilder: (context, state) {
+            final isMobile = MediaQuery.of(context).size.width < 1200;
+
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const EventsView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                if (isMobile) {
+                  return SharedAxisTransition(
+                    animation: animation,
+                    secondaryAnimation: secondaryAnimation,
+                    transitionType: SharedAxisTransitionType.vertical,
+                    child: child,
+                  );
+                }
+
+                return FadeThroughTransition(
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  child: child,
+                );
+              },
+            );
+          },
+        )
+      ],
     ),
     GoRoute(
       path: "/signin",
