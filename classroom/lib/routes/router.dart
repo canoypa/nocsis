@@ -37,6 +37,7 @@ final router = GoRouter(
       path: "/",
       pageBuilder: (context, state) {
         return MaterialPage(
+          key: state.pageKey,
           child: ScreenUtilInit(
             designSize: const Size(960, 540),
             builder: (context, child) {
@@ -125,8 +126,9 @@ final router = GoRouter(
     GoRoute(
       path: "/signin",
       pageBuilder: (context, state) {
-        return const MaterialPage(
-          child: SignInPage(),
+        return MaterialPage(
+          key: state.pageKey,
+          child: const SignInPage(),
         );
       },
     ),
