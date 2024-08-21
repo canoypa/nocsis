@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,6 +7,25 @@ import 'package:go_router/go_router.dart';
 import 'package:nocsis_classroom/themes/display.dart';
 import 'package:nocsis_classroom/pages/sign_in.dart';
 import 'package:nocsis_classroom/screens/home.dart';
+
+class GoRouterRefresher extends ChangeNotifier {
+  late final StreamSubscription<dynamic> _auth;
+
+  GoRouterRefresher() {
+    notifyListeners();
+
+    _auth = FirebaseAuth.instance
+        .authStateChanges()
+        .asBroadcastStream()
+        .listen((_) => notifyListeners());
+  }
+
+  @override
+  void dispose() {
+    _auth.cancel();
+    super.dispose();
+  }
+}
 
 final router = GoRouter(
   routes: [
@@ -62,4 +83,5 @@ final router = GoRouter(
 
     return null;
   },
+  refreshListenable: GoRouterRefresher(),
 );
