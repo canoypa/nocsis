@@ -24,7 +24,7 @@ Map<String, dynamic> _$$WeatherImplToJson(_$WeatherImpl instance) =>
 _$WeatherCurrentImpl _$$WeatherCurrentImplFromJson(Map<String, dynamic> json) =>
     _$WeatherCurrentImpl(
       name: json['name'] as String,
-      temp: json['temp'] as int,
+      temp: (json['temp'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$WeatherCurrentImplToJson(

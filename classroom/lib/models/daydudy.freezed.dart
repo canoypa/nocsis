@@ -12,7 +12,7 @@ part of 'daydudy.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 Daydudy _$DaydudyFromJson(Map<String, dynamic> json) {
   return _Daydudy.fromJson(json);
@@ -24,8 +24,12 @@ mixin _$Daydudy {
   String get lastName => throw _privateConstructorUsedError;
   int get stuNo => throw _privateConstructorUsedError;
 
+  /// Serializes this Daydudy to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of Daydudy
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $DaydudyCopyWith<Daydudy> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -47,6 +51,8 @@ class _$DaydudyCopyWithImpl<$Res, $Val extends Daydudy>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Daydudy
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -89,6 +95,8 @@ class __$$DaydudyImplCopyWithImpl<$Res>
       _$DaydudyImpl _value, $Res Function(_$DaydudyImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Daydudy
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -146,11 +154,13 @@ class _$DaydudyImpl implements _Daydudy {
             (identical(other.stuNo, stuNo) || other.stuNo == stuNo));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, firstName, lastName, stuNo);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of Daydudy
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$DaydudyImplCopyWith<_$DaydudyImpl> get copyWith =>
@@ -178,8 +188,11 @@ abstract class _Daydudy implements Daydudy {
   String get lastName;
   @override
   int get stuNo;
+
+  /// Create a copy of Daydudy
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DaydudyImplCopyWith<_$DaydudyImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

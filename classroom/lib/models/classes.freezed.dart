@@ -12,7 +12,7 @@ part of 'classes.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 ClassList _$ClassListFromJson(Map<String, dynamic> json) {
   return _ClassList.fromJson(json);
@@ -22,8 +22,12 @@ ClassList _$ClassListFromJson(Map<String, dynamic> json) {
 mixin _$ClassList {
   List<ClassData> get items => throw _privateConstructorUsedError;
 
+  /// Serializes this ClassList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ClassList
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ClassListCopyWith<ClassList> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -46,6 +50,8 @@ class _$ClassListCopyWithImpl<$Res, $Val extends ClassList>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ClassList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -79,6 +85,8 @@ class __$$ClassListImplCopyWithImpl<$Res>
       _$ClassListImpl _value, $Res Function(_$ClassListImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ClassList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -123,12 +131,14 @@ class _$ClassListImpl implements _ClassList {
             const DeepCollectionEquality().equals(other._items, _items));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ClassList
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ClassListImplCopyWith<_$ClassListImpl> get copyWith =>
@@ -151,8 +161,11 @@ abstract class _ClassList implements ClassList {
 
   @override
   List<ClassData> get items;
+
+  /// Create a copy of ClassList
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ClassListImplCopyWith<_$ClassListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -168,8 +181,12 @@ mixin _$ClassData {
   DateTime get startAt => throw _privateConstructorUsedError;
   DateTime get endAt => throw _privateConstructorUsedError;
 
+  /// Serializes this ClassData to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of ClassData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $ClassDataCopyWith<ClassData> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -192,6 +209,8 @@ class _$ClassDataCopyWithImpl<$Res, $Val extends ClassData>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of ClassData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -240,6 +259,8 @@ class __$$ClassDataImplCopyWithImpl<$Res>
       _$ClassDataImpl _value, $Res Function(_$ClassDataImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of ClassData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -306,11 +327,13 @@ class _$ClassDataImpl implements _ClassData {
             (identical(other.endAt, endAt) || other.endAt == endAt));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, title, period, startAt, endAt);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of ClassData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$ClassDataImplCopyWith<_$ClassDataImpl> get copyWith =>
@@ -342,8 +365,11 @@ abstract class _ClassData implements ClassData {
   DateTime get startAt;
   @override
   DateTime get endAt;
+
+  /// Create a copy of ClassData
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ClassDataImplCopyWith<_$ClassDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -10,7 +10,7 @@ _$DaydudyImpl _$$DaydudyImplFromJson(Map<String, dynamic> json) =>
     _$DaydudyImpl(
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
-      stuNo: json['stuNo'] as int,
+      stuNo: (json['stuNo'] as num).toInt(),
     );
 
 Map<String, dynamic> _$$DaydudyImplToJson(_$DaydudyImpl instance) =>

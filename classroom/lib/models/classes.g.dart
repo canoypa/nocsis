@@ -21,7 +21,7 @@ Map<String, dynamic> _$$ClassListImplToJson(_$ClassListImpl instance) =>
 _$ClassDataImpl _$$ClassDataImplFromJson(Map<String, dynamic> json) =>
     _$ClassDataImpl(
       title: json['title'] as String,
-      period: json['period'] as int,
+      period: (json['period'] as num).toInt(),
       startAt: DateTime.parse(json['startAt'] as String),
       endAt: DateTime.parse(json['endAt'] as String),
     );

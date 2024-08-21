@@ -12,7 +12,7 @@ part of 'events.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 EventList _$EventListFromJson(Map<String, dynamic> json) {
   return _EventList.fromJson(json);
@@ -22,8 +22,12 @@ EventList _$EventListFromJson(Map<String, dynamic> json) {
 mixin _$EventList {
   List<EventData> get items => throw _privateConstructorUsedError;
 
+  /// Serializes this EventList to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of EventList
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $EventListCopyWith<EventList> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -46,6 +50,8 @@ class _$EventListCopyWithImpl<$Res, $Val extends EventList>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of EventList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -79,6 +85,8 @@ class __$$EventListImplCopyWithImpl<$Res>
       _$EventListImpl _value, $Res Function(_$EventListImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of EventList
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -123,12 +131,14 @@ class _$EventListImpl implements _EventList {
             const DeepCollectionEquality().equals(other._items, _items));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
       Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of EventList
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$EventListImplCopyWith<_$EventListImpl> get copyWith =>
@@ -151,8 +161,11 @@ abstract class _EventList implements EventList {
 
   @override
   List<EventData> get items;
+
+  /// Create a copy of EventList
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$EventListImplCopyWith<_$EventListImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -168,8 +181,12 @@ mixin _$EventData {
   DateTime get startAt => throw _privateConstructorUsedError;
   DateTime get endAt => throw _privateConstructorUsedError;
 
+  /// Serializes this EventData to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of EventData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $EventDataCopyWith<EventData> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -192,6 +209,8 @@ class _$EventDataCopyWithImpl<$Res, $Val extends EventData>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of EventData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -240,6 +259,8 @@ class __$$EventDataImplCopyWithImpl<$Res>
       _$EventDataImpl _value, $Res Function(_$EventDataImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of EventData
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -307,11 +328,13 @@ class _$EventDataImpl implements _EventData {
             (identical(other.endAt, endAt) || other.endAt == endAt));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, title, isAllDay, startAt, endAt);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of EventData
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$EventDataImplCopyWith<_$EventDataImpl> get copyWith =>
@@ -343,8 +366,11 @@ abstract class _EventData implements EventData {
   DateTime get startAt;
   @override
   DateTime get endAt;
+
+  /// Create a copy of EventData
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$EventDataImplCopyWith<_$EventDataImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
