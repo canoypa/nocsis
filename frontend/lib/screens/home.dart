@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nocsis_classroom/components/home_info.dart';
-import 'package:nocsis_classroom/components/home_schedules.dart';
-import 'package:nocsis_classroom/components/weather_graph.dart';
-import 'package:nocsis_classroom/providers/during_class_data.dart';
-import 'package:nocsis_classroom/screens/during_class.dart';
+import 'package:nocsis/components/home_info.dart';
+import 'package:nocsis/components/home_schedules.dart';
+import 'package:nocsis/components/weather_graph.dart';
+import 'package:nocsis/providers/during_class_data.dart';
+import 'package:nocsis/screens/during_class.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({

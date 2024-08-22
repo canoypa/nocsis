@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nocsis_classroom/core/cron.dart';
+import 'package:nocsis/core/cron.dart';
 
 void main() {
   group('Cron', () {

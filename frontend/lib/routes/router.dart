@@ -5,12 +5,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis_classroom/pages/main/events/page.dart';
-import 'package:nocsis_classroom/pages/main/home/page.dart';
-import 'package:nocsis_classroom/pages/main/layout.dart';
-import 'package:nocsis_classroom/themes/display.dart';
-import 'package:nocsis_classroom/pages/sign_in.dart';
-import 'package:nocsis_classroom/screens/home.dart';
+import 'package:nocsis/pages/main/events/page.dart';
+import 'package:nocsis/pages/main/home/page.dart';
+import 'package:nocsis/pages/main/layout.dart';
+import 'package:nocsis/themes/display.dart';
+import 'package:nocsis/pages/sign_in.dart';
+import 'package:nocsis/screens/home.dart';
 
 class GoRouterRefresher extends ChangeNotifier {
   late final StreamSubscription<dynamic> _auth;

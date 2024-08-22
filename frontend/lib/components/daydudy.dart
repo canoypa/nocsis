@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nocsis_classroom/providers/daydudy.dart';
+import 'package:nocsis/providers/daydudy.dart';
 
 class Daydudy extends ConsumerWidget {
   const Daydudy({super.key});

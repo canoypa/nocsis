@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:nocsis_classroom/providers/classes.dart';
-import 'package:nocsis_classroom/providers/cron.dart';
-import 'package:nocsis_classroom/providers/events.dart';
+import 'package:nocsis/providers/classes.dart';
+import 'package:nocsis/providers/cron.dart';
+import 'package:nocsis/providers/events.dart';
 
 class HomeSchedules extends ConsumerWidget {
   const HomeSchedules({super.key});

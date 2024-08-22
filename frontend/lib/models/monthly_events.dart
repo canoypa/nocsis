@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:nocsis_classroom/models/events.dart';
+import 'package:nocsis/models/events.dart';
 
 part 'monthly_events.freezed.dart';
 part 'monthly_events.g.dart';

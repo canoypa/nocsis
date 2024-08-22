@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nocsis_classroom/components/during_class_progress.dart';
-import 'package:nocsis_classroom/models/classes.dart';
-import 'package:nocsis_classroom/providers/cron.dart';
+import 'package:nocsis/components/during_class_progress.dart';
+import 'package:nocsis/models/classes.dart';
+import 'package:nocsis/providers/cron.dart';
 
 class DuringClassScreen extends ConsumerWidget {
   final ClassData? data;

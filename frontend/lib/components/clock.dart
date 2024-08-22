@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nocsis_classroom/providers/cron.dart';
+import 'package:nocsis/providers/cron.dart';
 
 class Clock extends ConsumerStatefulWidget {
   const Clock({super.key});

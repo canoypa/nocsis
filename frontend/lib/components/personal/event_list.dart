@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:nocsis_classroom/components/personal/basic_card.dart';
-import 'package:nocsis_classroom/models/events.dart';
+import 'package:nocsis/components/personal/basic_card.dart';
+import 'package:nocsis/models/events.dart';
 
 class EventListView extends StatelessWidget {
   final List<EventData> items;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:nocsis_classroom/themes/app.dart';
+import 'package:nocsis/themes/app.dart';
 
 ThemeData _base = darkTheme;
 

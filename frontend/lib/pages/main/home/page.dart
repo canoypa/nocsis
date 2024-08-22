@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:nocsis_classroom/components/personal/day_schedule.dart';
-import 'package:nocsis_classroom/components/personal/toggle_day.dart';
+import 'package:nocsis/components/personal/day_schedule.dart';
+import 'package:nocsis/components/personal/toggle_day.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});

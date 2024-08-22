@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:nocsis_classroom/converters/local_date_time.dart';
+import 'package:nocsis/converters/local_date_time.dart';
 
 part 'classes.freezed.dart';
 part 'classes.g.dart';

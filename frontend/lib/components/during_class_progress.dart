@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nocsis_classroom/models/classes.dart';
+import 'package:nocsis/models/classes.dart';
 
 class DuringClassProgress extends StatefulWidget {
   final ClassData data;

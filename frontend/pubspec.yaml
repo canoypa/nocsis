@@ -1,6 +1,6 @@
 publish_to: "none"
 
-name: nocsis_classroom
+name: nocsis
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

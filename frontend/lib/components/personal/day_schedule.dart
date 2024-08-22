@@ -1,10 +1,10 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nocsis_classroom/components/personal/class_list.dart';
-import 'package:nocsis_classroom/components/personal/event_list.dart';
-import 'package:nocsis_classroom/models/classes.dart';
-import 'package:nocsis_classroom/models/events.dart';
+import 'package:nocsis/components/personal/class_list.dart';
+import 'package:nocsis/components/personal/event_list.dart';
+import 'package:nocsis/models/classes.dart';
+import 'package:nocsis/models/events.dart';
 
 class DaySchedules {
   final ClassList classes;

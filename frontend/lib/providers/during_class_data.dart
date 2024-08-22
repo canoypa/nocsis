@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
-import 'package:nocsis_classroom/models/classes.dart';
-import 'package:nocsis_classroom/providers/classes.dart';
-import 'package:nocsis_classroom/providers/cron.dart';
+import 'package:nocsis/models/classes.dart';
+import 'package:nocsis/providers/classes.dart';
+import 'package:nocsis/providers/cron.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'during_class_data.g.dart';

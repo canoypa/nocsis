@@ -1,4 +1,4 @@
-import 'package:nocsis_classroom/core/cron.dart';
+import 'package:nocsis/core/cron.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cron.g.dart';

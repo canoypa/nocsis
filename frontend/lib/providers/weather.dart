@@ -1,6 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:nocsis_classroom/models/weather.dart';
-import 'package:nocsis_classroom/providers/cron.dart';
+import 'package:nocsis/models/weather.dart';
+import 'package:nocsis/providers/cron.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'weather.g.dart';

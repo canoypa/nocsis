@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:nocsis_classroom/components/personal/basic_card.dart';
-import 'package:nocsis_classroom/models/classes.dart';
+import 'package:nocsis/components/personal/basic_card.dart';
+import 'package:nocsis/models/classes.dart';
 
 class ClassListView extends StatelessWidget {
   final List<ClassData> items;

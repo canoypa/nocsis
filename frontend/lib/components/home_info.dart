@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:nocsis_classroom/components/clock.dart';
-import 'package:nocsis_classroom/components/daydudy.dart';
-import 'package:nocsis_classroom/components/weather_info.dart';
+import 'package:nocsis/components/clock.dart';
+import 'package:nocsis/components/daydudy.dart';
+import 'package:nocsis/components/weather_info.dart';
 
 class HomeInfo extends StatelessWidget {
   const HomeInfo({super.key});
