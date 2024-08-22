@@ -137,7 +137,7 @@ final router = GoRouter(
     final user = await FirebaseAuth.instance.authStateChanges().first;
     final isSignIn = user != null;
 
-    if (!isSignIn && state.matchedLocation != "/signin") {
+    if (!isSignIn && state.uri.path != "/signin") {
       final continueUri = state.uri.path;
       if (continueUri == "/") {
         return "/signin";
@@ -146,9 +146,9 @@ final router = GoRouter(
       return "/signin?continue=${continueUri}";
     }
 
-    if (isSignIn && state.matchedLocation == "/signin") {
+    if (isSignIn && state.uri.path == "/signin") {
       final continueUri =
-          Uri.tryParse(state.uri.queryParameters["continue"] ?? "");
+          Uri.tryParse(state.uri.queryParameters["continue"] ?? "/");
 
       if (continueUri != null) {
         return continueUri.path;
