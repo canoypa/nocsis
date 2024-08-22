@@ -8,10 +8,7 @@
       "path": "functions"
     },
     {
-      "path": "personal"
-    },
-    {
-      "path": "classroom"
+      "path": "frontend"
     }
   ],
   "settings": {
