@@ -138,19 +138,20 @@ final router = GoRouter(
     final isSignIn = user != null;
 
     if (!isSignIn && state.matchedLocation != "/signin") {
-      if (state.path == null) {
+      final continueUri = state.uri.path;
+      if (continueUri == "/") {
         return "/signin";
       }
 
-      return "/signin?continue=${state.path}";
+      return "/signin?continue=${continueUri}";
     }
 
     if (isSignIn && state.matchedLocation == "/signin") {
-      final continueUri = state.uri.queryParameters["continue"];
-      final validUriPattern = RegExp(r"^/.+$");
+      final continueUri =
+          Uri.tryParse(state.uri.queryParameters["continue"] ?? "");
 
-      if (continueUri is String && validUriPattern.hasMatch(continueUri)) {
-        return continueUri;
+      if (continueUri != null) {
+        return continueUri.path;
       }
 
       return "/";
