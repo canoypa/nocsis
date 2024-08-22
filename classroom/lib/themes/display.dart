@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nocsis_classroom/themes/app.dart';
 
-ThemeData _base = ThemeData(
-  colorSchemeSeed: const Color(0x006750a4),
-  brightness: Brightness.dark,
-);
+ThemeData _base = darkTheme;
 
 ThemeData createDisplayTheme(BuildContext context) {
   final theme = Theme.of(context);
