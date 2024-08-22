@@ -41,6 +41,26 @@
     </style>
   </head>
   <body>
-    <script src="flutter_bootstrap.js" async></script>
+    <!-- usePathUrlStrategy の場合に base href が考慮されないためカスタムしている -->
+    <script>
+      {{flutter_js}}
+      {{flutter_build_config}}
+
+      const serviceWorkerVersion = {{flutter_service_worker_version}};
+
+      window.addEventListener('load', () => {
+        _flutter.loader.loadEntrypoint({
+          entrypointUrl: "/main.dart.js",
+          serviceWorker: {
+            serviceWorkerVersion: serviceWorkerVersion,
+            serviceWorkerUrl: "/flutter_service_worker.js?v=",
+          },
+          onEntrypointLoaded: async (engineInitializer) => {
+            const appRunner = await engineInitializer.initializeEngine();
+            appRunner.runApp();
+          }
+        });
+      });
+    </script>
   </body>
 </html>
