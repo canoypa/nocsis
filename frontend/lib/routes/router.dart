@@ -143,7 +143,7 @@ final router = GoRouter(
         return "/signin";
       }
 
-      return "/signin?continue=${continueUri}";
+      return "/signin?continue=$continueUri";
     }
 
     if (isSignIn && state.uri.path == "/signin") {
