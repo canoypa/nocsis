@@ -111,9 +111,9 @@ class DaySchedule extends ConsumerWidget {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (!data.classes.items.isEmpty)
+              if (data.classes.items.isNotEmpty)
                 ClassListView(items: data.classes.items),
-              if (!data.events.items.isEmpty)
+              if (data.events.items.isNotEmpty)
                 EventListView(items: data.events.items),
             ],
           );
