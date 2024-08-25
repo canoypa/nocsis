@@ -14,8 +14,8 @@ class WeatherGraph extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final weather = ref.watch(weatherProvider).value?.hourly ??
         WeatherHourly(
-          temp: List.generate(9, (index) => 0),
-          pop: List.generate(9, (index) => 0),
+          temp: List.generate(8, (index) => 0),
+          pop: List.generate(8, (index) => 0),
         );
 
     return SizedBox.expand(
