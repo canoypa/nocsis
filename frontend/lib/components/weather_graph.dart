@@ -12,11 +12,14 @@ class WeatherGraph extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weather = ref.watch(weatherProvider).value?.hourly ??
-        WeatherHourly(
-          temp: List.generate(8, (index) => 0),
-          pop: List.generate(8, (index) => 0),
-        );
+    final weather = ref.watch(weatherProvider).maybeMap(
+        data: (data) => data.value.hourly,
+        orElse: () {
+          return WeatherHourly(
+            temp: List.generate(8, (index) => 0),
+            pop: List.generate(8, (index) => 0),
+          );
+        });
 
     return SizedBox.expand(
       child: LayoutBuilder(builder: (context, constraints) {
