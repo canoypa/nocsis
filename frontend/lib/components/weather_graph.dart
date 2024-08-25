@@ -136,14 +136,16 @@ class _Painter extends CustomPainter {
   static const _tempColor = Color(0xFFFFD54F);
   static const _popColor = Color(0xFF64B5F6);
 
-  static final _tempFillPaint = Paint()..color = _tempColor.withAlpha(51);
+  static final _tempFillPaint = Paint()
+    ..color = _tempColor.withAlpha((255 * 0.1).round());
   static final _tempLinePaint = Paint()
-    ..color = _tempColor
+    ..color = _tempColor.withAlpha((255 * 0.8).round())
     ..strokeWidth = 4
     ..style = PaintingStyle.stroke;
-  static final _popFillPaint = Paint()..color = _popColor.withAlpha(51);
+  static final _popFillPaint = Paint()
+    ..color = _popColor.withAlpha((255 * 0.1).round());
   static final _popLinePaint = Paint()
-    ..color = _popColor
+    ..color = _popColor.withAlpha((255 * 0.8).round())
     ..strokeWidth = 4
     ..style = PaintingStyle.stroke;
 
