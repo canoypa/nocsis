@@ -12,128 +12,28 @@ import 'package:nocsis/themes/display.dart';
 import 'package:nocsis/pages/sign_in.dart';
 import 'package:nocsis/screens/home.dart';
 
-class GoRouterRefresher extends ChangeNotifier {
-  late final StreamSubscription<dynamic> _auth;
+part 'router.g.dart';
 
-  GoRouterRefresher() {
-    notifyListeners();
-
-    _auth = FirebaseAuth.instance
-        .authStateChanges()
-        .asBroadcastStream()
-        .listen((_) => notifyListeners());
+@TypedShellRoute<AppShell>(
+  routes: [
+    TypedGoRoute<HomeRoute>(path: '/'),
+    TypedGoRoute<SignInRoute>(path: '/signin'),
+    TypedShellRoute<PersonalShell>(
+      routes: [
+        TypedGoRoute<PersonalHomeRoute>(path: '/personal'),
+        TypedGoRoute<PersonalEventsRoute>(path: '/personal/events'),
+      ],
+    ),
+  ],
+)
+class AppShell extends ShellRouteData {
+  @override
+  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
+    return navigator;
   }
 
   @override
-  void dispose() {
-    _auth.cancel();
-    super.dispose();
-  }
-}
-
-final router = GoRouter(
-  routes: [
-    GoRoute(
-      path: "/",
-      pageBuilder: (context, state) {
-        return MaterialPage(
-          key: state.pageKey,
-          child: ScreenUtilInit(
-            designSize: const Size(960, 540),
-            builder: (context, child) {
-              final theme = createDisplayTheme(context);
-
-              return Theme(
-                data: theme,
-                child: const Scaffold(
-                  body: HomeScreen(),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    ),
-    ShellRoute(
-      pageBuilder: (context, state, child) {
-        return MaterialPage(
-          key: state.pageKey,
-          child: MainPage(
-            location: state.matchedLocation,
-            child: child,
-          ),
-        );
-      },
-      routes: [
-        GoRoute(
-          path: "/personal",
-          pageBuilder: (context, state) {
-            final isMobile = MediaQuery.of(context).size.width < 1200;
-
-            return CustomTransitionPage(
-              key: state.pageKey,
-              child: const MainView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                if (isMobile) {
-                  return SharedAxisTransition(
-                    animation: animation,
-                    secondaryAnimation: secondaryAnimation,
-                    transitionType: SharedAxisTransitionType.vertical,
-                    child: child,
-                  );
-                }
-
-                return FadeThroughTransition(
-                  animation: animation,
-                  secondaryAnimation: secondaryAnimation,
-                  child: child,
-                );
-              },
-            );
-          },
-        ),
-        GoRoute(
-          path: "/personal/events",
-          pageBuilder: (context, state) {
-            final isMobile = MediaQuery.of(context).size.width < 1200;
-
-            return CustomTransitionPage(
-              key: state.pageKey,
-              child: const EventsView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                if (isMobile) {
-                  return SharedAxisTransition(
-                    animation: animation,
-                    secondaryAnimation: secondaryAnimation,
-                    transitionType: SharedAxisTransitionType.vertical,
-                    child: child,
-                  );
-                }
-
-                return FadeThroughTransition(
-                  animation: animation,
-                  secondaryAnimation: secondaryAnimation,
-                  child: child,
-                );
-              },
-            );
-          },
-        )
-      ],
-    ),
-    GoRoute(
-      path: "/signin",
-      pageBuilder: (context, state) {
-        return MaterialPage(
-          key: state.pageKey,
-          child: const SignInPage(),
-        );
-      },
-    ),
-  ],
-  redirect: (context, state) async {
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
     final user = await FirebaseAuth.instance.authStateChanges().first;
     final isSignIn = user != null;
 
@@ -158,6 +58,137 @@ final router = GoRouter(
     }
 
     return null;
-  },
+  }
+}
+
+class HomeRoute extends GoRouteData {
+  const HomeRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return MaterialPage(
+      key: state.pageKey,
+      child: ScreenUtilInit(
+        designSize: const Size(960, 540),
+        builder: (context, child) {
+          final theme = createDisplayTheme(context);
+
+          return Theme(
+            data: theme,
+            child: const Scaffold(
+              body: HomeScreen(),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class SignInRoute extends GoRouteData {
+  const SignInRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return MaterialPage(
+      key: state.pageKey,
+      child: const SignInPage(),
+    );
+  }
+}
+
+class PersonalShell extends ShellRouteData {
+  const PersonalShell();
+
+  @override
+  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
+    return MainPage(
+      location: state.matchedLocation,
+      child: navigator,
+    );
+  }
+}
+
+class PersonalHomeRoute extends GoRouteData {
+  const PersonalHomeRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    final isMobile = MediaQuery.of(context).size.width < 1200;
+
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: const MainView(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        if (isMobile) {
+          return SharedAxisTransition(
+            animation: animation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.vertical,
+            child: child,
+          );
+        }
+
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+class PersonalEventsRoute extends GoRouteData {
+  const PersonalEventsRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    final isMobile = MediaQuery.of(context).size.width < 1200;
+
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: const EventsView(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        if (isMobile) {
+          return SharedAxisTransition(
+            animation: animation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.vertical,
+            child: child,
+          );
+        }
+
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+class GoRouterRefresher extends ChangeNotifier {
+  late final StreamSubscription<dynamic> _auth;
+
+  GoRouterRefresher() {
+    notifyListeners();
+
+    _auth = FirebaseAuth.instance
+        .authStateChanges()
+        .asBroadcastStream()
+        .listen((_) => notifyListeners());
+  }
+
+  @override
+  void dispose() {
+    _auth.cancel();
+    super.dispose();
+  }
+}
+
+final router = GoRouter(
+  routes: $appRoutes,
   refreshListenable: GoRouterRefresher(),
 );
