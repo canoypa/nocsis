@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/models/weather.dart';
@@ -120,11 +121,14 @@ class _CanvasState extends ConsumerState<_Canvas>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
+        final primaryColor = Theme.of(context).colorScheme.primary;
+
         return CustomPaint(
           painter: _Painter(
             temp: _tempTweens!,
             pop: _popTweens!,
             animation: _animation,
+            primaryColor: primaryColor,
           ),
         );
       },
@@ -133,32 +137,40 @@ class _CanvasState extends ConsumerState<_Canvas>
 }
 
 class _Painter extends CustomPainter {
-  static const _tempColor = Color(0xFFFFD54F);
-  static const _popColor = Color(0xFF64B5F6);
-
-  static final _tempFillPaint = Paint()
-    ..color = _tempColor.withAlpha((255 * 0.1).round());
-  static final _tempLinePaint = Paint()
-    ..color = _tempColor.withAlpha((255 * 0.8).round())
-    ..strokeWidth = 4
-    ..style = PaintingStyle.stroke;
-  static final _popFillPaint = Paint()
-    ..color = _popColor.withAlpha((255 * 0.1).round());
-  static final _popLinePaint = Paint()
-    ..color = _popColor.withAlpha((255 * 0.8).round())
-    ..strokeWidth = 4
-    ..style = PaintingStyle.stroke;
-
   final List<Tween<Offset>> temp;
   final List<Tween<Offset>> pop;
 
   final Animation<double> animation;
 
+  final Color primaryColor;
+
+  late Color _tempColor;
+  late Color _popColor;
+  late Paint _tempFillPaint;
+  late Paint _tempLinePaint;
+  late Paint _popFillPaint;
+  late Paint _popLinePaint;
+
   _Painter({
     required this.temp,
     required this.pop,
     required this.animation,
-  });
+    required this.primaryColor,
+  }) {
+    _tempColor = const Color(0xFFFFD54F).harmonizeWith(primaryColor);
+    _popColor = const Color(0xFF64B5F6).harmonizeWith(primaryColor);
+
+    _tempFillPaint = Paint()..color = _tempColor.withAlpha((255 * 0.1).round());
+    _tempLinePaint = Paint()
+      ..color = _tempColor.withAlpha((255 * 0.8).round())
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke;
+    _popFillPaint = Paint()..color = _popColor.withAlpha((255 * 0.1).round());
+    _popLinePaint = Paint()
+      ..color = _popColor.withAlpha((255 * 0.8).round())
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke;
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -200,10 +212,10 @@ class _Painter extends CustomPainter {
     popFillPath.lineTo(0, size.height);
     popFillPath.close();
 
-    canvas.drawPath(tempFillPath, _Painter._tempFillPaint);
-    canvas.drawPath(tempLinePath, _Painter._tempLinePaint);
-    canvas.drawPath(popFillPath, _Painter._popFillPaint);
-    canvas.drawPath(popLinePath, _Painter._popLinePaint);
+    canvas.drawPath(tempFillPath, _tempFillPaint);
+    canvas.drawPath(tempLinePath, _tempLinePaint);
+    canvas.drawPath(popFillPath, _popFillPaint);
+    canvas.drawPath(popLinePath, _popLinePaint);
   }
 
   @override
