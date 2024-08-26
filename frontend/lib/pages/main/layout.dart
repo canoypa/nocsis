@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/personal/user_avatar.dart';
+import 'package:nocsis/routes/router.dart';
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {
@@ -62,7 +62,13 @@ class MainPage extends StatelessWidget {
           )
           .toList(),
       onDestinationSelected: (value) {
-        GoRouter.of(context).go(Navigation.values[value].pagePath);
+        final nav = Navigation.values[value];
+
+        if (nav == Navigation.home) {
+          const PersonalHomeRoute().go(context);
+        } else if (nav == Navigation.events) {
+          const PersonalEventsRoute().go(context);
+        }
       },
       labelType: NavigationRailLabelType.all,
     );
@@ -81,7 +87,13 @@ class MainPage extends StatelessWidget {
           )
           .toList(),
       onDestinationSelected: (value) {
-        GoRouter.of(context).go(Navigation.values[value].pagePath);
+        final nav = Navigation.values[value];
+
+        if (nav == Navigation.home) {
+          const PersonalHomeRoute().go(context);
+        } else if (nav == Navigation.events) {
+          const PersonalEventsRoute().go(context);
+        }
       },
     );
   }
