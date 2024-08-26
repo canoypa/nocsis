@@ -7,19 +7,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/models/weather.dart';
 import 'package:nocsis/providers/weather.dart';
 
+// 初回読み込み中のデータ
+final _initWeatherHourly = WeatherHourly(
+  temp: List.generate(8, (index) => 0),
+  pop: List.generate(8, (index) => 0),
+);
+
 class WeatherGraph extends ConsumerWidget {
   const WeatherGraph({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weather = ref.watch(weatherProvider).maybeMap(
-        data: (data) => data.value.hourly,
-        orElse: () {
-          return WeatherHourly(
-            temp: List.generate(8, (index) => 0),
-            pop: List.generate(8, (index) => 0),
-          );
-        });
+    final weather =
+        ref.watch(weatherProvider).value?.hourly ?? _initWeatherHourly;
 
     return SizedBox.expand(
       child: LayoutBuilder(builder: (context, constraints) {
