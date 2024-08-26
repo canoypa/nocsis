@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:nocsis/routes/router.dart';
 
 class ErrorPage extends StatelessWidget {
   const ErrorPage({super.key});
@@ -16,7 +16,7 @@ class ErrorPage extends StatelessWidget {
             ElevatedButton(
               child: const Text("Home"),
               onPressed: () {
-                GoRouter.of(context).go("/");
+                const HomeRoute().go(context);
               },
             ),
           ],
