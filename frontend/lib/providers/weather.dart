@@ -6,8 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'weather.g.dart';
 
 final fn = FirebaseFunctions.instanceFor(region: "asia-northeast1")
-    .httpsCallableFromUri(
-        Uri.parse("https://v3-weather-now-6joklbidfa-an.a.run.app"));
+    .httpsCallable("v3-weather-now");
 
 @riverpod
 Future<Weather> weather(WeatherRef ref) async {
