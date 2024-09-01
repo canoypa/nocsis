@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: Deploy to Staging
+  cancel-in-progress: true
 
 jobs:
   prepare:

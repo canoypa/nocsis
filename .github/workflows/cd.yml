@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: CD
+  cancel-in-progress: true
 
 jobs:
   lint:
