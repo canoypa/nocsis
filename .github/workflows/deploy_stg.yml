@@ -1,0 +1,30 @@
+name: Deploy to Staging
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare:
+    uses: ./.github/workflows/prepare.yml
+
+  deploy_frontend:
+    needs: [prepare]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ needs.prepare.outputs.flutter_channel }}
+          flutter-version: ${{ needs.prepare.outputs.flutter_version }}
+      - name: Build
+        run: flutter build web --wasm
+      - name: Deploy
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID}}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
+          working-directory: ./frontend
+          alias-domains: stg.nocsis.app
