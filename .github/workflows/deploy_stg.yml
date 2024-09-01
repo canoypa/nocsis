@@ -26,10 +26,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ needs.prepare.outputs.node_version }}
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          package_json_file: ./functions/package.json
       - name: Install dependencies
         run: pnpm install
       - name: Build
