@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: "CD"
+
 jobs:
   lint:
     uses: ./.github/workflows/lint.yml

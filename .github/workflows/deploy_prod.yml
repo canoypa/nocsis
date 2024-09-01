@@ -11,6 +11,9 @@ on:
       VERCEL_PROJECT_ID:
         required: true
 
+concurrency:
+  group: "Deploy to Production"
+
 jobs:
   prepare:
     uses: ./.github/workflows/prepare.yml
