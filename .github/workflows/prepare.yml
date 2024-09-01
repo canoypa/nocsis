@@ -1,0 +1,31 @@
+name: Prepare
+
+on:
+  workflow_call:
+    outputs:
+      node_version:
+        value: ${{ jobs.set_env.outputs.node_version }}
+      flutter_version:
+        value: ${{ jobs.set_env.outputs.flutter_version }}
+      flutter_channel:
+        value: ${{ jobs.set_env.outputs.flutter_channel }}
+
+jobs:
+  set_env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Read Node.js version
+        id: node_version
+        run: echo "NODE_VERSION=$(cat ./functions/.node-version)" >> $GITHUB_OUTPUT
+      - name: Read Flutter version
+        id: flutter_version
+        uses: kuhnroyal/flutter-fvm-config-action@v2
+        with:
+          path: ./frontend/.fvmrc
+          setup: false
+    outputs:
+      node_version: ${{ steps.node_version.outputs.NODE_VERSION }}
+      flutter_version: ${{ steps.flutter_version.outputs.FLUTTER_VERSION }}
+      flutter_channel: ${{ steps.flutter_version.outputs.FLUTTER_CHANNEL }}

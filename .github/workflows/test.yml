@@ -1,0 +1,50 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
+jobs:
+  prepare:
+    uses: ./.github/workflows/prepare.yml
+
+  functions:
+    needs: prepare
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./functions
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.prepare.outputs.node_version }}
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: ./functions/package.json
+      - name: Install dependencies
+        run: pnpm install
+      - name: Test
+        run: pnpm run test
+
+  frontend:
+    needs: prepare
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ needs.prepare.outputs.flutter_channel }}
+          flutter-version: ${{ needs.prepare.outputs.flutter_version }}
+      - name: Test
+        run: flutter test
