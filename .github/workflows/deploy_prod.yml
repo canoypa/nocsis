@@ -22,6 +22,7 @@ jobs:
         with:
           channel: ${{ needs.prepare.outputs.flutter_channel }}
           flutter-version: ${{ needs.prepare.outputs.flutter_version }}
+          cache: true
       - name: Build
         run: flutter build web --wasm
       - name: Deploy
