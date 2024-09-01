@@ -12,7 +12,7 @@ on:
         required: true
 
 concurrency:
-  group: "Deploy to Production"
+  group: ${{ github.workflow }}
 
 jobs:
   prepare:
