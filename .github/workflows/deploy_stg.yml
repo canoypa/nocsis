@@ -3,6 +3,9 @@ name: Deploy to Staging
 on:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}
+
 jobs:
   prepare:
     uses: ./.github/workflows/prepare.yml
