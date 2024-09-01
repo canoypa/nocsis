@@ -39,7 +39,7 @@ class DuringClassScreen extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "${classData.period}時間目",
+                    "${classData.period}時限目",
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   const Text("・"),
