@@ -1,5 +1,6 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { beforeUserCreated } from "firebase-functions/v2/identity";
+import { firebaseApp } from "~/client/firebaseApp.js";
 
 export const beforeUserCreate = beforeUserCreated(
   {
@@ -8,7 +9,7 @@ export const beforeUserCreate = beforeUserCreated(
   async (event) => {
     const user = event.data;
 
-    const snapshot = await getFirestore()
+    const snapshot = await getFirestore(firebaseApp)
       .doc("environment/allowed_emails")
       .get();
 
