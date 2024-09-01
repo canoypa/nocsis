@@ -1,0 +1,16 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+  test:
+    uses: ./.github/workflows/test.yml
+
+  deploy:
+    needs: [lint, test]
+    uses: ./.github/workflows/deploy_prod.yml
