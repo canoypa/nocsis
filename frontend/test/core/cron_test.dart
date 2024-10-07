@@ -20,7 +20,7 @@ void main() {
       const cronFormat = '*/15 5-10 2,4,8,16 10 *';
       final cron = Cron.parse(cronFormat);
 
-      expect(cron.minutes, [0, 15, 30, 45]);
+      expect(cron.minutes, [0, 15, 30, 45, 60, 75, 90, 105]);
       expect(cron.hours, [5, 6, 7, 8, 9, 10]);
       expect(cron.days, [2, 4, 8, 16]);
       expect(cron.months, [10]);

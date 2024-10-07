@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import type { CalendarEvent } from "../../types/calendar.js";
 import { getDisplayTitle } from "./get_display_title.js";
 
-const d = DateTime.fromISO;
+const d = (iso: string) => DateTime.fromISO(iso, { zone: "Asia/Tokyo" });
 const c = (
   startAt: DateTime,
   endAt: DateTime,

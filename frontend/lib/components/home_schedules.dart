@@ -48,7 +48,7 @@ class HomeSchedules extends ConsumerWidget {
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                         Text(
-                          "${e.period}時間目",
+                          "${e.period}時限目",
                           style:
                               Theme.of(context).textTheme.labelSmall?.copyWith(
                                     color: Theme.of(context)
