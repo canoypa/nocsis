@@ -34,6 +34,10 @@ RouteBase get $appShell => ShellRouteData.$route(
             ),
           ],
         ),
+        GoRouteData.$route(
+          path: '/licenses',
+          factory: $LicensesRouteExtension._fromState,
+        ),
       ],
     );
 
@@ -103,6 +107,23 @@ extension $PersonalEventsRouteExtension on PersonalEventsRoute {
 
   String get location => GoRouteData.$location(
         '/personal/events',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $LicensesRouteExtension on LicensesRoute {
+  static LicensesRoute _fromState(GoRouterState state) => const LicensesRoute();
+
+  String get location => GoRouteData.$location(
+        '/licenses',
       );
 
   void go(BuildContext context) => context.go(location);
