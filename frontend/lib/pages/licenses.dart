@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nocsis/components/pages/licenses/license_tile.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'licenses.g.dart';
@@ -33,9 +35,14 @@ class LicensesPage extends ConsumerWidget {
           SliverAppBar.large(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () {},
+              onPressed: () {
+                if (GoRouter.of(context).canPop()) {
+                  GoRouter.of(context).pop();
+                } else {
+                  GoRouter.of(context).go('/');
+                }
+              },
             ),
-            // title: const Text('ライセンス'),
             centerTitle: false,
             flexibleSpace: const FlexibleSpaceBar(
               title: Text('ライセンス'),
@@ -51,12 +58,16 @@ class LicensesPage extends ConsumerWidget {
               data: (licenses) {
                 return SliverList.separated(
                   itemCount: licenses.length,
-                  itemBuilder: (context, index) {
-                    final entry = licenses.entries.elementAt(index);
+                  itemBuilder: (context, i) {
+                    final entry = licenses.entries.elementAt(i);
+                    final packageName = entry.key;
+                    final paragraphs = entry.value;
+
                     return Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 800),
-                        child: Package(entry: entry),
+                        child: LicenseTile(
+                            packageName: packageName, paragraphs: paragraphs),
                       ),
                     );
                   },
@@ -80,56 +91,6 @@ class LicensesPage extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class Package extends StatelessWidget {
-  const Package({
-    super.key,
-    required this.entry,
-  });
-
-  final MapEntry<String, List<LicenseParagraph>> entry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          entry.key,
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Theme.of(context).colorScheme.surfaceContainerLow,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: entry.value.map((paragraph) {
-              if (paragraph.indent == LicenseParagraph.centeredIndent) {
-                return Center(
-                  child: Text(paragraph.text),
-                );
-              } else {
-                return Padding(
-                  padding: EdgeInsetsDirectional.only(
-                    start: 16.0 * paragraph.indent,
-                  ),
-                  child: Text(
-                    paragraph.text,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                );
-              }
-            }).toList(),
-          ),
-        ),
-      ],
     );
   }
 }
