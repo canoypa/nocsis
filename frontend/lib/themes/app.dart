@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 ThemeData _createTheme({
   required ThemeMode mode,
 }) {
-  final base = ThemeData(
+  return ThemeData(
+    fontFamily: 'NotoSansJP',
     colorSchemeSeed: const Color(0x005c6bc0),
     brightness: mode == ThemeMode.dark ? Brightness.dark : Brightness.light,
-  );
-
-  return base.copyWith(
-    textTheme: GoogleFonts.notoSansJpTextTheme(base.textTheme),
   );
 }
 
