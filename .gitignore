@@ -7,9 +7,6 @@ firebase-debug.*.log*
 # Firebase cache
 .firebase/
 
-# Firebase config
-.firebaserc
-
 # macOS
 .DS_Store
 
