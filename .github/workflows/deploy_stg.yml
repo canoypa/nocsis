@@ -11,6 +11,7 @@ jobs:
   deploy_functions:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       id-token: write
     defaults:
       run:
