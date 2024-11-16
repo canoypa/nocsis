@@ -16,24 +16,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prepare:
-    uses: ./.github/workflows/prepare.yml
-
-  deploy_frontend:
-    needs: [prepare]
+  deploy_functions:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm run build
+      - name: Auth
+        uses: google-github-actions/auth@v2
         with:
-          channel: ${{ needs.prepare.outputs.flutter_channel }}
-          flutter-version: ${{ needs.prepare.outputs.flutter_version }}
-          cache: true
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action-deploy-functions/providers/github-action
+          service_account: gh-action-deploy-functions@class-clock-40088.iam.gserviceaccount.com
+      - name: Deploy
+        run: pnpm firebase deploy --only functions
+
+  deploy_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: flutter pub get
       - name: Build
         run: flutter build web --wasm
       - name: Deploy
