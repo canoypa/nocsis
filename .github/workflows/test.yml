@@ -9,11 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prepare:
-    uses: ./.github/workflows/prepare.yml
-
   functions:
-    needs: prepare
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -35,7 +31,6 @@ jobs:
         run: pnpm run test
 
   frontend:
-    needs: prepare
     runs-on: ubuntu-latest
     defaults:
       run:

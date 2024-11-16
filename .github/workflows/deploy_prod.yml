@@ -16,24 +16,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prepare:
-    uses: ./.github/workflows/prepare.yml
-
-  deploy_frontend:
-    needs: [prepare]
+  deploy_functions:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: ${{ needs.prepare.outputs.flutter_channel }}
-          flutter-version: ${{ needs.prepare.outputs.flutter_version }}
-          cache: true
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+
+  deploy_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
       - name: Build
         run: flutter build web --wasm
       - name: Deploy
