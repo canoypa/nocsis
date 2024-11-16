@@ -4,6 +4,9 @@ logs
 firebase-debug.log*
 firebase-debug.*.log*
 
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json
+
 # Firebase cache
 .firebase/
 
