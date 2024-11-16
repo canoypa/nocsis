@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/pages/console/index.dart';
+import 'package:nocsis/pages/console/layout.dart';
 import 'package:nocsis/pages/licenses.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
@@ -25,6 +27,9 @@ part 'router.g.dart';
         TypedGoRoute<PersonalEventsRoute>(path: '/personal/events'),
       ],
     ),
+    TypedShellRoute<ConsoleShellRoute>(routes: [
+      TypedGoRoute<ConsoleRoute>(path: '/console'),
+    ]),
     TypedGoRoute<LicensesRoute>(path: '/licenses'),
   ],
 )

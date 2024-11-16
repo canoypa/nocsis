@@ -34,6 +34,15 @@ RouteBase get $appShell => ShellRouteData.$route(
             ),
           ],
         ),
+        ShellRouteData.$route(
+          factory: $ConsoleShellRouteExtension._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: '/console',
+              factory: $ConsoleRouteExtension._fromState,
+            ),
+          ],
+        ),
         GoRouteData.$route(
           path: '/licenses',
           factory: $LicensesRouteExtension._fromState,
@@ -107,6 +116,28 @@ extension $PersonalEventsRouteExtension on PersonalEventsRoute {
 
   String get location => GoRouteData.$location(
         '/personal/events',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ConsoleShellRouteExtension on ConsoleShellRoute {
+  static ConsoleShellRoute _fromState(GoRouterState state) =>
+      const ConsoleShellRoute();
+}
+
+extension $ConsoleRouteExtension on ConsoleRoute {
+  static ConsoleRoute _fromState(GoRouterState state) => const ConsoleRoute();
+
+  String get location => GoRouteData.$location(
+        '/console',
       );
 
   void go(BuildContext context) => context.go(location);
