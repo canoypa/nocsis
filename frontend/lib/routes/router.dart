@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/pages/licenses.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
@@ -24,6 +25,7 @@ part 'router.g.dart';
         TypedGoRoute<PersonalEventsRoute>(path: '/personal/events'),
       ],
     ),
+    TypedGoRoute<LicensesRoute>(path: '/licenses'),
   ],
 )
 class AppShell extends ShellRouteData {
@@ -165,6 +167,18 @@ class PersonalEventsRoute extends GoRouteData {
           child: child,
         );
       },
+    );
+  }
+}
+
+class LicensesRoute extends GoRouteData {
+  const LicensesRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return MaterialPage(
+      key: state.pageKey,
+      child: const LicensesPage(),
     );
   }
 }
