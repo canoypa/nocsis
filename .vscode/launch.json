@@ -4,19 +4,22 @@
     {
       "name": "classroom",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "program": "frontend/lib/main.dart"
     },
     {
       "name": "classroom (profile mode)",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "profile"
+      "flutterMode": "profile",
+      "program": "frontend/lib/main.dart"
     },
     {
       "name": "classroom (release mode)",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "program": "frontend/lib/main.dart"
     }
   ]
 }
