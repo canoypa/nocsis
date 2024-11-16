@@ -5,7 +5,7 @@ on:
   workflow_call:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-test
+  group: TEST_${{ github.workflow }}_${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -17,14 +17,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ needs.prepare.outputs.node_version }}
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          package_json_file: ./functions/package.json
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
       - name: Install dependencies
         run: pnpm install
       - name: Test
@@ -38,11 +32,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: ${{ needs.prepare.outputs.flutter_channel }}
-          flutter-version: ${{ needs.prepare.outputs.flutter_version }}
-          cache: true
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
       - name: Test
         run: flutter test
