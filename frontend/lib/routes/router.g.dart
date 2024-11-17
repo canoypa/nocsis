@@ -39,7 +39,31 @@ RouteBase get $appShell => ShellRouteData.$route(
           routes: [
             GoRouteData.$route(
               path: '/console',
-              factory: $ConsoleRouteExtension._fromState,
+              factory: $ConsoleTopRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/console/group',
+              factory: $ConsoleGroupRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/console/member',
+              factory: $ConsoleMemberRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/console/calendar',
+              factory: $ConsoleCalendarRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/console/day_duty',
+              factory: $ConsoleDayDutyRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/console/weather',
+              factory: $ConsoleWeatherRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/console/slack',
+              factory: $ConsoleSlackRouteExtension._fromState,
             ),
           ],
         ),
@@ -133,11 +157,120 @@ extension $ConsoleShellRouteExtension on ConsoleShellRoute {
       const ConsoleShellRoute();
 }
 
-extension $ConsoleRouteExtension on ConsoleRoute {
-  static ConsoleRoute _fromState(GoRouterState state) => const ConsoleRoute();
+extension $ConsoleTopRouteExtension on ConsoleTopRoute {
+  static ConsoleTopRoute _fromState(GoRouterState state) =>
+      const ConsoleTopRoute();
 
   String get location => GoRouteData.$location(
         '/console',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ConsoleGroupRouteExtension on ConsoleGroupRoute {
+  static ConsoleGroupRoute _fromState(GoRouterState state) =>
+      const ConsoleGroupRoute();
+
+  String get location => GoRouteData.$location(
+        '/console/group',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ConsoleMemberRouteExtension on ConsoleMemberRoute {
+  static ConsoleMemberRoute _fromState(GoRouterState state) =>
+      const ConsoleMemberRoute();
+
+  String get location => GoRouteData.$location(
+        '/console/member',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ConsoleCalendarRouteExtension on ConsoleCalendarRoute {
+  static ConsoleCalendarRoute _fromState(GoRouterState state) =>
+      const ConsoleCalendarRoute();
+
+  String get location => GoRouteData.$location(
+        '/console/calendar',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ConsoleDayDutyRouteExtension on ConsoleDayDutyRoute {
+  static ConsoleDayDutyRoute _fromState(GoRouterState state) =>
+      const ConsoleDayDutyRoute();
+
+  String get location => GoRouteData.$location(
+        '/console/day_duty',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ConsoleWeatherRouteExtension on ConsoleWeatherRoute {
+  static ConsoleWeatherRoute _fromState(GoRouterState state) =>
+      const ConsoleWeatherRoute();
+
+  String get location => GoRouteData.$location(
+        '/console/weather',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ConsoleSlackRouteExtension on ConsoleSlackRoute {
+  static ConsoleSlackRoute _fromState(GoRouterState state) =>
+      const ConsoleSlackRoute();
+
+  String get location => GoRouteData.$location(
+        '/console/slack',
       );
 
   void go(BuildContext context) => context.go(location);
