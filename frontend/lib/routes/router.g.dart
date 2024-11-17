@@ -67,6 +67,19 @@ RouteBase get $appShell => ShellRouteData.$route(
             ),
           ],
         ),
+        ShellRouteData.$route(
+          factory: $SettingsShellRouteExtension._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: '/settings',
+              factory: $SettingsTopRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/settings/sign_in',
+              factory: $SettingsSignInRouteExtension._fromState,
+            ),
+          ],
+        ),
         GoRouteData.$route(
           path: '/licenses',
           factory: $LicensesRouteExtension._fromState,
@@ -271,6 +284,47 @@ extension $ConsoleSlackRouteExtension on ConsoleSlackRoute {
 
   String get location => GoRouteData.$location(
         '/console/slack',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $SettingsShellRouteExtension on SettingsShellRoute {
+  static SettingsShellRoute _fromState(GoRouterState state) =>
+      const SettingsShellRoute();
+}
+
+extension $SettingsTopRouteExtension on SettingsTopRoute {
+  static SettingsTopRoute _fromState(GoRouterState state) =>
+      const SettingsTopRoute();
+
+  String get location => GoRouteData.$location(
+        '/settings',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $SettingsSignInRouteExtension on SettingsSignInRoute {
+  static SettingsSignInRoute _fromState(GoRouterState state) =>
+      const SettingsSignInRoute();
+
+  String get location => GoRouteData.$location(
+        '/settings/sign_in',
       );
 
   void go(BuildContext context) => context.go(location);
