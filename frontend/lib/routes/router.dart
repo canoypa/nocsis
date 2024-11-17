@@ -27,7 +27,7 @@ part 'router.g.dart';
 @TypedShellRoute<AppShell>(
   routes: [
     TypedGoRoute<HomeRoute>(path: '/'),
-    TypedGoRoute<SignInRoute>(path: '/signin'),
+    TypedGoRoute<SignInRoute>(path: '/sign_in'),
     TypedShellRoute<PersonalShell>(
       routes: [
         TypedGoRoute<PersonalHomeRoute>(path: '/personal'),
@@ -71,16 +71,16 @@ class AppShell extends ShellRouteData {
     final user = await FirebaseAuth.instance.authStateChanges().first;
     final isSignIn = user != null;
 
-    if (!isSignIn && state.uri.path != "/signin") {
+    if (!isSignIn && state.uri.path != "/sign_in") {
       final continueUri = state.uri.path;
       if (continueUri == "/") {
-        return "/signin";
+        return "/sign_in";
       }
 
-      return "/signin?continue=$continueUri";
+      return "/sign_in?continue=$continueUri";
     }
 
-    if (isSignIn && state.uri.path == "/signin") {
+    if (isSignIn && state.uri.path == "/sign_in") {
       final continueUri =
           Uri.tryParse(state.uri.queryParameters["continue"] ?? "/");
 
