@@ -94,19 +94,7 @@ class HomeRoute extends GoRouteData {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return MaterialPage(
       key: state.pageKey,
-      child: ScreenUtilInit(
-        designSize: const Size(960, 540),
-        builder: (context, child) {
-          final theme = createDisplayTheme(context);
-
-          return Theme(
-            data: theme,
-            child: const Scaffold(
-              body: HomeScreen(),
-            ),
-          );
-        },
-      ),
+      child: const HomeScreen(),
     );
   }
 }
