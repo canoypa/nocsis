@@ -49,7 +49,7 @@ class ConsoleTopPage extends StatelessWidget {
             OutlinedButton(
               child: const Text('Classroom を起動する'),
               onPressed: () {
-                const HomeRoute().push(context);
+                const HomeRoute().go(context);
               },
             ),
           ],

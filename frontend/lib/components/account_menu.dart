@@ -27,7 +27,7 @@ class AccountMenu extends StatelessWidget {
         MenuItemButton(
           child: const Text("設定"),
           onPressed: () {
-            const SettingsTopRoute().push(context);
+            const SettingsTopRoute().go(context);
           },
         ),
         MenuItemButton(
@@ -41,13 +41,13 @@ class AccountMenu extends StatelessWidget {
           MenuItemButton(
             child: const Text("管理コンソール"),
             onPressed: () {
-              const ConsoleTopRoute().push(context);
+              const ConsoleTopRoute().go(context);
             },
           ),
           MenuItemButton(
             child: const Text("Classroom を起動"),
             onPressed: () {
-              const HomeRoute().push(context);
+              const HomeRoute().go(context);
             },
           ),
         ],
@@ -55,7 +55,7 @@ class AccountMenu extends StatelessWidget {
         MenuItemButton(
           child: const Text("ライセンス"),
           onPressed: () {
-            const LicensesRoute().push(context);
+            const LicensesRoute().go(context);
           },
         )
       ],
