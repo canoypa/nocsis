@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/custom_icons_icons.dart';
+import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
 import 'package:nocsis/pages/console/index.dart';
