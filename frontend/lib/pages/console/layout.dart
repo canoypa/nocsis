@@ -23,6 +23,9 @@ class ConsoleLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DrawerLayout(child: child);
+    return DrawerLayout(
+      title: const Text('管理コンソール'),
+      child: child,
+    );
   }
 }

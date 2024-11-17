@@ -12,10 +12,12 @@ import 'package:nocsis/pages/console/weather.dart';
 import 'package:nocsis/routes/router.dart';
 
 class DrawerLayout extends StatelessWidget {
+  final Widget title;
   final Widget child;
 
   const DrawerLayout({
     super.key,
+    required this.title,
     required this.child,
   });
 
@@ -57,7 +59,7 @@ class DrawerLayout extends StatelessWidget {
           },
         ),
         actions: const [AccountMenu()],
-        title: const Text('管理コンソール'),
+        title: title,
         centerTitle: false,
         backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         surfaceTintColor: Theme.of(context).colorScheme.surfaceContainer,
