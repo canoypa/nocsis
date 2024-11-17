@@ -17,6 +17,9 @@ import 'package:nocsis/pages/licenses.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
+import 'package:nocsis/pages/settings/index.dart';
+import 'package:nocsis/pages/settings/layout.dart';
+import 'package:nocsis/pages/settings/sign_in.dart';
 import 'package:nocsis/themes/display.dart';
 import 'package:nocsis/pages/sign_in.dart';
 import 'package:nocsis/screens/home.dart';
@@ -41,6 +44,10 @@ part 'router.g.dart';
       TypedGoRoute<ConsoleDayDutyRoute>(path: '/console/day_duty'),
       TypedGoRoute<ConsoleWeatherRoute>(path: '/console/weather'),
       TypedGoRoute<ConsoleSlackRoute>(path: '/console/slack'),
+    ]),
+    TypedShellRoute<SettingsShellRoute>(routes: [
+      TypedGoRoute<SettingsTopRoute>(path: '/settings'),
+      TypedGoRoute<SettingsSignInRoute>(path: '/settings/sign_in'),
     ]),
     TypedGoRoute<LicensesRoute>(path: '/licenses'),
   ],
