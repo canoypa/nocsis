@@ -22,25 +22,25 @@ class DrawerLayout extends StatelessWidget {
   });
 
   int getSelectedIndex(BuildContext context) {
-    if (GoRouterState.of(context).matchedLocation == '/console') {
+    final location = GoRouterState.of(context).matchedLocation;
+
+    if (location == const ConsoleTopRoute().location) {
       return 0;
-    } else if (GoRouterState.of(context).matchedLocation == '/console/group') {
+    } else if (location == const ConsoleGroupRoute().location) {
       return 1;
-    } else if (GoRouterState.of(context).matchedLocation == '/console/member') {
+    } else if (location == const ConsoleMemberRoute().location) {
       return 2;
-    } else if (GoRouterState.of(context).matchedLocation ==
-        '/console/calendar') {
+    } else if (location == const ConsoleCalendarRoute().location) {
       return 3;
-    } else if (GoRouterState.of(context).matchedLocation ==
-        '/console/day_duty') {
+    } else if (location == const ConsoleDayDutyRoute().location) {
       return 4;
-    } else if (GoRouterState.of(context).matchedLocation ==
-        '/console/weather') {
+    } else if (location == const ConsoleWeatherRoute().location) {
       return 5;
-    } else if (GoRouterState.of(context).matchedLocation == '/console/slack') {
+    } else if (location == const ConsoleSlackRoute().location) {
       return 6;
+    } else {
+      return 0;
     }
-    return 0;
   }
 
   @override
