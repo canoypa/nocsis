@@ -59,7 +59,7 @@ class DrawerLayout extends StatelessWidget {
                 ),
               ),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(64),
                 child: child,
               ),
             ),

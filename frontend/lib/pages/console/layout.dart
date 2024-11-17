@@ -6,7 +6,7 @@ import 'package:nocsis/pages/console/dayduty.dart';
 import 'package:nocsis/pages/console/index.dart';
 import 'package:nocsis/pages/console/members.dart';
 import 'package:nocsis/pages/console/slack.dart';
-import 'package:nocsis/pages/console/team.dart';
+import 'package:nocsis/pages/console/group.dart';
 import 'package:nocsis/pages/console/weather.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
