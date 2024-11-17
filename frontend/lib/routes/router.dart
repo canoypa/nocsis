@@ -5,6 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/pages/console/calendar.dart';
+import 'package:nocsis/pages/console/dayduty.dart';
+import 'package:nocsis/pages/console/index.dart';
+import 'package:nocsis/pages/console/layout.dart';
+import 'package:nocsis/pages/console/members.dart';
+import 'package:nocsis/pages/console/slack.dart';
+import 'package:nocsis/pages/console/group.dart';
+import 'package:nocsis/pages/console/weather.dart';
 import 'package:nocsis/pages/licenses.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
@@ -25,6 +33,15 @@ part 'router.g.dart';
         TypedGoRoute<PersonalEventsRoute>(path: '/personal/events'),
       ],
     ),
+    TypedShellRoute<ConsoleShellRoute>(routes: [
+      TypedGoRoute<ConsoleTopRoute>(path: '/console'),
+      TypedGoRoute<ConsoleGroupRoute>(path: '/console/group'),
+      TypedGoRoute<ConsoleMemberRoute>(path: '/console/member'),
+      TypedGoRoute<ConsoleCalendarRoute>(path: '/console/calendar'),
+      TypedGoRoute<ConsoleDayDutyRoute>(path: '/console/day_duty'),
+      TypedGoRoute<ConsoleWeatherRoute>(path: '/console/weather'),
+      TypedGoRoute<ConsoleSlackRoute>(path: '/console/slack'),
+    ]),
     TypedGoRoute<LicensesRoute>(path: '/licenses'),
   ],
 )

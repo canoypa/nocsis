@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nocsis/components/personal/user_avatar.dart';
+import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/routes/router.dart';
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
@@ -108,12 +108,7 @@ class MainPage extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            actions: [
-              IconButton(
-                icon: const UserAvatar(),
-                onPressed: () {},
-              )
-            ],
+            actions: const [AccountMenu()],
           ),
           body: Row(
             children: [
