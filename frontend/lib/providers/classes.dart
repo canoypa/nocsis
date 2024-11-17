@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/models/classes.dart';
 import 'package:nocsis/providers/cron.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -9,7 +10,7 @@ final fn = FirebaseFunctions.instanceFor(region: "asia-northeast1")
     .httpsCallable("v3-classes-get");
 
 @riverpod
-Future<ClassList> classes(ClassesRef ref) async {
+Future<ClassList> classes(Ref ref) async {
   // 一日ごとに取得
   ref.watch(cronProvider("0 0 * * *"));
 
