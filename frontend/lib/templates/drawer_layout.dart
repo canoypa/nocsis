@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/components/personal/user_avatar.dart';
 import 'package:nocsis/custom_icons_icons.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
@@ -45,6 +47,70 @@ class DrawerLayout extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_outlined),
+          onPressed: () {
+            if (GoRouter.of(context).canPop()) {
+              GoRouter.of(context).pop();
+            } else {
+              const HomeRoute().go(context);
+            }
+          },
+        ),
+        actions: [
+          MenuAnchor(
+            builder: (context, controller, child) {
+              return IconButton(
+                icon: const UserAvatar(),
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+              );
+            },
+            menuChildren: [
+              MenuItemButton(
+                child: const Text("設定"),
+                onPressed: () {
+                  // TODO
+                },
+              ),
+              MenuItemButton(
+                child: const Text("ログアウト"),
+                onPressed: () {
+                  FirebaseAuth.instance.signOut();
+                },
+              ),
+              if (true /* isAdmin */) ...[
+                const Divider(),
+                MenuItemButton(
+                  child: const Text("管理コンソール"),
+                  onPressed: () {
+                    // TODO
+                  },
+                ),
+                MenuItemButton(
+                  child: const Text("Classroom を起動"),
+                  onPressed: () {
+                    const HomeRoute().go(context);
+                  },
+                ),
+              ],
+              const Divider(),
+              MenuItemButton(
+                child: const Text("ライセンス"),
+                onPressed: () {
+                  const LicensesRoute().go(context);
+                },
+              )
+            ],
+          ),
+        ],
+        title: const Text('管理コンソール'),
+        centerTitle: false,
         backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         surfaceTintColor: Theme.of(context).colorScheme.surfaceContainer,
       ),
