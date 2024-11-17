@@ -43,7 +43,7 @@ class ConsoleGroupPage extends StatelessWidget {
             const Text('グループに関する情報を管理します。'),
             const SizedBox(height: 48),
             TextField(
-              controller: TextEditingController(text: 'ITE'),
+              controller: TextEditingController(text: 'WIP'),
               enabled: false,
               decoration: const InputDecoration(
                 constraints: BoxConstraints(maxWidth: 800),
