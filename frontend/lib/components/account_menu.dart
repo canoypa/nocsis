@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nocsis/components/personal/user_avatar.dart';
+import 'package:nocsis/pages/console/index.dart';
+import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/routes/router.dart';
 
 class AccountMenu extends StatelessWidget {
@@ -25,7 +27,7 @@ class AccountMenu extends StatelessWidget {
         MenuItemButton(
           child: const Text("設定"),
           onPressed: () {
-            // TODO
+            const SettingsTopRoute().go(context);
           },
         ),
         MenuItemButton(
@@ -39,7 +41,7 @@ class AccountMenu extends StatelessWidget {
           MenuItemButton(
             child: const Text("管理コンソール"),
             onPressed: () {
-              // TODO
+              const ConsoleTopRoute().go(context);
             },
           ),
           MenuItemButton(
