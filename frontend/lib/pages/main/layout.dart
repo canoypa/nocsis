@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/components/personal/user_avatar.dart';
 import 'package:nocsis/routes/router.dart';
 
@@ -109,58 +110,7 @@ class MainPage extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            actions: [
-              MenuAnchor(
-                builder: (context, controller, child) {
-                  return IconButton(
-                    icon: const UserAvatar(),
-                    onPressed: () {
-                      if (controller.isOpen) {
-                        controller.close();
-                      } else {
-                        controller.open();
-                      }
-                    },
-                  );
-                },
-                menuChildren: [
-                  MenuItemButton(
-                    child: const Text("設定"),
-                    onPressed: () {
-                      // TODO
-                    },
-                  ),
-                  MenuItemButton(
-                    child: const Text("ログアウト"),
-                    onPressed: () {
-                      FirebaseAuth.instance.signOut();
-                    },
-                  ),
-                  if (true /* isAdmin */) ...[
-                    const Divider(),
-                    MenuItemButton(
-                      child: const Text("管理コンソール"),
-                      onPressed: () {
-                        // TODO
-                      },
-                    ),
-                    MenuItemButton(
-                      child: const Text("Classroom を起動"),
-                      onPressed: () {
-                        const HomeRoute().go(context);
-                      },
-                    ),
-                  ],
-                  const Divider(),
-                  MenuItemButton(
-                    child: const Text("ライセンス"),
-                    onPressed: () {
-                      const LicensesRoute().go(context);
-                    },
-                  )
-                ],
-              ),
-            ],
+            actions: const [AccountMenu()],
           ),
           body: Row(
             children: [
