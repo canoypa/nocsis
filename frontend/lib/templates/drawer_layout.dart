@@ -21,26 +21,19 @@ class DrawerLayout extends StatelessWidget {
     required this.child,
   });
 
+  static Map<String, int> routeToIndex = {
+    const ConsoleTopRoute().location: 0,
+    const ConsoleGroupRoute().location: 1,
+    const ConsoleMemberRoute().location: 2,
+    const ConsoleCalendarRoute().location: 3,
+    const ConsoleDayDutyRoute().location: 4,
+    const ConsoleWeatherRoute().location: 5,
+    const ConsoleSlackRoute().location: 6,
+  };
+
   int getSelectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
-
-    if (location == const ConsoleTopRoute().location) {
-      return 0;
-    } else if (location == const ConsoleGroupRoute().location) {
-      return 1;
-    } else if (location == const ConsoleMemberRoute().location) {
-      return 2;
-    } else if (location == const ConsoleCalendarRoute().location) {
-      return 3;
-    } else if (location == const ConsoleDayDutyRoute().location) {
-      return 4;
-    } else if (location == const ConsoleWeatherRoute().location) {
-      return 5;
-    } else if (location == const ConsoleSlackRoute().location) {
-      return 6;
-    } else {
-      return 0;
-    }
+    return routeToIndex[location] ?? 0;
   }
 
   @override
@@ -69,29 +62,10 @@ class DrawerLayout extends StatelessWidget {
         children: [
           NavigationDrawer(
             onDestinationSelected: (value) {
-              switch (value) {
-                case 0:
-                  const ConsoleTopRoute().go(context);
-                  break;
-                case 1:
-                  const ConsoleGroupRoute().go(context);
-                  break;
-                case 2:
-                  const ConsoleMemberRoute().go(context);
-                  break;
-                case 3:
-                  const ConsoleCalendarRoute().go(context);
-                  break;
-                case 4:
-                  const ConsoleDayDutyRoute().go(context);
-                  break;
-                case 5:
-                  const ConsoleWeatherRoute().go(context);
-                  break;
-                case 6:
-                  const ConsoleSlackRoute().go(context);
-                  break;
-              }
+              final route = routeToIndex.entries
+                  .firstWhere((entry) => entry.value == value)
+                  .key;
+              GoRouter.of(context).go(route);
             },
             selectedIndex: getSelectedIndex(context),
             backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
