@@ -52,19 +52,8 @@ part 'router.g.dart';
 )
 class AppShell extends ShellRouteData {
   @override
-  Page<void> pageBuilder(
-      BuildContext context, GoRouterState state, Widget navigator) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: navigator,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
+  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
+    return navigator;
   }
 
   @override
