@@ -18,7 +18,7 @@ RouteBase get $appShell => ShellRouteData.$route(
           factory: $HomeRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/signin',
+          path: '/sign_in',
           factory: $SignInRouteExtension._fromState,
         ),
         ShellRouteData.$route(
@@ -112,7 +112,7 @@ extension $SignInRouteExtension on SignInRoute {
   static SignInRoute _fromState(GoRouterState state) => const SignInRoute();
 
   String get location => GoRouteData.$location(
-        '/signin',
+        '/sign_in',
       );
 
   void go(BuildContext context) => context.go(location);

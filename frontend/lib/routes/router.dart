@@ -3,15 +3,14 @@ import 'dart:async';
 import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
+import 'package:nocsis/pages/console/group.dart';
 import 'package:nocsis/pages/console/index.dart';
 import 'package:nocsis/pages/console/layout.dart';
 import 'package:nocsis/pages/console/members.dart';
 import 'package:nocsis/pages/console/slack.dart';
-import 'package:nocsis/pages/console/group.dart';
 import 'package:nocsis/pages/console/weather.dart';
 import 'package:nocsis/pages/licenses.dart';
 import 'package:nocsis/pages/main/events/page.dart';
@@ -20,7 +19,6 @@ import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/pages/settings/sign_in.dart';
-import 'package:nocsis/themes/display.dart';
 import 'package:nocsis/pages/sign_in.dart';
 import 'package:nocsis/screens/home.dart';
 
@@ -29,7 +27,7 @@ part 'router.g.dart';
 @TypedShellRoute<AppShell>(
   routes: [
     TypedGoRoute<HomeRoute>(path: '/'),
-    TypedGoRoute<SignInRoute>(path: '/signin'),
+    TypedGoRoute<SignInRoute>(path: '/sign_in'),
     TypedShellRoute<PersonalShell>(
       routes: [
         TypedGoRoute<PersonalHomeRoute>(path: '/personal'),
@@ -54,8 +52,18 @@ part 'router.g.dart';
 )
 class AppShell extends ShellRouteData {
   @override
-  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
-    return navigator;
+  Page<void> pageBuilder(
+      BuildContext context, GoRouterState state, Widget navigator) {
+    return CustomTransitionPage(
+      child: navigator,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+    );
   }
 
   @override
@@ -63,16 +71,16 @@ class AppShell extends ShellRouteData {
     final user = await FirebaseAuth.instance.authStateChanges().first;
     final isSignIn = user != null;
 
-    if (!isSignIn && state.uri.path != "/signin") {
+    if (!isSignIn && state.uri.path != "/sign_in") {
       final continueUri = state.uri.path;
       if (continueUri == "/") {
-        return "/signin";
+        return "/sign_in";
       }
 
-      return "/signin?continue=$continueUri";
+      return "/sign_in?continue=$continueUri";
     }
 
-    if (isSignIn && state.uri.path == "/signin") {
+    if (isSignIn && state.uri.path == "/sign_in") {
       final continueUri =
           Uri.tryParse(state.uri.queryParameters["continue"] ?? "/");
 
@@ -92,21 +100,16 @@ class HomeRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return MaterialPage(
+    return CustomTransitionPage(
       key: state.pageKey,
-      child: ScreenUtilInit(
-        designSize: const Size(960, 540),
-        builder: (context, child) {
-          final theme = createDisplayTheme(context);
-
-          return Theme(
-            data: theme,
-            child: const Scaffold(
-              body: HomeScreen(),
-            ),
-          );
-        },
-      ),
+      child: const HomeScreen(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
     );
   }
 }
@@ -116,9 +119,16 @@ class SignInRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return MaterialPage(
+    return CustomTransitionPage(
       key: state.pageKey,
       child: const SignInPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
     );
   }
 }
@@ -127,10 +137,20 @@ class PersonalShell extends ShellRouteData {
   const PersonalShell();
 
   @override
-  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
-    return MainPage(
-      location: state.matchedLocation,
-      child: navigator,
+  Page<void> pageBuilder(
+      BuildContext context, GoRouterState state, Widget navigator) {
+    return CustomTransitionPage(
+      child: MainPage(
+        location: state.matchedLocation,
+        child: navigator,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
     );
   }
 }
@@ -200,9 +220,16 @@ class LicensesRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return MaterialPage(
+    return CustomTransitionPage(
       key: state.pageKey,
       child: const LicensesPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
     );
   }
 }

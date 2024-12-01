@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/pages/settings/index.dart';
@@ -9,9 +10,19 @@ class SettingsShellRoute extends ShellRouteData {
   const SettingsShellRoute();
 
   @override
-  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
-    return SettingsLayout(
-      child: navigator,
+  Page<void> pageBuilder(
+      BuildContext context, GoRouterState state, Widget navigator) {
+    return CustomTransitionPage(
+      child: SettingsLayout(
+        child: navigator,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
     );
   }
 }
