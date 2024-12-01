@@ -19,6 +19,7 @@ class ConsoleShellRoute extends ShellRouteData {
   Page<void> pageBuilder(
       BuildContext context, GoRouterState state, Widget navigator) {
     return CustomTransitionPage(
+      key: state.pageKey,
       child: ConsoleLayout(
         child: navigator,
       ),

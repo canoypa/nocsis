@@ -55,6 +55,7 @@ class AppShell extends ShellRouteData {
   Page<void> pageBuilder(
       BuildContext context, GoRouterState state, Widget navigator) {
     return CustomTransitionPage(
+      key: state.pageKey,
       child: navigator,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
@@ -140,6 +141,7 @@ class PersonalShell extends ShellRouteData {
   Page<void> pageBuilder(
       BuildContext context, GoRouterState state, Widget navigator) {
     return CustomTransitionPage(
+      key: state.pageKey,
       child: MainPage(
         location: state.matchedLocation,
         child: navigator,
