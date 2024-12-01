@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/routes/router.dart';
+import 'package:nocsis/screens/home.dart';
 
 class DrawerLayout extends StatelessWidget {
   final Widget title;

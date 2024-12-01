@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,25 @@ import 'package:nocsis/components/pages/licenses/license_tile.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'licenses.g.dart';
+
+class LicensesRoute extends GoRouteData {
+  const LicensesRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: const LicensesPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+}
 
 @riverpod
 Future<Map<String, List<LicenseParagraph>>> licenses(ref) async {

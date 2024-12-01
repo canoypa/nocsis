@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -52,18 +51,8 @@ part 'router.g.dart';
 )
 class AppShell extends ShellRouteData {
   @override
-  Page<void> pageBuilder(
-      BuildContext context, GoRouterState state, Widget navigator) {
-    return CustomTransitionPage(
-      child: navigator,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
+  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
+    return navigator;
   }
 
   @override
@@ -92,145 +81,6 @@ class AppShell extends ShellRouteData {
     }
 
     return null;
-  }
-}
-
-class HomeRoute extends GoRouteData {
-  const HomeRoute();
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const HomeScreen(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
-
-class SignInRoute extends GoRouteData {
-  const SignInRoute();
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const SignInPage(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
-
-class PersonalShell extends ShellRouteData {
-  const PersonalShell();
-
-  @override
-  Page<void> pageBuilder(
-      BuildContext context, GoRouterState state, Widget navigator) {
-    return CustomTransitionPage(
-      child: MainPage(
-        location: state.matchedLocation,
-        child: navigator,
-      ),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
-
-class PersonalHomeRoute extends GoRouteData {
-  const PersonalHomeRoute();
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    final isMobile = MediaQuery.of(context).size.width < 1200;
-
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const MainView(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        if (isMobile) {
-          return SharedAxisTransition(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.vertical,
-            child: child,
-          );
-        }
-
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
-
-class PersonalEventsRoute extends GoRouteData {
-  const PersonalEventsRoute();
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    final isMobile = MediaQuery.of(context).size.width < 1200;
-
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const EventsView(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        if (isMobile) {
-          return SharedAxisTransition(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.vertical,
-            child: child,
-          );
-        }
-
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
-
-class LicensesRoute extends GoRouteData {
-  const LicensesRoute();
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const LicensesPage(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
   }
 }
 
