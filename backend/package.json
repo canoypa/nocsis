@@ -2,8 +2,8 @@
   "name": "backend",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts --sourcemap",
+    "dev": "tsx watch src/main.ts",
+    "build": "tsup src/main.ts --clean --sourcemap",
     "lint": "biome lint"
   },
   "dependencies": {
