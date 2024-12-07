@@ -3,18 +3,18 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsup src/main.ts --clean --sourcemap",
+    "build": "tsup src/main.ts --clean --format esm --sourcemap",
     "lint": "biome lint"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",
-    "hono": "^4.6.12"
+    "hono": "^4.6.13"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@types/node": "^20.11.17",
+    "@types/node": "^20.17.9",
     "tsup": "^8.3.5",
-    "tsx": "^4.7.1",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
 }
