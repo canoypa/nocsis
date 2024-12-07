@@ -15,8 +15,8 @@ importers:
         specifier: ^9.7.6
         version: 9.7.6(encoding@0.1.13)
       '@slack/web-api':
-        specifier: ^7.3.3
-        version: 7.3.3
+        specifier: ^7.8.0
+        version: 7.8.0
       axios:
         specifier: ^1.7.4
         version: 1.7.4
@@ -968,8 +968,8 @@ packages:
     resolution: {integrity: sha512-yFewzUomYZ2BYaGJidPuIgjoYj5wqPDmi7DLSaGIkf+rCi4YZ2Z3DaiYIbz7qb/PL2NmamWjCvB7e9ArI5HkKg==}
     engines: {node: '>= 12.13.0', npm: '>= 6.12.0'}
 
-  '@slack/web-api@7.3.3':
-    resolution: {integrity: sha512-FquFqzugam/J3gk79q6cuUemFwQYt3s1m/FhuAGdiDZmBoj42JDOoztgLAdvTQLo5/4sGo2ikL1z2q9D8+rpvg==}
+  '@slack/web-api@7.8.0':
+    resolution: {integrity: sha512-d4SdG+6UmGdzWw38a4sN3lF/nTEzsDxhzU13wm10ejOpPehtmRoqBKnPztQUfFiWbNvSb4czkWYJD4kt+5+Fuw==}
     engines: {node: '>= 18', npm: '>= 8.6.0'}
 
   '@swc/core-darwin-arm64@1.7.11':
@@ -1323,6 +1323,9 @@ packages:
 
   axios@1.7.4:
     resolution: {integrity: sha512-DukmaFRnY6AzAALSH4J2M3k6PkaC+MfaAGdEERRWcC9q3/TWQwLpHR8ZRLKTdQ3aBDL64EdluRDjJqKw+BPZEw==}
+
+  axios@1.7.9:
+    resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
 
   b4a@1.6.6:
     resolution: {integrity: sha512-5Tk1HLk6b6ctmjIkAcU/Ujv/1WqiDl0F0JdRCR80VsOcUlHcu7pWeWRlOqQLHfDEsVx9YH/aif5AG4ehoCtTmg==}
@@ -5250,17 +5253,17 @@ snapshots:
 
   '@slack/logger@4.0.0':
     dependencies:
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
 
   '@slack/types@2.12.0': {}
 
-  '@slack/web-api@7.3.3':
+  '@slack/web-api@7.8.0':
     dependencies:
       '@slack/logger': 4.0.0
       '@slack/types': 2.12.0
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
       '@types/retry': 0.12.0
-      axios: 1.7.4
+      axios: 1.7.9
       eventemitter3: 5.0.1
       form-data: 4.0.0
       is-electron: 2.2.2
@@ -5354,23 +5357,23 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
 
   '@types/caseless@0.12.5': {}
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
 
   '@types/cors@2.8.17':
     dependencies:
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
 
   '@types/estree@1.0.6': {}
 
   '@types/express-serve-static-core@4.19.5':
     dependencies:
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
       '@types/qs': 6.9.15
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -5408,7 +5411,7 @@ snapshots:
 
   '@types/jsonwebtoken@9.0.6':
     dependencies:
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
 
   '@types/lodash@4.17.7': {}
 
@@ -5435,7 +5438,7 @@ snapshots:
   '@types/request@2.48.12':
     dependencies:
       '@types/caseless': 0.12.5
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
       '@types/tough-cookie': 4.0.5
       form-data: 2.5.1
 
@@ -5444,12 +5447,12 @@ snapshots:
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
 
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
       '@types/send': 0.17.4
 
   '@types/stack-utils@2.0.3': {}
@@ -5642,6 +5645,14 @@ snapshots:
       possible-typed-array-names: 1.0.0
 
   axios@1.7.4:
+    dependencies:
+      follow-redirects: 1.15.6
+      form-data: 4.0.0
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
+  axios@1.7.9:
     dependencies:
       follow-redirects: 1.15.6
       form-data: 4.0.0
@@ -8247,7 +8258,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.3.0
+      '@types/node': 22.10.1
       long: 5.2.3
 
   proxy-addr@2.0.7:
