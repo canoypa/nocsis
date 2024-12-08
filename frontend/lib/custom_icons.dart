@@ -29,4 +29,6 @@ class CustomIcons {
       IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData slack_outlined =
       IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData google =
+      IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }
