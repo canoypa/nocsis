@@ -43,6 +43,7 @@ class SettingsSignInPage extends StatelessWidget {
             ),
             const SizedBox(height: 48),
             const Text('Google'),
+            // TODO: unlink と　link の順番的にログイン不能になる危険があるので、メアドログインを有効にしてなければボタンを無効化する
             TextButton(
               onPressed: () async {
                 await FirebaseAuth.instance.currentUser!
