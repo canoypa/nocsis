@@ -45,28 +45,12 @@ class SettingsSignInPage extends StatelessWidget {
             const Text('Google'),
             TextButton(
               onPressed: () async {
-                final googleUser = await GoogleSignIn(
-                  clientId:
-                      '219141289630-1duqb26tbk7dte61804hjqg64qmhfsc2.apps.googleusercontent.com',
-                ).signInSilently();
-                if (googleUser == null) return;
-                print(googleUser);
-
-                final authentication = await googleUser.authentication;
-                print(authentication);
-
-                final newCredential = GoogleAuthProvider.credential(
-                  accessToken: authentication.accessToken,
-                  idToken: authentication.idToken,
-                );
-                print(newCredential);
-
                 await FirebaseAuth.instance.currentUser!
                     .unlink(GoogleAuthProvider.PROVIDER_ID);
                 print('unlink');
 
                 await FirebaseAuth.instance.currentUser!
-                    .linkWithCredential(newCredential);
+                    .linkWithPopup(GoogleAuthProvider());
                 print('link');
               },
               child: const Text("別アカウントと連携する"),
