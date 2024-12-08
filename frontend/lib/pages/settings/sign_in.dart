@@ -48,11 +48,8 @@ class SettingsSignInPage extends StatelessWidget {
               onPressed: () async {
                 await FirebaseAuth.instance.currentUser!
                     .unlink(GoogleAuthProvider.PROVIDER_ID);
-                print('unlink');
-
                 await FirebaseAuth.instance.currentUser!
                     .linkWithPopup(GoogleAuthProvider());
-                print('link');
               },
               child: const Text("別アカウントと連携する"),
             ),
