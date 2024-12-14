@@ -51,17 +51,25 @@ class DrawerLayout extends StatelessWidget {
             children: navigationItems,
           ),
           Expanded(
-            child: Container(
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(32),
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Container(
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: const BorderRadius.all(Radius.circular(28)),
                 ),
-              ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(64),
-                child: child,
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      padding: const EdgeInsets.all(64),
+                      child: child,
+                    ),
+                  );
+                }),
               ),
             ),
           ),
