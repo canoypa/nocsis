@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/components/sign_in_form.dart';
 
 class SettingsTopRoute extends GoRouteData {
   const SettingsTopRoute();
@@ -62,12 +63,31 @@ class SettingsTopPage extends StatelessWidget {
                 const Spacer(),
                 OutlinedButton(
                   onPressed: () {
-                    // TODO
                     showDialog(
-                        context: context,
-                        builder: (context) {
-                          return const ChangeEmailDialog();
-                        });
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          child: SignInForm(
+                            title: "メールアドレスを変更する",
+                            description: '始めに、現在のアカウントで再認証が必要です。',
+                            onGoogleSignIn: () async {
+                              await FirebaseAuth.instance.currentUser
+                                  ?.reauthenticateWithPopup(
+                                      GoogleAuthProvider());
+
+                              Navigator.of(context).pop();
+
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return const ChangeEmailDialog();
+                                },
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    );
                   },
                   child: const Text('変更する'),
                 ),
@@ -89,46 +109,58 @@ class ChangeEmailDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
 
-    return AlertDialog(
-      title: const Text('メールアドレスを変更する'),
-      content: ConstrainedBox(
+    return Dialog(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        ),
         constraints: const BoxConstraints(maxWidth: 800),
+        padding: const EdgeInsets.all(64),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Text(
+                'メールアドレスを変更する',
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+            ),
+            const SizedBox(height: 48),
+            const Text(
+                '1. 新しいメールアドレスを入力して、「確認する」を押してください。\n2. 入力したメールアドレス宛に確認のメールが届きます。メールに含まれるリンクを開いて、メールアドレスの変更を完了してください。'),
+            const SizedBox(height: 8),
+            const Text(
+                '※ 連携している Google アカウントは変更されません。\n※ 「新しいメールアドレスでログインできるようになりました」と表示されますが、現在 Google アカウント以外でログインする方法はないため、この内容は無視してください。'),
+            const SizedBox(height: 48),
             TextField(
+              autofocus: true,
               controller: emailController,
               decoration: const InputDecoration(
                 labelText: '新しいメールアドレス',
+                hintText: 'yourname@gmail.com',
+                border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 16),
-            const Text('入力したメールアドレス宛に届くリンクを開くと、メールアドレスが変更されます。'),
-            const Text('連携している Google アカウントは変わらないので、注意してください。'),
-            const Text(
-                '「新しいメールアドレスでログインできるようになりました」と表示されますが、現在 Google アカウント以外でログインする方法はないため、この内容は無視してください。')
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: () async {
+                  await FirebaseAuth.instance.currentUser
+                      ?.verifyBeforeUpdateEmail(
+                    emailController.text,
+                  );
+
+                  Navigator.of(context).pop();
+                },
+                child: const Text('確認する'),
+              ),
+            ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('キャンセル'),
-        ),
-        FilledButton(
-          onPressed: () async {
-            Navigator.of(context).pop();
-
-            await FirebaseAuth.instance.currentUser?.verifyBeforeUpdateEmail(
-              emailController.text,
-            );
-          },
-          child: const Text('確定'),
-        ),
-      ],
     );
   }
 }
