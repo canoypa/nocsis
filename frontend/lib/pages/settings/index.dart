@@ -66,7 +66,11 @@ class SettingsTopPage extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (context) {
-                        return const ChangeEmailDialog();
+                        return ChangeEmailDialog(
+                          onSubmit: () {
+                            Navigator.of(context).pop();
+                          },
+                        );
                       },
                     );
                   },
@@ -82,7 +86,12 @@ class SettingsTopPage extends StatelessWidget {
 }
 
 class ChangeEmailDialog extends StatefulWidget {
-  const ChangeEmailDialog({super.key});
+  final VoidCallback onSubmit;
+
+  const ChangeEmailDialog({
+    super.key,
+    required this.onSubmit,
+  });
 
   @override
   ChangeEmailDialogState createState() => ChangeEmailDialogState();
@@ -169,7 +178,7 @@ class ChangeEmailDialogState extends State<ChangeEmailDialog> {
                   emailController.text,
                 );
 
-                Navigator.of(context).pop();
+                widget.onSubmit();
               },
               child: const Text('確認する'),
             ),
