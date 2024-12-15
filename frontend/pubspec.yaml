@@ -49,6 +49,7 @@ flutter:
   assets:
     - assets/images/weather/
     - assets/images/Icon-192.png
+    - assets/images/google.svg
 
   fonts:
     - family: CustomIcons
