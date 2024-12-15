@@ -90,17 +90,26 @@ class ChangeEmailDialog extends StatelessWidget {
     final TextEditingController emailController = TextEditingController();
 
     return AlertDialog(
-      title: const Text('メールアドレスを変更'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: emailController,
-            decoration: const InputDecoration(
-              labelText: '新しいメールアドレス',
+      title: const Text('メールアドレスを変更する'),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 800),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                labelText: '新しいメールアドレス',
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            const Text('入力したメールアドレス宛に届くリンクを開くと、メールアドレスが変更されます。'),
+            const Text('連携している Google アカウントは変わらないので、注意してください。'),
+            const Text(
+                '「新しいメールアドレスでログインできるようになりました」と表示されますが、現在 Google アカウント以外でログインする方法はないため、この内容は無視してください。')
+          ],
+        ),
       ),
       actions: [
         TextButton(
@@ -109,13 +118,15 @@ class ChangeEmailDialog extends StatelessWidget {
           },
           child: const Text('キャンセル'),
         ),
-        ElevatedButton(
-          onPressed: () {
-            FirebaseAuth.instance.currentUser?.verifyBeforeUpdateEmail(
+        FilledButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+
+            await FirebaseAuth.instance.currentUser?.verifyBeforeUpdateEmail(
               emailController.text,
             );
           },
-          child: const Text('変更する'),
+          child: const Text('確定'),
         ),
       ],
     );
