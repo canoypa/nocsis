@@ -17,7 +17,6 @@ import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
-import 'package:nocsis/pages/settings/sign_in.dart';
 import 'package:nocsis/pages/sign_in.dart';
 import 'package:nocsis/screens/home.dart';
 
@@ -44,7 +43,6 @@ part 'router.g.dart';
     ]),
     TypedShellRoute<SettingsShellRoute>(routes: [
       TypedGoRoute<SettingsTopRoute>(path: '/settings'),
-      TypedGoRoute<SettingsSignInRoute>(path: '/settings/sign_in'),
     ]),
     TypedGoRoute<LicensesRoute>(path: '/licenses'),
   ],

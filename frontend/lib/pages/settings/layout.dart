@@ -1,10 +1,9 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/pages/settings/index.dart';
-import 'package:nocsis/pages/settings/sign_in.dart';
+import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/routes/router.dart';
-import 'package:nocsis/templates/drawer_layout.dart';
+import 'package:nocsis/screens/home.dart';
 
 class SettingsShellRoute extends ShellRouteData {
   const SettingsShellRoute();
@@ -36,40 +35,47 @@ class SettingsLayout extends StatelessWidget {
     required this.child,
   });
 
-  static final Map<String, int> _routeToIndex = {
-    const SettingsTopRoute().location: 0,
-    const SettingsSignInRoute().location: 1,
-  };
-
-  int _getNavigationIndex(BuildContext context) {
-    final location = GoRouterState.of(context).matchedLocation;
-    return _routeToIndex[location] ?? 0;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return DrawerLayout(
-      title: const Text('設定'),
-      navigationIndex: _getNavigationIndex(context),
-      onDestinationSelected: (value) {
-        final route = _routeToIndex.entries
-            .firstWhere((entry) => entry.value == value)
-            .key;
-        GoRouter.of(context).go(route);
-      },
-      navigationItems: const [
-        NavigationDrawerDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings),
-          label: Text('一般'),
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_outlined),
+          onPressed: () {
+            if (GoRouter.of(context).canPop()) {
+              GoRouter.of(context).pop();
+            } else {
+              const HomeRoute().go(context);
+            }
+          },
         ),
-        NavigationDrawerDestination(
-          icon: Icon(Icons.vpn_key_outlined),
-          selectedIcon: Icon(Icons.vpn_key),
-          label: Text('サインイン'),
+        actions: const [AccountMenu()],
+        centerTitle: false,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+        surfaceTintColor: Theme.of(context).colorScheme.surfaceContainer,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Container(
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.all(Radius.circular(28)),
+          ),
+          child: LayoutBuilder(builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                padding: const EdgeInsets.all(64),
+                child: child,
+              ),
+            );
+          }),
         ),
-      ],
-      child: child,
+      ),
     );
   }
 }
