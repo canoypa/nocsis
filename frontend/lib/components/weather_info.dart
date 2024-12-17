@@ -26,7 +26,11 @@ class WeatherInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weather = ref.watch(weatherProvider).value;
+    final weather = ref
+        .watch(weatherProvider)
+        .maybeWhen(data: (data) => data, orElse: () => null);
+
+    print(weather);
 
     if (weather == null) {
       return const SizedBox();
