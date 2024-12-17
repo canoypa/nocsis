@@ -77,7 +77,54 @@ class SettingsTopPage extends StatelessWidget {
                   child: const Text('変更する'),
                 ),
               ],
-            )
+            ),
+            const SizedBox(height: 48),
+            Text(
+              'サインイン',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 24),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.password),
+                        const SizedBox(width: 8),
+                        const Text('パスワード'),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return ChangePasswordDialog(
+                                  onSubmit: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          child: FirebaseAuth.instance.currentUser!.providerData
+                                  .any((e) => e.providerId == 'password')
+                              ? const Text('変更する')
+                              : const Text('設定する'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -124,6 +171,18 @@ class ChangeEmailDialogState extends State<ChangeEmailDialog> {
       onGoogleSignIn: () async {
         await FirebaseAuth.instance.currentUser
             ?.reauthenticateWithPopup(GoogleAuthProvider());
+
+        setState(() {
+          reAuthenticated = true;
+        });
+      },
+      onPasswordSignIn: (email, password) async {
+        final credential = EmailAuthProvider.credential(
+          email: email,
+          password: password,
+        );
+        await FirebaseAuth.instance.currentUser
+            ?.reauthenticateWithCredential(credential);
 
         setState(() {
           reAuthenticated = true;
@@ -181,6 +240,162 @@ class ChangeEmailDialogState extends State<ChangeEmailDialog> {
                 widget.onSubmit();
               },
               child: const Text('確認する'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ChangePasswordDialog extends StatefulWidget {
+  final VoidCallback onSubmit;
+
+  const ChangePasswordDialog({
+    super.key,
+    required this.onSubmit,
+  });
+
+  @override
+  ChangePasswordDialogState createState() => ChangePasswordDialogState();
+}
+
+class ChangePasswordDialogState extends State<ChangePasswordDialog> {
+  bool reAuthenticated = false;
+
+  final TextEditingController passwordController = TextEditingController();
+  bool invisiblePassword = true;
+  bool has_error = false;
+  String error_message = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: PageTransitionSwitcher(
+        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+          return SharedAxisTransition(
+            animation: primaryAnimation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.horizontal,
+            child: child,
+          );
+        },
+        child: !reAuthenticated ? _signInForm() : _changeEmailForm(),
+      ),
+    );
+  }
+
+  _changePasswordVisibilityCallback() {
+    setState(() {
+      invisiblePassword = invisiblePassword ? false : true;
+    });
+  }
+
+  _passwordVisibilityIcon() {
+    return invisiblePassword
+        ? Icons.visibility_off_outlined
+        : Icons.visibility_outlined;
+  }
+
+  _signInForm() {
+    return SignInForm(
+      title: "パスワードを設定する",
+      description: '始めに、現在のアカウントで再認証が必要です。',
+      onGoogleSignIn: () async {
+        await FirebaseAuth.instance.currentUser
+            ?.reauthenticateWithPopup(GoogleAuthProvider());
+
+        setState(() {
+          reAuthenticated = true;
+        });
+      },
+      onPasswordSignIn: (email, password) async {
+        final credential = EmailAuthProvider.credential(
+          email: email,
+          password: password,
+        );
+        await FirebaseAuth.instance.currentUser
+            ?.reauthenticateWithCredential(credential);
+
+        setState(() {
+          reAuthenticated = true;
+        });
+      },
+    );
+  }
+
+  _changeEmailForm() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      ),
+      constraints: const BoxConstraints(maxWidth: 800),
+      padding: const EdgeInsets.all(64),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Text(
+              'パスワードを設定する',
+              style: Theme.of(context).textTheme.displaySmall,
+            ),
+          ),
+          const SizedBox(height: 48),
+          TextField(
+            autofocus: true,
+            controller: passwordController,
+            decoration: InputDecoration(
+              labelText: '新しいパスワード',
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                onPressed: _changePasswordVisibilityCallback,
+                icon: Icon(_passwordVisibilityIcon()),
+              ),
+              errorText: has_error ? error_message : null,
+            ),
+            obscureText: invisiblePassword,
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () async {
+                try {
+                  if (passwordController.text.isEmpty) {
+                    setState(() {
+                      has_error = true;
+                      error_message = 'パスワードを入力してください。';
+                    });
+                    return;
+                  }
+
+                  await FirebaseAuth.instance.currentUser?.updatePassword(
+                    passwordController.text,
+                  );
+
+                  setState(() {
+                    has_error = false;
+                  });
+
+                  widget.onSubmit();
+                } catch (error) {
+                  setState(() {
+                    has_error = true;
+                  });
+
+                  if (error is FirebaseAuthException &&
+                      error.code == 'weak-password') {
+                    setState(() {
+                      error_message = 'パスワードが弱すぎます。';
+                    });
+                  } else {
+                    rethrow;
+                  }
+                }
+              },
+              child: const Text('設定する'),
             ),
           ),
         ],
