@@ -14,8 +14,12 @@ class HomeSchedules extends ConsumerWidget {
     // 毎分更新
     ref.watch(CronProvider("* * * * *"));
 
-    final classes = ref.watch(classesProvider).maybeWhen(orElse: () => null);
-    final events = ref.watch(eventsProvider).maybeWhen(orElse: () => null);
+    final classes = ref
+        .watch(classesProvider)
+        .maybeWhen(data: (data) => data, orElse: () => null);
+    final events = ref
+        .watch(eventsProvider)
+        .maybeWhen(data: (data) => data, orElse: () => null);
 
     if (classes != null && classes.items.isNotEmpty) {
       final upcomingClasses =
