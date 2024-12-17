@@ -38,7 +38,7 @@ jobs:
       - name: Make Title
         id: make_title
         run: |
-          title=$(echo "Release $(date +'%Y-%m-%d')")
+          title=$(echo "Release $(TZ=Asia/Tokyo date +'%Y-%m-%d')")
           echo "title=$title" >> $GITHUB_ENV
       - name: Make Body
         id: make_body
