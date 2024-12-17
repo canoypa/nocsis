@@ -44,9 +44,7 @@ jobs:
         id: make_body
         run: |
           body=$(gh pr list -B development -S "is:merged" --json "number,author" -t "{{range.}}- #{{.number}} @{{.author.login}}{{\"\n\"}}{{end}}")
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}"
+          body="${body//$'\n'/\\n}"
           echo "body=$body" >> $GITHUB_OUTPUT
 
   create_release_pr:
