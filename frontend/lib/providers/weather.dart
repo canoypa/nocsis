@@ -16,9 +16,5 @@ Future<Weather> weather(Ref ref) async {
 
   final res = await fn.call();
 
-  if (res.data == null) {
-    throw Exception("Failed to fetch weather data");
-  }
-
   return Weather.fromJson(res.data ?? {});
 }
