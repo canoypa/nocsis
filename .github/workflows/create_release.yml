@@ -6,6 +6,9 @@ on:
   push:
     # branches: [development]
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   check_existing_release_pr:
     runs-on: ubuntu-latest
