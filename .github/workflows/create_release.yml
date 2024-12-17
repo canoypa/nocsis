@@ -39,7 +39,7 @@ jobs:
         id: make_title
         run: |
           title=$(echo "Release $(TZ=Asia/Tokyo date +'%Y-%m-%d')")
-          echo "title=$title" >> $GITHUB_ENV
+          echo "title=$title" >> $GITHUB_OUTPUT
       - name: Make Body
         id: make_body
         run: |
@@ -47,7 +47,7 @@ jobs:
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"
           body="${body//$'\r'/'%0D'}"
-          echo "body=$body" >> $GITHUB_ENV
+          echo "body=$body" >> $GITHUB_OUTPUT
 
   create_release_pr:
     needs: [check_existing_release_pr, get_pr_content]
