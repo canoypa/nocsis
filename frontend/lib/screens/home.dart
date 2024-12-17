@@ -67,7 +67,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final duringClassData = ref.watch(duringClassDataProvider).value;
+    final duringClassData = ref
+        .watch(duringClassDataProvider)
+        .maybeWhen(data: (data) => data, orElse: () => null);
 
     return Scaffold(
       body: MouseRegion(
