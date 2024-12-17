@@ -43,7 +43,7 @@ jobs:
       - name: Make Body
         id: make_body
         run: |
-          body=$(gh pr list -B development -S "is:merged" --json "number,author" -t "{{range.}}- #{{.number}} @{{.author.login}}{{\"\n\"}}{{end}}")
+          body=$(gh pr list -B development -S "is:merged sort:created-asc" --json "number,author" -t "{{range.}}- #{{.number}} @{{.author.login}}{{\"\n\"}}{{end}}")
           body="${body//$'\n'/\\n}"
           echo "body=$body" >> $GITHUB_OUTPUT
 
