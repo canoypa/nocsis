@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/sign_in_form.dart';
+import 'package:nocsis/custom_icons.dart';
 
 class SettingsTopRoute extends GoRouteData {
   const SettingsTopRoute();
@@ -30,6 +31,10 @@ class SettingsTopPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final googleEmail = FirebaseAuth.instance.currentUser?.providerData
+        .firstWhere((e) => e.providerId == GoogleAuthProvider.PROVIDER_ID)
+        .email;
+
     return Align(
       alignment: Alignment.topLeft,
       child: ConstrainedBox(
@@ -118,6 +123,48 @@ class SettingsTopPage extends StatelessWidget {
                                   .any((e) => e.providerId == 'password')
                               ? const Text('変更する')
                               : const Text('設定する'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(CustomIcons.google),
+                            const SizedBox(width: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Google'),
+                                if (googleEmail != null)
+                                  Text(
+                                    googleEmail,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                        ),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            await FirebaseAuth.instance.currentUser!
+                                .unlink(GoogleAuthProvider.PROVIDER_ID);
+                            await FirebaseAuth.instance.currentUser!
+                                .linkWithPopup(GoogleAuthProvider());
+                          },
+                          child: const Text("別アカウントと連携する"),
                         ),
                       ],
                     ),
