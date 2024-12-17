@@ -265,8 +265,8 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
   final TextEditingController passwordController = TextEditingController();
   bool invisiblePassword = true;
-  bool has_error = false;
-  String error_message = '';
+  bool hasError = false;
+  String errorMessage = '';
 
   @override
   Widget build(BuildContext context) {
@@ -353,7 +353,7 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 onPressed: _changePasswordVisibilityCallback,
                 icon: Icon(_passwordVisibilityIcon()),
               ),
-              errorText: has_error ? error_message : null,
+              errorText: hasError ? errorMessage : null,
             ),
             obscureText: invisiblePassword,
           ),
@@ -365,8 +365,8 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 try {
                   if (passwordController.text.isEmpty) {
                     setState(() {
-                      has_error = true;
-                      error_message = 'パスワードを入力してください。';
+                      hasError = true;
+                      errorMessage = 'パスワードを入力してください。';
                     });
                     return;
                   }
@@ -376,19 +376,19 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
                   );
 
                   setState(() {
-                    has_error = false;
+                    hasError = false;
                   });
 
                   widget.onSubmit();
                 } catch (error) {
                   setState(() {
-                    has_error = true;
+                    hasError = true;
                   });
 
                   if (error is FirebaseAuthException &&
                       error.code == 'weak-password') {
                     setState(() {
-                      error_message = 'パスワードが弱すぎます。';
+                      errorMessage = 'パスワードが弱すぎます。';
                     });
                   } else {
                     rethrow;
