@@ -265,6 +265,8 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
   final TextEditingController passwordController = TextEditingController();
   bool invisiblePassword = true;
+  bool has_error = false;
+  String error_message = '';
 
   @override
   Widget build(BuildContext context) {
@@ -351,6 +353,7 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 onPressed: _changePasswordVisibilityCallback,
                 icon: Icon(_passwordVisibilityIcon()),
               ),
+              errorText: has_error ? error_message : null,
             ),
             obscureText: invisiblePassword,
           ),
@@ -359,11 +362,38 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
             width: double.infinity,
             child: FilledButton(
               onPressed: () async {
-                await FirebaseAuth.instance.currentUser?.updatePassword(
-                  passwordController.text,
-                );
+                try {
+                  if (passwordController.text.isEmpty) {
+                    setState(() {
+                      has_error = true;
+                      error_message = 'パスワードを入力してください。';
+                    });
+                    return;
+                  }
 
-                widget.onSubmit();
+                  await FirebaseAuth.instance.currentUser?.updatePassword(
+                    passwordController.text,
+                  );
+
+                  setState(() {
+                    has_error = false;
+                  });
+
+                  widget.onSubmit();
+                } catch (error) {
+                  setState(() {
+                    has_error = true;
+                  });
+
+                  if (error is FirebaseAuthException &&
+                      error.code == 'weak-password') {
+                    setState(() {
+                      error_message = 'パスワードが弱すぎます。';
+                    });
+                  } else {
+                    rethrow;
+                  }
+                }
               },
               child: const Text('設定する'),
             ),
