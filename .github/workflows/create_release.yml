@@ -23,7 +23,7 @@ jobs:
         id: check_existing_release_pr
         run: |
           release_pr_number=$(gh pr list -B main -H development --json "number" -q ".[0].number")
-          echo "release_pr_number=$release_pr_number" >> $GITHUB_ENV
+          echo "release_pr_number=$release_pr_number" >> $GITHUB_OUTPUT
 
   get_pr_content:
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
   create_release_pr:
     needs: [check_existing_release_pr, get_pr_content]
 
-    if: ${{ needs.check_existing_release_pr.outputs.release_pr_number == '' }}
+    if: needs.check_existing_release_pr.outputs.release_pr_number == ''
 
     runs-on: ubuntu-latest
 
@@ -64,7 +64,7 @@ jobs:
   update_release_pr:
     needs: [check_existing_release_pr, get_pr_content]
 
-    if: ${{ needs.check_existing_release_pr.outputs.release_pr_number != '' }}
+    if: needs.check_existing_release_pr.outputs.release_pr_number != ''
 
     runs-on: ubuntu-latest
 
