@@ -22,7 +22,7 @@ jobs:
       - name: Check Existing Release PR
         id: check_existing_release_pr
         run: |
-          release_pr_number=$(gh pr view development --json "number" -q ".number")
+          release_pr_number=$(gh pr list -B main -H development --json "number" -q ".[1].number")
           echo "release_pr_number=$release_pr_number" >> $GITHUB_ENV
 
   get_pr_content:
