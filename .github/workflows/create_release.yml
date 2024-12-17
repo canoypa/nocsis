@@ -1,0 +1,68 @@
+name: Create Release Pull Request
+
+on:
+  # schedule:
+  #   - cron: "0 15 * * *" # 00:00 JST
+  push:
+    # branches: [development]
+
+jobs:
+  check_existing_release_pr:
+    runs-on: ubuntu-latest
+
+    outputs:
+      release_pr_number: ${{ steps.check_existing_release_pr.outputs.release_pr_number }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Check Existing Release PR
+        id: check_existing_release_pr
+        run: |
+          release_pr_number=$(gh pr view development --json "number" -q ".number")
+          echo "release_pr_number=$release_pr_number" >> $GITHUB_ENV
+
+  get_pr_content:
+    runs-on: ubuntu-latest
+
+    outputs:
+      title: ${{ steps.make_title.outputs.title }}
+      body: ${{ steps.make_body.outputs.body }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Make Title
+        id: make_title
+        run: |
+          title=$(echo "Release $(date +'%Y-%m-%d')")
+          echo "title=$title" >> $GITHUB_ENV
+      - name: Make Body
+        id: make_body
+        run: |
+          body=$(gh pr list -B development -S "is:merged" --json "number" -t "{{range.}}- #{{.number}}{{\"\n\"}}{{end}}")
+          echo "body=$body" >> $GITHUB_ENV
+
+  create_release_pr:
+    needs: [check_existing_release_pr, get_pr_content]
+
+    if: needs.check_existing_release_pr.outputs.release_pr_number == ''
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Release PR
+        run: |
+          gh pr new -H development -B main -t "${{ needs.get_pr_content.outputs.title }}" -b "${{ needs.get_pr_content.outputs.body }}"
+
+  update_release_pr:
+    needs: [check_existing_release_pr, get_pr_content]
+
+    if: needs.check_existing_release_pr.outputs.release_pr_number != ''
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Update Release PR
+        run: |
+          gh pr edit ${{ needs.check_existing_release_pr.outputs.release_pr_number }} -t "${{ needs.get_pr_content.outputs.title }}" -b "${{ needs.get_pr_content.outputs.body }}"
