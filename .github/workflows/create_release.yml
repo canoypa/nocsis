@@ -57,6 +57,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Create Release PR
         run: |
           gh pr new -H development -B main -t "${{ needs.get_pr_content.outputs.title }}" -b "${{ needs.get_pr_content.outputs.body }}"
@@ -69,6 +71,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Update Release PR
         run: |
           gh pr edit ${{ needs.check_existing_release_pr.outputs.release_pr_number }} -t "${{ needs.get_pr_content.outputs.title }}" -b "${{ needs.get_pr_content.outputs.body }}"
