@@ -6,7 +6,7 @@ part of 'during_class_data.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$duringClassDataHash() => r'12c876aac73fed4076ecd5a2f0f2cff74ac74e8d';
+String _$duringClassDataHash() => r'69ada5d033d551b6125bca8379ba652e6d04a345';
 
 /// See also [duringClassData].
 @ProviderFor(duringClassData)
