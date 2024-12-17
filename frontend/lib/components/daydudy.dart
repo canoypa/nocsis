@@ -8,7 +8,7 @@ class Daydudy extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final daydudy = ref.watch(daydudyProvider).value;
+    final daydudy = ref.watch(daydudyProvider).maybeWhen(orElse: () => null);
 
     if (daydudy == null) {
       return const SizedBox();

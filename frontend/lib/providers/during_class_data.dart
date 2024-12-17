@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/models/classes.dart';
 import 'package:nocsis/providers/classes.dart';
@@ -12,7 +11,7 @@ Future<ClassData?> duringClassData(Ref ref) async {
   // 毎分更新
   ref.watch(cronProvider("* * * * *"));
 
-  final classes = ref.watch(classesProvider).value;
+  final classes = ref.watch(classesProvider).maybeWhen(orElse: () => null);
 
   final now = DateTime.now();
 
