@@ -15,6 +15,10 @@ Future<Weather> weather(Ref ref) async {
   ref.watch(cronProvider("*/15 * * * *"));
 
   final res = await fn.call();
-  print(res.data);
-  return Weather.fromJson(res.data);
+
+  if (res.data == null) {
+    throw Exception("Failed to fetch weather data");
+  }
+
+  return Weather.fromJson(res.data ?? {});
 }
