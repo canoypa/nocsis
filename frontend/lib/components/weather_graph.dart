@@ -21,7 +21,7 @@ class WeatherGraph extends ConsumerWidget {
     final weather = ref.watch(weatherProvider).maybeWhen(
         data: (data) => data.hourly, orElse: () => _initWeatherHourly);
 
-    print(weather);
+    // print(weather);
 
     return SizedBox.expand(
       child: LayoutBuilder(builder: (context, constraints) {

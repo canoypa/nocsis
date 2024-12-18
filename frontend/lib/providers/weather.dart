@@ -17,6 +17,11 @@ Future<Weather> weather(Ref ref) async {
   ref.watch(cronProvider("*/15 * * * *"));
 
   final res = await fn.call();
+
+  if (res.data == null) {
+    throw Exception("Failed to fetch weather data");
+  }
+
   final json = jsonDecode(res.data) as Map<String, dynamic>;
   return Weather.fromJson(json);
 }

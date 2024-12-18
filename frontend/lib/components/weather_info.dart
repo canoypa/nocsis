@@ -30,7 +30,7 @@ class WeatherInfo extends ConsumerWidget {
         .watch(weatherProvider)
         .maybeWhen(data: (data) => data, orElse: () => null);
 
-    print(weather);
+    // print(weather);
 
     if (weather == null) {
       return const SizedBox();
