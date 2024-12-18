@@ -6,7 +6,7 @@ part of 'daydudy.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$daydudyHash() => r'bd1aa53198bc1c53528a7867db2d03d34d28e07f';
+String _$daydudyHash() => r'00b26086b125269743fec0f44b0c87e9ca2a5799';
 
 /// See also [daydudy].
 @ProviderFor(daydudy)

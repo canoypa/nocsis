@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/routes/router.dart';
+import 'package:nocsis/screens/home.dart';
 
 class ConsoleTopRoute extends GoRouteData {
   const ConsoleTopRoute();

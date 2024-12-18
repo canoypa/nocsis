@@ -15,5 +15,10 @@ Future<Daydudy> daydudy(Ref ref) async {
   ref.watch(cronProvider("0 0 * * *"));
 
   final res = await fn.call({"date": DateTime.now().toIso8601String()});
+
+  if (res.data == null) {
+    throw Exception("No data");
+  }
+
   return Daydudy.fromJson(res.data);
 }

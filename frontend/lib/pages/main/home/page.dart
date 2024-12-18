@@ -1,7 +1,39 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/day_schedule.dart';
 import 'package:nocsis/components/personal/toggle_day.dart';
+
+class PersonalHomeRoute extends GoRouteData {
+  const PersonalHomeRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    final isMobile = MediaQuery.of(context).size.width < 1200;
+
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: const MainView(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        if (isMobile) {
+          return SharedAxisTransition(
+            animation: animation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.vertical,
+            child: child,
+          );
+        }
+
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+}
 
 class MainView extends StatefulWidget {
   const MainView({super.key});

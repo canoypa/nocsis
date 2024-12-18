@@ -1,6 +1,33 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
+import 'package:nocsis/pages/main/events/page.dart';
+import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/routes/router.dart';
+
+class PersonalShell extends ShellRouteData {
+  const PersonalShell();
+
+  @override
+  Page<void> pageBuilder(
+      BuildContext context, GoRouterState state, Widget navigator) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: MainPage(
+        location: state.matchedLocation,
+        child: navigator,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+}
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {

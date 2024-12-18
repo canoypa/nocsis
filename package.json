@@ -1,5 +1,8 @@
 {
-	"dependencies": {
-		"firebase-tools": "^13.25.0"
-	}
+  "dependencies": {
+    "firebase-tools": "^13.25.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  }
 }
