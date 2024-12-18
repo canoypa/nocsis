@@ -15,5 +15,10 @@ Future<Weather> weather(Ref ref) async {
   ref.watch(cronProvider("*/15 * * * *"));
 
   final res = await fn.call();
+
+  if (res.data == null) {
+    throw Exception("No data");
+  }
+
   return Weather.fromJson(res.data);
 }
