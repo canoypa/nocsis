@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/models/weather.dart';
@@ -15,6 +17,6 @@ Future<Weather> weather(Ref ref) async {
   ref.watch(cronProvider("*/15 * * * *"));
 
   final res = await fn.call();
-
-  return Weather.fromJson(res.data ?? {});
+  final json = jsonDecode(res.data) as Map<String, dynamic>;
+  return Weather.fromJson(json);
 }
