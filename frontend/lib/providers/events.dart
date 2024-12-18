@@ -19,5 +19,10 @@ Future<EventList> events(Ref ref) async {
   const limit = 3;
 
   final res = await fn.call({"from": from, "limit": limit});
+
+  if (res.data == null) {
+    throw Exception("No data");
+  }
+
   return EventList.fromJson(res.data);
 }
