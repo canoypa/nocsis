@@ -28,18 +28,16 @@ class LicensesRoute extends GoRouteData {
 }
 
 @riverpod
-Future<Map<String, List<LicenseParagraph>>> licenses(ref) async {
-  final licensesEntries = await LicenseRegistry.licenses.toList();
-
+Stream<Map<String, List<LicenseParagraph>>> licenses(ref) async* {
   Map<String, List<LicenseParagraph>> licenses = {};
 
-  for (final license in licensesEntries) {
-    for (final package in license.packages) {
-      licenses.putIfAbsent(package, () => []).addAll(license.paragraphs);
+  await for (final entry in LicenseRegistry.licenses) {
+    for (final package in entry.packages) {
+      licenses.putIfAbsent(package, () => []).addAll(entry.paragraphs);
     }
-  }
 
-  return licenses;
+    yield licenses;
+  }
 }
 
 class LicensesPage extends ConsumerWidget {
