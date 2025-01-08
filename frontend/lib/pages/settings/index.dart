@@ -177,8 +177,18 @@ class SettingsTopPage extends ConsumerWidget {
                             TextButton(
                               onPressed: hasNonGoogleSignInProvider
                                   ? () async {
-                                      await user.unlink(
-                                          GoogleAuthProvider.PROVIDER_ID);
+                                      try {
+                                        await user.unlink(
+                                            GoogleAuthProvider.PROVIDER_ID);
+                                      } catch (error) {
+                                        if (error is FirebaseAuthException &&
+                                            error.code == 'no-such-provider') {
+                                          return;
+                                        }
+
+                                        rethrow;
+                                      }
+
                                       await user
                                           .linkWithPopup(GoogleAuthProvider());
                                     }
