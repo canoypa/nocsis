@@ -1,9 +1,11 @@
 import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/sign_in_form.dart';
 import 'package:nocsis/custom_icons.dart';
+import 'package:nocsis/providers/user.dart';
 
 class SettingsTopRoute extends GoRouteData {
   const SettingsTopRoute();
@@ -24,14 +26,23 @@ class SettingsTopRoute extends GoRouteData {
   }
 }
 
-class SettingsTopPage extends StatelessWidget {
+class SettingsTopPage extends ConsumerWidget {
   const SettingsTopPage({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final googleEmail = FirebaseAuth.instance.currentUser?.providerData
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider).maybeWhen(
+          data: (data) => data,
+          orElse: () => null,
+        );
+
+    if (user == null) {
+      return const SizedBox.shrink();
+    }
+
+    final googleEmail = user.providerData
         .firstWhere((e) => e.providerId == GoogleAuthProvider.PROVIDER_ID)
         .email;
 
@@ -62,7 +73,7 @@ class SettingsTopPage extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 4),
-                    Text(FirebaseAuth.instance.currentUser?.email ?? ''),
+                    Text(user.email ?? ''),
                   ],
                 ),
                 const Spacer(),
@@ -119,7 +130,7 @@ class SettingsTopPage extends StatelessWidget {
                               },
                             );
                           },
-                          child: FirebaseAuth.instance.currentUser!.providerData
+                          child: user.providerData
                                   .any((e) => e.providerId == 'password')
                               ? const Text('変更する')
                               : const Text('設定する'),
@@ -159,10 +170,8 @@ class SettingsTopPage extends StatelessWidget {
                         ),
                         TextButton(
                           onPressed: () async {
-                            await FirebaseAuth.instance.currentUser!
-                                .unlink(GoogleAuthProvider.PROVIDER_ID);
-                            await FirebaseAuth.instance.currentUser!
-                                .linkWithPopup(GoogleAuthProvider());
+                            await user.unlink(GoogleAuthProvider.PROVIDER_ID);
+                            await user.linkWithPopup(GoogleAuthProvider());
                           },
                           child: const Text("別アカウントと連携する"),
                         ),
@@ -179,7 +188,7 @@ class SettingsTopPage extends StatelessWidget {
   }
 }
 
-class ChangeEmailDialog extends StatefulWidget {
+class ChangeEmailDialog extends ConsumerStatefulWidget {
   final VoidCallback onSubmit;
 
   const ChangeEmailDialog({
@@ -191,11 +200,20 @@ class ChangeEmailDialog extends StatefulWidget {
   ChangeEmailDialogState createState() => ChangeEmailDialogState();
 }
 
-class ChangeEmailDialogState extends State<ChangeEmailDialog> {
+class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
   bool reAuthenticated = false;
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider).maybeWhen(
+          data: (data) => data,
+          orElse: () => null,
+        );
+
+    if (user == null) {
+      return const SizedBox.shrink();
+    }
+
     return Dialog(
       child: PageTransitionSwitcher(
         transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
@@ -206,18 +224,17 @@ class ChangeEmailDialogState extends State<ChangeEmailDialog> {
             child: child,
           );
         },
-        child: !reAuthenticated ? _signInForm() : _changeEmailForm(),
+        child: !reAuthenticated ? _signInForm(user) : _changeEmailForm(user),
       ),
     );
   }
 
-  _signInForm() {
+  _signInForm(User currentUser) {
     return SignInForm(
       title: "メールアドレスを変更する",
       description: '始めに、現在のアカウントで再認証が必要です。',
       onGoogleSignIn: () async {
-        await FirebaseAuth.instance.currentUser
-            ?.reauthenticateWithPopup(GoogleAuthProvider());
+        await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
 
         setState(() {
           reAuthenticated = true;
@@ -228,8 +245,7 @@ class ChangeEmailDialogState extends State<ChangeEmailDialog> {
           email: email,
           password: password,
         );
-        await FirebaseAuth.instance.currentUser
-            ?.reauthenticateWithCredential(credential);
+        await currentUser.reauthenticateWithCredential(credential);
 
         setState(() {
           reAuthenticated = true;
@@ -238,7 +254,7 @@ class ChangeEmailDialogState extends State<ChangeEmailDialog> {
     );
   }
 
-  _changeEmailForm() {
+  _changeEmailForm(User currentUser) {
     final TextEditingController emailController = TextEditingController();
 
     return Container(
@@ -279,8 +295,7 @@ class ChangeEmailDialogState extends State<ChangeEmailDialog> {
             width: double.infinity,
             child: FilledButton(
               onPressed: () async {
-                await FirebaseAuth.instance.currentUser
-                    ?.verifyBeforeUpdateEmail(
+                await currentUser.verifyBeforeUpdateEmail(
                   emailController.text,
                 );
 
@@ -295,7 +310,7 @@ class ChangeEmailDialogState extends State<ChangeEmailDialog> {
   }
 }
 
-class ChangePasswordDialog extends StatefulWidget {
+class ChangePasswordDialog extends ConsumerStatefulWidget {
   final VoidCallback onSubmit;
 
   const ChangePasswordDialog({
@@ -307,7 +322,7 @@ class ChangePasswordDialog extends StatefulWidget {
   ChangePasswordDialogState createState() => ChangePasswordDialogState();
 }
 
-class ChangePasswordDialogState extends State<ChangePasswordDialog> {
+class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
   bool reAuthenticated = false;
 
   final TextEditingController passwordController = TextEditingController();
@@ -317,6 +332,15 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(userProvider).maybeWhen(
+          data: (data) => data,
+          orElse: () => null,
+        );
+
+    if (user == null) {
+      return const SizedBox.shrink();
+    }
+
     return Dialog(
       child: PageTransitionSwitcher(
         transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
@@ -327,7 +351,7 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
             child: child,
           );
         },
-        child: !reAuthenticated ? _signInForm() : _changeEmailForm(),
+        child: !reAuthenticated ? _signInForm(user) : _changeEmailForm(user),
       ),
     );
   }
@@ -344,13 +368,12 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
         : Icons.visibility_outlined;
   }
 
-  _signInForm() {
+  _signInForm(User currentUser) {
     return SignInForm(
       title: "パスワードを設定する",
       description: '始めに、現在のアカウントで再認証が必要です。',
       onGoogleSignIn: () async {
-        await FirebaseAuth.instance.currentUser
-            ?.reauthenticateWithPopup(GoogleAuthProvider());
+        await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
 
         setState(() {
           reAuthenticated = true;
@@ -361,8 +384,7 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
           email: email,
           password: password,
         );
-        await FirebaseAuth.instance.currentUser
-            ?.reauthenticateWithCredential(credential);
+        await currentUser.reauthenticateWithCredential(credential);
 
         setState(() {
           reAuthenticated = true;
@@ -371,7 +393,7 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
     );
   }
 
-  _changeEmailForm() {
+  _changeEmailForm(User currentUser) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
@@ -418,7 +440,7 @@ class ChangePasswordDialogState extends State<ChangePasswordDialog> {
                     return;
                   }
 
-                  await FirebaseAuth.instance.currentUser?.updatePassword(
+                  await currentUser.updatePassword(
                     passwordController.text,
                   );
 
