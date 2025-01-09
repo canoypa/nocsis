@@ -14,14 +14,14 @@ import 'package:nocsis/routes/router.dart';
 import 'package:nocsis/screens/during_class.dart';
 import 'package:nocsis/themes/display.dart';
 
-class HomeRoute extends GoRouteData {
-  const HomeRoute();
+class ClassroomRoute extends GoRouteData {
+  const ClassroomRoute();
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: const HomeScreen(),
+      child: const ClassroomScreen(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,
@@ -33,8 +33,8 @@ class HomeRoute extends GoRouteData {
   }
 }
 
-class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({
+class ClassroomScreen extends ConsumerStatefulWidget {
+  const ClassroomScreen({
     super.key,
   });
 
@@ -42,7 +42,7 @@ class HomeScreen extends ConsumerStatefulWidget {
   HomeScreenState createState() => HomeScreenState();
 }
 
-class HomeScreenState extends ConsumerState<HomeScreen> {
+class HomeScreenState extends ConsumerState<ClassroomScreen> {
   bool _isMouseMoving = false;
   Timer? _mouseTimer;
 

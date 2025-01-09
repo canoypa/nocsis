@@ -18,7 +18,7 @@ import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/pages/sign_in.dart';
-import 'package:nocsis/screens/home.dart';
+import 'package:nocsis/screens/classroom.dart';
 
 part 'router.g.dart';
 
@@ -31,7 +31,7 @@ part 'router.g.dart';
         TypedGoRoute<PersonalEventsRoute>(path: '/events'),
       ],
     ),
-    TypedGoRoute<HomeRoute>(path: '/classroom'),
+    TypedGoRoute<ClassroomRoute>(path: '/classroom'),
     TypedShellRoute<ConsoleShellRoute>(routes: [
       TypedGoRoute<ConsoleTopRoute>(path: '/console'),
       TypedGoRoute<ConsoleGroupRoute>(path: '/console/group'),

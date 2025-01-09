@@ -32,7 +32,7 @@ RouteBase get $appShell => ShellRouteData.$route(
         ),
         GoRouteData.$route(
           path: '/classroom',
-          factory: $HomeRouteExtension._fromState,
+          factory: $ClassroomRouteExtension._fromState,
         ),
         ShellRouteData.$route(
           factory: $ConsoleShellRouteExtension._fromState,
@@ -144,8 +144,9 @@ extension $PersonalEventsRouteExtension on PersonalEventsRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $HomeRouteExtension on HomeRoute {
-  static HomeRoute _fromState(GoRouterState state) => const HomeRoute();
+extension $ClassroomRouteExtension on ClassroomRoute {
+  static ClassroomRoute _fromState(GoRouterState state) =>
+      const ClassroomRoute();
 
   String get location => GoRouteData.$location(
         '/classroom',
