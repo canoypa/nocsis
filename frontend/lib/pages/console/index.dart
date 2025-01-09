@@ -1,8 +1,8 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/routes/router.dart';
-import 'package:nocsis/screens/classroom.dart';
 
 class ConsoleTopRoute extends GoRouteData {
   const ConsoleTopRoute();
