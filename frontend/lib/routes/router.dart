@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
 import 'package:nocsis/pages/console/group.dart';
@@ -18,20 +19,19 @@ import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/pages/sign_in.dart';
-import 'package:nocsis/screens/home.dart';
 
 part 'router.g.dart';
 
 @TypedShellRoute<AppShell>(
   routes: [
-    TypedGoRoute<HomeRoute>(path: '/'),
     TypedGoRoute<SignInRoute>(path: '/sign_in'),
     TypedShellRoute<PersonalShell>(
       routes: [
-        TypedGoRoute<PersonalHomeRoute>(path: '/personal'),
-        TypedGoRoute<PersonalEventsRoute>(path: '/personal/events'),
+        TypedGoRoute<PersonalHomeRoute>(path: '/'),
+        TypedGoRoute<PersonalEventsRoute>(path: '/events'),
       ],
     ),
+    TypedGoRoute<ClassroomRoute>(path: '/classroom'),
     TypedShellRoute<ConsoleShellRoute>(routes: [
       TypedGoRoute<ConsoleTopRoute>(path: '/console'),
       TypedGoRoute<ConsoleGroupRoute>(path: '/console/group'),

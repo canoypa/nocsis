@@ -2,8 +2,8 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
+import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/routes/router.dart';
-import 'package:nocsis/screens/home.dart';
 
 class SettingsShellRoute extends ShellRouteData {
   const SettingsShellRoute();
@@ -46,7 +46,7 @@ class SettingsLayout extends StatelessWidget {
             if (GoRouter.of(context).canPop()) {
               GoRouter.of(context).pop();
             } else {
-              const HomeRoute().go(context);
+              const PersonalHomeRoute().go(context);
             }
           },
         ),
