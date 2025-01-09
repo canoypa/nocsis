@@ -120,14 +120,6 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
                       shrinkWrap: true,
                       children: [
                         ListTile(
-                          title: const Text('Nocsis 起動時に Classroom を起動する'),
-                          trailing: Switch(
-                            value: true,
-                            onChanged: (v) {},
-                          ),
-                          onTap: () {},
-                        ),
-                        ListTile(
                           title: const Text('Classroom を終了する'),
                           onTap: () {
                             if (GoRouter.of(context).canPop()) {
