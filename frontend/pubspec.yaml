@@ -14,9 +14,9 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  firebase_core: ^3.1.0
+  firebase_core: ^3.8.1
   firebase_auth: ^5.1.0
-  flutter_svg: ^2.0.10+1
+  flutter_svg: ^2.0.16
   flutter_screenutil: ^5.5.4
   google_fonts: ^6.1.0
   flutter_riverpod: ^2.4.9
@@ -29,6 +29,7 @@ dependencies:
   go_router: ^14.2.3
   animations: ^2.0.11
   dynamic_color: ^1.7.0
+  gap: ^3.0.1
 
 dev_dependencies:
   flutter_test:
@@ -37,7 +38,7 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   riverpod_generator: ^2.3.9
   build_runner: ^2.4.7
-  custom_lint: ^0.6.4
+  custom_lint: ^0.7.0
   riverpod_lint: ^2.3.7
   freezed: ^2.4.6
   json_serializable: ^6.7.1
@@ -49,6 +50,7 @@ flutter:
   assets:
     - assets/images/weather/
     - assets/images/Icon-192.png
+    - assets/images/google.svg
 
   fonts:
     - family: CustomIcons

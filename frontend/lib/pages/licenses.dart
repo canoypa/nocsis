@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,19 +8,36 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'licenses.g.dart';
 
-@riverpod
-Future<Map<String, List<LicenseParagraph>>> licenses(ref) async {
-  final licensesEntries = await LicenseRegistry.licenses.toList();
+class LicensesRoute extends GoRouteData {
+  const LicensesRoute();
 
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: const LicensesPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+@riverpod
+Stream<Map<String, List<LicenseParagraph>>> licenses(ref) async* {
   Map<String, List<LicenseParagraph>> licenses = {};
 
-  for (final license in licensesEntries) {
-    for (final package in license.packages) {
-      licenses.putIfAbsent(package, () => []).addAll(license.paragraphs);
+  await for (final entry in LicenseRegistry.licenses) {
+    for (final package in entry.packages) {
+      licenses.putIfAbsent(package, () => []).addAll(entry.paragraphs);
     }
-  }
 
-  return licenses;
+    yield licenses;
+  }
 }
 
 class LicensesPage extends ConsumerWidget {

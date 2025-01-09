@@ -19,5 +19,10 @@ Future<ClassList> classes(Ref ref) async {
   final to = DateTime(now.year, now.month, now.day + 1).toIso8601String();
 
   final res = await fn.call({"from": from, "to": to});
+
+  if (res.data == null) {
+    throw Exception("No data");
+  }
+
   return ClassList.fromJson(res.data);
 }

@@ -1,11 +1,55 @@
+import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nocsis/components/sign_in_form.dart';
+
+class SignInRoute extends GoRouteData {
+  const SignInRoute();
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: const SignInPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+    );
+  }
+}
 
 class SignInPage extends StatelessWidget {
   const SignInPage({super.key});
 
-  _signIn(BuildContext context) async {
+  _passwordSignIn(BuildContext context, String email, String password) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text("サインイン出来ませんでした"),
+          ),
+        );
+      }
+    }
+  }
+
+  _googleSignIn(BuildContext context) async {
     try {
       final provider = GoogleAuthProvider();
       await FirebaseAuth.instance.signInWithPopup(provider);
@@ -34,24 +78,10 @@ class SignInPage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Image.asset("assets/images/Icon-192.png", width: 56),
-              const SizedBox(height: 8),
-              const Text("Nocsis", style: TextStyle(fontSize: 40)),
-              const SizedBox(height: 48),
-              Text(
-                "Nocsis を使用するには、サインインする必要があります。",
-                style: TextStyle(color: Theme.of(context).hintColor),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 48),
-              FilledButton(
-                onPressed: () => _signIn(context),
-                style: ButtonStyle(
-                  padding: WidgetStateProperty.all<EdgeInsets>(
-                    const EdgeInsets.symmetric(vertical: 32, horizontal: 64),
-                  ),
-                ),
-                child: const Text("サインイン"),
+              SignInForm(
+                onGoogleSignIn: () => _googleSignIn(context),
+                onPasswordSignIn: (email, password) =>
+                    _passwordSignIn(context, email, password),
               ),
             ],
           ),

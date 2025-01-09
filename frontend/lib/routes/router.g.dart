@@ -14,10 +14,6 @@ RouteBase get $appShell => ShellRouteData.$route(
       factory: $AppShellExtension._fromState,
       routes: [
         GoRouteData.$route(
-          path: '/',
-          factory: $HomeRouteExtension._fromState,
-        ),
-        GoRouteData.$route(
           path: '/sign_in',
           factory: $SignInRouteExtension._fromState,
         ),
@@ -25,14 +21,18 @@ RouteBase get $appShell => ShellRouteData.$route(
           factory: $PersonalShellExtension._fromState,
           routes: [
             GoRouteData.$route(
-              path: '/personal',
+              path: '/',
               factory: $PersonalHomeRouteExtension._fromState,
             ),
             GoRouteData.$route(
-              path: '/personal/events',
+              path: '/events',
               factory: $PersonalEventsRouteExtension._fromState,
             ),
           ],
+        ),
+        GoRouteData.$route(
+          path: '/classroom',
+          factory: $ClassroomRouteExtension._fromState,
         ),
         ShellRouteData.$route(
           factory: $ConsoleShellRouteExtension._fromState,
@@ -74,10 +74,6 @@ RouteBase get $appShell => ShellRouteData.$route(
               path: '/settings',
               factory: $SettingsTopRouteExtension._fromState,
             ),
-            GoRouteData.$route(
-              path: '/settings/sign_in',
-              factory: $SettingsSignInRouteExtension._fromState,
-            ),
           ],
         ),
         GoRouteData.$route(
@@ -89,23 +85,6 @@ RouteBase get $appShell => ShellRouteData.$route(
 
 extension $AppShellExtension on AppShell {
   static AppShell _fromState(GoRouterState state) => AppShell();
-}
-
-extension $HomeRouteExtension on HomeRoute {
-  static HomeRoute _fromState(GoRouterState state) => const HomeRoute();
-
-  String get location => GoRouteData.$location(
-        '/',
-      );
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
 }
 
 extension $SignInRouteExtension on SignInRoute {
@@ -134,7 +113,7 @@ extension $PersonalHomeRouteExtension on PersonalHomeRoute {
       const PersonalHomeRoute();
 
   String get location => GoRouteData.$location(
-        '/personal',
+        '/',
       );
 
   void go(BuildContext context) => context.go(location);
@@ -152,7 +131,25 @@ extension $PersonalEventsRouteExtension on PersonalEventsRoute {
       const PersonalEventsRoute();
 
   String get location => GoRouteData.$location(
-        '/personal/events',
+        '/events',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ClassroomRouteExtension on ClassroomRoute {
+  static ClassroomRoute _fromState(GoRouterState state) =>
+      const ClassroomRoute();
+
+  String get location => GoRouteData.$location(
+        '/classroom',
       );
 
   void go(BuildContext context) => context.go(location);
@@ -307,24 +304,6 @@ extension $SettingsTopRouteExtension on SettingsTopRoute {
 
   String get location => GoRouteData.$location(
         '/settings',
-      );
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
-}
-
-extension $SettingsSignInRouteExtension on SettingsSignInRoute {
-  static SettingsSignInRoute _fromState(GoRouterState state) =>
-      const SettingsSignInRoute();
-
-  String get location => GoRouteData.$location(
-        '/settings/sign_in',
       );
 
   void go(BuildContext context) => context.go(location);
