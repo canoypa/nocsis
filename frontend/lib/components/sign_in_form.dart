@@ -9,8 +9,8 @@ class SignInForm extends StatefulWidget {
 
   const SignInForm({
     super.key,
-    required this.title,
-    required this.description,
+    this.title = 'サインイン',
+    this.description = 'Nocsis を使用するには、サインインする必要があります。',
     required this.onGoogleSignIn,
     required this.onPasswordSignIn,
   });
