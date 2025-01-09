@@ -35,13 +35,13 @@ enum Navigation {
     label: "ホーム",
     icon: Icons.school_outlined,
     selectedIcon: Icons.school,
-    pagePath: "/personal/",
+    pagePath: "/",
   ),
   events(
     label: "イベント",
     icon: Icons.event_outlined,
     selectedIcon: Icons.event,
-    pagePath: "/personal/events",
+    pagePath: "/events",
   );
 
   final String label;
