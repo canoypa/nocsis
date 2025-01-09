@@ -24,14 +24,14 @@ part 'router.g.dart';
 
 @TypedShellRoute<AppShell>(
   routes: [
-    TypedGoRoute<HomeRoute>(path: '/'),
     TypedGoRoute<SignInRoute>(path: '/sign_in'),
     TypedShellRoute<PersonalShell>(
       routes: [
-        TypedGoRoute<PersonalHomeRoute>(path: '/personal'),
-        TypedGoRoute<PersonalEventsRoute>(path: '/personal/events'),
+        TypedGoRoute<PersonalHomeRoute>(path: '/'),
+        TypedGoRoute<PersonalEventsRoute>(path: '/events'),
       ],
     ),
+    TypedGoRoute<HomeRoute>(path: '/classroom'),
     TypedShellRoute<ConsoleShellRoute>(routes: [
       TypedGoRoute<ConsoleTopRoute>(path: '/console'),
       TypedGoRoute<ConsoleGroupRoute>(path: '/console/group'),
