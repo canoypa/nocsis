@@ -178,19 +178,37 @@ class SettingsTopPage extends ConsumerWidget {
                               onPressed: hasNonGoogleSignInProvider
                                   ? () async {
                                       try {
-                                        await user.unlink(
-                                            GoogleAuthProvider.PROVIDER_ID);
-                                      } catch (error) {
-                                        if (error is FirebaseAuthException &&
-                                            error.code == 'no-such-provider') {
+                                        await user.linkWithPopup(
+                                            GoogleAuthProvider());
+                                      } catch (e) {
+                                        if (e is FirebaseAuthException &&
+                                            e.code ==
+                                                'credential-already-in-use') {
+                                          final currentEmail = user.providerData
+                                              .firstWhere((e) =>
+                                                  e.providerId ==
+                                                  GoogleAuthProvider
+                                                      .PROVIDER_ID)
+                                              .email;
+                                          final sameAccount =
+                                              e.email == currentEmail;
+
+                                          if (!sameAccount) {
+                                            // ignore: use_build_context_synchronously
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'この Google アカウントはすでに別のユーザーと連携されています。'),
+                                              ),
+                                            );
+                                          }
+
                                           return;
                                         }
 
                                         rethrow;
                                       }
-
-                                      await user
-                                          .linkWithPopup(GoogleAuthProvider());
                                     }
                                   : null,
                               child: const Text("別アカウントと連携する"),
