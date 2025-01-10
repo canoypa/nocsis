@@ -4,6 +4,9 @@ on:
   push:
     # branches: [development]
 
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   get_pr_number:
     outputs:
