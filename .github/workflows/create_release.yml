@@ -47,7 +47,7 @@ jobs:
         id: make_body
         run: |
           release_pr_commits=$(gh pr view ${{ needs.get_pr_number.outputs.release_pr_number }} --json "commits" --jq "[.commits[].oid]")
-          prs=$(gh pr list -B development -s merged --json 'number,author,mergeCommit,createdAt' | jq --argjson release_pr_commits "$release_pr_commits" '[.[] | select(.mergeCommit.oid | IN($release_pr_commits[]))] | sort_by(.createdAt)')
+          prs=$(gh pr list -B development -s merged --json 'number,author,mergeCommit,createdAt' | jq --argjson release_pr_commits "$release_pr_commits" '[.[] | select(.mergeCommit.oid | IN($release_pr_commits[]))] | sort_by(.createdAt) | .[]')
           body=$(echo "$prs" | jq -r '["- #\(.number) @\(.author.login)"] | join("\n")')
           body="${body//$'\n'/\\n}"
           echo "body=$body" >> $GITHUB_OUTPUT
