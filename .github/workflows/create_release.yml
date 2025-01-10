@@ -23,7 +23,7 @@ jobs:
           if [ -n "$existing_release_pr_number" ]; then
             echo "release_pr_number=$existing_release_pr_number" >> $GITHUB_OUTPUT
           else
-            release_pr_number=$(gh pr create -H development -B main -t "Release" | sed -n 's/.*\///p')
+            release_pr_number=$(gh pr create -H development -B main -t "Release" -b "wip" | sed -n 's/.*\///p')
             echo "release_pr_number=$release_pr_number" >> $GITHUB_OUTPUT
           fi
 
