@@ -1,8 +1,6 @@
 name: Create Release Pull Request
 
 on:
-  schedule:
-    - cron: "0 15 * * *" # 00:00 JST
   push:
     branches: [development]
 
@@ -10,28 +8,33 @@ env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  check_existing_release_pr:
-    runs-on: ubuntu-latest
-
+  get_pr_number:
     outputs:
-      release_pr_number: ${{ steps.check_existing_release_pr.outputs.release_pr_number }}
+      release_pr_number: ${{ steps.get_pr_number.outputs.release_pr_number }}
 
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Check Existing Release PR
-        id: check_existing_release_pr
+        id: get_pr_number
         run: |
-          release_pr_number=$(gh pr list -B main -H development --json "number" -q ".[0].number")
-          echo "release_pr_number=$release_pr_number" >> $GITHUB_OUTPUT
+          existing_release_pr_number=$(gh pr list -B main -H development --json "number" -q ".[0].number")
+          if [ -n "$existing_release_pr_number" ]; then
+            echo "release_pr_number=$existing_release_pr_number" >> $GITHUB_OUTPUT
+          else
+            release_pr_number=$(gh pr create -H development -B main -t "Release" -b "wip" | sed -n 's/.*\///p')
+            echo "release_pr_number=$release_pr_number" >> $GITHUB_OUTPUT
+          fi
 
   get_pr_content:
-    runs-on: ubuntu-latest
+    needs: [get_pr_number]
 
     outputs:
       title: ${{ steps.make_title.outputs.title }}
       body: ${{ steps.make_body.outputs.body }}
 
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,33 +46,16 @@ jobs:
       - name: Make Body
         id: make_body
         run: |
-          body=$(gh pr list -B development -S "is:merged sort:created-asc" --json "number,author" -t "{{range.}}- #{{.number}} @{{.author.login}}{{\"\n\"}}{{end}}")
+          release_pr_commits=$(gh pr view ${{ needs.get_pr_number.outputs.release_pr_number }} --json "commits" --jq "[.commits[].oid]")
+          prs=$(gh pr list -B development -s merged --json 'number,author,mergeCommit,createdAt' | jq --argjson release_pr_commits "$release_pr_commits" '[.[] | select(.mergeCommit.oid | IN($release_pr_commits[]))] | sort_by(.createdAt) | .[]')
+          body=$(echo "$prs" | jq -r '["- #\(.number) @\(.author.login)"] | join("\n")')
           body="${body//$'\n'/\\n}"
           echo "body=$body" >> $GITHUB_OUTPUT
 
-  create_release_pr:
-    needs: [check_existing_release_pr, get_pr_content]
-
-    if: needs.check_existing_release_pr.outputs.release_pr_number == ''
+  edit:
+    needs: [get_pr_number, get_pr_content]
 
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Create Release PR
-        run: |
-          body="${{ needs.get_pr_content.outputs.body }}"
-          body=${body//\\n/$'\n'}
-          gh pr new -H development -B main -t "${{ needs.get_pr_content.outputs.title }}" -b "$body"
-
-  update_release_pr:
-    needs: [check_existing_release_pr, get_pr_content]
-
-    if: needs.check_existing_release_pr.outputs.release_pr_number != ''
-
-    runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,4 +63,4 @@ jobs:
         run: |
           body="${{ needs.get_pr_content.outputs.body }}"
           body=${body//\\n/$'\n'}
-          gh pr edit ${{ needs.check_existing_release_pr.outputs.release_pr_number }} -t "${{ needs.get_pr_content.outputs.title }}" -b "$body"
+          gh pr edit ${{ needs.get_pr_number.outputs.release_pr_number }} -t "${{ needs.get_pr_content.outputs.title }}" -b "$body"
