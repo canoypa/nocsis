@@ -52,19 +52,23 @@ export const matchCountdownPattern = (
 
 export const isCountdownTarget = (
   event: calendar_v3.Schema$Event,
-  timestamp: DateTime<true>,
+  timestampArg: DateTime<true>,
 ): boolean => {
   if (!event.description) return false;
 
   const match = matchCountdownPattern(event.description);
   if (!match) return false;
 
+  const timestamp = timestampArg.startOf("day");
+
   const startDate = event.start?.dateTime || event.start?.date;
   if (!startDate) {
     throw new Error("startDate or date is not found");
   }
 
-  const eventStartDate = DateTime.fromISO(startDate, { zone: "Asia/Tokyo" });
+  const eventStartDate = DateTime.fromISO(startDate, {
+    zone: "Asia/Tokyo",
+  }).startOf("day");
 
   // オプションが指定されていない場合
   if (!match.before || !match.unit) {
