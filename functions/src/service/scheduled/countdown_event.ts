@@ -52,41 +52,41 @@ export const matchCountdownPattern = (
 
 export const isCountdownTarget = (
   event: calendar_v3.Schema$Event,
-  timestamp: DateTime<true>,
+  timestampArg: DateTime<true>,
 ): boolean => {
   if (!event.description) return false;
 
   const match = matchCountdownPattern(event.description);
   if (!match) return false;
 
+  const timestamp = timestampArg.startOf("day");
+
   const startDate = event.start?.dateTime || event.start?.date;
   if (!startDate) {
     throw new Error("startDate or date is not found");
   }
 
-  const eventStartDate = DateTime.fromISO(startDate, { zone: "Asia/Tokyo" });
+  const eventStartDate = DateTime.fromISO(startDate, {
+    zone: "Asia/Tokyo",
+  }).startOf("day");
 
-  // オプションが指定されていない場合
-  if (!match.before || !match.unit) {
-    const isBeforeEventStart =
-      Math.floor(eventStartDate.diff(timestamp, "days").days) > 0;
-    return isBeforeEventStart;
+  // オプションが指定されている場合
+  if (match.before && match.unit) {
+    const countdownStartDate = eventStartDate.minus({
+      [match.unit]: match.before,
+    });
+
+    // カウントダウン開始日より前の場合、カウントダウン対象ではない
+    const isBeforeCountdownStart =
+      countdownStartDate.diff(timestamp, "days").days > 0;
+    if (isBeforeCountdownStart) {
+      return false;
+    }
   }
 
-  const countdownStartDate = eventStartDate.minus({
-    [match.unit]: match.before,
-  });
-
-  // 現在日時がカウントダウン開始日~イベント開始日前日の間にあるか
-  const isBeforeCountdownStart =
-    Math.floor(countdownStartDate.diff(timestamp, "days").days) <= 0;
-  const isBeforeEventStart =
-    Math.floor(eventStartDate.diff(timestamp, "days").days) > 0;
-  if (isBeforeCountdownStart && isBeforeEventStart) {
-    return true;
-  }
-
-  return false;
+  // イベント以前日より前の場合、カウントダウン対象
+  const isBeforeEventStart = eventStartDate.diff(timestamp, "days").days > 0;
+  return isBeforeEventStart;
 };
 
 export const removeCountdownPattern = (text: string): string => {
