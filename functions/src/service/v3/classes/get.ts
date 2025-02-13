@@ -1,4 +1,4 @@
-import { HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/https";
 import { DateTime } from "luxon";
 import {
   type FetchCalendarParams,
