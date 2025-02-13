@@ -37,6 +37,6 @@
     "firebase-tools": "^13.30.0",
     "tsup": "^8.2.4",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.9"
+    "vitest": "^3.0.5"
   }
 }
