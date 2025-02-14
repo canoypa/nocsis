@@ -1,4 +1,4 @@
-import { onSchedule } from "firebase-functions/v2/scheduler";
+import { onSchedule } from "firebase-functions/scheduler";
 
 // 毎分実行
 // 実際の実行タイミングは各関数で設定する
