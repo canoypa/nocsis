@@ -11,7 +11,10 @@ export const getStudentByStuNo = async (
   const firestore = getFirestore(firebaseApp);
 
   const ref = firestore.collection("classmates");
-  const snapshot = await ref.where("stuNo", "in", stuNos).get();
+  const snapshot = await ref
+    .where("stuNo", "in", stuNos)
+    .orderBy("stuNo")
+    .get();
 
   // 入力された出席番号に対して、取得した生徒数が足りない場合エラー
   if (snapshot.size !== stuNos.length) {
