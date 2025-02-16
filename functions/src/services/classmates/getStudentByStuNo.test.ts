@@ -13,7 +13,7 @@ describe("getStudentByStuNo", () => {
 
   beforeEach(async () => {
     // FIXME: よくわからんけど、おそらくタイミング系の問題でドキュメントが見つからずエラーになるので、ここで少し遅延させる
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const db = getFirestore(firebaseApp);
     const collection = db.collection("/classmates");
