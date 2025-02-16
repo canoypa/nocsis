@@ -1,6 +1,6 @@
 import type { DateTime } from "luxon";
+import { getStudentByStuNo } from "../../services/classmates/getStudentByStuNo.js";
 import type { Student } from "../../types/classmates.js";
-import { getStudentByStuNo } from "../classmates/getStudentByStuNo.js";
 import { getDaydutyStuNo } from "./getDaydutyStuNo.js";
 
 /**
