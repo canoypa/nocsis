@@ -5,7 +5,10 @@ import { getDisplayTitle } from "../../core/calendar/get_display_title.js";
 import { parseEvents } from "../../core/calendar/parseEvents.js";
 import { eventsToSlackBlock } from "../../core/calendar/slack_block.js";
 import type { CrontabHandler } from "../../core/crontab.js";
-import { fetchCountdownEvents, isCountdownTarget } from "./countdown_event.js";
+import {
+  fetchCountdownEvents,
+  isCountdownTarget,
+} from "../../core/events/countdown_event.js";
 
 /**
  * イベントの通知

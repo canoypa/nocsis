@@ -2,7 +2,7 @@ import type { calendar_v3 } from "@googleapis/calendar";
 import { DateTime } from "luxon";
 import * as v from "valibot";
 import { type InferOutput, safeParse } from "valibot";
-import { fetchCalendar } from "../../core/calendar.js";
+import { fetchCalendar } from "../calendar.js";
 
 export const fetchCountdownEvents =
   async (): Promise<calendar_v3.Schema$Events> => {
