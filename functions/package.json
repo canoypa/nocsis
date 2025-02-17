@@ -33,7 +33,7 @@
     "@types/luxon": "^3.4.2",
     "@types/node": "^22.3.0",
     "firebase-functions-test": "^3.3.0",
-    "firebase-tools": "^13.30.0",
+    "firebase-tools": "^13.31.1",
     "tsup": "^8.2.4",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"
