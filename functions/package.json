@@ -6,8 +6,10 @@
   "scripts": {
     "lint": "biome lint src",
     "format": "biome format src",
-    "test": "vitest run",
+    "test": "pnpm test:default && pnpm test:functions",
     "test:watch": "vitest watch",
+    "test:default": "vitest run --project default",
+    "test:functions": "firebase emulators:exec 'pnpm vitest run --project functions'",
     "build": "tsup src/main.ts --format esm -d dist --clean",
     "build:watch": "tsup src/main.ts --format esm --watch --clean",
     "serve": "pnpm run serve-emulator",
