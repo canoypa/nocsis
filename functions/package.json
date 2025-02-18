@@ -24,7 +24,7 @@
     "@googleapis/calendar": "^9.7.6",
     "@slack/web-api": "^7.8.0",
     "axios": "^1.7.9",
-    "cron-parser": "^4.9.0",
+    "cron-parser": "^5.0.1",
     "firebase-admin": "^12.3.1",
     "firebase-functions": "^6.3.2",
     "luxon": "^3.5.0",
