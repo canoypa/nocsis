@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^3.4.2",
-    "@googleapis/calendar": "^9.7.6",
+    "@googleapis/calendar": "^9.7.9",
     "@slack/web-api": "^7.8.0",
     "axios": "^1.7.9",
     "cron-parser": "^5.0.1",
