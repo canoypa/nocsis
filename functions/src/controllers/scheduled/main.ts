@@ -1,4 +1,4 @@
-import type { ScheduledEvent } from "firebase-functions/v2/scheduler";
+import type { ScheduledEvent } from "firebase-functions/scheduler";
 import { DateTime } from "luxon";
 import { crontab } from "../../core/crontab.js";
 

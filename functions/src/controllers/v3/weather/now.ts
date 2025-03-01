@@ -1,8 +1,4 @@
 import { fetchWeather } from "../../../core/weather/fetchWeather.js";
-import {
-  type SwitchbotStatusBody,
-  fetchSwitchbotStatus,
-} from "../../../core/weather/fetch_switchbot_status.js";
 import { getWeatherNameById } from "../../../core/weather/getWeatherNameById.js";
 import type { WeatherName } from "../../../types/weather.js";
 
@@ -25,22 +21,13 @@ export type WeathersResponse = {
   threeHour: [WeatherName, WeatherName, WeatherName];
 };
 
-const calcSwitchbotTempAvg = (data: SwitchbotStatusBody[]): number => {
-  const result =
-    data.map((v) => v.temperature).reduce((a, b) => a + b, 0) / data.length;
-  return result;
-};
-
 const now = async (): Promise<WeathersResponse> => {
-  const [openWeatherData, switchbotData] = await Promise.all([
-    fetchWeather(),
-    fetchSwitchbotStatus(),
-  ]);
+  const openWeatherData = await fetchWeather();
 
   // 現在の天気と気温
   const current = {
     name: getWeatherNameById(openWeatherData.hourly[0].weather[0].id),
-    temp: Math.round(calcSwitchbotTempAvg(switchbotData)),
+    temp: openWeatherData.current.temp,
   };
 
   // 3 時間先までの天気

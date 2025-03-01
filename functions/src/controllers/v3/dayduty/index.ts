@@ -1,9 +1,8 @@
-import { HttpsError, onCall } from "firebase-functions/v2/https";
+import { HttpsError, onCall } from "firebase-functions/https";
 
-export const now = onCall(
+export const get = onCall(
   {
     region: "asia-northeast1",
-    secrets: ["OPENWEATHERMAP_TOKEN", "SWITCHBOT_TOKEN"],
   },
   async (request) => {
     if (!request.auth) {
@@ -13,6 +12,8 @@ export const now = onCall(
       );
     }
 
-    return (await import("./now.js")).default().catch(console.error);
+    return (await import("./get.js"))
+      .default(request.data)
+      .catch(console.error);
   },
 );

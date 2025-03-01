@@ -1,8 +1,8 @@
 import type { ChatPostMessageArguments } from "@slack/web-api";
 import { slackClient } from "../../client/slackClient.js";
-import { getTeacher } from "../../core/classmates/getTeacher.js";
 import type { CrontabHandler } from "../../core/crontab.js";
 import { getDayduty } from "../../core/dayduty/getDayduty.js";
+import { getTeacher } from "../../services/classmates/getTeacher.js";
 
 /**
  * 日直の通知

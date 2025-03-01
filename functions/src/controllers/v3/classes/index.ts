@@ -1,8 +1,9 @@
-import { HttpsError, onCall } from "firebase-functions/v2/https";
+import { HttpsError, onCall } from "firebase-functions/https";
 
 export const get = onCall(
   {
     region: "asia-northeast1",
+    secrets: ["CALENDAR_ACCOUNT_KEY"],
   },
   async (request) => {
     if (!request.auth) {

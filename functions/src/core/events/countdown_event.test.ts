@@ -1,5 +1,5 @@
 import type { calendar_v3 } from "@googleapis/calendar";
-import { DateTime, Zone } from "luxon";
+import { DateTime } from "luxon";
 import { describe, expect, it } from "vitest";
 import {
   isCountdownTarget,

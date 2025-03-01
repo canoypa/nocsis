@@ -1,27 +1,30 @@
-import { HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/https";
 import { DateTime } from "luxon";
 import {
   type FetchCalendarParams,
   fetchCalendar,
 } from "../../../core/calendar.js";
-import { encodeCalendarClass } from "../../../core/calendar/encode.js";
-import { parseClasses } from "../../../core/calendar/parseClasses.js";
-import type { Classes } from "../../../types/classes.js";
+import { encodeCalendarEvent } from "../../../core/calendar/encode.js";
+import { parseEvents } from "../../../core/calendar/parseEvents.js";
+import type { Events } from "../../../types/events.js";
 
 type Args = {
   from: string;
   to: string;
+  limit: number;
 };
 
-const get = async (data: Args): Promise<Classes> => {
-  const calendarId = process.env.CLASSES_CALENDAR_ID;
+const get = async (data: Args): Promise<Events> => {
+  const calendarId = process.env.EVENTS_CALENDAR_ID;
   if (!calendarId) {
     throw new HttpsError("internal", "Internal error");
   }
 
   const from = DateTime.fromISO(data.from, { zone: "asia/tokyo" });
-  const to = DateTime.fromISO(data.to, { zone: "asia/tokyo" });
-  if (from === null || to === null) {
+  const to = data.to
+    ? DateTime.fromISO(data.to, { zone: "asia/tokyo" })
+    : undefined;
+  if (from === null) {
     throw new HttpsError("invalid-argument", "date is not ISO format");
   }
 
@@ -30,7 +33,8 @@ const get = async (data: Args): Promise<Classes> => {
     timeMax: to,
     singleEvents: true,
     orderBy: "startTime",
-    fields: "items(start,end,summary)",
+    maxResults: data.limit,
+    fields: "items(start,end,summary,description,location)",
   };
 
   const snapshot = await fetchCalendar(calendarId, options);
@@ -38,11 +42,11 @@ const get = async (data: Args): Promise<Classes> => {
     throw new HttpsError("internal", "Internal error");
   }
 
-  const classes = parseClasses(snapshot.items);
+  const events = parseEvents(snapshot.items);
 
   return {
-    isEmpty: classes.length === 0,
-    items: classes.map((v) => encodeCalendarClass(v)),
+    isEmpty: events.length === 0,
+    items: events.map((v) => encodeCalendarEvent(v)),
   };
 };
 export default get;
