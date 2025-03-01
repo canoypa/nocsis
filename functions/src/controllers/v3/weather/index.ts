@@ -3,7 +3,7 @@ import { HttpsError, onCall } from "firebase-functions/https";
 export const now = onCall(
   {
     region: "asia-northeast1",
-    secrets: ["OPENWEATHERMAP_TOKEN", "SWITCHBOT_TOKEN"],
+    secrets: ["OPENWEATHERMAP_TOKEN"],
   },
   async (request) => {
     if (!request.auth) {
