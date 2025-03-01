@@ -97,7 +97,7 @@ class ConsoleLayout extends StatelessWidget {
         NavigationDrawerDestination(
           icon: Icon(Icons.wb_sunny_outlined),
           selectedIcon: Icon(Icons.wb_sunny),
-          label: Text('気象/室温データ連携'),
+          label: Text('気象データ連携'),
         ),
         NavigationDrawerDestination(
           icon: Icon(CustomIcons.slack_outlined),
