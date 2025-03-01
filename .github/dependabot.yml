@@ -9,7 +9,33 @@ updates:
     directory: "/functions"
     schedule:
       interval: "weekly"
+    groups:
+      firebase:
+        patterns:
+          - "firebase-*"
+      patch:
+        update-types: ["patch"]
+
   - package-ecosystem: "pub"
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    groups:
+      firebase:
+        patterns:
+          - "firebase_*"
+          - "cloud_functions"
+      riverpod:
+        patterns:
+          - "riverpod_*"
+          - "flutter_riverpod"
+          - "freezed"
+          - "freezed_annotation"
+          - "json_serializable"
+          - "json_annotation"
+      go_router:
+        patterns:
+          - "go_router"
+          - "go_router_builder"
+      patch:
+        update-types: ["patch"]
