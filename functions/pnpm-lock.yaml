@@ -12,8 +12,8 @@ importers:
         specifier: ^3.4.2
         version: 3.4.2
       '@googleapis/calendar':
-        specifier: ^9.7.6
-        version: 9.7.6(encoding@0.1.13)
+        specifier: ^9.7.9
+        version: 9.7.9(encoding@0.1.13)
       '@slack/web-api':
         specifier: ^7.8.0
         version: 7.8.0
@@ -671,8 +671,8 @@ packages:
     resolution: {integrity: sha512-+2k+mcQBb9zkaXMllf2wwR/rI07guAx+eZLWsGTDihW2lJRGfiqB7xu1r7/s4uvSP/T+nAumvzT5TTscwHKJ9A==}
     engines: {node: '>=14'}
 
-  '@googleapis/calendar@9.7.6':
-    resolution: {integrity: sha512-8Mt+Vgm7ybDmU+ezAiLzeO6hxZZkt2hMY+bS/1OZeYM6moHUQAF5cFTOWiVk63U+HJji8dKt9XvscOxEWAwnrQ==}
+  '@googleapis/calendar@9.7.9':
+    resolution: {integrity: sha512-s1dD/j+WtJpdJ7dxmJL1NeSSvoO4D+hcGqSGw4+UtEUpGgBmmlE9Ptxf04cRj1T9Y2xEUfhszKI87+rgxcW2iA==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sqladmin@24.0.0':
@@ -1236,6 +1236,9 @@ packages:
 
   '@types/node@22.13.1':
     resolution: {integrity: sha512-jK8uzQlrvXqEU91UxiK5J7pKHyzgnI1Qnl0QDHIgVGuolJhRb9EEl28Cj9b3rGR8B2lhFCtvIm5os8lFnO/1Ew==}
+
+  '@types/node@22.13.5':
+    resolution: {integrity: sha512-+lTU0PxZXn0Dr1NBtC7Y8cR21AJr87dLLU953CWA6pMxxv/UDc7jYAY90upcrie1nRcD6XNG5HOYEDtgW5TxAg==}
 
   '@types/node@22.13.5':
     resolution: {integrity: sha512-+lTU0PxZXn0Dr1NBtC7Y8cR21AJr87dLLU953CWA6pMxxv/UDc7jYAY90upcrie1nRcD6XNG5HOYEDtgW5TxAg==}
@@ -2320,6 +2323,10 @@ packages:
 
   get-intrinsic@1.2.7:
     resolution: {integrity: sha512-VW6Pxhsrk0KAOqs3WEd0klDiF/+V7gQOpAvY1jVU/LHmaD/kQO4523aiJuikX/QAKYiW6x8Jh+RJej1almdtCA==}
+    engines: {node: '>= 0.4'}
+
+  get-intrinsic@1.3.0:
+    resolution: {integrity: sha512-9fSjSaos/fRIVIp+xSJlE6lfwhES7LNtKaCBIamHsjr2na1BiABJPo0mOjjz8GJDURarmCPGqaiVg5mfjb98CQ==}
     engines: {node: '>= 0.4'}
 
   get-package-type@0.1.0:
@@ -5034,7 +5041,7 @@ snapshots:
       - supports-color
     optional: true
 
-  '@googleapis/calendar@9.7.6(encoding@0.1.13)':
+  '@googleapis/calendar@9.7.9(encoding@0.1.13)':
     dependencies:
       googleapis-common: 7.2.0(encoding@0.1.13)
     transitivePeerDependencies:
@@ -5643,6 +5650,10 @@ snapshots:
     dependencies:
       undici-types: 6.20.0
 
+  '@types/node@22.13.5':
+    dependencies:
+      undici-types: 6.20.0
+
   '@types/node@22.3.0':
     dependencies:
       undici-types: 6.18.2
@@ -6061,7 +6072,7 @@ snapshots:
   call-bound@1.0.3:
     dependencies:
       call-bind-apply-helpers: 1.0.2
-      get-intrinsic: 1.2.7
+      get-intrinsic: 1.3.0
 
   call-me-maybe@1.0.2: {}
 
@@ -6972,6 +6983,19 @@ snapshots:
       hasown: 2.0.2
       math-intrinsics: 1.1.0
 
+  get-intrinsic@1.3.0:
+    dependencies:
+      call-bind-apply-helpers: 1.0.2
+      es-define-property: 1.0.1
+      es-errors: 1.3.0
+      es-object-atoms: 1.1.1
+      function-bind: 1.1.2
+      get-proto: 1.0.1
+      gopd: 1.2.0
+      has-symbols: 1.1.0
+      hasown: 2.0.2
+      math-intrinsics: 1.1.0
+
   get-package-type@0.1.0: {}
 
   get-proto@1.0.1:
@@ -7073,7 +7097,7 @@ snapshots:
       extend: 3.0.2
       gaxios: 6.7.1(encoding@0.1.13)
       google-auth-library: 9.15.1(encoding@0.1.13)
-      qs: 6.13.0
+      qs: 6.14.0
       url-template: 2.0.8
       uuid: 9.0.1
     transitivePeerDependencies:
@@ -8782,14 +8806,14 @@ snapshots:
     dependencies:
       call-bound: 1.0.3
       es-errors: 1.3.0
-      get-intrinsic: 1.2.7
+      get-intrinsic: 1.3.0
       object-inspect: 1.13.4
 
   side-channel-weakmap@1.0.2:
     dependencies:
       call-bound: 1.0.3
       es-errors: 1.3.0
-      get-intrinsic: 1.2.7
+      get-intrinsic: 1.3.0
       object-inspect: 1.13.4
       side-channel-map: 1.0.1
 
