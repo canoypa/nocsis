@@ -18,26 +18,26 @@ export const crontab = (
     default: CrontabHandler;
   }>,
 ) => {
-  // crontab の解析
-
   return async (date: DateTime): Promise<void> => {
     // 現在時刻を分切り捨てで取得
     const now = date.setZone("asia/tokyo").startOf("minute");
 
+    // crontab の解析
     const interval = CronExpressionParser.parse(expression, {
       tz: "asia/tokyo",
+      // nextが現在時刻かをチェックするため、過去の時刻を指定する
       currentDate: now.minus({ minutes: 1 }).toJSDate(),
     });
 
-    // 1 分前から見た次のインターバルを取得
-    const next = interval.next();
-    const dateString = next.toDate();
-    const timestamp = DateTime.fromJSDate(dateString, { zone: "asia/tokyo" });
+    const nextStr = interval.next().toISOString();
+    if (!nextStr) return;
+
+    const next = DateTime.fromISO(nextStr, { zone: "asia/tokyo" });
 
     // 現在時刻と一致すれば実行
-    const diff = now.diff(timestamp).as("minutes");
+    const diff = now.diff(next).as("minutes");
     if (diff === 0) {
-      return (await loadModule()).default(timestamp);
+      return (await loadModule()).default(next);
     }
   };
 };
