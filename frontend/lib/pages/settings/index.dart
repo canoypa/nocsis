@@ -28,29 +28,28 @@ class SettingsTopRoute extends GoRouteData {
 }
 
 class SettingsTopPage extends ConsumerWidget {
-  const SettingsTopPage({
-    super.key,
-  });
+  const SettingsTopPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider).maybeWhen(
-          data: (data) => data,
-          orElse: () => null,
-        );
+    final user = ref
+        .watch(userProvider)
+        .maybeWhen(data: (data) => data, orElse: () => null);
 
     if (user == null) {
       return const SizedBox();
     }
 
-    final googleEmail = user.providerData
-        .firstWhereOrNull(
-          (e) => e.providerId == GoogleAuthProvider.PROVIDER_ID,
-        )
-        ?.email;
+    final googleEmail =
+        user.providerData
+            .firstWhereOrNull(
+              (e) => e.providerId == GoogleAuthProvider.PROVIDER_ID,
+            )
+            ?.email;
 
-    final hasNonGoogleSignInProvider = user.providerData
-        .any((e) => e.providerId != GoogleAuthProvider.PROVIDER_ID);
+    final hasNonGoogleSignInProvider = user.providerData.any(
+      (e) => e.providerId != GoogleAuthProvider.PROVIDER_ID,
+    );
 
     return Align(
       alignment: Alignment.topLeft,
@@ -59,15 +58,9 @@ class SettingsTopPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '設定',
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
+            Text('設定', style: Theme.of(context).textTheme.displayMedium),
             const SizedBox(height: 48),
-            Text(
-              'アカウント',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text('アカウント', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 24),
             Row(
               children: [
@@ -101,10 +94,7 @@ class SettingsTopPage extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 48),
-            Text(
-              'サインイン',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text('サインイン', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 24),
             Container(
               decoration: BoxDecoration(
@@ -136,10 +126,12 @@ class SettingsTopPage extends ConsumerWidget {
                               },
                             );
                           },
-                          child: user.providerData
-                                  .any((e) => e.providerId == 'password')
-                              ? const Text('変更する')
-                              : const Text('設定する'),
+                          child:
+                              user.providerData.any(
+                                    (e) => e.providerId == 'password',
+                                  )
+                                  ? const Text('変更する')
+                                  : const Text('設定する'),
                         ),
                       ],
                     ),
@@ -161,68 +153,79 @@ class SettingsTopPage extends ConsumerWidget {
                                 if (googleEmail != null)
                                   Text(
                                     googleEmail,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurfaceVariant,
-                                        ),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium?.copyWith(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                    ),
                                   ),
                               ],
                             ),
                           ],
                         ),
                         TextButton(
-                          onPressed: hasNonGoogleSignInProvider
-                              ? () async {
-                                  try {
-                                    await user
-                                        .unlink(GoogleAuthProvider.PROVIDER_ID);
-                                  } catch (e) {
-                                    if (e is FirebaseAuthException &&
-                                        e.code == 'no-such-provider') {
-                                      // noop
-                                    } else {
-                                      rethrow;
-                                    }
-                                  }
-
-                                  try {
-                                    await user
-                                        .linkWithPopup(GoogleAuthProvider());
-                                  } catch (e) {
-                                    if (e is FirebaseAuthException &&
-                                        e.code == 'credential-already-in-use') {
-                                      final currentEmail = user.providerData
-                                          .firstWhere((e) =>
-                                              e.providerId ==
-                                              GoogleAuthProvider.PROVIDER_ID)
-                                          .email;
-                                      final sameAccount =
-                                          e.email == currentEmail;
-
-                                      if (!sameAccount) {
-                                        // ignore: use_build_context_synchronously
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                'この Google アカウントはすでに別のユーザーと連携されています。'),
-                                          ),
-                                        );
+                          onPressed:
+                              hasNonGoogleSignInProvider
+                                  ? () async {
+                                    try {
+                                      await user.unlink(
+                                        GoogleAuthProvider.PROVIDER_ID,
+                                      );
+                                    } catch (e) {
+                                      if (e is FirebaseAuthException &&
+                                          e.code == 'no-such-provider') {
+                                        // noop
+                                      } else {
+                                        rethrow;
                                       }
-                                    } else {
-                                      rethrow;
+                                    }
+
+                                    try {
+                                      await user.linkWithPopup(
+                                        GoogleAuthProvider(),
+                                      );
+                                    } catch (e) {
+                                      if (e is FirebaseAuthException &&
+                                          e.code ==
+                                              'credential-already-in-use') {
+                                        final currentEmail =
+                                            user.providerData
+                                                .firstWhere(
+                                                  (e) =>
+                                                      e.providerId ==
+                                                      GoogleAuthProvider
+                                                          .PROVIDER_ID,
+                                                )
+                                                .email;
+                                        final sameAccount =
+                                            e.email == currentEmail;
+
+                                        if (!sameAccount) {
+                                          ScaffoldMessenger.of(
+                                            // ignore: use_build_context_synchronously
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'この Google アカウントはすでに別のユーザーと連携されています。',
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        rethrow;
+                                      }
                                     }
                                   }
-                                }
-                              : null,
+                                  : null,
                           child: Tooltip(
-                            message: !hasNonGoogleSignInProvider
-                                ? '別アカウントと連携するには、初めにパスワードを設定してください。'
-                                : '',
+                            message:
+                                !hasNonGoogleSignInProvider
+                                    ? '別アカウントと連携するには、初めにパスワードを設定してください。'
+                                    : '',
                             child: const Text("別アカウントと連携する"),
                           ),
                         ),
@@ -242,10 +245,7 @@ class SettingsTopPage extends ConsumerWidget {
 class ChangeEmailDialog extends ConsumerStatefulWidget {
   final VoidCallback onSubmit;
 
-  const ChangeEmailDialog({
-    super.key,
-    required this.onSubmit,
-  });
+  const ChangeEmailDialog({super.key, required this.onSubmit});
 
   @override
   ChangeEmailDialogState createState() => ChangeEmailDialogState();
@@ -256,10 +256,9 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(userProvider).maybeWhen(
-          data: (data) => data,
-          orElse: () => null,
-        );
+    final user = ref
+        .watch(userProvider)
+        .maybeWhen(data: (data) => data, orElse: () => null);
 
     if (user == null) {
       return const SizedBox.shrink();
@@ -327,10 +326,12 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
           ),
           const SizedBox(height: 48),
           const Text(
-              '1. 新しいメールアドレスを入力して、「確認する」を押してください。\n2. 入力したメールアドレス宛に確認のメールが届きます。メールに含まれるリンクを開いて、メールアドレスの変更を完了してください。'),
+            '1. 新しいメールアドレスを入力して、「確認する」を押してください。\n2. 入力したメールアドレス宛に確認のメールが届きます。メールに含まれるリンクを開いて、メールアドレスの変更を完了してください。',
+          ),
           const SizedBox(height: 8),
           const Text(
-              '※ 連携している Google アカウントは変更されません。\n※ 「新しいメールアドレスでログインできるようになりました」と表示されますが、現在 Google アカウント以外でログインする方法はないため、この内容は無視してください。'),
+            '※ 連携している Google アカウントは変更されません。\n※ 「新しいメールアドレスでログインできるようになりました」と表示されますが、現在 Google アカウント以外でログインする方法はないため、この内容は無視してください。',
+          ),
           const SizedBox(height: 48),
           TextField(
             autofocus: true,
@@ -346,9 +347,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
             width: double.infinity,
             child: FilledButton(
               onPressed: () async {
-                await currentUser.verifyBeforeUpdateEmail(
-                  emailController.text,
-                );
+                await currentUser.verifyBeforeUpdateEmail(emailController.text);
 
                 widget.onSubmit();
               },
@@ -364,10 +363,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
 class ChangePasswordDialog extends ConsumerStatefulWidget {
   final VoidCallback onSubmit;
 
-  const ChangePasswordDialog({
-    super.key,
-    required this.onSubmit,
-  });
+  const ChangePasswordDialog({super.key, required this.onSubmit});
 
   @override
   ChangePasswordDialogState createState() => ChangePasswordDialogState();
@@ -383,10 +379,9 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(userProvider).maybeWhen(
-          data: (data) => data,
-          orElse: () => null,
-        );
+    final user = ref
+        .watch(userProvider)
+        .maybeWhen(data: (data) => data, orElse: () => null);
 
     if (user == null) {
       return const SizedBox.shrink();
@@ -491,9 +486,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
                     return;
                   }
 
-                  await currentUser.updatePassword(
-                    passwordController.text,
-                  );
+                  await currentUser.updatePassword(passwordController.text);
 
                   setState(() {
                     hasError = false;

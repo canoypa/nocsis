@@ -22,9 +22,7 @@ class ConsoleMemberRoute extends GoRouteData {
 }
 
 class ConsoleMemberPage extends StatelessWidget {
-  const ConsoleMemberPage({
-    super.key,
-  });
+  const ConsoleMemberPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +33,7 @@ class ConsoleMemberPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'メンバー',
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
+            Text('メンバー', style: Theme.of(context).textTheme.displayMedium),
             const SizedBox(height: 24),
             const Text('グループのメンバーを管理します。'),
             const SizedBox(height: 48),
@@ -77,7 +72,7 @@ class ConsoleMemberPage extends StatelessWidget {
                   ],
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

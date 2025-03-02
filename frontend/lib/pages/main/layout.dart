@@ -11,13 +11,13 @@ class PersonalShell extends ShellRouteData {
 
   @override
   Page<void> pageBuilder(
-      BuildContext context, GoRouterState state, Widget navigator) {
+    BuildContext context,
+    GoRouterState state,
+    Widget navigator,
+  ) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: MainPage(
-        location: state.matchedLocation,
-        child: navigator,
-      ),
+      child: MainPage(location: state.matchedLocation, child: navigator),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,
@@ -68,26 +68,23 @@ class MainPage extends StatelessWidget {
   final Widget child;
   final String location;
 
-  const MainPage({
-    super.key,
-    required this.child,
-    required this.location,
-  });
+  const MainPage({super.key, required this.child, required this.location});
 
   Widget _buildNavRail(BuildContext context, Navigation navigation) {
     return NavigationRail(
       // top padding, but it doesn't look like it
       leading: const SizedBox(height: 8),
       selectedIndex: navigation.index,
-      destinations: Navigation.values
-          .map(
-            (e) => NavigationRailDestination(
-              label: Text(e.label),
-              icon: Icon(e.icon),
-              selectedIcon: Icon(e.selectedIcon),
-            ),
-          )
-          .toList(),
+      destinations:
+          Navigation.values
+              .map(
+                (e) => NavigationRailDestination(
+                  label: Text(e.label),
+                  icon: Icon(e.icon),
+                  selectedIcon: Icon(e.selectedIcon),
+                ),
+              )
+              .toList(),
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
@@ -104,15 +101,16 @@ class MainPage extends StatelessWidget {
   Widget _buildNavBar(BuildContext context, Navigation navigation) {
     return NavigationBar(
       selectedIndex: navigation.index,
-      destinations: Navigation.values
-          .map(
-            (e) => NavigationDestination(
-              label: e.label,
-              icon: Icon(e.icon),
-              selectedIcon: Icon(e.selectedIcon),
-            ),
-          )
-          .toList(),
+      destinations:
+          Navigation.values
+              .map(
+                (e) => NavigationDestination(
+                  label: e.label,
+                  icon: Icon(e.icon),
+                  selectedIcon: Icon(e.selectedIcon),
+                ),
+              )
+              .toList(),
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
@@ -134,9 +132,7 @@ class MainPage extends StatelessWidget {
         final bool isLargeScreen = constraints.minWidth >= 1200;
 
         return Scaffold(
-          appBar: AppBar(
-            actions: const [AccountMenu()],
-          ),
+          appBar: AppBar(actions: const [AccountMenu()]),
           body: Row(
             children: [
               if (isLargeScreen) _buildNavRail(context, nav),

@@ -32,18 +32,20 @@ part 'router.g.dart';
       ],
     ),
     TypedGoRoute<ClassroomRoute>(path: '/classroom'),
-    TypedShellRoute<ConsoleShellRoute>(routes: [
-      TypedGoRoute<ConsoleTopRoute>(path: '/console'),
-      TypedGoRoute<ConsoleGroupRoute>(path: '/console/group'),
-      TypedGoRoute<ConsoleMemberRoute>(path: '/console/member'),
-      TypedGoRoute<ConsoleCalendarRoute>(path: '/console/calendar'),
-      TypedGoRoute<ConsoleDayDutyRoute>(path: '/console/day_duty'),
-      TypedGoRoute<ConsoleWeatherRoute>(path: '/console/weather'),
-      TypedGoRoute<ConsoleSlackRoute>(path: '/console/slack'),
-    ]),
-    TypedShellRoute<SettingsShellRoute>(routes: [
-      TypedGoRoute<SettingsTopRoute>(path: '/settings'),
-    ]),
+    TypedShellRoute<ConsoleShellRoute>(
+      routes: [
+        TypedGoRoute<ConsoleTopRoute>(path: '/console'),
+        TypedGoRoute<ConsoleGroupRoute>(path: '/console/group'),
+        TypedGoRoute<ConsoleMemberRoute>(path: '/console/member'),
+        TypedGoRoute<ConsoleCalendarRoute>(path: '/console/calendar'),
+        TypedGoRoute<ConsoleDayDutyRoute>(path: '/console/day_duty'),
+        TypedGoRoute<ConsoleWeatherRoute>(path: '/console/weather'),
+        TypedGoRoute<ConsoleSlackRoute>(path: '/console/slack'),
+      ],
+    ),
+    TypedShellRoute<SettingsShellRoute>(
+      routes: [TypedGoRoute<SettingsTopRoute>(path: '/settings')],
+    ),
     TypedGoRoute<LicensesRoute>(path: '/licenses'),
   ],
 )
@@ -68,8 +70,9 @@ class AppShell extends ShellRouteData {
     }
 
     if (isSignIn && state.uri.path == "/sign_in") {
-      final continueUri =
-          Uri.tryParse(state.uri.queryParameters["continue"] ?? "/");
+      final continueUri = Uri.tryParse(
+        state.uri.queryParameters["continue"] ?? "/",
+      );
 
       if (continueUri != null) {
         return continueUri.path;
@@ -88,10 +91,9 @@ class GoRouterRefresher extends ChangeNotifier {
   GoRouterRefresher() {
     notifyListeners();
 
-    _auth = FirebaseAuth.instance
-        .authStateChanges()
-        .asBroadcastStream()
-        .listen((_) => notifyListeners());
+    _auth = FirebaseAuth.instance.authStateChanges().asBroadcastStream().listen(
+      (_) => notifyListeners(),
+    );
   }
 
   @override

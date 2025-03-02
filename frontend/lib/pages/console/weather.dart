@@ -22,9 +22,7 @@ class ConsoleWeatherRoute extends GoRouteData {
 }
 
 class ConsoleWeatherPage extends StatelessWidget {
-  const ConsoleWeatherPage({
-    super.key,
-  });
+  const ConsoleWeatherPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +33,7 @@ class ConsoleWeatherPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '気象データ連携',
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
+            Text('気象データ連携', style: Theme.of(context).textTheme.displayMedium),
             const SizedBox(height: 24),
             const Text('気象データの取得に関する設定を行えます。'),
             const SizedBox(height: 48),

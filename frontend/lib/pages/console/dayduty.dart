@@ -22,9 +22,7 @@ class ConsoleDayDutyRoute extends GoRouteData {
 }
 
 class ConsoleDayDutyPage extends StatelessWidget {
-  const ConsoleDayDutyPage({
-    super.key,
-  });
+  const ConsoleDayDutyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,17 +33,11 @@ class ConsoleDayDutyPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '日直',
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
+            Text('日直', style: Theme.of(context).textTheme.displayMedium),
             const SizedBox(height: 24),
             const Text('日直の確認や周期の設定を行えます。'),
             const SizedBox(height: 48),
-            Text(
-              '開始日の設定',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text('開始日の設定', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 24),
             const Text(
               '出席番号1番の人が日直になる日付を入力してください。この日が基準になり、翌日は出席番号2番の人が日直になります。',
@@ -59,7 +51,7 @@ class ConsoleDayDutyPage extends StatelessWidget {
                 border: OutlineInputBorder(),
                 labelText: '開始日',
               ),
-            )
+            ),
           ],
         ),
       ),

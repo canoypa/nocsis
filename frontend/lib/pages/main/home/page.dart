@@ -78,9 +78,10 @@ class _MainViewState extends State<MainView> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 800),
             child: ToggleDay(
-              label: DateFormat("M月d日 (E)", "ja_JP").format(
-                _parseEpochDay(_epochDay),
-              ),
+              label: DateFormat(
+                "M月d日 (E)",
+                "ja_JP",
+              ).format(_parseEpochDay(_epochDay)),
               onClickLeft: () {
                 controller.previousPage(
                   duration: const Duration(milliseconds: 300),

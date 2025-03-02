@@ -6,9 +6,7 @@ part 'classes.g.dart';
 
 @freezed
 class ClassList with _$ClassList {
-  const factory ClassList({
-    required List<ClassData> items,
-  }) = _ClassList;
+  const factory ClassList({required List<ClassData> items}) = _ClassList;
 
   factory ClassList.fromJson(Map<String, dynamic> json) =>
       _$ClassListFromJson(json);

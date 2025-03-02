@@ -67,9 +67,7 @@ class LicensesPage extends ConsumerWidget {
               centerTitle: false,
             ),
           ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 48),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 48)),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: snapshot.when(
@@ -85,7 +83,9 @@ class LicensesPage extends ConsumerWidget {
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 800),
                         child: LicenseTile(
-                            packageName: packageName, paragraphs: paragraphs),
+                          packageName: packageName,
+                          paragraphs: paragraphs,
+                        ),
                       ),
                     );
                   },
@@ -99,12 +99,10 @@ class LicensesPage extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const SliverToBoxAdapter(
-                child: SizedBox(),
-              ),
-              error: (error, stackTrace) => SliverToBoxAdapter(
-                child: Text('Error: $error'),
-              ),
+              loading: () => const SliverToBoxAdapter(child: SizedBox()),
+              error:
+                  (error, stackTrace) =>
+                      SliverToBoxAdapter(child: Text('Error: $error')),
             ),
           ),
         ],

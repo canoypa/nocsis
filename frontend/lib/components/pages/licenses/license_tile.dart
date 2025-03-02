@@ -16,10 +16,7 @@ class LicenseTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          packageName,
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+        Text(packageName, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 24),
         Container(
           padding: const EdgeInsets.all(16),
@@ -29,26 +26,27 @@ class LicenseTile extends StatelessWidget {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: paragraphs.map((paragraph) {
-              if (paragraph.indent == LicenseParagraph.centeredIndent) {
-                return Center(
-                  child: Text(
-                    paragraph.text,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                );
-              } else {
-                return Padding(
-                  padding: EdgeInsetsDirectional.only(
-                    start: 16.0 * paragraph.indent,
-                  ),
-                  child: Text(
-                    paragraph.text,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                );
-              }
-            }).toList(),
+            children:
+                paragraphs.map((paragraph) {
+                  if (paragraph.indent == LicenseParagraph.centeredIndent) {
+                    return Center(
+                      child: Text(
+                        paragraph.text,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    );
+                  } else {
+                    return Padding(
+                      padding: EdgeInsetsDirectional.only(
+                        start: 16.0 * paragraph.indent,
+                      ),
+                      child: Text(
+                        paragraph.text,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    );
+                  }
+                }).toList(),
           ),
         ),
       ],

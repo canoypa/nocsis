@@ -10,10 +10,7 @@ class DaySchedules {
   final ClassList classes;
   final EventList events;
 
-  DaySchedules({
-    required this.classes,
-    required this.events,
-  });
+  DaySchedules({required this.classes, required this.events});
 }
 
 class DaySchedulesState extends StateNotifier<Map<int, DaySchedules>> {
@@ -41,19 +38,16 @@ class DaySchedulesState extends StateNotifier<Map<int, DaySchedules>> {
       events: EventList.fromJson(result[1]),
     );
 
-    state = {
-      ...state,
-      epochDay: newData,
-    };
+    state = {...state, epochDay: newData};
 
     return newData;
   }
 
   // 授業を取得
   Future<dynamic> _getClasses(String from, String to) async {
-    final HttpsCallable getClasses =
-        FirebaseFunctions.instanceFor(region: "asia-northeast1")
-            .httpsCallable("v3-classes-get");
+    final HttpsCallable getClasses = FirebaseFunctions.instanceFor(
+      region: "asia-northeast1",
+    ).httpsCallable("v3-classes-get");
 
     final res = await getClasses.call({"from": from, "to": to});
 
@@ -62,9 +56,9 @@ class DaySchedulesState extends StateNotifier<Map<int, DaySchedules>> {
 
   // イベントを取得
   Future<dynamic> _getEvents(String from, String to) async {
-    final HttpsCallable getClasses =
-        FirebaseFunctions.instanceFor(region: "asia-northeast1")
-            .httpsCallable("v3-events-get");
+    final HttpsCallable getClasses = FirebaseFunctions.instanceFor(
+      region: "asia-northeast1",
+    ).httpsCallable("v3-events-get");
 
     final res = await getClasses.call({"from": from, "to": to});
 
@@ -74,16 +68,13 @@ class DaySchedulesState extends StateNotifier<Map<int, DaySchedules>> {
 
 final daySchedulesProvider =
     StateNotifierProvider<DaySchedulesState, Map<int, dynamic>>((ref) {
-  return DaySchedulesState();
-});
+      return DaySchedulesState();
+    });
 
 class DaySchedule extends ConsumerWidget {
   final int epochDay;
 
-  const DaySchedule({
-    super.key,
-    required this.epochDay,
-  });
+  const DaySchedule({super.key, required this.epochDay});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -98,10 +89,7 @@ class DaySchedule extends ConsumerWidget {
             return const Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.event_available_outlined),
-                  Text("予定なし"),
-                ],
+                children: [Icon(Icons.event_available_outlined), Text("予定なし")],
               ),
             );
           }
@@ -118,14 +106,10 @@ class DaySchedule extends ConsumerWidget {
         }
 
         if (snap.hasError) {
-          return const Center(
-            child: Text('Something went wrong'),
-          );
+          return const Center(child: Text('Something went wrong'));
         }
 
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
+        return const Center(child: CircularProgressIndicator());
       },
     );
   }

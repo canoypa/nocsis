@@ -18,20 +18,23 @@ class WeatherGraph extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weather = ref
+    final weather =
+        ref
             .watch(weatherProvider)
             .maybeWhen(data: (data) => data, orElse: () => null)
             ?.hourly ??
         _initWeatherHourly;
 
     return SizedBox.expand(
-      child: LayoutBuilder(builder: (context, constraints) {
-        return _Canvas(
-          constraints: constraints,
-          temp: weather.temp,
-          pop: weather.pop,
-        );
-      }),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return _Canvas(
+            constraints: constraints,
+            temp: weather.temp,
+            pop: weather.pop,
+          );
+        },
+      ),
     );
   }
 }
@@ -57,8 +60,10 @@ class _CanvasState extends ConsumerState<_Canvas>
     vsync: this,
     duration: const Duration(milliseconds: 500),
   );
-  late final CurvedAnimation _animation =
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutExpo);
+  late final CurvedAnimation _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeOutExpo,
+  );
 
   List<Tween<Offset>>? _tempTweens;
   List<Tween<Offset>>? _popTweens;
@@ -98,28 +103,30 @@ class _CanvasState extends ConsumerState<_Canvas>
     final tempRange = tempMax - tempMin;
     final isInitial = widget.temp.every((e) => e == 0);
 
-    _tempTweens = widget.temp.mapIndexed<Tween<Offset>>((i, e) {
-      final h = (e - tempMin) / (tempRange == 0 ? 1 : tempRange);
-      final target = Offset(
-        i / (widget.temp.length - 1) * width,
-        height - (h * height * 0.25 + (isInitial ? 0 : height * 0.25)),
-      );
+    _tempTweens =
+        widget.temp.mapIndexed<Tween<Offset>>((i, e) {
+          final h = (e - tempMin) / (tempRange == 0 ? 1 : tempRange);
+          final target = Offset(
+            i / (widget.temp.length - 1) * width,
+            height - (h * height * 0.25 + (isInitial ? 0 : height * 0.25)),
+          );
 
-      return Tween(
-        begin: _tempTweens?[i].evaluate(_animation) ?? target,
-        end: target,
-      );
-    }).toList();
-    _popTweens = widget.pop.mapIndexed<Tween<Offset>>((i, e) {
-      final target = Offset(
-        i / (widget.pop.length - 1) * width,
-        height - e.toDouble() * (height * 0.25),
-      );
-      return Tween(
-        begin: _popTweens?[i].evaluate(_animation) ?? target,
-        end: target,
-      );
-    }).toList();
+          return Tween(
+            begin: _tempTweens?[i].evaluate(_animation) ?? target,
+            end: target,
+          );
+        }).toList();
+    _popTweens =
+        widget.pop.mapIndexed<Tween<Offset>>((i, e) {
+          final target = Offset(
+            i / (widget.pop.length - 1) * width,
+            height - e.toDouble() * (height * 0.25),
+          );
+          return Tween(
+            begin: _popTweens?[i].evaluate(_animation) ?? target,
+            end: target,
+          );
+        }).toList();
   }
 
   @override
@@ -167,15 +174,17 @@ class _Painter extends CustomPainter {
     _popColor = const Color(0xFF64B5F6).harmonizeWith(primaryColor);
 
     _tempFillPaint = Paint()..color = _tempColor.withAlpha((255 * 0.1).round());
-    _tempLinePaint = Paint()
-      ..color = _tempColor.withAlpha((255 * 0.8).round())
-      ..strokeWidth = 4
-      ..style = PaintingStyle.stroke;
+    _tempLinePaint =
+        Paint()
+          ..color = _tempColor.withAlpha((255 * 0.8).round())
+          ..strokeWidth = 4
+          ..style = PaintingStyle.stroke;
     _popFillPaint = Paint()..color = _popColor.withAlpha((255 * 0.1).round());
-    _popLinePaint = Paint()
-      ..color = _popColor.withAlpha((255 * 0.8).round())
-      ..strokeWidth = 4
-      ..style = PaintingStyle.stroke;
+    _popLinePaint =
+        Paint()
+          ..color = _popColor.withAlpha((255 * 0.8).round())
+          ..strokeWidth = 4
+          ..style = PaintingStyle.stroke;
   }
 
   @override

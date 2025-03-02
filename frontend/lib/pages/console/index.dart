@@ -24,9 +24,7 @@ class ConsoleTopRoute extends GoRouteData {
 }
 
 class ConsoleTopPage extends StatelessWidget {
-  const ConsoleTopPage({
-    super.key,
-  });
+  const ConsoleTopPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,15 +35,9 @@ class ConsoleTopPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '管理コンソール',
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
+            Text('管理コンソール', style: Theme.of(context).textTheme.displayMedium),
             const SizedBox(height: 24),
-            Text(
-              'かなり開発中です',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('かなり開発中です', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 48),
             OutlinedButton(
               child: const Text('Classroom を起動する'),

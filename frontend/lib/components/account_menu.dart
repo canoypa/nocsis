@@ -38,7 +38,7 @@ class AccountMenu extends StatelessWidget {
             FirebaseAuth.instance.signOut();
           },
         ),
-        if (true /* isAdmin */) ...[
+        if (true /* isAdmin */ ) ...[
           const Divider(),
           ListTile(
             title: const Text("管理コンソール"),
@@ -59,7 +59,7 @@ class AccountMenu extends StatelessWidget {
           onTap: () {
             const LicensesRoute().go(context);
           },
-        )
+        ),
       ],
     );
   }
