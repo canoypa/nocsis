@@ -19,17 +19,19 @@ export const crontab = (
   }>,
 ) => {
   // crontab の解析
-  const interval = CronExpressionParser.parse(expression, { tz: "asia/tokyo" });
 
   return async (date: DateTime): Promise<void> => {
     // 現在時刻を分切り捨てで取得
     const now = date.setZone("asia/tokyo").startOf("minute");
 
-    // 基準時間を 1 分前に更新
-    interval.reset(now.minus({ minutes: 1 }).toJSDate());
+    const interval = CronExpressionParser.parse(expression, {
+      tz: "asia/tokyo",
+      currentDate: now.minus({ minutes: 1 }).toJSDate(),
+    });
 
     // 1 分前から見た次のインターバルを取得
-    const dateString = interval.next().toDate();
+    const next = interval.next();
+    const dateString = next.toDate();
     const timestamp = DateTime.fromJSDate(dateString, { zone: "asia/tokyo" });
 
     // 現在時刻と一致すれば実行
