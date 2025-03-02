@@ -59,11 +59,15 @@ class _SignInFormState extends State<SignInForm> {
               children: [
                 Image.asset("assets/images/Icon-192.png", width: 64),
                 const SizedBox(height: 16),
-                Text(widget.title,
-                    style: Theme.of(context).textTheme.displaySmall),
+                Text(
+                  widget.title,
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
                 const SizedBox(height: 24),
-                Text(widget.description,
-                    style: Theme.of(context).textTheme.bodyLarge),
+                Text(
+                  widget.description,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ],
             ),
           ),
@@ -87,8 +91,8 @@ class _SignInFormState extends State<SignInForm> {
                 Text(
                   'または',
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 TextField(

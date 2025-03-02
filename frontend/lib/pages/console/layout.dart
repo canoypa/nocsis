@@ -17,12 +17,13 @@ class ConsoleShellRoute extends ShellRouteData {
 
   @override
   Page<void> pageBuilder(
-      BuildContext context, GoRouterState state, Widget navigator) {
+    BuildContext context,
+    GoRouterState state,
+    Widget navigator,
+  ) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: ConsoleLayout(
-        child: navigator,
-      ),
+      child: ConsoleLayout(child: navigator),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,
@@ -37,10 +38,7 @@ class ConsoleShellRoute extends ShellRouteData {
 class ConsoleLayout extends StatelessWidget {
   final Widget child;
 
-  const ConsoleLayout({
-    super.key,
-    required this.child,
-  });
+  const ConsoleLayout({super.key, required this.child});
 
   static final Map<String, int> _routeToIndex = {
     const ConsoleTopRoute().location: 0,
@@ -63,9 +61,10 @@ class ConsoleLayout extends StatelessWidget {
       title: const Text('管理コンソール'),
       navigationIndex: _getNavigationIndex(context),
       onDestinationSelected: (value) {
-        final route = _routeToIndex.entries
-            .firstWhere((entry) => entry.value == value)
-            .key;
+        final route =
+            _routeToIndex.entries
+                .firstWhere((entry) => entry.value == value)
+                .key;
         GoRouter.of(context).go(route);
       },
       navigationItems: const [

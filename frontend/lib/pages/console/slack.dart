@@ -22,9 +22,7 @@ class ConsoleSlackRoute extends GoRouteData {
 }
 
 class ConsoleSlackPage extends StatelessWidget {
-  const ConsoleSlackPage({
-    super.key,
-  });
+  const ConsoleSlackPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,17 +33,11 @@ class ConsoleSlackPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Slack 連携',
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
+            Text('Slack 連携', style: Theme.of(context).textTheme.displayMedium),
             const SizedBox(height: 24),
             const Text('Slack への各種通知メッセージの送信を管理します。'),
             const SizedBox(height: 48),
-            Text(
-              'トークン',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text('トークン', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 24),
             TextField(
               controller: TextEditingController(text: 'WIP'),
@@ -57,19 +49,13 @@ class ConsoleSlackPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 48),
-            Text(
-              'イベント通知',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text('イベント通知', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 24),
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('イベント通知を受け取る'),
-                Switch(
-                  value: true,
-                  onChanged: null,
-                )
+                Switch(value: true, onChanged: null),
               ],
             ),
             const SizedBox(height: 24),
@@ -93,19 +79,13 @@ class ConsoleSlackPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 48),
-            Text(
-              '日直通知',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text('日直通知', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 24),
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('日直通知を受け取る'),
-                Switch(
-                  value: true,
-                  onChanged: null,
-                )
+                Switch(value: true, onChanged: null),
               ],
             ),
             const SizedBox(height: 24),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-ThemeData _createTheme({
-  required ThemeMode mode,
-}) {
+ThemeData _createTheme({required ThemeMode mode}) {
   final buttonStyle = ButtonStyle(
     minimumSize: WidgetStateProperty.all(const Size(0, 44)),
   );

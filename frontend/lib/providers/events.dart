@@ -6,8 +6,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'events.g.dart';
 
-final fn = FirebaseFunctions.instanceFor(region: "asia-northeast1")
-    .httpsCallable("v3-events-get");
+final fn = FirebaseFunctions.instanceFor(
+  region: "asia-northeast1",
+).httpsCallable("v3-events-get");
 
 @riverpod
 Future<EventList> events(Ref ref) async {

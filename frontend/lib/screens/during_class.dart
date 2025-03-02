@@ -7,10 +7,7 @@ import 'package:nocsis/providers/cron.dart';
 class DuringClassScreen extends ConsumerWidget {
   final ClassData? data;
 
-  const DuringClassScreen({
-    super.key,
-    required this.data,
-  });
+  const DuringClassScreen({super.key, required this.data});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,7 +22,8 @@ class DuringClassScreen extends ConsumerWidget {
 
     //残り時間を分で計算
     final classTerm = classData.endAt.difference(classData.startAt);
-    final remainingTime = classTerm.inMinutes -
+    final remainingTime =
+        classTerm.inMinutes -
         DateTime.now().difference(classData.startAt).inMinutes;
 
     return Stack(

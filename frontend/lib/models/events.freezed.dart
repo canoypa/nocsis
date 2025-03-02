@@ -12,7 +12,8 @@ part of 'events.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 EventList _$EventListFromJson(Map<String, dynamic> json) {
   return _EventList.fromJson(json);
@@ -54,15 +55,17 @@ class _$EventListCopyWithImpl<$Res, $Val extends EventList>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<EventData>,
-    ) as $Val);
+  $Res call({Object? items = null}) {
+    return _then(
+      _value.copyWith(
+            items:
+                null == items
+                    ? _value.items
+                    : items // ignore: cast_nullable_to_non_nullable
+                        as List<EventData>,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -70,8 +73,9 @@ class _$EventListCopyWithImpl<$Res, $Val extends EventList>
 abstract class _$$EventListImplCopyWith<$Res>
     implements $EventListCopyWith<$Res> {
   factory _$$EventListImplCopyWith(
-          _$EventListImpl value, $Res Function(_$EventListImpl) then) =
-      __$$EventListImplCopyWithImpl<$Res>;
+    _$EventListImpl value,
+    $Res Function(_$EventListImpl) then,
+  ) = __$$EventListImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<EventData> items});
@@ -82,22 +86,24 @@ class __$$EventListImplCopyWithImpl<$Res>
     extends _$EventListCopyWithImpl<$Res, _$EventListImpl>
     implements _$$EventListImplCopyWith<$Res> {
   __$$EventListImplCopyWithImpl(
-      _$EventListImpl _value, $Res Function(_$EventListImpl) _then)
-      : super(_value, _then);
+    _$EventListImpl _value,
+    $Res Function(_$EventListImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of EventList
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_$EventListImpl(
-      items: null == items
-          ? _value._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<EventData>,
-    ));
+  $Res call({Object? items = null}) {
+    return _then(
+      _$EventListImpl(
+        items:
+            null == items
+                ? _value._items
+                : items // ignore: cast_nullable_to_non_nullable
+                    as List<EventData>,
+      ),
+    );
   }
 }
 
@@ -105,7 +111,7 @@ class __$$EventListImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$EventListImpl implements _EventList {
   const _$EventListImpl({required final List<EventData> items})
-      : _items = items;
+    : _items = items;
 
   factory _$EventListImpl.fromJson(Map<String, dynamic> json) =>
       _$$EventListImplFromJson(json);
@@ -146,9 +152,7 @@ class _$EventListImpl implements _EventList {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$EventListImplToJson(
-      this,
-    );
+    return _$$EventListImplToJson(this);
   }
 }
 
@@ -198,11 +202,12 @@ abstract class $EventDataCopyWith<$Res> {
   factory $EventDataCopyWith(EventData value, $Res Function(EventData) then) =
       _$EventDataCopyWithImpl<$Res, EventData>;
   @useResult
-  $Res call(
-      {String title,
-      bool isAllDay,
-      @LocalDateTimeConverter() DateTime startAt,
-      @LocalDateTimeConverter() DateTime endAt});
+  $Res call({
+    String title,
+    bool isAllDay,
+    @LocalDateTimeConverter() DateTime startAt,
+    @LocalDateTimeConverter() DateTime endAt,
+  });
 }
 
 /// @nodoc
@@ -225,24 +230,31 @@ class _$EventDataCopyWithImpl<$Res, $Val extends EventData>
     Object? startAt = null,
     Object? endAt = null,
   }) {
-    return _then(_value.copyWith(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      isAllDay: null == isAllDay
-          ? _value.isAllDay
-          : isAllDay // ignore: cast_nullable_to_non_nullable
-              as bool,
-      startAt: null == startAt
-          ? _value.startAt
-          : startAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endAt: null == endAt
-          ? _value.endAt
-          : endAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            title:
+                null == title
+                    ? _value.title
+                    : title // ignore: cast_nullable_to_non_nullable
+                        as String,
+            isAllDay:
+                null == isAllDay
+                    ? _value.isAllDay
+                    : isAllDay // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            startAt:
+                null == startAt
+                    ? _value.startAt
+                    : startAt // ignore: cast_nullable_to_non_nullable
+                        as DateTime,
+            endAt:
+                null == endAt
+                    ? _value.endAt
+                    : endAt // ignore: cast_nullable_to_non_nullable
+                        as DateTime,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -250,15 +262,17 @@ class _$EventDataCopyWithImpl<$Res, $Val extends EventData>
 abstract class _$$EventDataImplCopyWith<$Res>
     implements $EventDataCopyWith<$Res> {
   factory _$$EventDataImplCopyWith(
-          _$EventDataImpl value, $Res Function(_$EventDataImpl) then) =
-      __$$EventDataImplCopyWithImpl<$Res>;
+    _$EventDataImpl value,
+    $Res Function(_$EventDataImpl) then,
+  ) = __$$EventDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String title,
-      bool isAllDay,
-      @LocalDateTimeConverter() DateTime startAt,
-      @LocalDateTimeConverter() DateTime endAt});
+  $Res call({
+    String title,
+    bool isAllDay,
+    @LocalDateTimeConverter() DateTime startAt,
+    @LocalDateTimeConverter() DateTime endAt,
+  });
 }
 
 /// @nodoc
@@ -266,8 +280,9 @@ class __$$EventDataImplCopyWithImpl<$Res>
     extends _$EventDataCopyWithImpl<$Res, _$EventDataImpl>
     implements _$$EventDataImplCopyWith<$Res> {
   __$$EventDataImplCopyWithImpl(
-      _$EventDataImpl _value, $Res Function(_$EventDataImpl) _then)
-      : super(_value, _then);
+    _$EventDataImpl _value,
+    $Res Function(_$EventDataImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of EventData
   /// with the given fields replaced by the non-null parameter values.
@@ -279,35 +294,42 @@ class __$$EventDataImplCopyWithImpl<$Res>
     Object? startAt = null,
     Object? endAt = null,
   }) {
-    return _then(_$EventDataImpl(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      isAllDay: null == isAllDay
-          ? _value.isAllDay
-          : isAllDay // ignore: cast_nullable_to_non_nullable
-              as bool,
-      startAt: null == startAt
-          ? _value.startAt
-          : startAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endAt: null == endAt
-          ? _value.endAt
-          : endAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
+    return _then(
+      _$EventDataImpl(
+        title:
+            null == title
+                ? _value.title
+                : title // ignore: cast_nullable_to_non_nullable
+                    as String,
+        isAllDay:
+            null == isAllDay
+                ? _value.isAllDay
+                : isAllDay // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        startAt:
+            null == startAt
+                ? _value.startAt
+                : startAt // ignore: cast_nullable_to_non_nullable
+                    as DateTime,
+        endAt:
+            null == endAt
+                ? _value.endAt
+                : endAt // ignore: cast_nullable_to_non_nullable
+                    as DateTime,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$EventDataImpl implements _EventData {
-  const _$EventDataImpl(
-      {required this.title,
-      required this.isAllDay,
-      @LocalDateTimeConverter() required this.startAt,
-      @LocalDateTimeConverter() required this.endAt});
+  const _$EventDataImpl({
+    required this.title,
+    required this.isAllDay,
+    @LocalDateTimeConverter() required this.startAt,
+    @LocalDateTimeConverter() required this.endAt,
+  });
 
   factory _$EventDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$EventDataImplFromJson(json);
@@ -354,19 +376,17 @@ class _$EventDataImpl implements _EventData {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$EventDataImplToJson(
-      this,
-    );
+    return _$$EventDataImplToJson(this);
   }
 }
 
 abstract class _EventData implements EventData {
-  const factory _EventData(
-          {required final String title,
-          required final bool isAllDay,
-          @LocalDateTimeConverter() required final DateTime startAt,
-          @LocalDateTimeConverter() required final DateTime endAt}) =
-      _$EventDataImpl;
+  const factory _EventData({
+    required final String title,
+    required final bool isAllDay,
+    @LocalDateTimeConverter() required final DateTime startAt,
+    @LocalDateTimeConverter() required final DateTime endAt,
+  }) = _$EventDataImpl;
 
   factory _EventData.fromJson(Map<String, dynamic> json) =
       _$EventDataImpl.fromJson;

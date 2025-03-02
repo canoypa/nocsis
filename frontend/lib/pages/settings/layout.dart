@@ -10,12 +10,13 @@ class SettingsShellRoute extends ShellRouteData {
 
   @override
   Page<void> pageBuilder(
-      BuildContext context, GoRouterState state, Widget navigator) {
+    BuildContext context,
+    GoRouterState state,
+    Widget navigator,
+  ) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: SettingsLayout(
-        child: navigator,
-      ),
+      child: SettingsLayout(child: navigator),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,
@@ -30,10 +31,7 @@ class SettingsShellRoute extends ShellRouteData {
 class SettingsLayout extends StatelessWidget {
   final Widget child;
 
-  const SettingsLayout({
-    super.key,
-    required this.child,
-  });
+  const SettingsLayout({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -63,17 +61,17 @@ class SettingsLayout extends StatelessWidget {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(Radius.circular(28)),
           ),
-          child: LayoutBuilder(builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: Container(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: Container(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  padding: const EdgeInsets.all(64),
+                  child: child,
                 ),
-                padding: const EdgeInsets.all(64),
-                child: child,
-              ),
-            );
-          }),
+              );
+            },
+          ),
         ),
       ),
     );
