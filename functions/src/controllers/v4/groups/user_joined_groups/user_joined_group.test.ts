@@ -34,6 +34,7 @@ describe("user_joined_group", () => {
       uid: userId,
     });
 
+    // @ts-expect-error
     const result = await wrapped({ auth });
 
     expect(result).toEqual({
@@ -43,6 +44,7 @@ describe("user_joined_group", () => {
 
   describe("認証されていない場合", () => {
     it("エラーを返す", async () => {
+      // @ts-expect-error
       await expect(wrapped({})).rejects.toThrow(
         "You must be authenticated to use this function",
       );
