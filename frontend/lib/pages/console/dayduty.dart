@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ConsoleDayDutyRoute extends GoRouteData {
-  const ConsoleDayDutyRoute();
+  final String groupId;
+
+  const ConsoleDayDutyRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {

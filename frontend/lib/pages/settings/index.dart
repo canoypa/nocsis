@@ -9,7 +9,9 @@ import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/providers/user.dart';
 
 class SettingsTopRoute extends GoRouteData {
-  const SettingsTopRoute();
+  final String groupId;
+
+  const SettingsTopRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {

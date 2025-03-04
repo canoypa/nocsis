@@ -20,19 +20,19 @@ RouteBase get $appShell => ShellRouteData.$route(
       factory: $PersonalShellExtension._fromState,
       routes: [
         GoRouteData.$route(
-          path: '/',
+          path: '/groups/:groupId',
 
           factory: $PersonalHomeRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/events',
+          path: '/groups/:groupId/events',
 
           factory: $PersonalEventsRouteExtension._fromState,
         ),
       ],
     ),
     GoRouteData.$route(
-      path: '/classroom',
+      path: '/groups/:groupId/classroom',
 
       factory: $ClassroomRouteExtension._fromState,
     ),
@@ -40,37 +40,37 @@ RouteBase get $appShell => ShellRouteData.$route(
       factory: $ConsoleShellRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
-          path: '/console',
+          path: '/groups/:groupId/console',
 
           factory: $ConsoleTopRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/console/group',
+          path: '/groups/:groupId/console/group',
 
           factory: $ConsoleGroupRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/console/member',
+          path: '/groups/:groupId/console/member',
 
           factory: $ConsoleMemberRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/console/calendar',
+          path: '/groups/:groupId/console/calendar',
 
           factory: $ConsoleCalendarRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/console/day_duty',
+          path: '/groups/:groupId/console/day_duty',
 
           factory: $ConsoleDayDutyRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/console/weather',
+          path: '/groups/:groupId/console/weather',
 
           factory: $ConsoleWeatherRouteExtension._fromState,
         ),
         GoRouteData.$route(
-          path: '/console/slack',
+          path: '/groups/:groupId/console/slack',
 
           factory: $ConsoleSlackRouteExtension._fromState,
         ),
@@ -80,7 +80,7 @@ RouteBase get $appShell => ShellRouteData.$route(
       factory: $SettingsShellRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
-          path: '/settings',
+          path: '/groups/:groupId/settings',
 
           factory: $SettingsTopRouteExtension._fromState,
         ),
@@ -119,9 +119,10 @@ extension $PersonalShellExtension on PersonalShell {
 
 extension $PersonalHomeRouteExtension on PersonalHomeRoute {
   static PersonalHomeRoute _fromState(GoRouterState state) =>
-      const PersonalHomeRoute();
+      PersonalHomeRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/');
+  String get location =>
+      GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}');
 
   void go(BuildContext context) => context.go(location);
 
@@ -135,9 +136,10 @@ extension $PersonalHomeRouteExtension on PersonalHomeRoute {
 
 extension $PersonalEventsRouteExtension on PersonalEventsRoute {
   static PersonalEventsRoute _fromState(GoRouterState state) =>
-      const PersonalEventsRoute();
+      PersonalEventsRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/events');
+  String get location =>
+      GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}/events');
 
   void go(BuildContext context) => context.go(location);
 
@@ -151,9 +153,11 @@ extension $PersonalEventsRouteExtension on PersonalEventsRoute {
 
 extension $ClassroomRouteExtension on ClassroomRoute {
   static ClassroomRoute _fromState(GoRouterState state) =>
-      const ClassroomRoute();
+      ClassroomRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/classroom');
+  String get location => GoRouteData.$location(
+    '/groups/${Uri.encodeComponent(groupId)}/classroom',
+  );
 
   void go(BuildContext context) => context.go(location);
 
@@ -172,9 +176,10 @@ extension $ConsoleShellRouteExtension on ConsoleShellRoute {
 
 extension $ConsoleTopRouteExtension on ConsoleTopRoute {
   static ConsoleTopRoute _fromState(GoRouterState state) =>
-      const ConsoleTopRoute();
+      ConsoleTopRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/console');
+  String get location =>
+      GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}/console');
 
   void go(BuildContext context) => context.go(location);
 
@@ -188,9 +193,11 @@ extension $ConsoleTopRouteExtension on ConsoleTopRoute {
 
 extension $ConsoleGroupRouteExtension on ConsoleGroupRoute {
   static ConsoleGroupRoute _fromState(GoRouterState state) =>
-      const ConsoleGroupRoute();
+      ConsoleGroupRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/console/group');
+  String get location => GoRouteData.$location(
+    '/groups/${Uri.encodeComponent(groupId)}/console/group',
+  );
 
   void go(BuildContext context) => context.go(location);
 
@@ -204,9 +211,11 @@ extension $ConsoleGroupRouteExtension on ConsoleGroupRoute {
 
 extension $ConsoleMemberRouteExtension on ConsoleMemberRoute {
   static ConsoleMemberRoute _fromState(GoRouterState state) =>
-      const ConsoleMemberRoute();
+      ConsoleMemberRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/console/member');
+  String get location => GoRouteData.$location(
+    '/groups/${Uri.encodeComponent(groupId)}/console/member',
+  );
 
   void go(BuildContext context) => context.go(location);
 
@@ -220,9 +229,11 @@ extension $ConsoleMemberRouteExtension on ConsoleMemberRoute {
 
 extension $ConsoleCalendarRouteExtension on ConsoleCalendarRoute {
   static ConsoleCalendarRoute _fromState(GoRouterState state) =>
-      const ConsoleCalendarRoute();
+      ConsoleCalendarRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/console/calendar');
+  String get location => GoRouteData.$location(
+    '/groups/${Uri.encodeComponent(groupId)}/console/calendar',
+  );
 
   void go(BuildContext context) => context.go(location);
 
@@ -236,9 +247,11 @@ extension $ConsoleCalendarRouteExtension on ConsoleCalendarRoute {
 
 extension $ConsoleDayDutyRouteExtension on ConsoleDayDutyRoute {
   static ConsoleDayDutyRoute _fromState(GoRouterState state) =>
-      const ConsoleDayDutyRoute();
+      ConsoleDayDutyRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/console/day_duty');
+  String get location => GoRouteData.$location(
+    '/groups/${Uri.encodeComponent(groupId)}/console/day_duty',
+  );
 
   void go(BuildContext context) => context.go(location);
 
@@ -252,9 +265,11 @@ extension $ConsoleDayDutyRouteExtension on ConsoleDayDutyRoute {
 
 extension $ConsoleWeatherRouteExtension on ConsoleWeatherRoute {
   static ConsoleWeatherRoute _fromState(GoRouterState state) =>
-      const ConsoleWeatherRoute();
+      ConsoleWeatherRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/console/weather');
+  String get location => GoRouteData.$location(
+    '/groups/${Uri.encodeComponent(groupId)}/console/weather',
+  );
 
   void go(BuildContext context) => context.go(location);
 
@@ -268,9 +283,11 @@ extension $ConsoleWeatherRouteExtension on ConsoleWeatherRoute {
 
 extension $ConsoleSlackRouteExtension on ConsoleSlackRoute {
   static ConsoleSlackRoute _fromState(GoRouterState state) =>
-      const ConsoleSlackRoute();
+      ConsoleSlackRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/console/slack');
+  String get location => GoRouteData.$location(
+    '/groups/${Uri.encodeComponent(groupId)}/console/slack',
+  );
 
   void go(BuildContext context) => context.go(location);
 
@@ -289,9 +306,10 @@ extension $SettingsShellRouteExtension on SettingsShellRoute {
 
 extension $SettingsTopRouteExtension on SettingsTopRoute {
   static SettingsTopRoute _fromState(GoRouterState state) =>
-      const SettingsTopRoute();
+      SettingsTopRoute(state.pathParameters['groupId']!);
 
-  String get location => GoRouteData.$location('/settings');
+  String get location =>
+      GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}/settings');
 
   void go(BuildContext context) => context.go(location);
 

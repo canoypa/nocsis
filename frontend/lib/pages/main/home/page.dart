@@ -6,7 +6,9 @@ import 'package:nocsis/components/personal/day_schedule.dart';
 import 'package:nocsis/components/personal/toggle_day.dart';
 
 class PersonalHomeRoute extends GoRouteData {
-  const PersonalHomeRoute();
+  final String groupId;
+
+  const PersonalHomeRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {

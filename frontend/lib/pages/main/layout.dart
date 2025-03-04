@@ -17,7 +17,7 @@ class PersonalShell extends ShellRouteData {
   ) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: MainPage(location: state.matchedLocation, child: navigator),
+      child: MainPage(navigationState: state, child: navigator),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,
@@ -35,13 +35,13 @@ enum Navigation {
     label: "ホーム",
     icon: Icons.school_outlined,
     selectedIcon: Icons.school,
-    pagePath: "/",
+    pagePath: "/groups/:groupId",
   ),
   events(
     label: "イベント",
     icon: Icons.event_outlined,
     selectedIcon: Icons.event,
-    pagePath: "/events",
+    pagePath: "/groups/:groupId/events",
   );
 
   final String label;
@@ -66,9 +66,13 @@ enum Navigation {
 
 class MainPage extends StatelessWidget {
   final Widget child;
-  final String location;
+  final GoRouterState navigationState;
 
-  const MainPage({super.key, required this.child, required this.location});
+  const MainPage({
+    super.key,
+    required this.navigationState,
+    required this.child,
+  });
 
   Widget _buildNavRail(BuildContext context, Navigation navigation) {
     return NavigationRail(
@@ -88,10 +92,12 @@ class MainPage extends StatelessWidget {
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
+        final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+
         if (nav == Navigation.home) {
-          const PersonalHomeRoute().go(context);
+          PersonalHomeRoute(groupId).go(context);
         } else if (nav == Navigation.events) {
-          const PersonalEventsRoute().go(context);
+          PersonalEventsRoute(groupId).go(context);
         }
       },
       labelType: NavigationRailLabelType.all,
@@ -114,10 +120,12 @@ class MainPage extends StatelessWidget {
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
+        final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+
         if (nav == Navigation.home) {
-          const PersonalHomeRoute().go(context);
+          PersonalHomeRoute(groupId).go(context);
         } else if (nav == Navigation.events) {
-          const PersonalEventsRoute().go(context);
+          PersonalEventsRoute(groupId).go(context);
         }
       },
     );
@@ -125,7 +133,7 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nav = Navigation.fromPagePath(location);
+    final nav = Navigation.fromPagePath(navigationState.fullPath!);
 
     return LayoutBuilder(
       builder: ((context, constraints) {

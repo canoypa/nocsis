@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ConsoleWeatherRoute extends GoRouteData {
-  const ConsoleWeatherRoute();
+  final String groupId;
+
+  const ConsoleWeatherRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {

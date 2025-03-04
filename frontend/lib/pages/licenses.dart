@@ -54,8 +54,8 @@ class LicensesPage extends ConsumerWidget {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                if (GoRouter.of(context).canPop()) {
-                  GoRouter.of(context).pop();
+                if (context.canPop()) {
+                  context.pop();
                 } else {
                   GoRouter.of(context).go('/');
                 }
