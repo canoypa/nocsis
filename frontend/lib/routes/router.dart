@@ -143,7 +143,9 @@ Future<String?> _redirectFromOldPaths(Uri uri) async {
     final groupId = sharedPreferences.getString('latest_group_id');
 
     if (groupId != null) {
-      return "/groups/$groupId";
+      return uri.path == '/'
+          ? "/groups/$groupId"
+          : "/groups/$groupId${uri.path}";
     }
 
     final res =
@@ -155,7 +157,9 @@ Future<String?> _redirectFromOldPaths(Uri uri) async {
 
     final firstUserJoinedGroup = data.groups.first;
 
-    return "/groups/${firstUserJoinedGroup.groupId}";
+    return uri.path == '/'
+        ? "/groups/${firstUserJoinedGroup.groupId}"
+        : "/groups/${firstUserJoinedGroup.groupId}${uri.path}";
   }
 
   return null;
