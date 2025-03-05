@@ -151,7 +151,7 @@ Future<String?> _redirectFromOldPaths(Uri uri) async {
     final res =
         await FirebaseFunctions.instanceFor(
           region: "asia-northeast1",
-        ).httpsCallable("v4-groups-get").call();
+        ).httpsCallable("v4-groups-user_joined_groups-get").call();
 
     final data = UserJoinedGroups.fromJson(res.data);
 

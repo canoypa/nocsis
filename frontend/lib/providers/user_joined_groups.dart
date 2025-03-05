@@ -7,7 +7,7 @@ part 'user_joined_groups.g.dart';
 
 final fn = FirebaseFunctions.instanceFor(
   region: "asia-northeast1",
-).httpsCallable("v3-classes-get");
+).httpsCallable("v4-groups-user_joined_groups-get");
 
 @riverpod
 Future<UserJoinedGroups> userJoinedGroups(Ref ref) async {
