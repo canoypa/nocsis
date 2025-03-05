@@ -1,25 +1,21 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nocsis/models/weather.dart';
-import 'package:nocsis/providers/cron.dart';
+import 'package:nocsis/models/user_joined_groups.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'weather.g.dart';
+part 'user_joined_groups.g.dart';
 
 final fn = FirebaseFunctions.instanceFor(
   region: "asia-northeast1",
-).httpsCallable("v3-weather-now");
+).httpsCallable("v4-groups-user_joined_groups-get");
 
 @riverpod
-Future<Weather> weather(Ref ref) async {
-  // 15分ごとに更新
-  ref.watch(cronProvider("*/15 * * * *"));
-
+Future<UserJoinedGroups> userJoinedGroups(Ref ref) async {
   final res = await fn.call();
 
   if (res.data == null) {
     throw Exception("No data");
   }
 
-  return Weather.fromJson(res.data);
+  return UserJoinedGroups.fromJson(res.data);
 }

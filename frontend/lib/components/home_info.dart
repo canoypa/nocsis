@@ -10,19 +10,13 @@ class HomeInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Stack(
       children: [
-        Align(
-          alignment: Alignment.topLeft,
-          child: WeatherInfo(),
-        ),
+        Align(alignment: Alignment.topLeft, child: WeatherInfo()),
         Align(
           alignment: Alignment.bottomLeft,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Daydudy(),
-              Clock(),
-            ],
+            children: [Daydudy(), Clock()],
           ),
         ),
       ],

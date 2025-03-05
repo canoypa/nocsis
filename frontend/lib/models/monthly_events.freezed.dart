@@ -12,7 +12,8 @@ part of 'monthly_events.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 MonthlyEventList _$MonthlyEventListFromJson(Map<String, dynamic> json) {
   return _MonthlyEventList.fromJson(json);
@@ -35,8 +36,9 @@ mixin _$MonthlyEventList {
 /// @nodoc
 abstract class $MonthlyEventListCopyWith<$Res> {
   factory $MonthlyEventListCopyWith(
-          MonthlyEventList value, $Res Function(MonthlyEventList) then) =
-      _$MonthlyEventListCopyWithImpl<$Res, MonthlyEventList>;
+    MonthlyEventList value,
+    $Res Function(MonthlyEventList) then,
+  ) = _$MonthlyEventListCopyWithImpl<$Res, MonthlyEventList>;
   @useResult
   $Res call({List<MonthEventList> items});
 }
@@ -55,24 +57,27 @@ class _$MonthlyEventListCopyWithImpl<$Res, $Val extends MonthlyEventList>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<MonthEventList>,
-    ) as $Val);
+  $Res call({Object? items = null}) {
+    return _then(
+      _value.copyWith(
+            items:
+                null == items
+                    ? _value.items
+                    : items // ignore: cast_nullable_to_non_nullable
+                        as List<MonthEventList>,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$MonthlyEventListImplCopyWith<$Res>
     implements $MonthlyEventListCopyWith<$Res> {
-  factory _$$MonthlyEventListImplCopyWith(_$MonthlyEventListImpl value,
-          $Res Function(_$MonthlyEventListImpl) then) =
-      __$$MonthlyEventListImplCopyWithImpl<$Res>;
+  factory _$$MonthlyEventListImplCopyWith(
+    _$MonthlyEventListImpl value,
+    $Res Function(_$MonthlyEventListImpl) then,
+  ) = __$$MonthlyEventListImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<MonthEventList> items});
@@ -82,23 +87,25 @@ abstract class _$$MonthlyEventListImplCopyWith<$Res>
 class __$$MonthlyEventListImplCopyWithImpl<$Res>
     extends _$MonthlyEventListCopyWithImpl<$Res, _$MonthlyEventListImpl>
     implements _$$MonthlyEventListImplCopyWith<$Res> {
-  __$$MonthlyEventListImplCopyWithImpl(_$MonthlyEventListImpl _value,
-      $Res Function(_$MonthlyEventListImpl) _then)
-      : super(_value, _then);
+  __$$MonthlyEventListImplCopyWithImpl(
+    _$MonthlyEventListImpl _value,
+    $Res Function(_$MonthlyEventListImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of MonthlyEventList
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_$MonthlyEventListImpl(
-      items: null == items
-          ? _value._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<MonthEventList>,
-    ));
+  $Res call({Object? items = null}) {
+    return _then(
+      _$MonthlyEventListImpl(
+        items:
+            null == items
+                ? _value._items
+                : items // ignore: cast_nullable_to_non_nullable
+                    as List<MonthEventList>,
+      ),
+    );
   }
 }
 
@@ -106,7 +113,7 @@ class __$$MonthlyEventListImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$MonthlyEventListImpl implements _MonthlyEventList {
   const _$MonthlyEventListImpl({required final List<MonthEventList> items})
-      : _items = items;
+    : _items = items;
 
   factory _$MonthlyEventListImpl.fromJson(Map<String, dynamic> json) =>
       _$$MonthlyEventListImplFromJson(json);
@@ -144,13 +151,13 @@ class _$MonthlyEventListImpl implements _MonthlyEventList {
   @pragma('vm:prefer-inline')
   _$$MonthlyEventListImplCopyWith<_$MonthlyEventListImpl> get copyWith =>
       __$$MonthlyEventListImplCopyWithImpl<_$MonthlyEventListImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$MonthlyEventListImplToJson(
-      this,
-    );
+    return _$$MonthlyEventListImplToJson(this);
   }
 }
 
@@ -194,8 +201,9 @@ mixin _$MonthEventList {
 /// @nodoc
 abstract class $MonthEventListCopyWith<$Res> {
   factory $MonthEventListCopyWith(
-          MonthEventList value, $Res Function(MonthEventList) then) =
-      _$MonthEventListCopyWithImpl<$Res, MonthEventList>;
+    MonthEventList value,
+    $Res Function(MonthEventList) then,
+  ) = _$MonthEventListCopyWithImpl<$Res, MonthEventList>;
   @useResult
   $Res call({String month, List<EventData> items});
 }
@@ -214,29 +222,32 @@ class _$MonthEventListCopyWithImpl<$Res, $Val extends MonthEventList>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? month = null,
-    Object? items = null,
-  }) {
-    return _then(_value.copyWith(
-      month: null == month
-          ? _value.month
-          : month // ignore: cast_nullable_to_non_nullable
-              as String,
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<EventData>,
-    ) as $Val);
+  $Res call({Object? month = null, Object? items = null}) {
+    return _then(
+      _value.copyWith(
+            month:
+                null == month
+                    ? _value.month
+                    : month // ignore: cast_nullable_to_non_nullable
+                        as String,
+            items:
+                null == items
+                    ? _value.items
+                    : items // ignore: cast_nullable_to_non_nullable
+                        as List<EventData>,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$MonthEventListImplCopyWith<$Res>
     implements $MonthEventListCopyWith<$Res> {
-  factory _$$MonthEventListImplCopyWith(_$MonthEventListImpl value,
-          $Res Function(_$MonthEventListImpl) then) =
-      __$$MonthEventListImplCopyWithImpl<$Res>;
+  factory _$$MonthEventListImplCopyWith(
+    _$MonthEventListImpl value,
+    $Res Function(_$MonthEventListImpl) then,
+  ) = __$$MonthEventListImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String month, List<EventData> items});
@@ -247,36 +258,39 @@ class __$$MonthEventListImplCopyWithImpl<$Res>
     extends _$MonthEventListCopyWithImpl<$Res, _$MonthEventListImpl>
     implements _$$MonthEventListImplCopyWith<$Res> {
   __$$MonthEventListImplCopyWithImpl(
-      _$MonthEventListImpl _value, $Res Function(_$MonthEventListImpl) _then)
-      : super(_value, _then);
+    _$MonthEventListImpl _value,
+    $Res Function(_$MonthEventListImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of MonthEventList
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? month = null,
-    Object? items = null,
-  }) {
-    return _then(_$MonthEventListImpl(
-      month: null == month
-          ? _value.month
-          : month // ignore: cast_nullable_to_non_nullable
-              as String,
-      items: null == items
-          ? _value._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<EventData>,
-    ));
+  $Res call({Object? month = null, Object? items = null}) {
+    return _then(
+      _$MonthEventListImpl(
+        month:
+            null == month
+                ? _value.month
+                : month // ignore: cast_nullable_to_non_nullable
+                    as String,
+        items:
+            null == items
+                ? _value._items
+                : items // ignore: cast_nullable_to_non_nullable
+                    as List<EventData>,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$MonthEventListImpl implements _MonthEventList {
-  const _$MonthEventListImpl(
-      {required this.month, required final List<EventData> items})
-      : _items = items;
+  const _$MonthEventListImpl({
+    required this.month,
+    required final List<EventData> items,
+  }) : _items = items;
 
   factory _$MonthEventListImpl.fromJson(Map<String, dynamic> json) =>
       _$$MonthEventListImplFromJson(json);
@@ -308,7 +322,10 @@ class _$MonthEventListImpl implements _MonthEventList {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, month, const DeepCollectionEquality().hash(_items));
+    runtimeType,
+    month,
+    const DeepCollectionEquality().hash(_items),
+  );
 
   /// Create a copy of MonthEventList
   /// with the given fields replaced by the non-null parameter values.
@@ -317,20 +334,21 @@ class _$MonthEventListImpl implements _MonthEventList {
   @pragma('vm:prefer-inline')
   _$$MonthEventListImplCopyWith<_$MonthEventListImpl> get copyWith =>
       __$$MonthEventListImplCopyWithImpl<_$MonthEventListImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$MonthEventListImplToJson(
-      this,
-    );
+    return _$$MonthEventListImplToJson(this);
   }
 }
 
 abstract class _MonthEventList implements MonthEventList {
-  const factory _MonthEventList(
-      {required final String month,
-      required final List<EventData> items}) = _$MonthEventListImpl;
+  const factory _MonthEventList({
+    required final String month,
+    required final List<EventData> items,
+  }) = _$MonthEventListImpl;
 
   factory _MonthEventList.fromJson(Map<String, dynamic> json) =
       _$MonthEventListImpl.fromJson;

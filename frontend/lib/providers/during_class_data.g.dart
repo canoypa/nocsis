@@ -13,9 +13,10 @@ String _$duringClassDataHash() => r'69ada5d033d551b6125bca8379ba652e6d04a345';
 final duringClassDataProvider = AutoDisposeFutureProvider<ClassData?>.internal(
   duringClassData,
   name: r'duringClassDataProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$duringClassDataHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$duringClassDataHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

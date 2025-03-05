@@ -24,15 +24,12 @@ void main() async {
 
   if (kDebugMode) {
     await FirebaseAuth.instance.useAuthEmulator("localhost", 9099);
-    FirebaseFunctions.instanceFor(region: "asia-northeast1")
-        .useFunctionsEmulator("localhost", 5001);
+    FirebaseFunctions.instanceFor(
+      region: "asia-northeast1",
+    ).useFunctionsEmulator("localhost", 5001);
   }
 
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

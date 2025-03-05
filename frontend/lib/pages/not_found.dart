@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/routes/router.dart';
 
@@ -17,7 +18,9 @@ class ErrorPage extends StatelessWidget {
             ElevatedButton(
               child: const Text("Home"),
               onPressed: () {
-                const PersonalHomeRoute().go(context);
+                final groupId =
+                    GoRouter.of(context).state.pathParameters['groupId']!;
+                PersonalHomeRoute(groupId).go(context);
               },
             ),
           ],

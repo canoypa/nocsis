@@ -12,7 +12,8 @@ part of 'classes.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 ClassList _$ClassListFromJson(Map<String, dynamic> json) {
   return _ClassList.fromJson(json);
@@ -54,15 +55,17 @@ class _$ClassListCopyWithImpl<$Res, $Val extends ClassList>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<ClassData>,
-    ) as $Val);
+  $Res call({Object? items = null}) {
+    return _then(
+      _value.copyWith(
+            items:
+                null == items
+                    ? _value.items
+                    : items // ignore: cast_nullable_to_non_nullable
+                        as List<ClassData>,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -70,8 +73,9 @@ class _$ClassListCopyWithImpl<$Res, $Val extends ClassList>
 abstract class _$$ClassListImplCopyWith<$Res>
     implements $ClassListCopyWith<$Res> {
   factory _$$ClassListImplCopyWith(
-          _$ClassListImpl value, $Res Function(_$ClassListImpl) then) =
-      __$$ClassListImplCopyWithImpl<$Res>;
+    _$ClassListImpl value,
+    $Res Function(_$ClassListImpl) then,
+  ) = __$$ClassListImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<ClassData> items});
@@ -82,22 +86,24 @@ class __$$ClassListImplCopyWithImpl<$Res>
     extends _$ClassListCopyWithImpl<$Res, _$ClassListImpl>
     implements _$$ClassListImplCopyWith<$Res> {
   __$$ClassListImplCopyWithImpl(
-      _$ClassListImpl _value, $Res Function(_$ClassListImpl) _then)
-      : super(_value, _then);
+    _$ClassListImpl _value,
+    $Res Function(_$ClassListImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ClassList
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_$ClassListImpl(
-      items: null == items
-          ? _value._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<ClassData>,
-    ));
+  $Res call({Object? items = null}) {
+    return _then(
+      _$ClassListImpl(
+        items:
+            null == items
+                ? _value._items
+                : items // ignore: cast_nullable_to_non_nullable
+                    as List<ClassData>,
+      ),
+    );
   }
 }
 
@@ -105,7 +111,7 @@ class __$$ClassListImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ClassListImpl implements _ClassList {
   const _$ClassListImpl({required final List<ClassData> items})
-      : _items = items;
+    : _items = items;
 
   factory _$ClassListImpl.fromJson(Map<String, dynamic> json) =>
       _$$ClassListImplFromJson(json);
@@ -146,9 +152,7 @@ class _$ClassListImpl implements _ClassList {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ClassListImplToJson(
-      this,
-    );
+    return _$$ClassListImplToJson(this);
   }
 }
 
@@ -198,11 +202,12 @@ abstract class $ClassDataCopyWith<$Res> {
   factory $ClassDataCopyWith(ClassData value, $Res Function(ClassData) then) =
       _$ClassDataCopyWithImpl<$Res, ClassData>;
   @useResult
-  $Res call(
-      {String title,
-      int period,
-      @LocalDateTimeConverter() DateTime startAt,
-      @LocalDateTimeConverter() DateTime endAt});
+  $Res call({
+    String title,
+    int period,
+    @LocalDateTimeConverter() DateTime startAt,
+    @LocalDateTimeConverter() DateTime endAt,
+  });
 }
 
 /// @nodoc
@@ -225,24 +230,31 @@ class _$ClassDataCopyWithImpl<$Res, $Val extends ClassData>
     Object? startAt = null,
     Object? endAt = null,
   }) {
-    return _then(_value.copyWith(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      period: null == period
-          ? _value.period
-          : period // ignore: cast_nullable_to_non_nullable
-              as int,
-      startAt: null == startAt
-          ? _value.startAt
-          : startAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endAt: null == endAt
-          ? _value.endAt
-          : endAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            title:
+                null == title
+                    ? _value.title
+                    : title // ignore: cast_nullable_to_non_nullable
+                        as String,
+            period:
+                null == period
+                    ? _value.period
+                    : period // ignore: cast_nullable_to_non_nullable
+                        as int,
+            startAt:
+                null == startAt
+                    ? _value.startAt
+                    : startAt // ignore: cast_nullable_to_non_nullable
+                        as DateTime,
+            endAt:
+                null == endAt
+                    ? _value.endAt
+                    : endAt // ignore: cast_nullable_to_non_nullable
+                        as DateTime,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -250,15 +262,17 @@ class _$ClassDataCopyWithImpl<$Res, $Val extends ClassData>
 abstract class _$$ClassDataImplCopyWith<$Res>
     implements $ClassDataCopyWith<$Res> {
   factory _$$ClassDataImplCopyWith(
-          _$ClassDataImpl value, $Res Function(_$ClassDataImpl) then) =
-      __$$ClassDataImplCopyWithImpl<$Res>;
+    _$ClassDataImpl value,
+    $Res Function(_$ClassDataImpl) then,
+  ) = __$$ClassDataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String title,
-      int period,
-      @LocalDateTimeConverter() DateTime startAt,
-      @LocalDateTimeConverter() DateTime endAt});
+  $Res call({
+    String title,
+    int period,
+    @LocalDateTimeConverter() DateTime startAt,
+    @LocalDateTimeConverter() DateTime endAt,
+  });
 }
 
 /// @nodoc
@@ -266,8 +280,9 @@ class __$$ClassDataImplCopyWithImpl<$Res>
     extends _$ClassDataCopyWithImpl<$Res, _$ClassDataImpl>
     implements _$$ClassDataImplCopyWith<$Res> {
   __$$ClassDataImplCopyWithImpl(
-      _$ClassDataImpl _value, $Res Function(_$ClassDataImpl) _then)
-      : super(_value, _then);
+    _$ClassDataImpl _value,
+    $Res Function(_$ClassDataImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of ClassData
   /// with the given fields replaced by the non-null parameter values.
@@ -279,35 +294,42 @@ class __$$ClassDataImplCopyWithImpl<$Res>
     Object? startAt = null,
     Object? endAt = null,
   }) {
-    return _then(_$ClassDataImpl(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      period: null == period
-          ? _value.period
-          : period // ignore: cast_nullable_to_non_nullable
-              as int,
-      startAt: null == startAt
-          ? _value.startAt
-          : startAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endAt: null == endAt
-          ? _value.endAt
-          : endAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
+    return _then(
+      _$ClassDataImpl(
+        title:
+            null == title
+                ? _value.title
+                : title // ignore: cast_nullable_to_non_nullable
+                    as String,
+        period:
+            null == period
+                ? _value.period
+                : period // ignore: cast_nullable_to_non_nullable
+                    as int,
+        startAt:
+            null == startAt
+                ? _value.startAt
+                : startAt // ignore: cast_nullable_to_non_nullable
+                    as DateTime,
+        endAt:
+            null == endAt
+                ? _value.endAt
+                : endAt // ignore: cast_nullable_to_non_nullable
+                    as DateTime,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$ClassDataImpl implements _ClassData {
-  const _$ClassDataImpl(
-      {required this.title,
-      required this.period,
-      @LocalDateTimeConverter() required this.startAt,
-      @LocalDateTimeConverter() required this.endAt});
+  const _$ClassDataImpl({
+    required this.title,
+    required this.period,
+    @LocalDateTimeConverter() required this.startAt,
+    @LocalDateTimeConverter() required this.endAt,
+  });
 
   factory _$ClassDataImpl.fromJson(Map<String, dynamic> json) =>
       _$$ClassDataImplFromJson(json);
@@ -353,19 +375,17 @@ class _$ClassDataImpl implements _ClassData {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$ClassDataImplToJson(
-      this,
-    );
+    return _$$ClassDataImplToJson(this);
   }
 }
 
 abstract class _ClassData implements ClassData {
-  const factory _ClassData(
-          {required final String title,
-          required final int period,
-          @LocalDateTimeConverter() required final DateTime startAt,
-          @LocalDateTimeConverter() required final DateTime endAt}) =
-      _$ClassDataImpl;
+  const factory _ClassData({
+    required final String title,
+    required final int period,
+    @LocalDateTimeConverter() required final DateTime startAt,
+    @LocalDateTimeConverter() required final DateTime endAt,
+  }) = _$ClassDataImpl;
 
   factory _ClassData.fromJson(Map<String, dynamic> json) =
       _$ClassDataImpl.fromJson;

@@ -80,8 +80,9 @@ class SignInPage extends StatelessWidget {
             children: <Widget>[
               SignInForm(
                 onGoogleSignIn: () => _googleSignIn(context),
-                onPasswordSignIn: (email, password) =>
-                    _passwordSignIn(context, email, password),
+                onPasswordSignIn:
+                    (email, password) =>
+                        _passwordSignIn(context, email, password),
               ),
             ],
           ),

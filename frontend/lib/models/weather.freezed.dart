@@ -12,7 +12,8 @@ part of 'weather.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 Weather _$WeatherFromJson(Map<String, dynamic> json) {
   return _Weather.fromJson(json);
@@ -38,8 +39,11 @@ abstract class $WeatherCopyWith<$Res> {
   factory $WeatherCopyWith(Weather value, $Res Function(Weather) then) =
       _$WeatherCopyWithImpl<$Res, Weather>;
   @useResult
-  $Res call(
-      {WeatherCurrent current, WeatherHourly hourly, List<String> threeHour});
+  $Res call({
+    WeatherCurrent current,
+    WeatherHourly hourly,
+    List<String> threeHour,
+  });
 
   $WeatherCurrentCopyWith<$Res> get current;
   $WeatherHourlyCopyWith<$Res> get hourly;
@@ -64,20 +68,26 @@ class _$WeatherCopyWithImpl<$Res, $Val extends Weather>
     Object? hourly = null,
     Object? threeHour = null,
   }) {
-    return _then(_value.copyWith(
-      current: null == current
-          ? _value.current
-          : current // ignore: cast_nullable_to_non_nullable
-              as WeatherCurrent,
-      hourly: null == hourly
-          ? _value.hourly
-          : hourly // ignore: cast_nullable_to_non_nullable
-              as WeatherHourly,
-      threeHour: null == threeHour
-          ? _value.threeHour
-          : threeHour // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            current:
+                null == current
+                    ? _value.current
+                    : current // ignore: cast_nullable_to_non_nullable
+                        as WeatherCurrent,
+            hourly:
+                null == hourly
+                    ? _value.hourly
+                    : hourly // ignore: cast_nullable_to_non_nullable
+                        as WeatherHourly,
+            threeHour:
+                null == threeHour
+                    ? _value.threeHour
+                    : threeHour // ignore: cast_nullable_to_non_nullable
+                        as List<String>,
+          )
+          as $Val,
+    );
   }
 
   /// Create a copy of Weather
@@ -104,12 +114,16 @@ class _$WeatherCopyWithImpl<$Res, $Val extends Weather>
 /// @nodoc
 abstract class _$$WeatherImplCopyWith<$Res> implements $WeatherCopyWith<$Res> {
   factory _$$WeatherImplCopyWith(
-          _$WeatherImpl value, $Res Function(_$WeatherImpl) then) =
-      __$$WeatherImplCopyWithImpl<$Res>;
+    _$WeatherImpl value,
+    $Res Function(_$WeatherImpl) then,
+  ) = __$$WeatherImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {WeatherCurrent current, WeatherHourly hourly, List<String> threeHour});
+  $Res call({
+    WeatherCurrent current,
+    WeatherHourly hourly,
+    List<String> threeHour,
+  });
 
   @override
   $WeatherCurrentCopyWith<$Res> get current;
@@ -122,8 +136,9 @@ class __$$WeatherImplCopyWithImpl<$Res>
     extends _$WeatherCopyWithImpl<$Res, _$WeatherImpl>
     implements _$$WeatherImplCopyWith<$Res> {
   __$$WeatherImplCopyWithImpl(
-      _$WeatherImpl _value, $Res Function(_$WeatherImpl) _then)
-      : super(_value, _then);
+    _$WeatherImpl _value,
+    $Res Function(_$WeatherImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of Weather
   /// with the given fields replaced by the non-null parameter values.
@@ -134,31 +149,36 @@ class __$$WeatherImplCopyWithImpl<$Res>
     Object? hourly = null,
     Object? threeHour = null,
   }) {
-    return _then(_$WeatherImpl(
-      current: null == current
-          ? _value.current
-          : current // ignore: cast_nullable_to_non_nullable
-              as WeatherCurrent,
-      hourly: null == hourly
-          ? _value.hourly
-          : hourly // ignore: cast_nullable_to_non_nullable
-              as WeatherHourly,
-      threeHour: null == threeHour
-          ? _value._threeHour
-          : threeHour // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-    ));
+    return _then(
+      _$WeatherImpl(
+        current:
+            null == current
+                ? _value.current
+                : current // ignore: cast_nullable_to_non_nullable
+                    as WeatherCurrent,
+        hourly:
+            null == hourly
+                ? _value.hourly
+                : hourly // ignore: cast_nullable_to_non_nullable
+                    as WeatherHourly,
+        threeHour:
+            null == threeHour
+                ? _value._threeHour
+                : threeHour // ignore: cast_nullable_to_non_nullable
+                    as List<String>,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$WeatherImpl implements _Weather {
-  const _$WeatherImpl(
-      {required this.current,
-      required this.hourly,
-      required final List<String> threeHour})
-      : _threeHour = threeHour;
+  const _$WeatherImpl({
+    required this.current,
+    required this.hourly,
+    required final List<String> threeHour,
+  }) : _threeHour = threeHour;
 
   factory _$WeatherImpl.fromJson(Map<String, dynamic> json) =>
       _$$WeatherImplFromJson(json);
@@ -187,14 +207,20 @@ class _$WeatherImpl implements _Weather {
             other is _$WeatherImpl &&
             (identical(other.current, current) || other.current == current) &&
             (identical(other.hourly, hourly) || other.hourly == hourly) &&
-            const DeepCollectionEquality()
-                .equals(other._threeHour, _threeHour));
+            const DeepCollectionEquality().equals(
+              other._threeHour,
+              _threeHour,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, current, hourly,
-      const DeepCollectionEquality().hash(_threeHour));
+  int get hashCode => Object.hash(
+    runtimeType,
+    current,
+    hourly,
+    const DeepCollectionEquality().hash(_threeHour),
+  );
 
   /// Create a copy of Weather
   /// with the given fields replaced by the non-null parameter values.
@@ -206,17 +232,16 @@ class _$WeatherImpl implements _Weather {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$WeatherImplToJson(
-      this,
-    );
+    return _$$WeatherImplToJson(this);
   }
 }
 
 abstract class _Weather implements Weather {
-  const factory _Weather(
-      {required final WeatherCurrent current,
-      required final WeatherHourly hourly,
-      required final List<String> threeHour}) = _$WeatherImpl;
+  const factory _Weather({
+    required final WeatherCurrent current,
+    required final WeatherHourly hourly,
+    required final List<String> threeHour,
+  }) = _$WeatherImpl;
 
   factory _Weather.fromJson(Map<String, dynamic> json) = _$WeatherImpl.fromJson;
 
@@ -257,8 +282,9 @@ mixin _$WeatherCurrent {
 /// @nodoc
 abstract class $WeatherCurrentCopyWith<$Res> {
   factory $WeatherCurrentCopyWith(
-          WeatherCurrent value, $Res Function(WeatherCurrent) then) =
-      _$WeatherCurrentCopyWithImpl<$Res, WeatherCurrent>;
+    WeatherCurrent value,
+    $Res Function(WeatherCurrent) then,
+  ) = _$WeatherCurrentCopyWithImpl<$Res, WeatherCurrent>;
   @useResult
   $Res call({String name, int temp});
 }
@@ -277,29 +303,32 @@ class _$WeatherCurrentCopyWithImpl<$Res, $Val extends WeatherCurrent>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? name = null,
-    Object? temp = null,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      temp: null == temp
-          ? _value.temp
-          : temp // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  $Res call({Object? name = null, Object? temp = null}) {
+    return _then(
+      _value.copyWith(
+            name:
+                null == name
+                    ? _value.name
+                    : name // ignore: cast_nullable_to_non_nullable
+                        as String,
+            temp:
+                null == temp
+                    ? _value.temp
+                    : temp // ignore: cast_nullable_to_non_nullable
+                        as int,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$WeatherCurrentImplCopyWith<$Res>
     implements $WeatherCurrentCopyWith<$Res> {
-  factory _$$WeatherCurrentImplCopyWith(_$WeatherCurrentImpl value,
-          $Res Function(_$WeatherCurrentImpl) then) =
-      __$$WeatherCurrentImplCopyWithImpl<$Res>;
+  factory _$$WeatherCurrentImplCopyWith(
+    _$WeatherCurrentImpl value,
+    $Res Function(_$WeatherCurrentImpl) then,
+  ) = __$$WeatherCurrentImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String name, int temp});
@@ -310,27 +339,29 @@ class __$$WeatherCurrentImplCopyWithImpl<$Res>
     extends _$WeatherCurrentCopyWithImpl<$Res, _$WeatherCurrentImpl>
     implements _$$WeatherCurrentImplCopyWith<$Res> {
   __$$WeatherCurrentImplCopyWithImpl(
-      _$WeatherCurrentImpl _value, $Res Function(_$WeatherCurrentImpl) _then)
-      : super(_value, _then);
+    _$WeatherCurrentImpl _value,
+    $Res Function(_$WeatherCurrentImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of WeatherCurrent
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? name = null,
-    Object? temp = null,
-  }) {
-    return _then(_$WeatherCurrentImpl(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      temp: null == temp
-          ? _value.temp
-          : temp // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+  $Res call({Object? name = null, Object? temp = null}) {
+    return _then(
+      _$WeatherCurrentImpl(
+        name:
+            null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                    as String,
+        temp:
+            null == temp
+                ? _value.temp
+                : temp // ignore: cast_nullable_to_non_nullable
+                    as int,
+      ),
+    );
   }
 }
 
@@ -372,20 +403,21 @@ class _$WeatherCurrentImpl implements _WeatherCurrent {
   @pragma('vm:prefer-inline')
   _$$WeatherCurrentImplCopyWith<_$WeatherCurrentImpl> get copyWith =>
       __$$WeatherCurrentImplCopyWithImpl<_$WeatherCurrentImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$WeatherCurrentImplToJson(
-      this,
-    );
+    return _$$WeatherCurrentImplToJson(this);
   }
 }
 
 abstract class _WeatherCurrent implements WeatherCurrent {
-  const factory _WeatherCurrent(
-      {required final String name,
-      required final int temp}) = _$WeatherCurrentImpl;
+  const factory _WeatherCurrent({
+    required final String name,
+    required final int temp,
+  }) = _$WeatherCurrentImpl;
 
   factory _WeatherCurrent.fromJson(Map<String, dynamic> json) =
       _$WeatherCurrentImpl.fromJson;
@@ -425,8 +457,9 @@ mixin _$WeatherHourly {
 /// @nodoc
 abstract class $WeatherHourlyCopyWith<$Res> {
   factory $WeatherHourlyCopyWith(
-          WeatherHourly value, $Res Function(WeatherHourly) then) =
-      _$WeatherHourlyCopyWithImpl<$Res, WeatherHourly>;
+    WeatherHourly value,
+    $Res Function(WeatherHourly) then,
+  ) = _$WeatherHourlyCopyWithImpl<$Res, WeatherHourly>;
   @useResult
   $Res call({List<num> temp, List<num> pop});
 }
@@ -445,20 +478,22 @@ class _$WeatherHourlyCopyWithImpl<$Res, $Val extends WeatherHourly>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? temp = null,
-    Object? pop = null,
-  }) {
-    return _then(_value.copyWith(
-      temp: null == temp
-          ? _value.temp
-          : temp // ignore: cast_nullable_to_non_nullable
-              as List<num>,
-      pop: null == pop
-          ? _value.pop
-          : pop // ignore: cast_nullable_to_non_nullable
-              as List<num>,
-    ) as $Val);
+  $Res call({Object? temp = null, Object? pop = null}) {
+    return _then(
+      _value.copyWith(
+            temp:
+                null == temp
+                    ? _value.temp
+                    : temp // ignore: cast_nullable_to_non_nullable
+                        as List<num>,
+            pop:
+                null == pop
+                    ? _value.pop
+                    : pop // ignore: cast_nullable_to_non_nullable
+                        as List<num>,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -466,8 +501,9 @@ class _$WeatherHourlyCopyWithImpl<$Res, $Val extends WeatherHourly>
 abstract class _$$WeatherHourlyImplCopyWith<$Res>
     implements $WeatherHourlyCopyWith<$Res> {
   factory _$$WeatherHourlyImplCopyWith(
-          _$WeatherHourlyImpl value, $Res Function(_$WeatherHourlyImpl) then) =
-      __$$WeatherHourlyImplCopyWithImpl<$Res>;
+    _$WeatherHourlyImpl value,
+    $Res Function(_$WeatherHourlyImpl) then,
+  ) = __$$WeatherHourlyImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({List<num> temp, List<num> pop});
@@ -478,37 +514,40 @@ class __$$WeatherHourlyImplCopyWithImpl<$Res>
     extends _$WeatherHourlyCopyWithImpl<$Res, _$WeatherHourlyImpl>
     implements _$$WeatherHourlyImplCopyWith<$Res> {
   __$$WeatherHourlyImplCopyWithImpl(
-      _$WeatherHourlyImpl _value, $Res Function(_$WeatherHourlyImpl) _then)
-      : super(_value, _then);
+    _$WeatherHourlyImpl _value,
+    $Res Function(_$WeatherHourlyImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of WeatherHourly
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? temp = null,
-    Object? pop = null,
-  }) {
-    return _then(_$WeatherHourlyImpl(
-      temp: null == temp
-          ? _value._temp
-          : temp // ignore: cast_nullable_to_non_nullable
-              as List<num>,
-      pop: null == pop
-          ? _value._pop
-          : pop // ignore: cast_nullable_to_non_nullable
-              as List<num>,
-    ));
+  $Res call({Object? temp = null, Object? pop = null}) {
+    return _then(
+      _$WeatherHourlyImpl(
+        temp:
+            null == temp
+                ? _value._temp
+                : temp // ignore: cast_nullable_to_non_nullable
+                    as List<num>,
+        pop:
+            null == pop
+                ? _value._pop
+                : pop // ignore: cast_nullable_to_non_nullable
+                    as List<num>,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$WeatherHourlyImpl implements _WeatherHourly {
-  const _$WeatherHourlyImpl(
-      {required final List<num> temp, required final List<num> pop})
-      : _temp = temp,
-        _pop = pop;
+  const _$WeatherHourlyImpl({
+    required final List<num> temp,
+    required final List<num> pop,
+  }) : _temp = temp,
+       _pop = pop;
 
   factory _$WeatherHourlyImpl.fromJson(Map<String, dynamic> json) =>
       _$$WeatherHourlyImplFromJson(json);
@@ -546,9 +585,10 @@ class _$WeatherHourlyImpl implements _WeatherHourly {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(_temp),
-      const DeepCollectionEquality().hash(_pop));
+    runtimeType,
+    const DeepCollectionEquality().hash(_temp),
+    const DeepCollectionEquality().hash(_pop),
+  );
 
   /// Create a copy of WeatherHourly
   /// with the given fields replaced by the non-null parameter values.
@@ -560,16 +600,15 @@ class _$WeatherHourlyImpl implements _WeatherHourly {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$WeatherHourlyImplToJson(
-      this,
-    );
+    return _$$WeatherHourlyImplToJson(this);
   }
 }
 
 abstract class _WeatherHourly implements WeatherHourly {
-  const factory _WeatherHourly(
-      {required final List<num> temp,
-      required final List<num> pop}) = _$WeatherHourlyImpl;
+  const factory _WeatherHourly({
+    required final List<num> temp,
+    required final List<num> pop,
+  }) = _$WeatherHourlyImpl;
 
   factory _WeatherHourly.fromJson(Map<String, dynamic> json) =
       _$WeatherHourlyImpl.fromJson;

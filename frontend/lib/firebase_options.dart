@@ -61,5 +61,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'class-clock-40088.appspot.com',
     measurementId: 'G-65TL6HH3BN',
   );
-
 }

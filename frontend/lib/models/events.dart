@@ -6,9 +6,7 @@ part 'events.g.dart';
 
 @freezed
 class EventList with _$EventList {
-  const factory EventList({
-    required List<EventData> items,
-  }) = _EventList;
+  const factory EventList({required List<EventData> items}) = _EventList;
 
   factory EventList.fromJson(Map<String, dynamic> json) =>
       _$EventListFromJson(json);

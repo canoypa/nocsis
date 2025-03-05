@@ -39,21 +39,13 @@ class CronFamily extends Family<AsyncValue<DateTime>> {
   const CronFamily();
 
   /// See also [cron].
-  CronProvider call(
-    String cronFormat,
-  ) {
-    return CronProvider(
-      cronFormat,
-    );
+  CronProvider call(String cronFormat) {
+    return CronProvider(cronFormat);
   }
 
   @override
-  CronProvider getProviderOverride(
-    covariant CronProvider provider,
-  ) {
-    return call(
-      provider.cronFormat,
-    );
+  CronProvider getProviderOverride(covariant CronProvider provider) {
+    return call(provider.cronFormat);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -74,21 +66,17 @@ class CronFamily extends Family<AsyncValue<DateTime>> {
 /// See also [cron].
 class CronProvider extends AutoDisposeStreamProvider<DateTime> {
   /// See also [cron].
-  CronProvider(
-    String cronFormat,
-  ) : this._internal(
-          (ref) => cron(
-            ref as CronRef,
-            cronFormat,
-          ),
-          from: cronProvider,
-          name: r'cronProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product') ? null : _$cronHash,
-          dependencies: CronFamily._dependencies,
-          allTransitiveDependencies: CronFamily._allTransitiveDependencies,
-          cronFormat: cronFormat,
-        );
+  CronProvider(String cronFormat)
+    : this._internal(
+        (ref) => cron(ref as CronRef, cronFormat),
+        from: cronProvider,
+        name: r'cronProvider',
+        debugGetCreateSourceHash:
+            const bool.fromEnvironment('dart.vm.product') ? null : _$cronHash,
+        dependencies: CronFamily._dependencies,
+        allTransitiveDependencies: CronFamily._allTransitiveDependencies,
+        cronFormat: cronFormat,
+      );
 
   CronProvider._internal(
     super._createNotifier, {
@@ -103,9 +91,7 @@ class CronProvider extends AutoDisposeStreamProvider<DateTime> {
   final String cronFormat;
 
   @override
-  Override overrideWith(
-    Stream<DateTime> Function(CronRef provider) create,
-  ) {
+  Override overrideWith(Stream<DateTime> Function(CronRef provider) create) {
     return ProviderOverride(
       origin: this,
       override: CronProvider._internal(
@@ -153,5 +139,6 @@ class _CronProviderElement extends AutoDisposeStreamProviderElement<DateTime>
   @override
   String get cronFormat => (origin as CronProvider).cronFormat;
 }
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

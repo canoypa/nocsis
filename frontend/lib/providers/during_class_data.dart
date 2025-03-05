@@ -12,10 +12,9 @@ Future<ClassData?> duringClassData(Ref ref) async {
   // 毎分更新
   ref.watch(cronProvider("* * * * *"));
 
-  final classes = ref.watch(classesProvider).maybeWhen(
-        data: (data) => data,
-        orElse: () => null,
-      );
+  final classes = ref
+      .watch(classesProvider)
+      .maybeWhen(data: (data) => data, orElse: () => null);
 
   final now = DateTime.now();
 

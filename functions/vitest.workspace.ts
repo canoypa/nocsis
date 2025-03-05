@@ -24,8 +24,9 @@ const functionsConfig = defineConfig({
     setupFiles: ["tests/functions_setup.ts"],
     fileParallelism: false,
     poolOptions: {
-      threads: {
-        singleThread: true,
+      forks: {
+        singleFork: true,
+        isolate: false,
       },
     },
   },

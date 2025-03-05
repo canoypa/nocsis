@@ -28,11 +28,8 @@ _$WeatherCurrentImpl _$$WeatherCurrentImplFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$$WeatherCurrentImplToJson(
-        _$WeatherCurrentImpl instance) =>
-    <String, dynamic>{
-      'name': instance.name,
-      'temp': instance.temp,
-    };
+  _$WeatherCurrentImpl instance,
+) => <String, dynamic>{'name': instance.name, 'temp': instance.temp};
 
 _$WeatherHourlyImpl _$$WeatherHourlyImplFromJson(Map<String, dynamic> json) =>
     _$WeatherHourlyImpl(
@@ -41,7 +38,4 @@ _$WeatherHourlyImpl _$$WeatherHourlyImplFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$$WeatherHourlyImplToJson(_$WeatherHourlyImpl instance) =>
-    <String, dynamic>{
-      'temp': instance.temp,
-      'pop': instance.pop,
-    };
+    <String, dynamic>{'temp': instance.temp, 'pop': instance.pop};

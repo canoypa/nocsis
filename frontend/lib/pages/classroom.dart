@@ -13,7 +13,9 @@ import 'package:nocsis/screens/during_class.dart';
 import 'package:nocsis/themes/display.dart';
 
 class ClassroomRoute extends GoRouteData {
-  const ClassroomRoute();
+  final String groupId;
+
+  const ClassroomRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
@@ -125,7 +127,11 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
                             if (GoRouter.of(context).canPop()) {
                               GoRouter.of(context).pop();
                             } else {
-                              const ConsoleTopRoute().go(context);
+                              final groupId =
+                                  GoRouter.of(
+                                    context,
+                                  ).state.pathParameters['groupId']!;
+                              ConsoleTopRoute(groupId).go(context);
                             }
                           },
                         ),

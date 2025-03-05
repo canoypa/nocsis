@@ -22,8 +22,9 @@ class HomeSchedules extends ConsumerWidget {
         .maybeWhen(data: (data) => data, orElse: () => null);
 
     if (classes != null && classes.items.isNotEmpty) {
-      final upcomingClasses =
-          classes.items.where((e) => e.endAt.isAfter(DateTime.now()));
+      final upcomingClasses = classes.items.where(
+        (e) => e.endAt.isAfter(DateTime.now()),
+      );
 
       if (upcomingClasses.isNotEmpty) {
         return Card(
@@ -38,32 +39,27 @@ class HomeSchedules extends ConsumerWidget {
                 Text(
                   "今日の授業",
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
-                ...upcomingClasses.map(
-                  (e) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          e.title,
-                          style: Theme.of(context).textTheme.titleSmall,
+                ...upcomingClasses.map((e) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        e.title,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      Text(
+                        "${e.period}時限目",
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
-                        Text(
-                          "${e.period}時限目",
-                          style:
-                              Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                        ),
-                      ],
-                    );
-                  },
-                )
+                      ),
+                    ],
+                  );
+                }),
               ],
             ),
           ),
@@ -85,32 +81,28 @@ class HomeSchedules extends ConsumerWidget {
               Text(
                 "今後のイベント",
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
-              ...events.items.map(
-                (e) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        e.title,
-                        style: Theme.of(context).textTheme.titleSmall,
+              ...events.items.map((e) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      e.title,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    Text(
+                      // utc なので表示用にローカルに変換
+                      eventDateFormatter.format(e.startAt.toLocal()),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                      Text(
-                        // utc なので表示用にローカルに変換
-                        eventDateFormatter.format(e.startAt.toLocal()),
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                      ),
-                    ],
-                  );
-                },
-              )
+                    ),
+                  ],
+                );
+              }),
             ],
           ),
         ),

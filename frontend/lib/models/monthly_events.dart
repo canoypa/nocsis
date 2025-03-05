@@ -6,9 +6,8 @@ part 'monthly_events.g.dart';
 
 @freezed
 class MonthlyEventList with _$MonthlyEventList {
-  const factory MonthlyEventList({
-    required List<MonthEventList> items,
-  }) = _MonthlyEventList;
+  const factory MonthlyEventList({required List<MonthEventList> items}) =
+      _MonthlyEventList;
 
   factory MonthlyEventList.fromJson(Map<String, dynamic> json) =>
       _$MonthlyEventListFromJson(json);
