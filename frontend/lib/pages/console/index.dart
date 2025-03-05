@@ -5,7 +5,9 @@ import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/routes/router.dart';
 
 class ConsoleTopRoute extends GoRouteData {
-  const ConsoleTopRoute();
+  final String groupId;
+
+  const ConsoleTopRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
@@ -42,7 +44,9 @@ class ConsoleTopPage extends StatelessWidget {
             OutlinedButton(
               child: const Text('Classroom を起動する'),
               onPressed: () {
-                const ClassroomRoute().go(context);
+                final groupId =
+                    GoRouter.of(context).state.pathParameters['groupId']!;
+                ClassroomRoute(groupId).go(context);
               },
             ),
           ],

@@ -8,7 +8,9 @@ import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/models/monthly_events.dart';
 
 class PersonalEventsRoute extends GoRouteData {
-  const PersonalEventsRoute();
+  final String groupId;
+
+  const PersonalEventsRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {

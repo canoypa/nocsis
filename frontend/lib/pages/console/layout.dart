@@ -2,14 +2,6 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/custom_icons.dart';
-import 'package:nocsis/pages/console/calendar.dart';
-import 'package:nocsis/pages/console/dayduty.dart';
-import 'package:nocsis/pages/console/index.dart';
-import 'package:nocsis/pages/console/members.dart';
-import 'package:nocsis/pages/console/slack.dart';
-import 'package:nocsis/pages/console/group.dart';
-import 'package:nocsis/pages/console/weather.dart';
-import 'package:nocsis/routes/router.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
 
 class ConsoleShellRoute extends ShellRouteData {
@@ -41,18 +33,22 @@ class ConsoleLayout extends StatelessWidget {
   const ConsoleLayout({super.key, required this.child});
 
   static final Map<String, int> _routeToIndex = {
-    const ConsoleTopRoute().location: 0,
-    const ConsoleGroupRoute().location: 1,
-    const ConsoleMemberRoute().location: 2,
-    const ConsoleCalendarRoute().location: 3,
-    const ConsoleDayDutyRoute().location: 4,
-    const ConsoleWeatherRoute().location: 5,
-    const ConsoleSlackRoute().location: 6,
+    '/console': 0,
+    '/console/group': 1,
+    '/console/member': 2,
+    '/console/calendar': 3,
+    '/console/day_duty': 4,
+    '/console/weather': 5,
+    '/console/slack': 6,
   };
 
   int _getNavigationIndex(BuildContext context) {
-    final location = GoRouterState.of(context).matchedLocation;
-    return _routeToIndex[location] ?? 0;
+    final location = GoRouterState.of(context).fullPath!;
+    final routeKey = _routeToIndex.keys.firstWhere(
+      (key) => location.replaceFirst('/groups/:groupId', '') == key,
+      orElse: () => '/console',
+    );
+    return _routeToIndex[routeKey]!;
   }
 
   @override
@@ -61,11 +57,12 @@ class ConsoleLayout extends StatelessWidget {
       title: const Text('管理コンソール'),
       navigationIndex: _getNavigationIndex(context),
       onDestinationSelected: (value) {
+        final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
         final route =
             _routeToIndex.entries
                 .firstWhere((entry) => entry.value == value)
                 .key;
-        GoRouter.of(context).go(route);
+        GoRouter.of(context).go("/groups/$groupId$route");
       },
       navigationItems: const [
         NavigationDrawerDestination(

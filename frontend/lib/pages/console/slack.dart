@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ConsoleSlackRoute extends GoRouteData {
-  const ConsoleSlackRoute();
+  final String groupId;
+
+  const ConsoleSlackRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
