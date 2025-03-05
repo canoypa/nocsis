@@ -1,6 +1,6 @@
 import { HttpsError } from "firebase-functions/https";
 import { DateTime } from "luxon";
-import { getDayduty } from "../../../core/dayduty/getDayduty.js";
+import { getDayduty } from "../../../core/dayduty/getDayduty.old.js";
 
 type DayDuty = {
   stuNo: number;

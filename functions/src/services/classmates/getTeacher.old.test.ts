@@ -1,7 +1,7 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { beforeEach, describe, expect, it } from "vitest";
 import { firebaseApp } from "~/client/firebaseApp.js";
-import { getTeacher } from "./getTeacher.js";
+import { getTeacher } from "./getTeacher.old.js";
 
 describe("getTeacher", () => {
   const data = {
