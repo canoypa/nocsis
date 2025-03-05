@@ -2,10 +2,10 @@ import { getFirestore } from "firebase-admin/firestore";
 import { functionsTest } from "tests/functions_setup.js";
 import { beforeEach, describe, expect, it } from "vitest";
 import { firebaseApp } from "~/client/firebaseApp.js";
-import { get } from "~/controllers/v4/groups/index.js";
+import { user_joined_groups } from "~/controllers/v4/groups/index.js";
 
 describe("user_joined_group", () => {
-  const wrapped = functionsTest.wrap(get);
+  const wrapped = functionsTest.wrap(user_joined_groups.get);
 
   const userId = "user_a";
   const otherUserId = "user_b";
