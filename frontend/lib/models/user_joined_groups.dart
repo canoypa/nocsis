@@ -5,6 +5,7 @@ part 'user_joined_groups.g.dart';
 
 @freezed
 class UserJoinedGroup with _$UserJoinedGroup {
+  // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
   const factory UserJoinedGroup({
     required String groupId,
