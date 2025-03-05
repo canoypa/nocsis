@@ -152,10 +152,14 @@ Future<String?> _redirectFromOldPaths(Uri uri) async {
         await FirebaseFunctions.instanceFor(
           region: "asia-northeast1",
         ).httpsCallable("v4-groups-user_joined_groups-get").call();
-
     final data = UserJoinedGroups.fromJson(res.data);
 
     final firstUserJoinedGroup = data.groups.first;
+
+    sharedPreferences.setString(
+      'latest_group_id',
+      firstUserJoinedGroup.groupId,
+    );
 
     return uri.path == '/'
         ? "/groups/${firstUserJoinedGroup.groupId}"
