@@ -1,6 +1,6 @@
 import { HttpsError } from "firebase-functions/https";
 import { DateTime } from "luxon";
-import { getDayduty } from "../../../core/dayduty/getDayduty.old.js";
+import { getDayduty } from "~/core/dayduty/getDayduty.js";
 
 type DayDuty = {
   stuNo: number;
@@ -9,6 +9,7 @@ type DayDuty = {
 };
 
 type Args = {
+  groupId: string;
   date: string;
 };
 
@@ -18,7 +19,7 @@ const get = async (data: Args): Promise<DayDuty> => {
     throw new HttpsError("invalid-argument", "date is not ISO format");
   }
 
-  const student = await getDayduty(date.startOf("day"));
+  const student = await getDayduty(data.groupId, date.startOf("day"));
 
   const response = {
     stuNo: student.stuNo,
