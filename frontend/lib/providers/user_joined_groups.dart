@@ -17,7 +17,5 @@ Future<UserJoinedGroups> userJoinedGroups(Ref ref) async {
     throw Exception("No data");
   }
 
-  print(res.data);
-
   return UserJoinedGroups.fromJson(res.data);
 }
