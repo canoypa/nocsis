@@ -90,67 +90,83 @@ class GoRouterRefresher extends ChangeNotifier {
   }
 }
 
+Future<String?> _redirectNotSignedInUser(Uri uri) async {
+  final user = await FirebaseAuth.instance.authStateChanges().first;
+  final isSignIn = user != null;
+
+  if (!isSignIn && uri.path != "/sign_in") {
+    final continueUri = uri.path;
+    if (continueUri == "/") {
+      return "/sign_in";
+    }
+
+    return "/sign_in?continue=$continueUri";
+  }
+
+  return null;
+}
+
+Future<String?> _redirectSignedInUser(Uri uri) async {
+  final user = await FirebaseAuth.instance.authStateChanges().first;
+  final isSignIn = user != null;
+
+  if (isSignIn && uri.path == "/sign_in") {
+    final continueUri = Uri.tryParse(uri.queryParameters["continue"] ?? "/");
+
+    if (continueUri != null) {
+      return await _redirectFromOldPaths(continueUri) ?? continueUri.path;
+    }
+
+    return "/";
+  }
+
+  return null;
+}
+
+Future<String?> _redirectFromOldPaths(Uri uri) async {
+  final oldPaths = [
+    '/',
+    '/events',
+    '/classroom',
+    '/console',
+    '/console/group',
+    '/console/member',
+    '/console/calendar',
+    '/console/day_duty',
+    '/console/weather',
+    '/console/slack',
+    '/settings',
+  ];
+
+  if (oldPaths.contains(uri.path)) {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final groupId = sharedPreferences.getString('latest_group_id');
+
+    if (groupId != null) {
+      return "/groups/$groupId";
+    }
+
+    final res =
+        await FirebaseFunctions.instanceFor(
+          region: "asia-northeast1",
+        ).httpsCallable("v4-groups-get").call();
+
+    final data = UserJoinedGroups.fromJson(res.data);
+
+    final firstUserJoinedGroup = data.groups.first;
+
+    return "/groups/${firstUserJoinedGroup.groupId}";
+  }
+
+  return null;
+}
+
 final router = GoRouter(
   routes: $appRoutes,
   refreshListenable: GoRouterRefresher(),
   redirect: (context, state) async {
-    final user = await FirebaseAuth.instance.authStateChanges().first;
-    final isSignIn = user != null;
-
-    if (!isSignIn && state.uri.path != "/sign_in") {
-      final continueUri = state.uri.path;
-      if (continueUri == "/") {
-        return "/sign_in";
-      }
-
-      return "/sign_in?continue=$continueUri";
-    }
-
-    if (isSignIn && state.uri.path == "/sign_in") {
-      final continueUri = Uri.tryParse(
-        state.uri.queryParameters["continue"] ?? "/",
-      );
-
-      if (continueUri != null) {
-        return continueUri.path;
-      }
-
-      return "/";
-    }
-
-    final oldPaths = [
-      '/',
-      '/events',
-      '/classroom',
-      '/console',
-      '/console/group',
-      '/console/member',
-      '/console/calendar',
-      '/console/day_duty',
-      '/console/weather',
-      '/console/slack',
-      '/settings',
-    ];
-    if (oldPaths.contains(state.uri.path)) {
-      final sharedPreferences = await SharedPreferences.getInstance();
-      final groupId = sharedPreferences.getString('latest_group_id');
-
-      if (groupId != null) {
-        return "/groups/$groupId";
-      }
-
-      final res =
-          await FirebaseFunctions.instanceFor(
-            region: "asia-northeast1",
-          ).httpsCallable("v4-groups-get").call();
-
-      final data = UserJoinedGroups.fromJson(res.data);
-
-      final firstUserJoinedGroup = data.groups.first;
-
-      return "/groups/${firstUserJoinedGroup.groupId}";
-    }
-
-    return null;
+    return await _redirectNotSignedInUser(state.uri) ??
+        await _redirectSignedInUser(state.uri) ??
+        await _redirectFromOldPaths(state.uri);
   },
 );
