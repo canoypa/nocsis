@@ -14,3 +14,7 @@ gha-creds-*.json
 .DS_Store
 
 node_modules
+
+# emulator data
+emulator_data/auth_export/accounts.json
+emulator_data/firestore_export/
