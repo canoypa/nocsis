@@ -1,6 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/personal/class_list.dart';
 import 'package:nocsis/components/personal/event_list.dart';
 import 'package:nocsis/models/classes.dart';
@@ -16,7 +17,7 @@ class DaySchedules {
 class DaySchedulesState extends StateNotifier<Map<int, DaySchedules>> {
   DaySchedulesState() : super(<int, DaySchedules>{});
 
-  Future<DaySchedules> get(int epochDay) async {
+  Future<DaySchedules> get(String groupId, int epochDay) async {
     final date = DateTime.fromMillisecondsSinceEpoch(
       epochDay * Duration.millisecondsPerDay - Duration.millisecondsPerHour * 9,
     );
@@ -29,8 +30,8 @@ class DaySchedulesState extends StateNotifier<Map<int, DaySchedules>> {
     final to = date.add(const Duration(days: 1)).toIso8601String();
 
     final result = await Future.wait([
-      _getClasses(from, to),
-      _getEvents(from, to),
+      _getClasses(groupId, from, to),
+      _getEvents(groupId, from, to),
     ]);
 
     final newData = DaySchedules(
@@ -44,23 +45,31 @@ class DaySchedulesState extends StateNotifier<Map<int, DaySchedules>> {
   }
 
   // 授業を取得
-  Future<dynamic> _getClasses(String from, String to) async {
+  Future<dynamic> _getClasses(String groupId, String from, String to) async {
     final HttpsCallable getClasses = FirebaseFunctions.instanceFor(
       region: "asia-northeast1",
-    ).httpsCallable("v3-classes-get");
+    ).httpsCallable("v4-classes-get");
 
-    final res = await getClasses.call({"from": from, "to": to});
+    final res = await getClasses.call({
+      'groupId': groupId,
+      "from": from,
+      "to": to,
+    });
 
     return res.data;
   }
 
   // イベントを取得
-  Future<dynamic> _getEvents(String from, String to) async {
+  Future<dynamic> _getEvents(String groupId, String from, String to) async {
     final HttpsCallable getClasses = FirebaseFunctions.instanceFor(
       region: "asia-northeast1",
-    ).httpsCallable("v3-events-get");
+    ).httpsCallable("v4-events-get");
 
-    final res = await getClasses.call({"from": from, "to": to});
+    final res = await getClasses.call({
+      'groupId': groupId,
+      "from": from,
+      "to": to,
+    });
 
     return res.data;
   }
@@ -78,7 +87,10 @@ class DaySchedule extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final future = ref.watch(daySchedulesProvider.notifier).get(epochDay);
+    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+    final future = ref
+        .watch(daySchedulesProvider.notifier)
+        .get(groupId, epochDay);
 
     return FutureBuilder<DaySchedules>(
       future: future,

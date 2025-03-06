@@ -32,7 +32,7 @@ class DrawerLayout extends StatelessWidget {
               GoRouter.of(context).pop();
             } else {
               final groupId =
-                  GoRouter.of(context).state.uri.queryParameters['groupId']!;
+                  GoRouter.of(context).state.pathParameters['groupId']!;
               PersonalHomeRoute(groupId).go(context);
             }
           },
