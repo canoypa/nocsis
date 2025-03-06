@@ -4,16 +4,15 @@ import type { Student } from "../../types/classmates.js";
 
 /**
  * 入力された出席番号の生徒を取得する
+ * @deprecated 複数クラスで使用できるようにする(#314)対応に伴ってgroupカラムが追加され、将来的に適切な値を返すことができなくなるため
  */
 export const getStudentByStuNo = async (
-  groupId: string,
   ...stuNos: [number, ...number[]]
 ): Promise<Student[]> => {
   const firestore = getFirestore(firebaseApp);
 
   const ref = firestore.collection("classmates");
   const snapshot = await ref
-    .where("group_id", "==", groupId)
     .where("stuNo", "in", stuNos)
     .orderBy("stuNo")
     .get();

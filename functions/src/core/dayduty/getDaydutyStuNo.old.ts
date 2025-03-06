@@ -3,6 +3,7 @@ import { getStudentCount } from "../../services/classmates/getStudentCount.js";
 
 /**
  * 入力された日時の日直の出席番号を取得する
+ * @deprecated 複数クラスで使用できるようにする(#314)対応に伴ってgroupカラムが追加され、将来的に適切な値を返すことができなくなるため
  */
 export const getDaydutyStuNo = async (date: DateTime): Promise<number> => {
   // 日直制度の開始日

@@ -1,18 +1,10 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { beforeEach, describe, expect, it } from "vitest";
 import { firebaseApp } from "~/client/firebaseApp.js";
-import { getStudentByStuNo } from "./getStudentByStuNo.js";
+import { getStudentByStuNo } from "./getStudentByStuNo.old.js";
 
 describe("getStudentByStuNo", () => {
-  const data1 = {
-    group_id: "group_1",
-    stuNo: 1,
-    firstName: "Foo",
-    lastName: "Bar",
-    slackUserId: "foobar",
-  };
-  const data2 = {
-    group_id: "group_2",
+  const data = {
     stuNo: 1,
     firstName: "Foo",
     lastName: "Bar",
@@ -23,23 +15,21 @@ describe("getStudentByStuNo", () => {
     const db = getFirestore(firebaseApp);
     const collection = db.collection("/classmates");
 
-    await collection.add(data1);
-    await collection.add(data2);
+    await collection.add(data);
   });
 
   it("指定した出席番号の生徒を取得できる", async () => {
-    await expect(getStudentByStuNo("group_1", 1)).resolves.toEqual([data1]);
+    await expect(getStudentByStuNo(1)).resolves.toEqual([data]);
   });
 
   it("該当するレコードがない場合、エラーが発生する", async () => {
-    await expect(getStudentByStuNo("group_1", 2)).rejects.toThrowError(
+    await expect(getStudentByStuNo(2)).rejects.toThrowError(
       "Classmate not found: 2",
     );
   });
 
   describe("複数指定する場合", () => {
-    const data3 = {
-      group_id: "group_1",
+    const data2 = {
       stuNo: 2,
       firstName: "Baz",
       lastName: "Qux",
@@ -50,18 +40,15 @@ describe("getStudentByStuNo", () => {
       const db = getFirestore(firebaseApp);
       const collection = db.collection("/classmates");
 
-      await collection.add(data3);
+      await collection.add(data2);
     });
 
     it("指定した出席番号の生徒を取得できる", async () => {
-      await expect(getStudentByStuNo("group_1", 1, 2)).resolves.toEqual([
-        data1,
-        data3,
-      ]);
+      await expect(getStudentByStuNo(1, 2)).resolves.toEqual([data, data2]);
     });
 
     it("該当するレコードがない場合、エラーが発生する", async () => {
-      await expect(getStudentByStuNo("group_1", 3, 4)).rejects.toThrowError(
+      await expect(getStudentByStuNo(3, 4)).rejects.toThrowError(
         "Classmate not found: 3,4",
       );
     });
