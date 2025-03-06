@@ -17,10 +17,8 @@ class Weather with _$Weather {
 
 @freezed
 class WeatherCurrent with _$WeatherCurrent {
-  const factory WeatherCurrent({
-    required String name,
-    required int temp,
-  }) = _WeatherCurrent;
+  const factory WeatherCurrent({required String name, required int temp}) =
+      _WeatherCurrent;
 
   factory WeatherCurrent.fromJson(Map<String, dynamic> json) =>
       _$WeatherCurrentFromJson(json);

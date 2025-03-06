@@ -12,7 +12,8 @@ part of 'daydudy.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 Daydudy _$DaydudyFromJson(Map<String, dynamic> json) {
   return _Daydudy.fromJson(json);
@@ -60,28 +61,35 @@ class _$DaydudyCopyWithImpl<$Res, $Val extends Daydudy>
     Object? lastName = null,
     Object? stuNo = null,
   }) {
-    return _then(_value.copyWith(
-      firstName: null == firstName
-          ? _value.firstName
-          : firstName // ignore: cast_nullable_to_non_nullable
-              as String,
-      lastName: null == lastName
-          ? _value.lastName
-          : lastName // ignore: cast_nullable_to_non_nullable
-              as String,
-      stuNo: null == stuNo
-          ? _value.stuNo
-          : stuNo // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            firstName:
+                null == firstName
+                    ? _value.firstName
+                    : firstName // ignore: cast_nullable_to_non_nullable
+                        as String,
+            lastName:
+                null == lastName
+                    ? _value.lastName
+                    : lastName // ignore: cast_nullable_to_non_nullable
+                        as String,
+            stuNo:
+                null == stuNo
+                    ? _value.stuNo
+                    : stuNo // ignore: cast_nullable_to_non_nullable
+                        as int,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$DaydudyImplCopyWith<$Res> implements $DaydudyCopyWith<$Res> {
   factory _$$DaydudyImplCopyWith(
-          _$DaydudyImpl value, $Res Function(_$DaydudyImpl) then) =
-      __$$DaydudyImplCopyWithImpl<$Res>;
+    _$DaydudyImpl value,
+    $Res Function(_$DaydudyImpl) then,
+  ) = __$$DaydudyImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String firstName, String lastName, int stuNo});
@@ -92,8 +100,9 @@ class __$$DaydudyImplCopyWithImpl<$Res>
     extends _$DaydudyCopyWithImpl<$Res, _$DaydudyImpl>
     implements _$$DaydudyImplCopyWith<$Res> {
   __$$DaydudyImplCopyWithImpl(
-      _$DaydudyImpl _value, $Res Function(_$DaydudyImpl) _then)
-      : super(_value, _then);
+    _$DaydudyImpl _value,
+    $Res Function(_$DaydudyImpl) _then,
+  ) : super(_value, _then);
 
   /// Create a copy of Daydudy
   /// with the given fields replaced by the non-null parameter values.
@@ -104,28 +113,36 @@ class __$$DaydudyImplCopyWithImpl<$Res>
     Object? lastName = null,
     Object? stuNo = null,
   }) {
-    return _then(_$DaydudyImpl(
-      firstName: null == firstName
-          ? _value.firstName
-          : firstName // ignore: cast_nullable_to_non_nullable
-              as String,
-      lastName: null == lastName
-          ? _value.lastName
-          : lastName // ignore: cast_nullable_to_non_nullable
-              as String,
-      stuNo: null == stuNo
-          ? _value.stuNo
-          : stuNo // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+    return _then(
+      _$DaydudyImpl(
+        firstName:
+            null == firstName
+                ? _value.firstName
+                : firstName // ignore: cast_nullable_to_non_nullable
+                    as String,
+        lastName:
+            null == lastName
+                ? _value.lastName
+                : lastName // ignore: cast_nullable_to_non_nullable
+                    as String,
+        stuNo:
+            null == stuNo
+                ? _value.stuNo
+                : stuNo // ignore: cast_nullable_to_non_nullable
+                    as int,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$DaydudyImpl implements _Daydudy {
-  const _$DaydudyImpl(
-      {required this.firstName, required this.lastName, required this.stuNo});
+  const _$DaydudyImpl({
+    required this.firstName,
+    required this.lastName,
+    required this.stuNo,
+  });
 
   factory _$DaydudyImpl.fromJson(Map<String, dynamic> json) =>
       _$$DaydudyImplFromJson(json);
@@ -168,17 +185,16 @@ class _$DaydudyImpl implements _Daydudy {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$DaydudyImplToJson(
-      this,
-    );
+    return _$$DaydudyImplToJson(this);
   }
 }
 
 abstract class _Daydudy implements Daydudy {
-  const factory _Daydudy(
-      {required final String firstName,
-      required final String lastName,
-      required final int stuNo}) = _$DaydudyImpl;
+  const factory _Daydudy({
+    required final String firstName,
+    required final String lastName,
+    required final int stuNo,
+  }) = _$DaydudyImpl;
 
   factory _Daydudy.fromJson(Map<String, dynamic> json) = _$DaydudyImpl.fromJson;
 
