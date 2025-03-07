@@ -11,6 +11,9 @@ importers:
       '@google-cloud/functions-framework':
         specifier: ^3.4.5
         version: 3.4.5
+      '@google-cloud/secret-manager':
+        specifier: ^5.6.0
+        version: 5.6.0(encoding@0.1.13)
       '@googleapis/calendar':
         specifier: ^9.7.9
         version: 9.8.0(encoding@0.1.13)
@@ -664,6 +667,10 @@ packages:
 
   '@google-cloud/pubsub@4.10.0':
     resolution: {integrity: sha512-HLlIA8qGr6PxAnjK4YjSi2swqEiXjGAC2Tj9GHMNYFtL4uubTIJLHv4CtbJ/Gzem5Cb1HRjuubt/H0oTuRLV0g==}
+    engines: {node: '>=14.0.0'}
+
+  '@google-cloud/secret-manager@5.6.0':
+    resolution: {integrity: sha512-0daW/OXQEVc6VQKPyJTQNyD+563I/TYQ7GCQJx4dq3lB666R9FUPvqHx9b/o/qQtZ5pfuoCbGZl3krpxgTSW8Q==}
     engines: {node: '>=14.0.0'}
 
   '@google-cloud/storage@7.15.2':
@@ -4822,6 +4829,13 @@ snapshots:
       is-stream-ended: 0.1.4
       lodash.snakecase: 4.1.1
       p-defer: 3.0.0
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@google-cloud/secret-manager@5.6.0(encoding@0.1.13)':
+    dependencies:
+      google-gax: 4.4.1(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
       - supports-color
