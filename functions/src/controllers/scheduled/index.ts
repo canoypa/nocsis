@@ -6,7 +6,7 @@ export const main = onSchedule(
   {
     region: "asia-northeast1",
     maxInstances: 1,
-    secrets: ["CALENDAR_ACCOUNT_KEY", "SLACK_TOKEN"],
+    secrets: ["CALENDAR_ACCOUNT_KEY"],
     schedule: "* * * * *",
     timeZone: "Asia/Tokyo",
   },
