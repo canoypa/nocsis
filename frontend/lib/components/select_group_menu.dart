@@ -27,12 +27,6 @@ class SelectGroupMenu extends ConsumerWidget {
           orElse: () => UserJoinedGroups(groups: []),
         );
 
-    // リリースまでコメントアウト
-    // if (userJoinedGroups.groups.length <= 1) {
-    return const SizedBox();
-    // }
-
-    // ignore: dead_code
     return DropdownButton(
       items:
           userJoinedGroups.groups
