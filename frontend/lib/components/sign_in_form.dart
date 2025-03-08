@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SignInForm extends StatefulWidget {
+  static const _defaultFormTitle = 'サインイン';
+  static const _defaultFormDescription = 'Nocsis を使用するには、サインインする必要があります。';
+
   final String title;
   final String description;
   final VoidCallback onGoogleSignIn;
@@ -9,8 +12,8 @@ class SignInForm extends StatefulWidget {
 
   const SignInForm({
     super.key,
-    this.title = 'サインイン',
-    this.description = 'Nocsis を使用するには、サインインする必要があります。',
+    this.title = _defaultFormTitle,
+    this.description = _defaultFormDescription,
     required this.onGoogleSignIn,
     required this.onPasswordSignIn,
   });
