@@ -23,6 +23,8 @@ class SignInForm extends StatefulWidget {
 }
 
 class _SignInFormState extends State<SignInForm> {
+  final _formKey = GlobalKey<FormState>();
+
   bool invisiblePassword = true;
 
   final emailFieldController = TextEditingController();
@@ -85,35 +87,43 @@ class _SignInFormState extends State<SignInForm> {
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
-          TextField(
-            controller: emailFieldController,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'メールアドレス',
-            ),
-          ),
-          TextField(
-            controller: passwordFieldController,
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              labelText: 'パスワード',
-              suffixIcon: IconButton(
-                onPressed: _togglePasswordVisibility,
-                icon: Icon(_passwordVisibilityIcon()),
-              ),
-            ),
-            obscureText: invisiblePassword,
-          ),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () {
-                widget.onPasswordSignIn(
-                  emailFieldController.text,
-                  passwordFieldController.text,
-                );
-              },
-              child: const Text('サインイン'),
+          Form(
+            key: _formKey,
+            child: Column(
+              spacing: 24,
+              children: [
+                TextFormField(
+                  controller: emailFieldController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'メールアドレス',
+                  ),
+                ),
+                TextFormField(
+                  controller: passwordFieldController,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: 'パスワード',
+                    suffixIcon: IconButton(
+                      onPressed: _togglePasswordVisibility,
+                      icon: Icon(_passwordVisibilityIcon()),
+                    ),
+                  ),
+                  obscureText: invisiblePassword,
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () {
+                      widget.onPasswordSignIn(
+                        emailFieldController.text,
+                        passwordFieldController.text,
+                      );
+                    },
+                    child: const Text('サインイン'),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
