@@ -65,8 +65,9 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
 
   @override
   Widget build(BuildContext context) {
+    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
     final duringClassData = ref
-        .watch(duringClassDataProvider)
+        .watch(duringClassDataProvider(groupId))
         .maybeWhen(data: (data) => data, orElse: () => null);
 
     return Scaffold(
