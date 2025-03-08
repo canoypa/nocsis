@@ -94,6 +94,7 @@ class _SignInFormState extends State<SignInForm> {
               children: [
                 TextFormField(
                   controller: emailFieldController,
+                  autofillHints: const [AutofillHints.email],
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'メールアドレス',
@@ -101,6 +102,7 @@ class _SignInFormState extends State<SignInForm> {
                 ),
                 TextFormField(
                   controller: passwordFieldController,
+                  autofillHints: const [AutofillHints.password],
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     labelText: 'パスワード',
