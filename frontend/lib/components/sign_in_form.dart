@@ -24,6 +24,7 @@ class SignInForm extends StatefulWidget {
 
 class _SignInFormState extends State<SignInForm> {
   final _formKey = GlobalKey<FormState>();
+  final _passwordFocusNode = FocusNode();
 
   bool invisiblePassword = true;
 
@@ -41,6 +42,28 @@ class _SignInFormState extends State<SignInForm> {
       return Icons.visibility_off_outlined;
     } else {
       return Icons.visibility_outlined;
+    }
+  }
+
+  String? _validateEmailField(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'メールアドレスを入力してください';
+    }
+
+    return null;
+  }
+
+  String? _validatePasswordField(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'パスワードを入力してください';
+    }
+
+    return null;
+  }
+
+  void _onEmailAndPasswordFormSubmitted(String email, String password) {
+    if (_formKey.currentState!.validate()) {
+      widget.onPasswordSignIn(email, password);
     }
   }
 
@@ -95,14 +118,21 @@ class _SignInFormState extends State<SignInForm> {
                 TextFormField(
                   controller: emailFieldController,
                   autofillHints: const [AutofillHints.email],
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'メールアドレス',
                   ),
+                  validator: _validateEmailField,
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_passwordFocusNode);
+                  },
                 ),
                 TextFormField(
                   controller: passwordFieldController,
                   autofillHints: const [AutofillHints.password],
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  focusNode: _passwordFocusNode,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     labelText: 'パスワード',
@@ -112,12 +142,19 @@ class _SignInFormState extends State<SignInForm> {
                     ),
                   ),
                   obscureText: invisiblePassword,
+                  validator: _validatePasswordField,
+                  onFieldSubmitted: (value) {
+                    _onEmailAndPasswordFormSubmitted(
+                      emailFieldController.text,
+                      passwordFieldController.text,
+                    );
+                  },
                 ),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () {
-                      widget.onPasswordSignIn(
+                      _onEmailAndPasswordFormSubmitted(
                         emailFieldController.text,
                         passwordFieldController.text,
                       );
