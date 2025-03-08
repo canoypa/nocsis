@@ -1,5 +1,11 @@
-import type { ChatPostMessageArguments } from "@slack/web-api";
-import { slackClient } from "../../client/slackClient.js";
+import {
+  type ChatPostMessageArguments,
+  WebClient as SlackWebClient,
+} from "@slack/web-api";
+import { getFirestore } from "firebase-admin/firestore";
+import type { DateTime } from "luxon";
+import { firebaseApp } from "~/client/firebaseApp.js";
+import { fetchSecret } from "~/services/fetch_secret.js";
 import { fetchCalendar } from "../../core/calendar.js";
 import { getDisplayTitle } from "../../core/calendar/get_display_title.js";
 import { parseEvents } from "../../core/calendar/parseEvents.js";
@@ -10,19 +16,21 @@ import {
   isCountdownTarget,
 } from "../../core/events/countdown_event.js";
 
+type Group = {
+  id: string;
+  events_calendar_id: string;
+  slack_event_channel_id: string;
+};
+
 /**
  * イベントの通知
  */
-const notifyEvent: CrontabHandler = async (timestamp) => {
-  const calendarId = process.env.EVENTS_CALENDAR_ID;
-  if (!calendarId) {
-    throw new Error("EVENTS_CALENDAR_ID is not defined");
-  }
+const notifyEventPerGroup = async (group: Group, timestamp: DateTime) => {
+  const slackToken = await fetchSecret(`group_${group.id}-slack_token`);
+  const slackClient = new SlackWebClient(slackToken);
 
-  const targetChannelId = process.env.SLACK_EVENT_CHANNEL_ID;
-  if (!targetChannelId) {
-    throw new Error("Can not read SLACK_EVENT_CHANNEL_ID");
-  }
+  const calendarId = group.events_calendar_id;
+  const targetChannelId = group.slack_event_channel_id;
 
   // 今日の範囲を取得
   const from = timestamp.startOf("day");
@@ -70,4 +78,20 @@ const notifyEvent: CrontabHandler = async (timestamp) => {
   };
   slackClient.chat.postMessage(options);
 };
+
+const notifyEvent: CrontabHandler = async (timestamp) => {
+  const firestore = getFirestore(firebaseApp);
+
+  const groupsSnapshot = await firestore.collection("groups").get();
+  const groups = groupsSnapshot.docs.map((doc) => ({
+    id: doc.id,
+    events_calendar_id: doc.get("events_calendar_id"),
+    slack_event_channel_id: doc.get("slack_event_channel_id"),
+  }));
+
+  await Promise.all(
+    groups.map((group) => notifyEventPerGroup(group, timestamp)),
+  );
+};
+
 export default notifyEvent;
