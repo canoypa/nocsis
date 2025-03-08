@@ -2,15 +2,12 @@ import {
   type ChatPostMessageArguments,
   WebClient as SlackWebClient,
 } from "@slack/web-api";
-import { getFirestore } from "firebase-admin/firestore";
 import type { DateTime } from "luxon";
-import { firebaseApp } from "~/client/firebaseApp.js";
 import { fetchSecret } from "~/services/fetch_secret.js";
 import { fetchCalendar } from "../../core/calendar.js";
 import { getDisplayTitle } from "../../core/calendar/get_display_title.js";
 import { parseEvents } from "../../core/calendar/parseEvents.js";
 import { eventsToSlackBlock } from "../../core/calendar/slack_block.js";
-import type { CrontabHandler } from "../../core/crontab.js";
 import {
   fetchCountdownEvents,
   isCountdownTarget,
@@ -25,7 +22,10 @@ type Group = {
 /**
  * イベントの通知
  */
-const notifyEventPerGroup = async (group: Group, timestamp: DateTime) => {
+export const notifyEventPerGroup = async (
+  group: Group,
+  timestamp: DateTime,
+) => {
   const slackToken = await fetchSecret(`group_${group.id}-slack_token`);
   const slackClient = new SlackWebClient(slackToken);
 
@@ -78,20 +78,3 @@ const notifyEventPerGroup = async (group: Group, timestamp: DateTime) => {
   };
   slackClient.chat.postMessage(options);
 };
-
-const notifyEvent: CrontabHandler = async (timestamp) => {
-  const firestore = getFirestore(firebaseApp);
-
-  const groupsSnapshot = await firestore.collection("groups").get();
-  const groups = groupsSnapshot.docs.map((doc) => ({
-    id: doc.id,
-    events_calendar_id: doc.get("events_calendar_id"),
-    slack_event_channel_id: doc.get("slack_event_channel_id"),
-  }));
-
-  await Promise.all(
-    groups.map((group) => notifyEventPerGroup(group, timestamp)),
-  );
-};
-
-export default notifyEvent;
