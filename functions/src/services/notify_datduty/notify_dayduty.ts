@@ -14,7 +14,7 @@ export const notifyDayDuty: CrontabHandler = async (timestamp) => {
     id: doc.id,
   }));
 
-  await Promise.all(
+  await Promise.allSettled(
     groups.map((group) => notifyDayDutyPerGroup(group, timestamp)),
   );
 };

@@ -16,7 +16,7 @@ export const notifyEvent: CrontabHandler = async (timestamp) => {
     slack_event_channel_id: doc.get("slack_event_channel_id"),
   }));
 
-  await Promise.all(
+  await Promise.allSettled(
     groups.map((group) => notifyEventPerGroup(group, timestamp)),
   );
 };
