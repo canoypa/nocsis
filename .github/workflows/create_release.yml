@@ -19,7 +19,7 @@ jobs:
 
           release_pr_number=$(gh pr list -B main -H development --json "number" -q ".[0].number")
           if [ -z "$release_pr_number" ]; then
-            release_pr_number=$(gh pr create -H development -B main -t "$pr_title" -b "wip" | sed -n 's/.*\///p')
+            release_pr_number=$(gh pr create -H development -B main -t "$pr_title" -b "wip" --label "🚀 リリース" | sed -n 's/.*\///p')
           fi
 
           release_pr_commits=$(gh pr view $release_pr_number --json "commits" --jq "[.commits[].oid]")
