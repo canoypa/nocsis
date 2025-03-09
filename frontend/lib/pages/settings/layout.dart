@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
+import 'package:nocsis/components/select_group_menu.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/routes/router.dart';
 
@@ -50,7 +51,7 @@ class SettingsLayout extends StatelessWidget {
             }
           },
         ),
-        actions: const [AccountMenu()],
+        actions: const [SelectGroupMenu(), AccountMenu()],
         centerTitle: false,
         backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         surfaceTintColor: Theme.of(context).colorScheme.surfaceContainer,

@@ -5,7 +5,7 @@ part 'classes.freezed.dart';
 part 'classes.g.dart';
 
 @freezed
-class ClassList with _$ClassList {
+abstract class ClassList with _$ClassList {
   const factory ClassList({required List<ClassData> items}) = _ClassList;
 
   factory ClassList.fromJson(Map<String, dynamic> json) =>
@@ -13,7 +13,7 @@ class ClassList with _$ClassList {
 }
 
 @freezed
-class ClassData with _$ClassData {
+abstract class ClassData with _$ClassData {
   const factory ClassData({
     required String title,
     required int period,
