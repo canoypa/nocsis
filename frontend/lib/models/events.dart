@@ -5,7 +5,7 @@ part 'events.freezed.dart';
 part 'events.g.dart';
 
 @freezed
-class EventList with _$EventList {
+abstract class EventList with _$EventList {
   const factory EventList({required List<EventData> items}) = _EventList;
 
   factory EventList.fromJson(Map<String, dynamic> json) =>
@@ -13,7 +13,7 @@ class EventList with _$EventList {
 }
 
 @freezed
-class EventData with _$EventData {
+abstract class EventData with _$EventData {
   const factory EventData({
     required String title,
     required bool isAllDay,

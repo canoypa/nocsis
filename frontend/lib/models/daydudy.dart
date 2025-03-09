@@ -4,7 +4,7 @@ part 'daydudy.freezed.dart';
 part 'daydudy.g.dart';
 
 @freezed
-class Daydudy with _$Daydudy {
+abstract class Daydudy with _$Daydudy {
   const factory Daydudy({
     required String firstName,
     required String lastName,
