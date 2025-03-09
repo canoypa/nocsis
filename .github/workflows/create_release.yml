@@ -11,6 +11,8 @@ jobs:
   create_release_pr:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Create Release Pull Request
         run: |
           pr_title=$(echo "Release $(TZ=Asia/Tokyo date +'%Y-%m-%d')")
