@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SignInForm extends StatefulWidget {
+  static const _defaultFormTitle = 'サインイン';
+  static const _defaultFormDescription = 'Nocsis を使用するには、サインインする必要があります。';
+
   final String title;
   final String description;
   final VoidCallback onGoogleSignIn;
@@ -9,8 +12,8 @@ class SignInForm extends StatefulWidget {
 
   const SignInForm({
     super.key,
-    this.title = 'サインイン',
-    this.description = 'Nocsis を使用するには、サインインする必要があります。',
+    this.title = _defaultFormTitle,
+    this.description = _defaultFormDescription,
     required this.onGoogleSignIn,
     required this.onPasswordSignIn,
   });
@@ -20,6 +23,9 @@ class SignInForm extends StatefulWidget {
 }
 
 class _SignInFormState extends State<SignInForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _passwordFocusNode = FocusNode();
+
   bool invisiblePassword = true;
 
   final emailFieldController = TextEditingController();
@@ -39,72 +45,94 @@ class _SignInFormState extends State<SignInForm> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      ),
-      constraints: const BoxConstraints(maxWidth: 1200),
-      padding: const EdgeInsets.all(64),
-      child: Row(
+  String? _validateEmailField(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'メールアドレスを入力してください';
+    }
+
+    return null;
+  }
+
+  String? _validatePasswordField(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'パスワードを入力してください';
+    }
+
+    return null;
+  }
+
+  void _onEmailAndPasswordFormSubmitted(String email, String password) {
+    if (_formKey.currentState!.validate()) {
+      widget.onPasswordSignIn(email, password);
+    }
+  }
+
+  Widget _intro() {
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Image.asset("assets/images/Icon-192.png", width: 64),
+          const SizedBox(height: 16),
+          Text(widget.title, style: Theme.of(context).textTheme.displaySmall),
+          const SizedBox(height: 24),
+          Text(
+            widget.description,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _form() {
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 24,
+        children: [
+          OutlinedButton(
+            onPressed: widget.onGoogleSignIn,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset("assets/images/Icon-192.png", width: 64),
-                const SizedBox(height: 16),
-                Text(
-                  widget.title,
-                  style: Theme.of(context).textTheme.displaySmall,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  widget.description,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
+                SvgPicture.asset("assets/images/google.svg", width: 18),
+                const SizedBox(width: 8),
+                const Text("Google で続行"),
               ],
             ),
           ),
-          const SizedBox(width: 48),
-          Expanded(
+          Text(
+            'または',
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          Form(
+            key: _formKey,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              spacing: 24,
               children: [
-                OutlinedButton(
-                  onPressed: widget.onGoogleSignIn,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset("assets/images/google.svg", width: 18),
-                      const SizedBox(width: 8),
-                      const Text("Google で続行"),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'または',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                TextField(
+                TextFormField(
                   controller: emailFieldController,
+                  autofillHints: const [AutofillHints.email],
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'メールアドレス',
                   ),
+                  validator: _validateEmailField,
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_passwordFocusNode);
+                  },
                 ),
-                const SizedBox(height: 24),
-                TextField(
+                TextFormField(
                   controller: passwordFieldController,
+                  autofillHints: const [AutofillHints.password],
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  focusNode: _passwordFocusNode,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     labelText: 'パスワード',
@@ -114,13 +142,19 @@ class _SignInFormState extends State<SignInForm> {
                     ),
                   ),
                   obscureText: invisiblePassword,
+                  validator: _validatePasswordField,
+                  onFieldSubmitted: (value) {
+                    _onEmailAndPasswordFormSubmitted(
+                      emailFieldController.text,
+                      passwordFieldController.text,
+                    );
+                  },
                 ),
-                const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () {
-                      widget.onPasswordSignIn(
+                      _onEmailAndPasswordFormSubmitted(
                         emailFieldController.text,
                         passwordFieldController.text,
                       );
@@ -132,6 +166,23 @@ class _SignInFormState extends State<SignInForm> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      ),
+      constraints: const BoxConstraints(maxWidth: 1200),
+      padding: const EdgeInsets.all(64),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 48,
+        children: [_intro(), _form()],
       ),
     );
   }

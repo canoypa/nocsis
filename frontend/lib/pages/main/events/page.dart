@@ -39,15 +39,21 @@ class PersonalEventsRoute extends GoRouteData {
   }
 }
 
-final eventsProvider = FutureProvider<MonthlyEventList>((ref) async {
+final eventsProvider = FutureProvider.family<MonthlyEventList, String>((
+  ref,
+  groupId,
+) async {
   final DateTime now = DateTime.now();
   final DateTime today = DateTime(now.year, now.month, now.day);
 
   final HttpsCallable getEvents = FirebaseFunctions.instanceFor(
     region: "asia-northeast1",
-  ).httpsCallable("v3-events-monthly");
+  ).httpsCallable("v4-events-monthly");
 
-  final res = await getEvents.call({"date": today.toIso8601String()});
+  final res = await getEvents.call({
+    'groupId': groupId,
+    "date": today.toIso8601String(),
+  });
 
   return MonthlyEventList.fromJson({"items": res.data});
 });
@@ -57,7 +63,8 @@ class EventsView extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final snap = ref.watch(eventsProvider);
+    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+    final snap = ref.watch(eventsProvider(groupId));
 
     return snap.when(
       data: (d) {

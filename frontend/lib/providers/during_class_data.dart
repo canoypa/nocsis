@@ -8,12 +8,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'during_class_data.g.dart';
 
 @riverpod
-Future<ClassData?> duringClassData(Ref ref) async {
+Future<ClassData?> duringClassData(Ref ref, String groupId) async {
   // 毎分更新
   ref.watch(cronProvider("* * * * *"));
 
   final classes = ref
-      .watch(classesProvider)
+      .watch(classesProvider(groupId))
       .maybeWhen(data: (data) => data, orElse: () => null);
 
   final now = DateTime.now();

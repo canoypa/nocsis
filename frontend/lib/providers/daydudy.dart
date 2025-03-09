@@ -8,14 +8,17 @@ part 'daydudy.g.dart';
 
 final fn = FirebaseFunctions.instanceFor(
   region: "asia-northeast1",
-).httpsCallable("v3-dayduty-get");
+).httpsCallable("v4-dayduty-get");
 
 @riverpod
-Future<Daydudy> daydudy(Ref ref) async {
+Future<Daydudy> daydudy(Ref ref, String groupId) async {
   // 一日ごとに取得
   ref.watch(cronProvider("0 0 * * *"));
 
-  final res = await fn.call({"date": DateTime.now().toIso8601String()});
+  final res = await fn.call({
+    'groupId': groupId,
+    "date": DateTime.now().toIso8601String(),
+  });
 
   if (res.data == null) {
     throw Exception("No data");

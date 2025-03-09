@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
+import 'package:nocsis/components/select_group_menu.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/routes/router.dart';
 
@@ -32,12 +33,12 @@ class DrawerLayout extends StatelessWidget {
               GoRouter.of(context).pop();
             } else {
               final groupId =
-                  GoRouter.of(context).state.uri.queryParameters['groupId']!;
+                  GoRouter.of(context).state.pathParameters['groupId']!;
               PersonalHomeRoute(groupId).go(context);
             }
           },
         ),
-        actions: const [AccountMenu()],
+        actions: const [SelectGroupMenu(), AccountMenu()],
         title: title,
         centerTitle: false,
         backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
