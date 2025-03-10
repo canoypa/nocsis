@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,402 +10,287 @@ part of 'classes.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
-ClassList _$ClassListFromJson(Map<String, dynamic> json) {
-  return _ClassList.fromJson(json);
-}
 
 /// @nodoc
 mixin _$ClassList {
-  List<ClassData> get items => throw _privateConstructorUsedError;
+
+ List<ClassData> get items;
+/// Create a copy of ClassList
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ClassListCopyWith<ClassList> get copyWith => _$ClassListCopyWithImpl<ClassList>(this as ClassList, _$identity);
 
   /// Serializes this ClassList to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of ClassList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ClassListCopyWith<ClassList> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClassList&&const DeepCollectionEquality().equals(other.items, items));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items));
+
+@override
+String toString() {
+  return 'ClassList(items: $items)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $ClassListCopyWith<$Res> {
-  factory $ClassListCopyWith(ClassList value, $Res Function(ClassList) then) =
-      _$ClassListCopyWithImpl<$Res, ClassList>;
-  @useResult
-  $Res call({List<ClassData> items});
-}
+abstract mixin class $ClassListCopyWith<$Res>  {
+  factory $ClassListCopyWith(ClassList value, $Res Function(ClassList) _then) = _$ClassListCopyWithImpl;
+@useResult
+$Res call({
+ List<ClassData> items
+});
 
+
+
+
+}
 /// @nodoc
-class _$ClassListCopyWithImpl<$Res, $Val extends ClassList>
+class _$ClassListCopyWithImpl<$Res>
     implements $ClassListCopyWith<$Res> {
-  _$ClassListCopyWithImpl(this._value, this._then);
+  _$ClassListCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final ClassList _self;
+  final $Res Function(ClassList) _then;
 
-  /// Create a copy of ClassList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? items = null}) {
-    return _then(
-      _value.copyWith(
-            items:
-                null == items
-                    ? _value.items
-                    : items // ignore: cast_nullable_to_non_nullable
-                        as List<ClassData>,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of ClassList
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? items = null,}) {
+  return _then(_self.copyWith(
+items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
+as List<ClassData>,
+  ));
 }
 
-/// @nodoc
-abstract class _$$ClassListImplCopyWith<$Res>
-    implements $ClassListCopyWith<$Res> {
-  factory _$$ClassListImplCopyWith(
-    _$ClassListImpl value,
-    $Res Function(_$ClassListImpl) then,
-  ) = __$$ClassListImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<ClassData> items});
 }
 
-/// @nodoc
-class __$$ClassListImplCopyWithImpl<$Res>
-    extends _$ClassListCopyWithImpl<$Res, _$ClassListImpl>
-    implements _$$ClassListImplCopyWith<$Res> {
-  __$$ClassListImplCopyWithImpl(
-    _$ClassListImpl _value,
-    $Res Function(_$ClassListImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ClassList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? items = null}) {
-    return _then(
-      _$ClassListImpl(
-        items:
-            null == items
-                ? _value._items
-                : items // ignore: cast_nullable_to_non_nullable
-                    as List<ClassData>,
-      ),
-    );
-  }
-}
 
 /// @nodoc
 @JsonSerializable()
-class _$ClassListImpl implements _ClassList {
-  const _$ClassListImpl({required final List<ClassData> items})
-    : _items = items;
 
-  factory _$ClassListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ClassListImplFromJson(json);
+class _ClassList implements ClassList {
+  const _ClassList({required final  List<ClassData> items}): _items = items;
+  factory _ClassList.fromJson(Map<String, dynamic> json) => _$ClassListFromJson(json);
 
-  final List<ClassData> _items;
-  @override
-  List<ClassData> get items {
-    if (_items is EqualUnmodifiableListView) return _items;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_items);
-  }
-
-  @override
-  String toString() {
-    return 'ClassList(items: $items)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ClassListImpl &&
-            const DeepCollectionEquality().equals(other._items, _items));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
-
-  /// Create a copy of ClassList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ClassListImplCopyWith<_$ClassListImpl> get copyWith =>
-      __$$ClassListImplCopyWithImpl<_$ClassListImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ClassListImplToJson(this);
-  }
+ final  List<ClassData> _items;
+@override List<ClassData> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
 }
 
-abstract class _ClassList implements ClassList {
-  const factory _ClassList({required final List<ClassData> items}) =
-      _$ClassListImpl;
 
-  factory _ClassList.fromJson(Map<String, dynamic> json) =
-      _$ClassListImpl.fromJson;
+/// Create a copy of ClassList
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ClassListCopyWith<_ClassList> get copyWith => __$ClassListCopyWithImpl<_ClassList>(this, _$identity);
 
-  @override
-  List<ClassData> get items;
-
-  /// Create a copy of ClassList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ClassListImplCopyWith<_$ClassListImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+Map<String, dynamic> toJson() {
+  return _$ClassListToJson(this, );
 }
 
-ClassData _$ClassDataFromJson(Map<String, dynamic> json) {
-  return _ClassData.fromJson(json);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ClassList&&const DeepCollectionEquality().equals(other._items, _items));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items));
+
+@override
+String toString() {
+  return 'ClassList(items: $items)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ClassListCopyWith<$Res> implements $ClassListCopyWith<$Res> {
+  factory _$ClassListCopyWith(_ClassList value, $Res Function(_ClassList) _then) = __$ClassListCopyWithImpl;
+@override @useResult
+$Res call({
+ List<ClassData> items
+});
+
+
+
+
+}
+/// @nodoc
+class __$ClassListCopyWithImpl<$Res>
+    implements _$ClassListCopyWith<$Res> {
+  __$ClassListCopyWithImpl(this._self, this._then);
+
+  final _ClassList _self;
+  final $Res Function(_ClassList) _then;
+
+/// Create a copy of ClassList
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? items = null,}) {
+  return _then(_ClassList(
+items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<ClassData>,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$ClassData {
-  String get title => throw _privateConstructorUsedError;
-  int get period => throw _privateConstructorUsedError;
-  @LocalDateTimeConverter()
-  DateTime get startAt => throw _privateConstructorUsedError;
-  @LocalDateTimeConverter()
-  DateTime get endAt => throw _privateConstructorUsedError;
+
+ String get title; int get period;@LocalDateTimeConverter() DateTime get startAt;@LocalDateTimeConverter() DateTime get endAt;
+/// Create a copy of ClassData
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ClassDataCopyWith<ClassData> get copyWith => _$ClassDataCopyWithImpl<ClassData>(this as ClassData, _$identity);
 
   /// Serializes this ClassData to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of ClassData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ClassDataCopyWith<ClassData> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClassData&&(identical(other.title, title) || other.title == title)&&(identical(other.period, period) || other.period == period)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,period,startAt,endAt);
+
+@override
+String toString() {
+  return 'ClassData(title: $title, period: $period, startAt: $startAt, endAt: $endAt)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $ClassDataCopyWith<$Res> {
-  factory $ClassDataCopyWith(ClassData value, $Res Function(ClassData) then) =
-      _$ClassDataCopyWithImpl<$Res, ClassData>;
-  @useResult
-  $Res call({
-    String title,
-    int period,
-    @LocalDateTimeConverter() DateTime startAt,
-    @LocalDateTimeConverter() DateTime endAt,
-  });
-}
+abstract mixin class $ClassDataCopyWith<$Res>  {
+  factory $ClassDataCopyWith(ClassData value, $Res Function(ClassData) _then) = _$ClassDataCopyWithImpl;
+@useResult
+$Res call({
+ String title, int period,@LocalDateTimeConverter() DateTime startAt,@LocalDateTimeConverter() DateTime endAt
+});
 
+
+
+
+}
 /// @nodoc
-class _$ClassDataCopyWithImpl<$Res, $Val extends ClassData>
+class _$ClassDataCopyWithImpl<$Res>
     implements $ClassDataCopyWith<$Res> {
-  _$ClassDataCopyWithImpl(this._value, this._then);
+  _$ClassDataCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final ClassData _self;
+  final $Res Function(ClassData) _then;
 
-  /// Create a copy of ClassData
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? title = null,
-    Object? period = null,
-    Object? startAt = null,
-    Object? endAt = null,
-  }) {
-    return _then(
-      _value.copyWith(
-            title:
-                null == title
-                    ? _value.title
-                    : title // ignore: cast_nullable_to_non_nullable
-                        as String,
-            period:
-                null == period
-                    ? _value.period
-                    : period // ignore: cast_nullable_to_non_nullable
-                        as int,
-            startAt:
-                null == startAt
-                    ? _value.startAt
-                    : startAt // ignore: cast_nullable_to_non_nullable
-                        as DateTime,
-            endAt:
-                null == endAt
-                    ? _value.endAt
-                    : endAt // ignore: cast_nullable_to_non_nullable
-                        as DateTime,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of ClassData
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? period = null,Object? startAt = null,Object? endAt = null,}) {
+  return _then(_self.copyWith(
+title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,period: null == period ? _self.period : period // ignore: cast_nullable_to_non_nullable
+as int,startAt: null == startAt ? _self.startAt : startAt // ignore: cast_nullable_to_non_nullable
+as DateTime,endAt: null == endAt ? _self.endAt : endAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
 }
 
-/// @nodoc
-abstract class _$$ClassDataImplCopyWith<$Res>
-    implements $ClassDataCopyWith<$Res> {
-  factory _$$ClassDataImplCopyWith(
-    _$ClassDataImpl value,
-    $Res Function(_$ClassDataImpl) then,
-  ) = __$$ClassDataImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({
-    String title,
-    int period,
-    @LocalDateTimeConverter() DateTime startAt,
-    @LocalDateTimeConverter() DateTime endAt,
-  });
 }
 
-/// @nodoc
-class __$$ClassDataImplCopyWithImpl<$Res>
-    extends _$ClassDataCopyWithImpl<$Res, _$ClassDataImpl>
-    implements _$$ClassDataImplCopyWith<$Res> {
-  __$$ClassDataImplCopyWithImpl(
-    _$ClassDataImpl _value,
-    $Res Function(_$ClassDataImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of ClassData
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? title = null,
-    Object? period = null,
-    Object? startAt = null,
-    Object? endAt = null,
-  }) {
-    return _then(
-      _$ClassDataImpl(
-        title:
-            null == title
-                ? _value.title
-                : title // ignore: cast_nullable_to_non_nullable
-                    as String,
-        period:
-            null == period
-                ? _value.period
-                : period // ignore: cast_nullable_to_non_nullable
-                    as int,
-        startAt:
-            null == startAt
-                ? _value.startAt
-                : startAt // ignore: cast_nullable_to_non_nullable
-                    as DateTime,
-        endAt:
-            null == endAt
-                ? _value.endAt
-                : endAt // ignore: cast_nullable_to_non_nullable
-                    as DateTime,
-      ),
-    );
-  }
-}
 
 /// @nodoc
 @JsonSerializable()
-class _$ClassDataImpl implements _ClassData {
-  const _$ClassDataImpl({
-    required this.title,
-    required this.period,
-    @LocalDateTimeConverter() required this.startAt,
-    @LocalDateTimeConverter() required this.endAt,
-  });
 
-  factory _$ClassDataImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ClassDataImplFromJson(json);
+class _ClassData implements ClassData {
+  const _ClassData({required this.title, required this.period, @LocalDateTimeConverter() required this.startAt, @LocalDateTimeConverter() required this.endAt});
+  factory _ClassData.fromJson(Map<String, dynamic> json) => _$ClassDataFromJson(json);
 
-  @override
-  final String title;
-  @override
-  final int period;
-  @override
-  @LocalDateTimeConverter()
-  final DateTime startAt;
-  @override
-  @LocalDateTimeConverter()
-  final DateTime endAt;
+@override final  String title;
+@override final  int period;
+@override@LocalDateTimeConverter() final  DateTime startAt;
+@override@LocalDateTimeConverter() final  DateTime endAt;
 
-  @override
-  String toString() {
-    return 'ClassData(title: $title, period: $period, startAt: $startAt, endAt: $endAt)';
-  }
+/// Create a copy of ClassData
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ClassDataCopyWith<_ClassData> get copyWith => __$ClassDataCopyWithImpl<_ClassData>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ClassDataImpl &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.period, period) || other.period == period) &&
-            (identical(other.startAt, startAt) || other.startAt == startAt) &&
-            (identical(other.endAt, endAt) || other.endAt == endAt));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, title, period, startAt, endAt);
-
-  /// Create a copy of ClassData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ClassDataImplCopyWith<_$ClassDataImpl> get copyWith =>
-      __$$ClassDataImplCopyWithImpl<_$ClassDataImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ClassDataImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$ClassDataToJson(this, );
 }
 
-abstract class _ClassData implements ClassData {
-  const factory _ClassData({
-    required final String title,
-    required final int period,
-    @LocalDateTimeConverter() required final DateTime startAt,
-    @LocalDateTimeConverter() required final DateTime endAt,
-  }) = _$ClassDataImpl;
-
-  factory _ClassData.fromJson(Map<String, dynamic> json) =
-      _$ClassDataImpl.fromJson;
-
-  @override
-  String get title;
-  @override
-  int get period;
-  @override
-  @LocalDateTimeConverter()
-  DateTime get startAt;
-  @override
-  @LocalDateTimeConverter()
-  DateTime get endAt;
-
-  /// Create a copy of ClassData
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ClassDataImplCopyWith<_$ClassDataImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ClassData&&(identical(other.title, title) || other.title == title)&&(identical(other.period, period) || other.period == period)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,period,startAt,endAt);
+
+@override
+String toString() {
+  return 'ClassData(title: $title, period: $period, startAt: $startAt, endAt: $endAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ClassDataCopyWith<$Res> implements $ClassDataCopyWith<$Res> {
+  factory _$ClassDataCopyWith(_ClassData value, $Res Function(_ClassData) _then) = __$ClassDataCopyWithImpl;
+@override @useResult
+$Res call({
+ String title, int period,@LocalDateTimeConverter() DateTime startAt,@LocalDateTimeConverter() DateTime endAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$ClassDataCopyWithImpl<$Res>
+    implements _$ClassDataCopyWith<$Res> {
+  __$ClassDataCopyWithImpl(this._self, this._then);
+
+  final _ClassData _self;
+  final $Res Function(_ClassData) _then;
+
+/// Create a copy of ClassData
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? period = null,Object? startAt = null,Object? endAt = null,}) {
+  return _then(_ClassData(
+title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,period: null == period ? _self.period : period // ignore: cast_nullable_to_non_nullable
+as int,startAt: null == startAt ? _self.startAt : startAt // ignore: cast_nullable_to_non_nullable
+as DateTime,endAt: null == endAt ? _self.endAt : endAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+
+}
+
+// dart format on
