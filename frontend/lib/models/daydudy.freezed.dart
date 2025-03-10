@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,206 +10,145 @@ part of 'daydudy.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
-Daydudy _$DaydudyFromJson(Map<String, dynamic> json) {
-  return _Daydudy.fromJson(json);
-}
 
 /// @nodoc
 mixin _$Daydudy {
-  String get firstName => throw _privateConstructorUsedError;
-  String get lastName => throw _privateConstructorUsedError;
-  int get stuNo => throw _privateConstructorUsedError;
+
+ String get firstName; String get lastName; int get stuNo;
+/// Create a copy of Daydudy
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$DaydudyCopyWith<Daydudy> get copyWith => _$DaydudyCopyWithImpl<Daydudy>(this as Daydudy, _$identity);
 
   /// Serializes this Daydudy to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of Daydudy
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $DaydudyCopyWith<Daydudy> get copyWith => throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Daydudy&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.stuNo, stuNo) || other.stuNo == stuNo));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,firstName,lastName,stuNo);
+
+@override
+String toString() {
+  return 'Daydudy(firstName: $firstName, lastName: $lastName, stuNo: $stuNo)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $DaydudyCopyWith<$Res> {
-  factory $DaydudyCopyWith(Daydudy value, $Res Function(Daydudy) then) =
-      _$DaydudyCopyWithImpl<$Res, Daydudy>;
-  @useResult
-  $Res call({String firstName, String lastName, int stuNo});
-}
+abstract mixin class $DaydudyCopyWith<$Res>  {
+  factory $DaydudyCopyWith(Daydudy value, $Res Function(Daydudy) _then) = _$DaydudyCopyWithImpl;
+@useResult
+$Res call({
+ String firstName, String lastName, int stuNo
+});
 
+
+
+
+}
 /// @nodoc
-class _$DaydudyCopyWithImpl<$Res, $Val extends Daydudy>
+class _$DaydudyCopyWithImpl<$Res>
     implements $DaydudyCopyWith<$Res> {
-  _$DaydudyCopyWithImpl(this._value, this._then);
+  _$DaydudyCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final Daydudy _self;
+  final $Res Function(Daydudy) _then;
 
-  /// Create a copy of Daydudy
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? firstName = null,
-    Object? lastName = null,
-    Object? stuNo = null,
-  }) {
-    return _then(
-      _value.copyWith(
-            firstName:
-                null == firstName
-                    ? _value.firstName
-                    : firstName // ignore: cast_nullable_to_non_nullable
-                        as String,
-            lastName:
-                null == lastName
-                    ? _value.lastName
-                    : lastName // ignore: cast_nullable_to_non_nullable
-                        as String,
-            stuNo:
-                null == stuNo
-                    ? _value.stuNo
-                    : stuNo // ignore: cast_nullable_to_non_nullable
-                        as int,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of Daydudy
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? firstName = null,Object? lastName = null,Object? stuNo = null,}) {
+  return _then(_self.copyWith(
+firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String,stuNo: null == stuNo ? _self.stuNo : stuNo // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-/// @nodoc
-abstract class _$$DaydudyImplCopyWith<$Res> implements $DaydudyCopyWith<$Res> {
-  factory _$$DaydudyImplCopyWith(
-    _$DaydudyImpl value,
-    $Res Function(_$DaydudyImpl) then,
-  ) = __$$DaydudyImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String firstName, String lastName, int stuNo});
 }
 
-/// @nodoc
-class __$$DaydudyImplCopyWithImpl<$Res>
-    extends _$DaydudyCopyWithImpl<$Res, _$DaydudyImpl>
-    implements _$$DaydudyImplCopyWith<$Res> {
-  __$$DaydudyImplCopyWithImpl(
-    _$DaydudyImpl _value,
-    $Res Function(_$DaydudyImpl) _then,
-  ) : super(_value, _then);
-
-  /// Create a copy of Daydudy
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? firstName = null,
-    Object? lastName = null,
-    Object? stuNo = null,
-  }) {
-    return _then(
-      _$DaydudyImpl(
-        firstName:
-            null == firstName
-                ? _value.firstName
-                : firstName // ignore: cast_nullable_to_non_nullable
-                    as String,
-        lastName:
-            null == lastName
-                ? _value.lastName
-                : lastName // ignore: cast_nullable_to_non_nullable
-                    as String,
-        stuNo:
-            null == stuNo
-                ? _value.stuNo
-                : stuNo // ignore: cast_nullable_to_non_nullable
-                    as int,
-      ),
-    );
-  }
-}
 
 /// @nodoc
 @JsonSerializable()
-class _$DaydudyImpl implements _Daydudy {
-  const _$DaydudyImpl({
-    required this.firstName,
-    required this.lastName,
-    required this.stuNo,
-  });
 
-  factory _$DaydudyImpl.fromJson(Map<String, dynamic> json) =>
-      _$$DaydudyImplFromJson(json);
+class _Daydudy implements Daydudy {
+  const _Daydudy({required this.firstName, required this.lastName, required this.stuNo});
+  factory _Daydudy.fromJson(Map<String, dynamic> json) => _$DaydudyFromJson(json);
 
-  @override
-  final String firstName;
-  @override
-  final String lastName;
-  @override
-  final int stuNo;
+@override final  String firstName;
+@override final  String lastName;
+@override final  int stuNo;
 
-  @override
-  String toString() {
-    return 'Daydudy(firstName: $firstName, lastName: $lastName, stuNo: $stuNo)';
-  }
+/// Create a copy of Daydudy
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$DaydudyCopyWith<_Daydudy> get copyWith => __$DaydudyCopyWithImpl<_Daydudy>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$DaydudyImpl &&
-            (identical(other.firstName, firstName) ||
-                other.firstName == firstName) &&
-            (identical(other.lastName, lastName) ||
-                other.lastName == lastName) &&
-            (identical(other.stuNo, stuNo) || other.stuNo == stuNo));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, firstName, lastName, stuNo);
-
-  /// Create a copy of Daydudy
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$DaydudyImplCopyWith<_$DaydudyImpl> get copyWith =>
-      __$$DaydudyImplCopyWithImpl<_$DaydudyImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$DaydudyImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$DaydudyToJson(this, );
 }
 
-abstract class _Daydudy implements Daydudy {
-  const factory _Daydudy({
-    required final String firstName,
-    required final String lastName,
-    required final int stuNo,
-  }) = _$DaydudyImpl;
-
-  factory _Daydudy.fromJson(Map<String, dynamic> json) = _$DaydudyImpl.fromJson;
-
-  @override
-  String get firstName;
-  @override
-  String get lastName;
-  @override
-  int get stuNo;
-
-  /// Create a copy of Daydudy
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$DaydudyImplCopyWith<_$DaydudyImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Daydudy&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.stuNo, stuNo) || other.stuNo == stuNo));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,firstName,lastName,stuNo);
+
+@override
+String toString() {
+  return 'Daydudy(firstName: $firstName, lastName: $lastName, stuNo: $stuNo)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$DaydudyCopyWith<$Res> implements $DaydudyCopyWith<$Res> {
+  factory _$DaydudyCopyWith(_Daydudy value, $Res Function(_Daydudy) _then) = __$DaydudyCopyWithImpl;
+@override @useResult
+$Res call({
+ String firstName, String lastName, int stuNo
+});
+
+
+
+
+}
+/// @nodoc
+class __$DaydudyCopyWithImpl<$Res>
+    implements _$DaydudyCopyWith<$Res> {
+  __$DaydudyCopyWithImpl(this._self, this._then);
+
+  final _Daydudy _self;
+  final $Res Function(_Daydudy) _then;
+
+/// Create a copy of Daydudy
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? firstName = null,Object? lastName = null,Object? stuNo = null,}) {
+  return _then(_Daydudy(
+firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
+as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
+as String,stuNo: null == stuNo ? _self.stuNo : stuNo // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+// dart format on
