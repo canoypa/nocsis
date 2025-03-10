@@ -6,16 +6,14 @@ part of 'daydudy.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$DaydudyImpl _$$DaydudyImplFromJson(Map<String, dynamic> json) =>
-    _$DaydudyImpl(
-      firstName: json['firstName'] as String,
-      lastName: json['lastName'] as String,
-      stuNo: (json['stuNo'] as num).toInt(),
-    );
+_Daydudy _$DaydudyFromJson(Map<String, dynamic> json) => _Daydudy(
+  firstName: json['firstName'] as String,
+  lastName: json['lastName'] as String,
+  stuNo: (json['stuNo'] as num).toInt(),
+);
 
-Map<String, dynamic> _$$DaydudyImplToJson(_$DaydudyImpl instance) =>
-    <String, dynamic>{
-      'firstName': instance.firstName,
-      'lastName': instance.lastName,
-      'stuNo': instance.stuNo,
-    };
+Map<String, dynamic> _$DaydudyToJson(_Daydudy instance) => <String, dynamic>{
+  'firstName': instance.firstName,
+  'lastName': instance.lastName,
+  'stuNo': instance.stuNo,
+};

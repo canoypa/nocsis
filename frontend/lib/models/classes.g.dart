@@ -6,28 +6,24 @@ part of 'classes.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ClassListImpl _$$ClassListImplFromJson(Map<String, dynamic> json) =>
-    _$ClassListImpl(
-      items:
-          (json['items'] as List<dynamic>)
-              .map((e) => ClassData.fromJson(e as Map<String, dynamic>))
-              .toList(),
-    );
+_ClassList _$ClassListFromJson(Map<String, dynamic> json) => _ClassList(
+  items:
+      (json['items'] as List<dynamic>)
+          .map((e) => ClassData.fromJson(e as Map<String, dynamic>))
+          .toList(),
+);
 
-Map<String, dynamic> _$$ClassListImplToJson(_$ClassListImpl instance) =>
+Map<String, dynamic> _$ClassListToJson(_ClassList instance) =>
     <String, dynamic>{'items': instance.items};
 
-_$ClassDataImpl _$$ClassDataImplFromJson(Map<String, dynamic> json) =>
-    _$ClassDataImpl(
-      title: json['title'] as String,
-      period: (json['period'] as num).toInt(),
-      startAt: const LocalDateTimeConverter().fromJson(
-        json['startAt'] as String,
-      ),
-      endAt: const LocalDateTimeConverter().fromJson(json['endAt'] as String),
-    );
+_ClassData _$ClassDataFromJson(Map<String, dynamic> json) => _ClassData(
+  title: json['title'] as String,
+  period: (json['period'] as num).toInt(),
+  startAt: const LocalDateTimeConverter().fromJson(json['startAt'] as String),
+  endAt: const LocalDateTimeConverter().fromJson(json['endAt'] as String),
+);
 
-Map<String, dynamic> _$$ClassDataImplToJson(_$ClassDataImpl instance) =>
+Map<String, dynamic> _$ClassDataToJson(_ClassData instance) =>
     <String, dynamic>{
       'title': instance.title,
       'period': instance.period,

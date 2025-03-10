@@ -1,0 +1,29 @@
+name: Create Release Pull Request
+
+on:
+  push:
+    branches: [development]
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  create_release_pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Create Release Pull Request
+        run: |
+          pr_title=$(echo "Release $(TZ=Asia/Tokyo date +'%Y-%m-%d')")
+
+          release_pr_number=$(gh pr list -B main -H development --json "number" -q ".[0].number")
+          if [ -z "$release_pr_number" ]; then
+            release_pr_number=$(gh pr create -H development -B main -t "$pr_title" -b "wip" --label "🚀 リリース" | sed -n 's/.*\///p')
+          fi
+
+          release_pr_commits=$(gh pr view $release_pr_number --json "commits" --jq "[.commits[].oid]")
+          prs=$(gh pr list -B development -s merged --json 'number,author,mergeCommit,createdAt' | jq --argjson release_pr_commits "$release_pr_commits" '[.[] | select(.mergeCommit.oid | IN($release_pr_commits[]))] | sort_by(.createdAt) | .[]')
+          body=$(echo "$prs" | jq -r '["- #\(.number) @\(.author.login)"] | join("\n")')
+
+          gh pr edit $release_pr_number -t "$pr_title" -b "$body"
