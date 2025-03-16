@@ -1,5 +1,5 @@
 import * as slackModule from "@slack/web-api";
-import { getFirestore } from "firebase-admin/firestore";
+import { Timestamp, getFirestore } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
 import {
   type MockedObject,
@@ -16,7 +16,7 @@ import { notifyDayDutyPerGroup } from "./notify_dayduty_per_group.js";
 describe("notifyDayDutyPerGroup", () => {
   const group = {
     id: "group_1",
-    dayduty_start_date: "2025-01-01",
+    dayduty_start_date: Timestamp.fromDate(new Date("2025-01-01")),
   };
 
   const student = {
