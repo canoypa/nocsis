@@ -1,4 +1,4 @@
-import { type Timestamp, getFirestore } from "firebase-admin/firestore";
+import { getFirestore } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/identity";
 import { DateTime } from "luxon";
 import { firebaseApp } from "~/client/firebaseApp.js";
@@ -19,15 +19,12 @@ export const getDaydutyStuNo = async (
   }
 
   // 日直制度の開始日
-  const startDateEnv = group.dayduty_start_date as Timestamp;
+  const startDateEnv = group.dayduty_start_date;
   if (!startDateEnv) {
     throw new Error("Can not read DAYDUTY_START_DATE");
   }
 
-  const zoneOffset = 9 * 60 * 60 * 1000;
-  const startDate = DateTime.fromMillis(startDateEnv.toMillis() - zoneOffset, {
-    zone: "Asia/Tokyo",
-  });
+  const startDate = DateTime.fromISO(startDateEnv, { zone: "Asia/Tokyo" });
 
   const elapseDays = Math.floor(
     date.setZone("asia/tokyo").diff(startDate).as("days"),

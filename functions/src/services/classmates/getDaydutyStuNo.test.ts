@@ -1,4 +1,4 @@
-import { Timestamp, getFirestore } from "firebase-admin/firestore";
+import { getFirestore } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
 import { beforeEach, describe, expect, it } from "vitest";
 import { firebaseApp } from "~/client/firebaseApp.js";
@@ -6,7 +6,7 @@ import { getDaydutyStuNo } from "./getDaydutyStuNo.js";
 
 describe("getDaydutyStuNo", () => {
   const group = {
-    dayduty_start_date: Timestamp.fromDate(new Date("2025-01-01")),
+    dayduty_start_date: "2025-01-01",
   };
 
   const student = {
