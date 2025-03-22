@@ -8,14 +8,14 @@ part 'weather.g.dart';
 
 final fn = FirebaseFunctions.instanceFor(
   region: "asia-northeast1",
-).httpsCallable("v3-weather-now");
+).httpsCallable("v4-weather-now");
 
 @riverpod
-Future<Weather> weather(Ref ref) async {
+Future<Weather> weather(Ref ref, String groupId) async {
   // 15分ごとに更新
   ref.watch(cronProvider("*/15 * * * *"));
 
-  final res = await fn.call();
+  final res = await fn.call({'groupId': groupId});
 
   if (res.data == null) {
     throw Exception("No data");
