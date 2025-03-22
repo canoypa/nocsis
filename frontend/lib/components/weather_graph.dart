@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nocsis/models/weather.dart';
 import 'package:nocsis/providers/weather.dart';
 
@@ -18,9 +19,11 @@ class WeatherGraph extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+
     final weather =
         ref
-            .watch(weatherProvider)
+            .watch(weatherProvider(groupId))
             .maybeWhen(data: (data) => data, orElse: () => null)
             ?.hourly ??
         _initWeatherHourly;
