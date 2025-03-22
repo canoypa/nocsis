@@ -1,4 +1,4 @@
-import { fetchWeather } from "../../../core/weather/fetchWeather.js";
+import { fetchWeather } from "../../../core/weather/fetchWeather.old.js";
 import { getWeatherNameById } from "../../../core/weather/getWeatherNameById.js";
 import type { WeatherName } from "../../../types/weather.js";
 

@@ -33,6 +33,7 @@ const FiveDayWeatherForecastEndpoint =
 
 /**
  * OpenWeatherMap API から天気情報を取得する
+ * @deprecated 複数クラスで使用できるようにする(#314)対応に伴ってgroupカラムが追加され、将来的に適切な値を返すことができなくなるため
  */
 export const fetchWeather = async (): Promise<WeatherData> => {
   if (
