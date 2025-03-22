@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nocsis/providers/weather.dart';
 
 class WeatherInfo extends ConsumerWidget {
@@ -26,8 +27,10 @@ class WeatherInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+
     final weather = ref
-        .watch(weatherProvider)
+        .watch(weatherProvider(groupId))
         .maybeWhen(data: (data) => data, orElse: () => null);
 
     if (weather == null) {
