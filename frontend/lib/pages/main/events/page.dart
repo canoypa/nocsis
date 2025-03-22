@@ -8,7 +8,9 @@ import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/models/monthly_events.dart';
 
 class PersonalEventsRoute extends GoRouteData {
-  const PersonalEventsRoute();
+  final String groupId;
+
+  const PersonalEventsRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
@@ -37,15 +39,19 @@ class PersonalEventsRoute extends GoRouteData {
   }
 }
 
-final eventsProvider = FutureProvider<MonthlyEventList>((ref) async {
+final eventsProvider = FutureProvider.family<MonthlyEventList, String>((
+  ref,
+  groupId,
+) async {
   final DateTime now = DateTime.now();
   final DateTime today = DateTime(now.year, now.month, now.day);
 
-  final HttpsCallable getEvents =
-      FirebaseFunctions.instanceFor(region: "asia-northeast1")
-          .httpsCallable("v3-events-monthly");
+  final HttpsCallable getEvents = FirebaseFunctions.instanceFor(
+    region: "asia-northeast1",
+  ).httpsCallable("v4-events-monthly");
 
   final res = await getEvents.call({
+    'groupId': groupId,
     "date": today.toIso8601String(),
   });
 
@@ -57,7 +63,8 @@ class EventsView extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final snap = ref.watch(eventsProvider);
+    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+    final snap = ref.watch(eventsProvider(groupId));
 
     return snap.when(
       data: (d) {
@@ -65,10 +72,7 @@ class EventsView extends ConsumerWidget {
           return const Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.event_available_outlined),
-                Text("予定なし"),
-              ],
+              children: [Icon(Icons.event_available_outlined), Text("予定なし")],
             ),
           );
         }
@@ -87,20 +91,20 @@ class EventsView extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
-                        children: (d.items[i].items).map(
-                          (data) {
-                            return BasicCard(
-                              primary: Text(
-                                data.title,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              // TODO: 日を跨いだりする場合の表示に対応する
-                              secondary: Text(
-                                DateFormat("M月d日").format(data.startAt),
-                              ),
-                            );
-                          },
-                        ).toList(),
+                        children:
+                            (d.items[i].items).map((data) {
+                              return BasicCard(
+                                primary: Text(
+                                  data.title,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                                // TODO: 日を跨いだりする場合の表示に対応する
+                                secondary: Text(
+                                  DateFormat("M月d日").format(data.startAt),
+                                ),
+                              );
+                            }).toList(),
                       ),
                     ),
                   ],
@@ -111,14 +115,10 @@ class EventsView extends ConsumerWidget {
         );
       },
       error: (error, stackTrace) {
-        return const Center(
-          child: Text('Something went wrong'),
-        );
+        return const Center(child: Text('Something went wrong'));
       },
       loading: () {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
+        return const Center(child: CircularProgressIndicator());
       },
     );
   }

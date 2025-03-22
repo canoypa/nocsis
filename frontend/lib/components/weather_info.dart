@@ -26,7 +26,9 @@ class WeatherInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weather = ref.watch(weatherProvider).value;
+    final weather = ref
+        .watch(weatherProvider)
+        .maybeWhen(data: (data) => data, orElse: () => null);
 
     if (weather == null) {
       return const SizedBox();
@@ -51,26 +53,24 @@ class WeatherInfo extends ConsumerWidget {
                   weather.current.temp.toString(),
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
-                Text(
-                  "℃",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                Text("℃", style: Theme.of(context).textTheme.titleMedium),
               ],
-            )
+            ),
           ],
         ),
         Row(
-          children: weather.threeHour
-              .map(
-                (e) => SvgPicture.asset(
-                  _getWeatherIconPath(e),
-                  width: 48.sp,
-                  height: 48.sp,
-                ),
-              )
-              .expand((e) => [e, Icon(Icons.navigate_next, size: 32.sp)])
-              .toList()
-            ..removeLast(),
+          children:
+              weather.threeHour
+                  .map(
+                    (e) => SvgPicture.asset(
+                      _getWeatherIconPath(e),
+                      width: 48.sp,
+                      height: 48.sp,
+                    ),
+                  )
+                  .expand((e) => [e, Icon(Icons.navigate_next, size: 32.sp)])
+                  .toList()
+                ..removeLast(),
         ),
       ],
     );

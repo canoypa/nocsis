@@ -54,7 +54,7 @@ jobs:
           workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action-deploy-functions/providers/github-action
           service_account: gh-action-deploy-functions@class-clock-40088.iam.gserviceaccount.com
       - name: Deploy
-        run: pnpm firebase deploy --only functions
+        run: pnpm firebase deploy --only functions --force
 
   deploy_frontend:
     runs-on: ubuntu-latest

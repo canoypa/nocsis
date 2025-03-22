@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class ConsoleMemberRoute extends GoRouteData {
-  const ConsoleMemberRoute();
+  final String groupId;
+
+  const ConsoleMemberRoute(this.groupId);
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
@@ -22,9 +24,7 @@ class ConsoleMemberRoute extends GoRouteData {
 }
 
 class ConsoleMemberPage extends StatelessWidget {
-  const ConsoleMemberPage({
-    super.key,
-  });
+  const ConsoleMemberPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +35,7 @@ class ConsoleMemberPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'メンバー',
-              style: Theme.of(context).textTheme.displayMedium,
-            ),
+            Text('メンバー', style: Theme.of(context).textTheme.displayMedium),
             const SizedBox(height: 24),
             const Text('グループのメンバーを管理します。'),
             const SizedBox(height: 48),
@@ -77,7 +74,7 @@ class ConsoleMemberPage extends StatelessWidget {
                   ],
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

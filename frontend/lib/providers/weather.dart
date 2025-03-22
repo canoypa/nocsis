@@ -6,8 +6,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'weather.g.dart';
 
-final fn = FirebaseFunctions.instanceFor(region: "asia-northeast1")
-    .httpsCallable("v3-weather-now");
+final fn = FirebaseFunctions.instanceFor(
+  region: "asia-northeast1",
+).httpsCallable("v3-weather-now");
 
 @riverpod
 Future<Weather> weather(Ref ref) async {
@@ -15,5 +16,10 @@ Future<Weather> weather(Ref ref) async {
   ref.watch(cronProvider("*/15 * * * *"));
 
   final res = await fn.call();
+
+  if (res.data == null) {
+    throw Exception("No data");
+  }
+
   return Weather.fromJson(res.data);
 }

@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
+import 'package:nocsis/components/select_group_menu.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/routes/router.dart';
@@ -11,13 +12,13 @@ class PersonalShell extends ShellRouteData {
 
   @override
   Page<void> pageBuilder(
-      BuildContext context, GoRouterState state, Widget navigator) {
+    BuildContext context,
+    GoRouterState state,
+    Widget navigator,
+  ) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: MainPage(
-        location: state.matchedLocation,
-        child: navigator,
-      ),
+      child: MainPage(navigationState: state, child: navigator),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,
@@ -35,13 +36,13 @@ enum Navigation {
     label: "ホーム",
     icon: Icons.school_outlined,
     selectedIcon: Icons.school,
-    pagePath: "/personal/",
+    pagePath: "/groups/:groupId",
   ),
   events(
     label: "イベント",
     icon: Icons.event_outlined,
     selectedIcon: Icons.event,
-    pagePath: "/personal/events",
+    pagePath: "/groups/:groupId/events",
   );
 
   final String label;
@@ -66,12 +67,12 @@ enum Navigation {
 
 class MainPage extends StatelessWidget {
   final Widget child;
-  final String location;
+  final GoRouterState navigationState;
 
   const MainPage({
     super.key,
+    required this.navigationState,
     required this.child,
-    required this.location,
   });
 
   Widget _buildNavRail(BuildContext context, Navigation navigation) {
@@ -79,22 +80,25 @@ class MainPage extends StatelessWidget {
       // top padding, but it doesn't look like it
       leading: const SizedBox(height: 8),
       selectedIndex: navigation.index,
-      destinations: Navigation.values
-          .map(
-            (e) => NavigationRailDestination(
-              label: Text(e.label),
-              icon: Icon(e.icon),
-              selectedIcon: Icon(e.selectedIcon),
-            ),
-          )
-          .toList(),
+      destinations:
+          Navigation.values
+              .map(
+                (e) => NavigationRailDestination(
+                  label: Text(e.label),
+                  icon: Icon(e.icon),
+                  selectedIcon: Icon(e.selectedIcon),
+                ),
+              )
+              .toList(),
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
+        final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+
         if (nav == Navigation.home) {
-          const PersonalHomeRoute().go(context);
+          PersonalHomeRoute(groupId).go(context);
         } else if (nav == Navigation.events) {
-          const PersonalEventsRoute().go(context);
+          PersonalEventsRoute(groupId).go(context);
         }
       },
       labelType: NavigationRailLabelType.all,
@@ -104,22 +108,25 @@ class MainPage extends StatelessWidget {
   Widget _buildNavBar(BuildContext context, Navigation navigation) {
     return NavigationBar(
       selectedIndex: navigation.index,
-      destinations: Navigation.values
-          .map(
-            (e) => NavigationDestination(
-              label: e.label,
-              icon: Icon(e.icon),
-              selectedIcon: Icon(e.selectedIcon),
-            ),
-          )
-          .toList(),
+      destinations:
+          Navigation.values
+              .map(
+                (e) => NavigationDestination(
+                  label: e.label,
+                  icon: Icon(e.icon),
+                  selectedIcon: Icon(e.selectedIcon),
+                ),
+              )
+              .toList(),
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
+        final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+
         if (nav == Navigation.home) {
-          const PersonalHomeRoute().go(context);
+          PersonalHomeRoute(groupId).go(context);
         } else if (nav == Navigation.events) {
-          const PersonalEventsRoute().go(context);
+          PersonalEventsRoute(groupId).go(context);
         }
       },
     );
@@ -127,16 +134,14 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nav = Navigation.fromPagePath(location);
+    final nav = Navigation.fromPagePath(navigationState.fullPath!);
 
     return LayoutBuilder(
       builder: ((context, constraints) {
         final bool isLargeScreen = constraints.minWidth >= 1200;
 
         return Scaffold(
-          appBar: AppBar(
-            actions: const [AccountMenu()],
-          ),
+          appBar: AppBar(actions: const [SelectGroupMenu(), AccountMenu()]),
           body: Row(
             children: [
               if (isLargeScreen) _buildNavRail(context, nav),

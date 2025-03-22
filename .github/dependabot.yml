@@ -1,0 +1,41 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/functions"
+    schedule:
+      interval: "weekly"
+    groups:
+      firebase:
+        patterns:
+          - "firebase-*"
+      patch:
+        update-types: ["patch"]
+
+  - package-ecosystem: "pub"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    groups:
+      firebase:
+        patterns:
+          - "firebase_*"
+          - "cloud_functions"
+      riverpod:
+        patterns:
+          - "riverpod_*"
+          - "flutter_riverpod"
+          - "freezed"
+          - "freezed_annotation"
+          - "json_serializable"
+          - "json_annotation"
+      go_router:
+        patterns:
+          - "go_router"
+          - "go_router_builder"
+      patch:
+        update-types: ["patch"]

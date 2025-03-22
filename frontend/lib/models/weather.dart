@@ -4,7 +4,7 @@ part 'weather.freezed.dart';
 part 'weather.g.dart';
 
 @freezed
-class Weather with _$Weather {
+abstract class Weather with _$Weather {
   const factory Weather({
     required WeatherCurrent current,
     required WeatherHourly hourly,
@@ -16,18 +16,16 @@ class Weather with _$Weather {
 }
 
 @freezed
-class WeatherCurrent with _$WeatherCurrent {
-  const factory WeatherCurrent({
-    required String name,
-    required int temp,
-  }) = _WeatherCurrent;
+abstract class WeatherCurrent with _$WeatherCurrent {
+  const factory WeatherCurrent({required String name, required int temp}) =
+      _WeatherCurrent;
 
   factory WeatherCurrent.fromJson(Map<String, dynamic> json) =>
       _$WeatherCurrentFromJson(json);
 }
 
 @freezed
-class WeatherHourly with _$WeatherHourly {
+abstract class WeatherHourly with _$WeatherHourly {
   const factory WeatherHourly({
     required List<num> temp,
     required List<num> pop,

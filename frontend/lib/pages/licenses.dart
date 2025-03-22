@@ -28,18 +28,16 @@ class LicensesRoute extends GoRouteData {
 }
 
 @riverpod
-Future<Map<String, List<LicenseParagraph>>> licenses(ref) async {
-  final licensesEntries = await LicenseRegistry.licenses.toList();
-
+Stream<Map<String, List<LicenseParagraph>>> licenses(ref) async* {
   Map<String, List<LicenseParagraph>> licenses = {};
 
-  for (final license in licensesEntries) {
-    for (final package in license.packages) {
-      licenses.putIfAbsent(package, () => []).addAll(license.paragraphs);
+  await for (final entry in LicenseRegistry.licenses) {
+    for (final package in entry.packages) {
+      licenses.putIfAbsent(package, () => []).addAll(entry.paragraphs);
     }
-  }
 
-  return licenses;
+    yield licenses;
+  }
 }
 
 class LicensesPage extends ConsumerWidget {
@@ -56,8 +54,8 @@ class LicensesPage extends ConsumerWidget {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                if (GoRouter.of(context).canPop()) {
-                  GoRouter.of(context).pop();
+                if (context.canPop()) {
+                  context.pop();
                 } else {
                   GoRouter.of(context).go('/');
                 }
@@ -69,9 +67,7 @@ class LicensesPage extends ConsumerWidget {
               centerTitle: false,
             ),
           ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 48),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 48)),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: snapshot.when(
@@ -87,7 +83,9 @@ class LicensesPage extends ConsumerWidget {
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 800),
                         child: LicenseTile(
-                            packageName: packageName, paragraphs: paragraphs),
+                          packageName: packageName,
+                          paragraphs: paragraphs,
+                        ),
                       ),
                     );
                   },
@@ -101,12 +99,10 @@ class LicensesPage extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const SliverToBoxAdapter(
-                child: SizedBox(),
-              ),
-              error: (error, stackTrace) => SliverToBoxAdapter(
-                child: Text('Error: $error'),
-              ),
+              loading: () => const SliverToBoxAdapter(child: SizedBox()),
+              error:
+                  (error, stackTrace) =>
+                      SliverToBoxAdapter(child: Text('Error: $error')),
             ),
           ),
         ],

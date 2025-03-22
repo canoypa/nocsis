@@ -6,28 +6,24 @@ part of 'events.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$EventListImpl _$$EventListImplFromJson(Map<String, dynamic> json) =>
-    _$EventListImpl(
-      items: (json['items'] as List<dynamic>)
+_EventList _$EventListFromJson(Map<String, dynamic> json) => _EventList(
+  items:
+      (json['items'] as List<dynamic>)
           .map((e) => EventData.fromJson(e as Map<String, dynamic>))
           .toList(),
-    );
+);
 
-Map<String, dynamic> _$$EventListImplToJson(_$EventListImpl instance) =>
-    <String, dynamic>{
-      'items': instance.items,
-    };
+Map<String, dynamic> _$EventListToJson(_EventList instance) =>
+    <String, dynamic>{'items': instance.items};
 
-_$EventDataImpl _$$EventDataImplFromJson(Map<String, dynamic> json) =>
-    _$EventDataImpl(
-      title: json['title'] as String,
-      isAllDay: json['isAllDay'] as bool,
-      startAt:
-          const LocalDateTimeConverter().fromJson(json['startAt'] as String),
-      endAt: const LocalDateTimeConverter().fromJson(json['endAt'] as String),
-    );
+_EventData _$EventDataFromJson(Map<String, dynamic> json) => _EventData(
+  title: json['title'] as String,
+  isAllDay: json['isAllDay'] as bool,
+  startAt: const LocalDateTimeConverter().fromJson(json['startAt'] as String),
+  endAt: const LocalDateTimeConverter().fromJson(json['endAt'] as String),
+);
 
-Map<String, dynamic> _$$EventDataImplToJson(_$EventDataImpl instance) =>
+Map<String, dynamic> _$EventDataToJson(_EventData instance) =>
     <String, dynamic>{
       'title': instance.title,
       'isAllDay': instance.isAllDay,

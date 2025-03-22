@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/models/user_joined_groups.dart';
+import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
 import 'package:nocsis/pages/console/group.dart';
@@ -17,35 +20,48 @@ import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
-import 'package:nocsis/pages/settings/sign_in.dart';
 import 'package:nocsis/pages/sign_in.dart';
-import 'package:nocsis/screens/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'router.g.dart';
 
 @TypedShellRoute<AppShell>(
   routes: [
-    TypedGoRoute<HomeRoute>(path: '/'),
     TypedGoRoute<SignInRoute>(path: '/sign_in'),
+
+    // 新Path
     TypedShellRoute<PersonalShell>(
       routes: [
-        TypedGoRoute<PersonalHomeRoute>(path: '/personal'),
-        TypedGoRoute<PersonalEventsRoute>(path: '/personal/events'),
+        TypedGoRoute<PersonalHomeRoute>(path: '/groups/:groupId'),
+        TypedGoRoute<PersonalEventsRoute>(path: '/groups/:groupId/events'),
       ],
     ),
-    TypedShellRoute<ConsoleShellRoute>(routes: [
-      TypedGoRoute<ConsoleTopRoute>(path: '/console'),
-      TypedGoRoute<ConsoleGroupRoute>(path: '/console/group'),
-      TypedGoRoute<ConsoleMemberRoute>(path: '/console/member'),
-      TypedGoRoute<ConsoleCalendarRoute>(path: '/console/calendar'),
-      TypedGoRoute<ConsoleDayDutyRoute>(path: '/console/day_duty'),
-      TypedGoRoute<ConsoleWeatherRoute>(path: '/console/weather'),
-      TypedGoRoute<ConsoleSlackRoute>(path: '/console/slack'),
-    ]),
-    TypedShellRoute<SettingsShellRoute>(routes: [
-      TypedGoRoute<SettingsTopRoute>(path: '/settings'),
-      TypedGoRoute<SettingsSignInRoute>(path: '/settings/sign_in'),
-    ]),
+    TypedGoRoute<ClassroomRoute>(path: '/groups/:groupId/classroom'),
+    TypedShellRoute<ConsoleShellRoute>(
+      routes: [
+        TypedGoRoute<ConsoleTopRoute>(path: '/groups/:groupId/console'),
+        TypedGoRoute<ConsoleGroupRoute>(path: '/groups/:groupId/console/group'),
+        TypedGoRoute<ConsoleMemberRoute>(
+          path: '/groups/:groupId/console/member',
+        ),
+        TypedGoRoute<ConsoleCalendarRoute>(
+          path: '/groups/:groupId/console/calendar',
+        ),
+        TypedGoRoute<ConsoleDayDutyRoute>(
+          path: '/groups/:groupId/console/day_duty',
+        ),
+        TypedGoRoute<ConsoleWeatherRoute>(
+          path: '/groups/:groupId/console/weather',
+        ),
+        TypedGoRoute<ConsoleSlackRoute>(path: '/groups/:groupId/console/slack'),
+      ],
+    ),
+    TypedShellRoute<SettingsShellRoute>(
+      routes: [
+        TypedGoRoute<SettingsTopRoute>(path: '/groups/:groupId/settings'),
+      ],
+    ),
+
     TypedGoRoute<LicensesRoute>(path: '/licenses'),
   ],
 )
@@ -53,34 +69,6 @@ class AppShell extends ShellRouteData {
   @override
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
     return navigator;
-  }
-
-  @override
-  FutureOr<String?> redirect(BuildContext context, GoRouterState state) async {
-    final user = await FirebaseAuth.instance.authStateChanges().first;
-    final isSignIn = user != null;
-
-    if (!isSignIn && state.uri.path != "/sign_in") {
-      final continueUri = state.uri.path;
-      if (continueUri == "/") {
-        return "/sign_in";
-      }
-
-      return "/sign_in?continue=$continueUri";
-    }
-
-    if (isSignIn && state.uri.path == "/sign_in") {
-      final continueUri =
-          Uri.tryParse(state.uri.queryParameters["continue"] ?? "/");
-
-      if (continueUri != null) {
-        return continueUri.path;
-      }
-
-      return "/";
-    }
-
-    return null;
   }
 }
 
@@ -90,10 +78,9 @@ class GoRouterRefresher extends ChangeNotifier {
   GoRouterRefresher() {
     notifyListeners();
 
-    _auth = FirebaseAuth.instance
-        .authStateChanges()
-        .asBroadcastStream()
-        .listen((_) => notifyListeners());
+    _auth = FirebaseAuth.instance.authStateChanges().asBroadcastStream().listen(
+      (_) => notifyListeners(),
+    );
   }
 
   @override
@@ -103,7 +90,91 @@ class GoRouterRefresher extends ChangeNotifier {
   }
 }
 
+Future<String?> _redirectNotSignedInUser(Uri uri) async {
+  final user = await FirebaseAuth.instance.authStateChanges().first;
+  final isSignIn = user != null;
+
+  if (!isSignIn && uri.path != "/sign_in") {
+    final continueUri = uri.path;
+    if (continueUri == "/") {
+      return "/sign_in";
+    }
+
+    return "/sign_in?continue=$continueUri";
+  }
+
+  return null;
+}
+
+Future<String?> _redirectSignedInUser(Uri uri) async {
+  final user = await FirebaseAuth.instance.authStateChanges().first;
+  final isSignIn = user != null;
+
+  if (isSignIn && uri.path == "/sign_in") {
+    final continueUri = Uri.tryParse(uri.queryParameters["continue"] ?? "/");
+
+    if (continueUri != null) {
+      return await _redirectFromOldPaths(continueUri) ?? continueUri.path;
+    }
+
+    return "/";
+  }
+
+  return null;
+}
+
+Future<String?> _redirectFromOldPaths(Uri uri) async {
+  final oldPaths = [
+    '/',
+    '/events',
+    '/classroom',
+    '/console',
+    '/console/group',
+    '/console/member',
+    '/console/calendar',
+    '/console/day_duty',
+    '/console/weather',
+    '/console/slack',
+    '/settings',
+  ];
+
+  if (oldPaths.contains(uri.path)) {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final groupId = sharedPreferences.getString('latest_group_id');
+
+    if (groupId != null) {
+      return uri.path == '/'
+          ? "/groups/$groupId"
+          : "/groups/$groupId${uri.path}";
+    }
+
+    final res =
+        await FirebaseFunctions.instanceFor(
+          region: "asia-northeast1",
+        ).httpsCallable("v4-groups-user_joined_groups-get").call();
+    final data = UserJoinedGroups.fromJson(res.data);
+
+    final firstUserJoinedGroup = data.groups.first;
+
+    sharedPreferences.setString(
+      'latest_group_id',
+      firstUserJoinedGroup.groupId,
+    );
+
+    return uri.path == '/'
+        ? "/groups/${firstUserJoinedGroup.groupId}"
+        : "/groups/${firstUserJoinedGroup.groupId}${uri.path}";
+  }
+
+  return null;
+}
+
 final router = GoRouter(
   routes: $appRoutes,
   refreshListenable: GoRouterRefresher(),
+  redirect: (context, state) async {
+    return await _redirectNotSignedInUser(state.uri) ??
+        await _redirectSignedInUser(state.uri) ??
+        await _redirectFromOldPaths(state.uri);
+  },
 );

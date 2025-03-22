@@ -1,4 +1,4 @@
-import parser from "cron-parser";
+import { CronExpressionParser } from "cron-parser";
 import { DateTime } from "luxon";
 
 export type CrontabHandler<T = void> = (
@@ -18,24 +18,26 @@ export const crontab = (
     default: CrontabHandler;
   }>,
 ) => {
-  // crontab の解析
-  const interval = parser.parseExpression(expression, { tz: "asia/tokyo" });
-
   return async (date: DateTime): Promise<void> => {
     // 現在時刻を分切り捨てで取得
     const now = date.setZone("asia/tokyo").startOf("minute");
 
-    // 基準時間を 1 分前に更新
-    interval.reset(now.minus({ minutes: 1 }).toISO());
+    // crontab の解析
+    const interval = CronExpressionParser.parse(expression, {
+      tz: "asia/tokyo",
+      // nextが現在時刻かをチェックするため、過去の時刻を指定する
+      currentDate: now.minus({ minutes: 1 }).toJSDate(),
+    });
 
-    // 1 分前から見た次のインターバルを取得
-    const dateString = interval.next().toISOString();
-    const timestamp = DateTime.fromISO(dateString, { zone: "asia/tokyo" });
+    const nextStr = interval.next().toISOString();
+    if (!nextStr) return;
+
+    const next = DateTime.fromISO(nextStr, { zone: "asia/tokyo" });
 
     // 現在時刻と一致すれば実行
-    const diff = now.diff(timestamp).as("minutes");
+    const diff = now.diff(next).as("minutes");
     if (diff === 0) {
-      return (await loadModule()).default(timestamp);
+      return (await loadModule()).default(next);
     }
   };
 };

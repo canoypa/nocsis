@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nocsis/providers/daydudy.dart';
 
 class Daydudy extends ConsumerWidget {
@@ -8,7 +9,10 @@ class Daydudy extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final daydudy = ref.watch(daydudyProvider).value;
+    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+    final daydudy = ref
+        .watch(daydudyProvider(groupId))
+        .maybeWhen(data: (data) => data, orElse: () => null);
 
     if (daydudy == null) {
       return const SizedBox();

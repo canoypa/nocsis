@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,383 +10,287 @@ part of 'events.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-EventList _$EventListFromJson(Map<String, dynamic> json) {
-  return _EventList.fromJson(json);
-}
 
 /// @nodoc
 mixin _$EventList {
-  List<EventData> get items => throw _privateConstructorUsedError;
+
+ List<EventData> get items;
+/// Create a copy of EventList
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$EventListCopyWith<EventList> get copyWith => _$EventListCopyWithImpl<EventList>(this as EventList, _$identity);
 
   /// Serializes this EventList to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of EventList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $EventListCopyWith<EventList> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EventList&&const DeepCollectionEquality().equals(other.items, items));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items));
+
+@override
+String toString() {
+  return 'EventList(items: $items)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $EventListCopyWith<$Res> {
-  factory $EventListCopyWith(EventList value, $Res Function(EventList) then) =
-      _$EventListCopyWithImpl<$Res, EventList>;
-  @useResult
-  $Res call({List<EventData> items});
-}
+abstract mixin class $EventListCopyWith<$Res>  {
+  factory $EventListCopyWith(EventList value, $Res Function(EventList) _then) = _$EventListCopyWithImpl;
+@useResult
+$Res call({
+ List<EventData> items
+});
 
+
+
+
+}
 /// @nodoc
-class _$EventListCopyWithImpl<$Res, $Val extends EventList>
+class _$EventListCopyWithImpl<$Res>
     implements $EventListCopyWith<$Res> {
-  _$EventListCopyWithImpl(this._value, this._then);
+  _$EventListCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final EventList _self;
+  final $Res Function(EventList) _then;
 
-  /// Create a copy of EventList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_value.copyWith(
-      items: null == items
-          ? _value.items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<EventData>,
-    ) as $Val);
-  }
+/// Create a copy of EventList
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? items = null,}) {
+  return _then(_self.copyWith(
+items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
+as List<EventData>,
+  ));
 }
 
-/// @nodoc
-abstract class _$$EventListImplCopyWith<$Res>
-    implements $EventListCopyWith<$Res> {
-  factory _$$EventListImplCopyWith(
-          _$EventListImpl value, $Res Function(_$EventListImpl) then) =
-      __$$EventListImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({List<EventData> items});
 }
 
-/// @nodoc
-class __$$EventListImplCopyWithImpl<$Res>
-    extends _$EventListCopyWithImpl<$Res, _$EventListImpl>
-    implements _$$EventListImplCopyWith<$Res> {
-  __$$EventListImplCopyWithImpl(
-      _$EventListImpl _value, $Res Function(_$EventListImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of EventList
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? items = null,
-  }) {
-    return _then(_$EventListImpl(
-      items: null == items
-          ? _value._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<EventData>,
-    ));
-  }
-}
 
 /// @nodoc
 @JsonSerializable()
-class _$EventListImpl implements _EventList {
-  const _$EventListImpl({required final List<EventData> items})
-      : _items = items;
 
-  factory _$EventListImpl.fromJson(Map<String, dynamic> json) =>
-      _$$EventListImplFromJson(json);
+class _EventList implements EventList {
+  const _EventList({required final  List<EventData> items}): _items = items;
+  factory _EventList.fromJson(Map<String, dynamic> json) => _$EventListFromJson(json);
 
-  final List<EventData> _items;
-  @override
-  List<EventData> get items {
-    if (_items is EqualUnmodifiableListView) return _items;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_items);
-  }
-
-  @override
-  String toString() {
-    return 'EventList(items: $items)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$EventListImpl &&
-            const DeepCollectionEquality().equals(other._items, _items));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
-
-  /// Create a copy of EventList
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$EventListImplCopyWith<_$EventListImpl> get copyWith =>
-      __$$EventListImplCopyWithImpl<_$EventListImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$EventListImplToJson(
-      this,
-    );
-  }
+ final  List<EventData> _items;
+@override List<EventData> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
 }
 
-abstract class _EventList implements EventList {
-  const factory _EventList({required final List<EventData> items}) =
-      _$EventListImpl;
 
-  factory _EventList.fromJson(Map<String, dynamic> json) =
-      _$EventListImpl.fromJson;
+/// Create a copy of EventList
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$EventListCopyWith<_EventList> get copyWith => __$EventListCopyWithImpl<_EventList>(this, _$identity);
 
-  @override
-  List<EventData> get items;
-
-  /// Create a copy of EventList
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$EventListImplCopyWith<_$EventListImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+Map<String, dynamic> toJson() {
+  return _$EventListToJson(this, );
 }
 
-EventData _$EventDataFromJson(Map<String, dynamic> json) {
-  return _EventData.fromJson(json);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EventList&&const DeepCollectionEquality().equals(other._items, _items));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items));
+
+@override
+String toString() {
+  return 'EventList(items: $items)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$EventListCopyWith<$Res> implements $EventListCopyWith<$Res> {
+  factory _$EventListCopyWith(_EventList value, $Res Function(_EventList) _then) = __$EventListCopyWithImpl;
+@override @useResult
+$Res call({
+ List<EventData> items
+});
+
+
+
+
+}
+/// @nodoc
+class __$EventListCopyWithImpl<$Res>
+    implements _$EventListCopyWith<$Res> {
+  __$EventListCopyWithImpl(this._self, this._then);
+
+  final _EventList _self;
+  final $Res Function(_EventList) _then;
+
+/// Create a copy of EventList
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? items = null,}) {
+  return _then(_EventList(
+items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<EventData>,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$EventData {
-  String get title => throw _privateConstructorUsedError;
-  bool get isAllDay => throw _privateConstructorUsedError;
-  @LocalDateTimeConverter()
-  DateTime get startAt => throw _privateConstructorUsedError;
-  @LocalDateTimeConverter()
-  DateTime get endAt => throw _privateConstructorUsedError;
+
+ String get title; bool get isAllDay;@LocalDateTimeConverter() DateTime get startAt;@LocalDateTimeConverter() DateTime get endAt;
+/// Create a copy of EventData
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$EventDataCopyWith<EventData> get copyWith => _$EventDataCopyWithImpl<EventData>(this as EventData, _$identity);
 
   /// Serializes this EventData to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of EventData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $EventDataCopyWith<EventData> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EventData&&(identical(other.title, title) || other.title == title)&&(identical(other.isAllDay, isAllDay) || other.isAllDay == isAllDay)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,isAllDay,startAt,endAt);
+
+@override
+String toString() {
+  return 'EventData(title: $title, isAllDay: $isAllDay, startAt: $startAt, endAt: $endAt)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $EventDataCopyWith<$Res> {
-  factory $EventDataCopyWith(EventData value, $Res Function(EventData) then) =
-      _$EventDataCopyWithImpl<$Res, EventData>;
-  @useResult
-  $Res call(
-      {String title,
-      bool isAllDay,
-      @LocalDateTimeConverter() DateTime startAt,
-      @LocalDateTimeConverter() DateTime endAt});
-}
+abstract mixin class $EventDataCopyWith<$Res>  {
+  factory $EventDataCopyWith(EventData value, $Res Function(EventData) _then) = _$EventDataCopyWithImpl;
+@useResult
+$Res call({
+ String title, bool isAllDay,@LocalDateTimeConverter() DateTime startAt,@LocalDateTimeConverter() DateTime endAt
+});
 
+
+
+
+}
 /// @nodoc
-class _$EventDataCopyWithImpl<$Res, $Val extends EventData>
+class _$EventDataCopyWithImpl<$Res>
     implements $EventDataCopyWith<$Res> {
-  _$EventDataCopyWithImpl(this._value, this._then);
+  _$EventDataCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final EventData _self;
+  final $Res Function(EventData) _then;
 
-  /// Create a copy of EventData
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? title = null,
-    Object? isAllDay = null,
-    Object? startAt = null,
-    Object? endAt = null,
-  }) {
-    return _then(_value.copyWith(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      isAllDay: null == isAllDay
-          ? _value.isAllDay
-          : isAllDay // ignore: cast_nullable_to_non_nullable
-              as bool,
-      startAt: null == startAt
-          ? _value.startAt
-          : startAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endAt: null == endAt
-          ? _value.endAt
-          : endAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
-  }
+/// Create a copy of EventData
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? isAllDay = null,Object? startAt = null,Object? endAt = null,}) {
+  return _then(_self.copyWith(
+title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,isAllDay: null == isAllDay ? _self.isAllDay : isAllDay // ignore: cast_nullable_to_non_nullable
+as bool,startAt: null == startAt ? _self.startAt : startAt // ignore: cast_nullable_to_non_nullable
+as DateTime,endAt: null == endAt ? _self.endAt : endAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
 }
 
-/// @nodoc
-abstract class _$$EventDataImplCopyWith<$Res>
-    implements $EventDataCopyWith<$Res> {
-  factory _$$EventDataImplCopyWith(
-          _$EventDataImpl value, $Res Function(_$EventDataImpl) then) =
-      __$$EventDataImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String title,
-      bool isAllDay,
-      @LocalDateTimeConverter() DateTime startAt,
-      @LocalDateTimeConverter() DateTime endAt});
 }
 
-/// @nodoc
-class __$$EventDataImplCopyWithImpl<$Res>
-    extends _$EventDataCopyWithImpl<$Res, _$EventDataImpl>
-    implements _$$EventDataImplCopyWith<$Res> {
-  __$$EventDataImplCopyWithImpl(
-      _$EventDataImpl _value, $Res Function(_$EventDataImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of EventData
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? title = null,
-    Object? isAllDay = null,
-    Object? startAt = null,
-    Object? endAt = null,
-  }) {
-    return _then(_$EventDataImpl(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      isAllDay: null == isAllDay
-          ? _value.isAllDay
-          : isAllDay // ignore: cast_nullable_to_non_nullable
-              as bool,
-      startAt: null == startAt
-          ? _value.startAt
-          : startAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endAt: null == endAt
-          ? _value.endAt
-          : endAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
-  }
-}
 
 /// @nodoc
 @JsonSerializable()
-class _$EventDataImpl implements _EventData {
-  const _$EventDataImpl(
-      {required this.title,
-      required this.isAllDay,
-      @LocalDateTimeConverter() required this.startAt,
-      @LocalDateTimeConverter() required this.endAt});
 
-  factory _$EventDataImpl.fromJson(Map<String, dynamic> json) =>
-      _$$EventDataImplFromJson(json);
+class _EventData implements EventData {
+  const _EventData({required this.title, required this.isAllDay, @LocalDateTimeConverter() required this.startAt, @LocalDateTimeConverter() required this.endAt});
+  factory _EventData.fromJson(Map<String, dynamic> json) => _$EventDataFromJson(json);
 
-  @override
-  final String title;
-  @override
-  final bool isAllDay;
-  @override
-  @LocalDateTimeConverter()
-  final DateTime startAt;
-  @override
-  @LocalDateTimeConverter()
-  final DateTime endAt;
+@override final  String title;
+@override final  bool isAllDay;
+@override@LocalDateTimeConverter() final  DateTime startAt;
+@override@LocalDateTimeConverter() final  DateTime endAt;
 
-  @override
-  String toString() {
-    return 'EventData(title: $title, isAllDay: $isAllDay, startAt: $startAt, endAt: $endAt)';
-  }
+/// Create a copy of EventData
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$EventDataCopyWith<_EventData> get copyWith => __$EventDataCopyWithImpl<_EventData>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$EventDataImpl &&
-            (identical(other.title, title) || other.title == title) &&
-            (identical(other.isAllDay, isAllDay) ||
-                other.isAllDay == isAllDay) &&
-            (identical(other.startAt, startAt) || other.startAt == startAt) &&
-            (identical(other.endAt, endAt) || other.endAt == endAt));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, title, isAllDay, startAt, endAt);
-
-  /// Create a copy of EventData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$EventDataImplCopyWith<_$EventDataImpl> get copyWith =>
-      __$$EventDataImplCopyWithImpl<_$EventDataImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$EventDataImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$EventDataToJson(this, );
 }
 
-abstract class _EventData implements EventData {
-  const factory _EventData(
-          {required final String title,
-          required final bool isAllDay,
-          @LocalDateTimeConverter() required final DateTime startAt,
-          @LocalDateTimeConverter() required final DateTime endAt}) =
-      _$EventDataImpl;
-
-  factory _EventData.fromJson(Map<String, dynamic> json) =
-      _$EventDataImpl.fromJson;
-
-  @override
-  String get title;
-  @override
-  bool get isAllDay;
-  @override
-  @LocalDateTimeConverter()
-  DateTime get startAt;
-  @override
-  @LocalDateTimeConverter()
-  DateTime get endAt;
-
-  /// Create a copy of EventData
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$EventDataImplCopyWith<_$EventDataImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EventData&&(identical(other.title, title) || other.title == title)&&(identical(other.isAllDay, isAllDay) || other.isAllDay == isAllDay)&&(identical(other.startAt, startAt) || other.startAt == startAt)&&(identical(other.endAt, endAt) || other.endAt == endAt));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,title,isAllDay,startAt,endAt);
+
+@override
+String toString() {
+  return 'EventData(title: $title, isAllDay: $isAllDay, startAt: $startAt, endAt: $endAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$EventDataCopyWith<$Res> implements $EventDataCopyWith<$Res> {
+  factory _$EventDataCopyWith(_EventData value, $Res Function(_EventData) _then) = __$EventDataCopyWithImpl;
+@override @useResult
+$Res call({
+ String title, bool isAllDay,@LocalDateTimeConverter() DateTime startAt,@LocalDateTimeConverter() DateTime endAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$EventDataCopyWithImpl<$Res>
+    implements _$EventDataCopyWith<$Res> {
+  __$EventDataCopyWithImpl(this._self, this._then);
+
+  final _EventData _self;
+  final $Res Function(_EventData) _then;
+
+/// Create a copy of EventData
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? isAllDay = null,Object? startAt = null,Object? endAt = null,}) {
+  return _then(_EventData(
+title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,isAllDay: null == isAllDay ? _self.isAllDay : isAllDay // ignore: cast_nullable_to_non_nullable
+as bool,startAt: null == startAt ? _self.startAt : startAt // ignore: cast_nullable_to_non_nullable
+as DateTime,endAt: null == endAt ? _self.endAt : endAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+
+}
+
+// dart format on

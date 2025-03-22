@@ -6,11 +6,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'classes.g.dart';
 
-final fn = FirebaseFunctions.instanceFor(region: "asia-northeast1")
-    .httpsCallable("v3-classes-get");
+final fn = FirebaseFunctions.instanceFor(
+  region: "asia-northeast1",
+).httpsCallable("v4-classes-get");
 
 @riverpod
-Future<ClassList> classes(Ref ref) async {
+Future<ClassList> classes(Ref ref, String groupId) async {
   // 一日ごとに取得
   ref.watch(cronProvider("0 0 * * *"));
 
@@ -18,6 +19,11 @@ Future<ClassList> classes(Ref ref) async {
   final from = DateTime(now.year, now.month, now.day).toIso8601String();
   final to = DateTime(now.year, now.month, now.day + 1).toIso8601String();
 
-  final res = await fn.call({"from": from, "to": to});
+  final res = await fn.call({'groupId': groupId, "from": from, "to": to});
+
+  if (res.data == null) {
+    throw Exception("No data");
+  }
+
   return ClassList.fromJson(res.data);
 }

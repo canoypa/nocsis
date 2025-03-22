@@ -1,3 +1,3 @@
 import "./config/luxon.js";
 
-export * from "./service/index.js";
+export * from "./controllers/index.js";
