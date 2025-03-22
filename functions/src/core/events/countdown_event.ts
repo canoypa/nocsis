@@ -4,19 +4,15 @@ import * as v from "valibot";
 import { type InferOutput, safeParse } from "valibot";
 import { fetchCalendar } from "../calendar.js";
 
-export const fetchCountdownEvents =
-  async (): Promise<calendar_v3.Schema$Events> => {
-    const calendarId = process.env.EVENTS_CALENDAR_ID;
-    if (!calendarId) {
-      throw new Error("EVENTS_CALENDAR_ID is not defined");
-    }
+export const fetchCountdownEvents = async (
+  calendarId: string,
+): Promise<calendar_v3.Schema$Events> => {
+  const events = await fetchCalendar(calendarId, {
+    q: "countdown",
+  });
 
-    const events = await fetchCalendar(calendarId, {
-      q: "countdown",
-    });
-
-    return events;
-  };
+  return events;
+};
 
 /**
  * カウントダウンのパターン

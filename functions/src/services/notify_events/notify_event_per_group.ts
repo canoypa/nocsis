@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import {
   type ChatPostMessageArguments,
   WebClient as SlackWebClient,
@@ -31,6 +32,8 @@ export const notifyEventPerGroup = async (
 
   const calendarId = group.events_calendar_id;
   const targetChannelId = group.slack_event_channel_id;
+  assert(group.events_calendar_id, "events_calendar_id is not defined");
+  assert(group.slack_event_channel_id, "slack_event_channel_id is not defined");
 
   // 今日の範囲を取得
   const from = timestamp.startOf("day");
@@ -49,7 +52,7 @@ export const notifyEventPerGroup = async (
   }
 
   // カウントダウンイベントを取得する
-  const countdownSnapshot = await fetchCountdownEvents();
+  const countdownSnapshot = await fetchCountdownEvents(calendarId);
   const countdownSnapshotFiltered =
     countdownSnapshot.items?.filter((e) => isCountdownTarget(e, timestamp)) ??
     [];

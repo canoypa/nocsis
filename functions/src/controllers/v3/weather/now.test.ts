@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { WeatherName } from "~/types/weather.js";
 import now from "./now.js";
 
-vi.mock("../../../core/weather/fetchWeather.js", () => {
+vi.mock("../../../core/weather/fetchWeather.old.js", () => {
   return {
     fetchWeather: vi.fn().mockResolvedValue({
       current: { temp: 25 },
