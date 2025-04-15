@@ -82,19 +82,22 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
 
                 return Theme(
                   data: theme,
-                  child: Stack(
-                    children: [
-                      AnimatedOpacity(
-                        opacity: duringClassData == null ? 1 : 0,
-                        duration: const Duration(milliseconds: 300),
-                        child: const ClassroomScreen(),
-                      ),
-                      AnimatedOpacity(
-                        opacity: duringClassData == null ? 0 : 1,
-                        duration: const Duration(milliseconds: 300),
-                        child: DuringClassScreen(data: duringClassData),
-                      ),
-                    ],
+                  // Fixme: Scaffold 重ねはやめたい
+                  child: Scaffold(
+                    body: Stack(
+                      children: [
+                        AnimatedOpacity(
+                          opacity: duringClassData == null ? 1 : 0,
+                          duration: const Duration(milliseconds: 300),
+                          child: const ClassroomScreen(),
+                        ),
+                        AnimatedOpacity(
+                          opacity: duringClassData == null ? 0 : 1,
+                          duration: const Duration(milliseconds: 300),
+                          child: DuringClassScreen(data: duringClassData),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
