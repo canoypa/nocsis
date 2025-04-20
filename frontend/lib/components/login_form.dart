@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class SignInForm extends StatefulWidget {
-  static const _defaultFormTitle = 'サインイン';
-  static const _defaultFormDescription = 'Nocsis を使用するには、サインインする必要があります。';
+class LoginForm extends StatefulWidget {
+  static const _defaultFormTitle = 'ログイン';
+  static const _defaultFormDescription = 'Nocsis を使用するには、ログインする必要があります。';
 
   final String title;
   final String description;
-  final VoidCallback onGoogleSignIn;
-  final void Function(String email, String password) onPasswordSignIn;
+  final VoidCallback onGoogleLogin;
+  final void Function(String email, String password) onPasswordLogin;
 
-  const SignInForm({
+  const LoginForm({
     super.key,
     this.title = _defaultFormTitle,
     this.description = _defaultFormDescription,
-    required this.onGoogleSignIn,
-    required this.onPasswordSignIn,
+    required this.onGoogleLogin,
+    required this.onPasswordLogin,
   });
 
   @override
-  State<SignInForm> createState() => _SignInFormState();
+  State<LoginForm> createState() => _LoginFormState();
 }
 
-class _SignInFormState extends State<SignInForm> {
+class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _passwordFocusNode = FocusNode();
 
@@ -63,7 +63,7 @@ class _SignInFormState extends State<SignInForm> {
 
   void _onEmailAndPasswordFormSubmitted(String email, String password) {
     if (_formKey.currentState!.validate()) {
-      widget.onPasswordSignIn(email, password);
+      widget.onPasswordLogin(email, password);
     }
   }
 
@@ -94,7 +94,7 @@ class _SignInFormState extends State<SignInForm> {
         spacing: 24,
         children: [
           OutlinedButton(
-            onPressed: widget.onGoogleSignIn,
+            onPressed: widget.onGoogleLogin,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -159,7 +159,7 @@ class _SignInFormState extends State<SignInForm> {
                         passwordFieldController.text,
                       );
                     },
-                    child: const Text('サインイン'),
+                    child: const Text('ログイン'),
                   ),
                 ),
               ],

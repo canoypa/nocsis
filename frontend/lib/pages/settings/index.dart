@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/components/sign_in_form.dart';
+import 'package:nocsis/components/login_form.dart';
 import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/providers/user.dart';
 
@@ -49,7 +49,7 @@ class SettingsTopPage extends ConsumerWidget {
             )
             ?.email;
 
-    final hasNonGoogleSignInProvider = user.providerData.any(
+    final hasNonGoogleLoginProvider = user.providerData.any(
       (e) => e.providerId != GoogleAuthProvider.PROVIDER_ID,
     );
 
@@ -96,7 +96,7 @@ class SettingsTopPage extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 48),
-            Text('サインイン', style: Theme.of(context).textTheme.headlineMedium),
+            Text('ログイン', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 24),
             Container(
               decoration: BoxDecoration(
@@ -170,7 +170,7 @@ class SettingsTopPage extends ConsumerWidget {
                         ),
                         TextButton(
                           onPressed:
-                              hasNonGoogleSignInProvider
+                              hasNonGoogleLoginProvider
                                   ? () async {
                                     try {
                                       await user.unlink(
@@ -225,7 +225,7 @@ class SettingsTopPage extends ConsumerWidget {
                                   : null,
                           child: Tooltip(
                             message:
-                                !hasNonGoogleSignInProvider
+                                !hasNonGoogleLoginProvider
                                     ? '別アカウントと連携するには、初めにパスワードを設定してください。'
                                     : '',
                             child: const Text("別アカウントと連携する"),
@@ -278,23 +278,23 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
             child: child,
           );
         },
-        child: !reAuthenticated ? _signInForm(user) : _changeEmailForm(user),
+        child: !reAuthenticated ? _loginForm(user) : _changeEmailForm(user),
       ),
     );
   }
 
-  _signInForm(User currentUser) {
-    return SignInForm(
+  _loginForm(User currentUser) {
+    return LoginForm(
       title: "メールアドレスを変更する",
       description: '始めに、現在のアカウントで再認証が必要です。',
-      onGoogleSignIn: () async {
+      onGoogleLogin: () async {
         await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
 
         setState(() {
           reAuthenticated = true;
         });
       },
-      onPasswordSignIn: (email, password) async {
+      onPasswordLogin: (email, password) async {
         final credential = EmailAuthProvider.credential(
           email: email,
           password: password,
@@ -403,7 +403,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
             child: child,
           );
         },
-        child: !reAuthenticated ? _signInForm(user) : _changeEmailForm(user),
+        child: !reAuthenticated ? _loginForm(user) : _changeEmailForm(user),
       ),
     );
   }
@@ -420,18 +420,18 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
         : Icons.visibility_outlined;
   }
 
-  _signInForm(User currentUser) {
-    return SignInForm(
+  _loginForm(User currentUser) {
+    return LoginForm(
       title: "パスワードを設定する",
       description: '始めに、現在のアカウントで再認証が必要です。',
-      onGoogleSignIn: () async {
+      onGoogleLogin: () async {
         await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
 
         setState(() {
           reAuthenticated = true;
         });
       },
-      onPasswordSignIn: (email, password) async {
+      onPasswordLogin: (email, password) async {
         final credential = EmailAuthProvider.credential(
           email: email,
           password: password,
