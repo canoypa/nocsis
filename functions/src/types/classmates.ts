@@ -2,10 +2,17 @@ export type Classmate = {
   /**
    * 名前
    */
+  name: string;
+  
+  /**
+   * 名前
+   * @deprecated use `name`
+   */
   firstName: string;
 
   /**
    * 名字
+   * @deprecated use `name`
    */
   lastName: string;
 

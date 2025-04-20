@@ -3,8 +3,24 @@ import { DateTime } from "luxon";
 import { getDayduty } from "~/core/dayduty/getDayduty.js";
 
 type DayDuty = {
+  /**
+   * 出席番号
+   */
   stuNo: number;
+  
+  /**
+   * 名前
+   */
+  name: string;
+
+  /**
+   * @deprecated use `name`
+   */
   firstName: string;
+  
+  /**
+   * @deprecated use `name`
+   */
   lastName: string;
 };
 
@@ -23,6 +39,7 @@ const get = async (data: Args): Promise<DayDuty> => {
 
   const response = {
     stuNo: student.stuNo,
+    name: student.name,
     firstName: student.firstName,
     lastName: student.lastName,
   };
