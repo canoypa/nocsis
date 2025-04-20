@@ -1,21 +1,22 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { beforeEach, describe, expect, it } from "vitest";
 import { firebaseApp } from "~/client/firebaseApp.js";
+import type { Student } from "~/types/classmates.js";
 import { getStudentByStuNo } from "./getStudentByStuNo.js";
 
 describe("getStudentByStuNo", () => {
-  const data1 = {
+  const data1: Student = {
+    role: "student",
     group_id: "group_1",
     stuNo: 1,
-    firstName: "Foo",
-    lastName: "Bar",
+    name: "Foo Bar",
     slackUserId: "foobar",
   };
-  const data2 = {
+  const data2: Student = {
+    role: "student",
     group_id: "group_2",
     stuNo: 1,
-    firstName: "Foo",
-    lastName: "Bar",
+    name: "Foo Bar",
     slackUserId: "foobar",
   };
 
@@ -38,11 +39,11 @@ describe("getStudentByStuNo", () => {
   });
 
   describe("複数指定する場合", () => {
-    const data3 = {
+    const data3: Student = {
+      role: "student",
       group_id: "group_1",
       stuNo: 2,
-      firstName: "Baz",
-      lastName: "Qux",
+      name: "Baz Qux",
       slackUserId: "bazqux",
     };
 

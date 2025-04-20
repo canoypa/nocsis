@@ -1,28 +1,9 @@
 import { HttpsError } from "firebase-functions/https";
 import { DateTime } from "luxon";
 import { getDayduty } from "~/core/dayduty/getDayduty.js";
+import type { Student } from "~/types/classmates.js";
 
-type DayDuty = {
-  /**
-   * 出席番号
-   */
-  stuNo: number;
-  
-  /**
-   * 名前
-   */
-  name: string;
-
-  /**
-   * @deprecated use `name`
-   */
-  firstName: string;
-  
-  /**
-   * @deprecated use `name`
-   */
-  lastName: string;
-};
+type DayDuty = Pick<Student, "stuNo" | "name" | "firstName" | "lastName">;
 
 type Args = {
   groupId: string;

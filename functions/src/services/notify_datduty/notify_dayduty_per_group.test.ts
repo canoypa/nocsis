@@ -10,6 +10,7 @@ import {
   vi,
 } from "vitest";
 import { firebaseApp } from "~/client/firebaseApp.js";
+import type { Student, Teacher } from "~/types/classmates.js";
 import * as fetchSecretModule from "../fetch_secret.js";
 import { notifyDayDutyPerGroup } from "./notify_dayduty_per_group.js";
 
@@ -19,21 +20,18 @@ describe("notifyDayDutyPerGroup", () => {
     dayduty_start_date: "2025-01-01",
   };
 
-  const student = {
+  const student: Student = {
     group_id: "group_1",
     role: "student",
     stuNo: 1,
     slackUserId: "slack_user_student_1",
-    firstName: "2",
-    lastName: "テストユーザー",
+    name: "テストユーザー 2",
   };
 
-  const teacher = {
+  const teacher: Teacher = {
     group_id: "group_1",
     role: "teacher",
     slackUserId: "slack_user_teacher_1",
-    firstName: "2",
-    lastName: "テストユーザー",
   };
 
   beforeEach(async () => {
@@ -63,13 +61,13 @@ describe("notifyDayDutyPerGroup", () => {
     expect(postMessage).toBeCalledTimes(2);
     expect(postMessage).toBeCalledWith({
       channel: student.slackUserId,
-      text: `今日の日直は、${student.lastName}${student.firstName}さんです。`,
+      text: `今日の日直は、${student.name}さんです。`,
       icon_emoji: ":bust_in_silhouette:",
       username: "今日の日直",
     });
     expect(postMessage).toBeCalledWith({
       channel: teacher.slackUserId,
-      text: `今日の日直は、${student.lastName}${student.firstName}さんです。`,
+      text: `今日の日直は、${student.name}さんです。`,
       icon_emoji: ":bust_in_silhouette:",
       username: "今日の日直",
     });

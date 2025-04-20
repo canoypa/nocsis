@@ -2,6 +2,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
 import { beforeEach, describe, expect, it } from "vitest";
 import { firebaseApp } from "~/client/firebaseApp.js";
+import type { Student, Teacher } from "~/types/classmates.js";
 import { getDaydutyStuNo } from "./getDaydutyStuNo.js";
 
 describe("getDaydutyStuNo", () => {
@@ -9,14 +10,18 @@ describe("getDaydutyStuNo", () => {
     dayduty_start_date: "2025-01-01",
   };
 
-  const student = {
-    group_id: "group_1",
+  const student: Student = {
     role: "student",
+    group_id: "group_1",
+    stuNo: 1,
+    name: "テストユーザー 1",
+    slackUserId: "slack_user_student_1",
   };
 
-  const teacher = {
-    group_id: "group_1",
+  const teacher: Teacher = {
     role: "teacher",
+    group_id: "group_1",
+    slackUserId: "slack_user_teacher_1",
   };
 
   beforeEach(async () => {
