@@ -267,12 +267,14 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
     }
 
     return Dialog(
+      backgroundColor: Colors.transparent,
       child: PageTransitionSwitcher(
         transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
           return SharedAxisTransition(
             animation: primaryAnimation,
             secondaryAnimation: secondaryAnimation,
             transitionType: SharedAxisTransitionType.horizontal,
+            fillColor: Colors.transparent,
             child: child,
           );
         },
@@ -390,12 +392,14 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
     }
 
     return Dialog(
+      backgroundColor: Colors.transparent,
       child: PageTransitionSwitcher(
         transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
           return SharedAxisTransition(
             animation: primaryAnimation,
             secondaryAnimation: secondaryAnimation,
             transitionType: SharedAxisTransitionType.horizontal,
+            fillColor: Colors.transparent,
             child: child,
           );
         },
