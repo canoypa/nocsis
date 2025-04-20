@@ -22,10 +22,7 @@ class Daydudy extends ConsumerWidget {
       children: [
         Icon(Icons.person_pin_outlined, size: 48.sp),
         const SizedBox(width: 8),
-        Text(
-          "${daydudy.lastName}${daydudy.firstName}",
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        Text(daydudy.name, style: Theme.of(context).textTheme.titleMedium),
       ],
     );
   }
