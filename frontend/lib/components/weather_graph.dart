@@ -22,11 +22,7 @@ class WeatherGraph extends ConsumerWidget {
     final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
 
     final weather =
-        ref
-            .watch(weatherProvider(groupId))
-            .maybeWhen(data: (data) => data, orElse: () => null)
-            ?.hourly ??
-        _initWeatherHourly;
+        ref.watch(weatherProvider(groupId)).value?.hourly ?? _initWeatherHourly;
 
     return SizedBox.expand(
       child: LayoutBuilder(
