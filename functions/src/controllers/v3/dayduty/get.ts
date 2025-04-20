@@ -4,8 +4,8 @@ import { getDayduty } from "../../../core/dayduty/getDayduty.old.js";
 
 type DayDuty = {
   stuNo: number;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
 };
 
 type Args = {
