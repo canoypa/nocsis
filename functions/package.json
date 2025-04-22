@@ -37,7 +37,7 @@
     "@types/luxon": "^3.6.2",
     "@types/node": "^22.14.1",
     "firebase-functions-test": "^3.4.1",
-    "firebase-tools": "^13.34.0",
+    "firebase-tools": "^14.2.0",
     "msw": "^2.7.5",
     "tsup": "^8.4.0",
     "typescript": "^5.8.3",
