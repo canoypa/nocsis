@@ -20,14 +20,14 @@ import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
-import 'package:nocsis/pages/sign_in.dart';
+import 'package:nocsis/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'router.g.dart';
 
 @TypedShellRoute<AppShell>(
   routes: [
-    TypedGoRoute<SignInRoute>(path: '/sign_in'),
+    TypedGoRoute<LoginRoute>(path: '/login'),
 
     // 新Path
     TypedShellRoute<PersonalShell>(
@@ -92,15 +92,15 @@ class GoRouterRefresher extends ChangeNotifier {
 
 Future<String?> _redirectNotSignedInUser(Uri uri) async {
   final user = await FirebaseAuth.instance.authStateChanges().first;
-  final isSignIn = user != null;
+  final isLoggedIn = user != null;
 
-  if (!isSignIn && uri.path != "/sign_in") {
+  if (!isLoggedIn && uri.path != "/login") {
     final continueUri = uri.path;
     if (continueUri == "/") {
-      return "/sign_in";
+      return "/login";
     }
 
-    return "/sign_in?continue=$continueUri";
+    return "/login?continue=$continueUri";
   }
 
   return null;
@@ -108,9 +108,9 @@ Future<String?> _redirectNotSignedInUser(Uri uri) async {
 
 Future<String?> _redirectSignedInUser(Uri uri) async {
   final user = await FirebaseAuth.instance.authStateChanges().first;
-  final isSignIn = user != null;
+  final isLoggedIn = user != null;
 
-  if (isSignIn && uri.path == "/sign_in") {
+  if (isLoggedIn && uri.path == "/login") {
     final continueUri = Uri.tryParse(uri.queryParameters["continue"] ?? "/");
 
     if (continueUri != null) {

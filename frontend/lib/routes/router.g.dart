@@ -12,9 +12,9 @@ RouteBase get $appShell => ShellRouteData.$route(
   factory: $AppShellExtension._fromState,
   routes: [
     GoRouteData.$route(
-      path: '/sign_in',
+      path: '/login',
 
-      factory: $SignInRouteExtension._fromState,
+      factory: $LoginRouteExtension._fromState,
     ),
     ShellRouteData.$route(
       factory: $PersonalShellExtension._fromState,
@@ -98,10 +98,10 @@ extension $AppShellExtension on AppShell {
   static AppShell _fromState(GoRouterState state) => AppShell();
 }
 
-extension $SignInRouteExtension on SignInRoute {
-  static SignInRoute _fromState(GoRouterState state) => const SignInRoute();
+extension $LoginRouteExtension on LoginRoute {
+  static LoginRoute _fromState(GoRouterState state) => const LoginRoute();
 
-  String get location => GoRouteData.$location('/sign_in');
+  String get location => GoRouteData.$location('/login');
 
   void go(BuildContext context) => context.go(location);
 

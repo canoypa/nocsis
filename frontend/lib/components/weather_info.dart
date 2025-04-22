@@ -29,9 +29,7 @@ class WeatherInfo extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
 
-    final weather = ref
-        .watch(weatherProvider(groupId))
-        .maybeWhen(data: (data) => data, orElse: () => null);
+    final weather = ref.watch(weatherProvider(groupId)).value;
 
     if (weather == null) {
       return const SizedBox();
