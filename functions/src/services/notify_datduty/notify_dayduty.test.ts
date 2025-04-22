@@ -38,14 +38,14 @@ describe("notifyDayduty", () => {
       await firestore.doc("groups/group_2").set({});
     });
 
-    const mockedNotifyDayDutyPerGroup = vi
-      .spyOn(notifyDayDutyPerGroupModule, "notifyDayDutyPerGroup")
-      .mockImplementationOnce(async () => {
-        throw new Error("error");
-      })
-      .mockImplementationOnce(async () => {});
-
     it("処理は最後まで続行されること", async () => {
+      const mockedNotifyDayDutyPerGroup = vi
+        .spyOn(notifyDayDutyPerGroupModule, "notifyDayDutyPerGroup")
+        .mockImplementationOnce(async () => {
+          throw new Error("error");
+        })
+        .mockImplementationOnce(async () => {});
+
       const date = DateTime.local(2025, 1, 1);
       await notifyDayDuty(date);
 
