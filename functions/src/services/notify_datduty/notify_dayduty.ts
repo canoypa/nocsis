@@ -15,6 +15,13 @@ export const notifyDayDuty: CrontabHandler = async (timestamp) => {
   }));
 
   await Promise.allSettled(
-    groups.map((group) => notifyDayDutyPerGroup(group, timestamp)),
+    groups.map((group) =>
+      notifyDayDutyPerGroup(group, timestamp).catch((error) => {
+        console.error("日直通知でエラーが発生しました", {
+          group: group.id,
+          error: error,
+        });
+      }),
+    ),
   );
 };
