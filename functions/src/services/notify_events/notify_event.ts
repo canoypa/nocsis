@@ -21,7 +21,7 @@ export const notifyEvent: CrontabHandler = async (timestamp) => {
       notifyEventPerGroup(group, timestamp).catch((error) => {
         console.error("イベント通知でエラーが発生しました", {
           group: group.id,
-          error: error,
+          error,
         });
       }),
     ),

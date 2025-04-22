@@ -17,7 +17,7 @@ export const get = onCall(
       .then((m) => m.default(request.data))
       .catch((error) => {
         console.error("v4-events-getで内部エラー", {
-          error: error,
+          error,
         });
 
         throw new HttpsError("internal", "Internal error");
@@ -44,7 +44,7 @@ export const monthly = onCall(
       .then((m) => m.default(request.data))
       .catch((error) => {
         console.error("v4-events-monthlyで内部エラー", {
-          error: error,
+          error,
         });
 
         throw new HttpsError("internal", "Internal error");

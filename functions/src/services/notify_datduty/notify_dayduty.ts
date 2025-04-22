@@ -19,7 +19,7 @@ export const notifyDayDuty: CrontabHandler = async (timestamp) => {
       notifyDayDutyPerGroup(group, timestamp).catch((error) => {
         console.error("日直通知でエラーが発生しました", {
           group: group.id,
-          error: error,
+          error,
         });
       }),
     ),

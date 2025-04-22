@@ -44,8 +44,8 @@ export const notifyDayDutyPerGroup = async (
     await slackClient.chat.postMessage(options).catch((error) => {
       console.error("日直通知のSlack APIリクエストでエラーが発生しました", {
         group: group.id,
-        slackUserId: slackUserId,
-        error: error,
+        slackUserId,
+        error,
       });
 
       throw error;

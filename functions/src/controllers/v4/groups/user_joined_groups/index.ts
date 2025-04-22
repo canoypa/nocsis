@@ -18,7 +18,7 @@ export const get = onCall(
       .then((m) => m.default({ user_id: auth.uid }))
       .catch((error) => {
         console.error("v4-user-joined-groups-getで内部エラー", {
-          error: error,
+          error,
         });
 
         throw new HttpsError("internal", "Internal error");
