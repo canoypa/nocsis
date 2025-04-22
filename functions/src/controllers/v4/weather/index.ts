@@ -13,15 +13,7 @@ export const now = onCall(
       );
     }
 
-    const data = import("./now.js")
-      .then((m) => m.default(request))
-      .catch((error) => {
-        console.error("v4-weather-nowで内部エラー", {
-          error,
-        });
-
-        throw new HttpsError("internal", "Internal error");
-      });
+    const data = await import("./now.js").then((m) => m.default(request));
 
     return data;
   },

@@ -14,15 +14,9 @@ export const get = onCall(
       );
     }
 
-    const data = import("./get.js")
-      .then((m) => m.default({ user_id: auth.uid }))
-      .catch((error) => {
-        console.error("v4-user-joined-groups-getで内部エラー", {
-          error,
-        });
-
-        throw new HttpsError("internal", "Internal error");
-      });
+    const data = await import("./get.js").then((m) =>
+      m.default({ user_id: auth.uid }),
+    );
 
     return data;
   },
