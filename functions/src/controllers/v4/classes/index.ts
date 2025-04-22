@@ -13,8 +13,8 @@ export const get = onCall(
       );
     }
 
-    return (await import("./get.js"))
-      .default(request.data)
-      .catch(console.error);
+    const data = await import("./get.js").then((m) => m.default(request.data));
+
+    return data;
   },
 );

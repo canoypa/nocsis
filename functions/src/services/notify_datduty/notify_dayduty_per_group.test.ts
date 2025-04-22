@@ -47,7 +47,7 @@ describe("notifyDayDutyPerGroup", () => {
       "dummy_slack_token",
     );
 
-    const postMessage = vi.fn();
+    const postMessage = vi.fn().mockResolvedValue({});
     const mockedSlackWebClient = {
       chat: { postMessage },
     } as unknown as MockedObject<slackModule.WebClient>;

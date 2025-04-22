@@ -27,6 +27,8 @@ export const notifyEventPerGroup = async (
   group: Group,
   timestamp: DateTime,
 ) => {
+  console.info("イベント通知開始", { group: group.id });
+
   const slackToken = await fetchSecret(`group_${group.id}-slack_token`);
   const slackClient = new SlackWebClient(slackToken);
 
@@ -79,5 +81,14 @@ export const notifyEventPerGroup = async (
     unfurl_links: false,
     unfurl_media: false,
   };
-  slackClient.chat.postMessage(options);
+  await slackClient.chat.postMessage(options).catch((error) => {
+    console.error("イベント通知のSlack APIリクエストでエラーが発生しました", {
+      group: group.id,
+      error,
+    });
+
+    throw error;
+  });
+
+  console.info("イベント通知完了", { group: group.id });
 };
