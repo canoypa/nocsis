@@ -5,15 +5,25 @@ export const get = onCall(
     region: "asia-northeast1",
   },
   async (request) => {
-    if (!request.auth) {
+    const auth = request.auth;
+
+    if (!auth) {
       throw new HttpsError(
         "unauthenticated",
         "You must be authenticated to use this function",
       );
     }
 
-    return (await import("./get.js"))
-      .default({ user_id: request.auth.uid })
-      .catch(console.error);
+    const data = import("./get.js")
+      .then((m) => m.default({ user_id: auth.uid }))
+      .catch((error) => {
+        console.error("v4-user-joined-groups-getで内部エラー", {
+          error: error,
+        });
+
+        throw new HttpsError("internal", "Internal error");
+      });
+
+    return data;
   },
 );

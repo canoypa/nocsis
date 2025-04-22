@@ -13,8 +13,16 @@ export const get = onCall(
       );
     }
 
-    return (await import("./get.js"))
-      .default(request.data)
-      .catch(console.error);
+    const data = await import("./get.js")
+      .then((m) => m.default(request.data))
+      .catch((error) => {
+        console.error("v4-classes-getで内部エラー", {
+          error: error,
+        });
+
+        throw new HttpsError("internal", "Internal error");
+      });
+
+    return data;
   },
 );
