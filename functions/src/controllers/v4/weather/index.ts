@@ -13,6 +13,8 @@ export const now = onCall(
       );
     }
 
-    return (await import("./now.js")).default(request);
+    const data = await import("./now.js").then((m) => m.default(request));
+
+    return data;
   },
 );
