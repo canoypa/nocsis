@@ -4,13 +4,13 @@
     "trailingSlash": false,
     "rewrites": [
       {
-        "source": "/(.*)",
+        "source": "/**",
         "destination": "/index.html"
       }
     ],
     "headers": [
       {
-        "source": "/__/auth/(.*)",
+        "source": "/__/auth/**",
         "headers": [
           {
             "key": "Cross-Origin-Resource-Policy",
@@ -19,7 +19,7 @@
         ]
       },
       {
-        "source": "/(.*)",
+        "source": "/**",
         "headers": [
           {
             "key": "Cross-Origin-Embedder-Policy",
