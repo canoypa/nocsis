@@ -1,0 +1,29 @@
+name: Deploy Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+
+concurrency:
+  group: Deploy Preview ${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build_and_preview:
+    if: ${{ contains(github.event.pull_request.labels.*.name, '🌟 Enable Preview') }}
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    environment:
+      name: preview
+      url: ${{ steps.hosting-deploy.outputs.details_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - id: hosting-deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
