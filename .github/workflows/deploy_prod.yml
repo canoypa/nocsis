@@ -2,18 +2,18 @@ name: Deploy to Production
 
 on:
   pull_request:
-  workflow_dispatch:
-  workflow_call:
-    secrets:
-      VERCEL_TOKEN:
-        required: true
-      VERCEL_ORG_ID:
-        required: true
-      VERCEL_PROJECT_ID:
-        required: true
+  # workflow_dispatch:
+  # workflow_call:
+  #   secrets:
+  #     VERCEL_TOKEN:
+  #       required: true
+  #     VERCEL_ORG_ID:
+  #       required: true
+  #     VERCEL_PROJECT_ID:
+  #       required: true
 
 concurrency:
-  group: Deploy to Production
+  group: Deploy to Production Test
   cancel-in-progress: true
 
 jobs:
