@@ -7,9 +7,10 @@ import { getDayduty } from "./getDayduty.js";
 
 describe("getDayduty", () => {
   const data: Student = {
+    role: "student",
+    group_id: "group_1",
     stuNo: 1,
-    firstName: "Foo",
-    lastName: "Bar",
+    name: "Foo Bar",
     slackUserId: "foobar",
   };
   it("戻り値が適切であること", async () => {

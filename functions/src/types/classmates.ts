@@ -1,13 +1,8 @@
 export type Classmate = {
   /**
-   * 名前
+   * グループ ID
    */
-  firstName: string;
-
-  /**
-   * 名字
-   */
-  lastName: string;
+  group_id: string;
 
   /**
    * Slack の ID
@@ -16,10 +11,31 @@ export type Classmate = {
 };
 
 export type Student = Classmate & {
+  role: "student";
+
   /**
    * 出席番号
    */
   stuNo: number;
+
+  /**
+   * 名前
+   */
+  name: string;
+
+  /**
+   * 名前
+   * @deprecated use `name`
+   */
+  firstName?: string;
+
+  /**
+   * 名字
+   * @deprecated use `name`
+   */
+  lastName?: string;
 };
 
-export type Teacher = Classmate;
+export type Teacher = Classmate & {
+  role: "teacher";
+};

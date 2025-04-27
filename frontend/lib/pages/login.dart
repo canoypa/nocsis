@@ -3,16 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/components/sign_in_form.dart';
+import 'package:nocsis/components/login_form.dart';
 
-class SignInRoute extends GoRouteData {
-  const SignInRoute();
+class LoginRoute extends GoRouteData {
+  const LoginRoute();
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: const SignInPage(),
+      child: const LoginPage(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,
@@ -24,10 +24,10 @@ class SignInRoute extends GoRouteData {
   }
 }
 
-class SignInPage extends StatelessWidget {
-  const SignInPage({super.key});
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
-  _passwordSignIn(BuildContext context, String email, String password) async {
+  _passwordLogin(BuildContext context, String email, String password) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
@@ -42,14 +42,14 @@ class SignInPage extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             behavior: SnackBarBehavior.floating,
-            content: Text("サインイン出来ませんでした"),
+            content: Text("ログイン出来ませんでした"),
           ),
         );
       }
     }
   }
 
-  _googleSignIn(BuildContext context) async {
+  _googleLogin(BuildContext context) async {
     try {
       final provider = GoogleAuthProvider();
       await FirebaseAuth.instance.signInWithPopup(provider);
@@ -62,7 +62,7 @@ class SignInPage extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             behavior: SnackBarBehavior.floating,
-            content: Text("サインイン出来ませんでした"),
+            content: Text("ログイン出来ませんでした"),
           ),
         );
       }
@@ -78,11 +78,11 @@ class SignInPage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              SignInForm(
-                onGoogleSignIn: () => _googleSignIn(context),
-                onPasswordSignIn:
+              LoginForm(
+                onGoogleLogin: () => _googleLogin(context),
+                onPasswordLogin:
                     (email, password) =>
-                        _passwordSignIn(context, email, password),
+                        _passwordLogin(context, email, password),
               ),
             ],
           ),

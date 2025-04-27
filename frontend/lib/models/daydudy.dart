@@ -5,11 +5,7 @@ part 'daydudy.g.dart';
 
 @freezed
 abstract class Daydudy with _$Daydudy {
-  const factory Daydudy({
-    required String firstName,
-    required String lastName,
-    required int stuNo,
-  }) = _Daydudy;
+  const factory Daydudy({required String name, required int stuNo}) = _Daydudy;
 
   factory Daydudy.fromJson(Map<String, dynamic> json) =>
       _$DaydudyFromJson(json);

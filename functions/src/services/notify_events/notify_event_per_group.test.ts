@@ -43,7 +43,7 @@ describe("notifyDayDutyPerGroup", () => {
       items: [countdownEvent],
     });
 
-    const postMessage = vi.fn();
+    const postMessage = vi.fn().mockResolvedValue({});
     const mockedSlackWebClient = {
       chat: { postMessage },
     } as unknown as MockedObject<slackModule.WebClient>;

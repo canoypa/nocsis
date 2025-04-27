@@ -1,12 +1,9 @@
 import { HttpsError } from "firebase-functions/https";
 import { DateTime } from "luxon";
 import { getDayduty } from "~/core/dayduty/getDayduty.js";
+import type { Student } from "~/types/classmates.js";
 
-type DayDuty = {
-  stuNo: number;
-  firstName: string;
-  lastName: string;
-};
+type DayDuty = Pick<Student, "stuNo" | "name" | "firstName" | "lastName">;
 
 type Args = {
   groupId: string;
@@ -23,6 +20,7 @@ const get = async (data: Args): Promise<DayDuty> => {
 
   const response = {
     stuNo: student.stuNo,
+    name: student.name,
     firstName: student.firstName,
     lastName: student.lastName,
   };

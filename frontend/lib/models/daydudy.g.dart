@@ -7,13 +7,11 @@ part of 'daydudy.dart';
 // **************************************************************************
 
 _Daydudy _$DaydudyFromJson(Map<String, dynamic> json) => _Daydudy(
-  firstName: json['firstName'] as String,
-  lastName: json['lastName'] as String,
+  name: json['name'] as String,
   stuNo: (json['stuNo'] as num).toInt(),
 );
 
 Map<String, dynamic> _$DaydudyToJson(_Daydudy instance) => <String, dynamic>{
-  'firstName': instance.firstName,
-  'lastName': instance.lastName,
+  'name': instance.name,
   'stuNo': instance.stuNo,
 };

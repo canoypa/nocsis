@@ -66,6 +66,8 @@ jobs:
 
   deploy_frontend:
     runs-on: ubuntu-latest
+    environment:
+      name: Production
     defaults:
       run:
         working-directory: ./frontend
@@ -86,3 +88,9 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
           working-directory: ./frontend
           vercel-args: "--prod"
+      - name: Deploy (Hosting)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
+          channelId: live
