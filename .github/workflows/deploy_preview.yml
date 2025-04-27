@@ -19,9 +19,18 @@ jobs:
     environment:
       name: preview
       url: ${{ steps.hosting-deploy.outputs.details_url }}
+    defaults:
+      run:
+        working-directory: ./frontend
     steps:
-      - uses: actions/checkout@v4
-      - run: npm ci && npm run build
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build
+        run: flutter build web --wasm
       - id: hosting-deploy
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
