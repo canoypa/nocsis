@@ -2,7 +2,7 @@ name: Deploy Preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 concurrency:
   group: Deploy Preview ${{ github.event.pull_request.number }}
@@ -10,14 +10,14 @@ concurrency:
 
 jobs:
   build_and_preview:
-    if: ${{ contains(github.event.pull_request.labels.*.name, '🌟 Enable Preview') }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
     runs-on: ubuntu-latest
     permissions:
       checks: write
       contents: read
       pull-requests: write
     environment:
-      name: preview
+      name: Preview
       url: ${{ steps.hosting-deploy.outputs.details_url }}
     defaults:
       run:
