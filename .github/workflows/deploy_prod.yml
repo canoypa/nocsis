@@ -16,6 +16,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  deploy_backend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-cloud-run
+          service_account: gh-action-deploy-cloud-run@class-clock-40088.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy
+        run: gcloud run deploy backend --source . --project class-clock-40088 --region asia-northeast1
+
   deploy_functions:
     runs-on: ubuntu-latest
     permissions:
