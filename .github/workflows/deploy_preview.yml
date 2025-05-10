@@ -1,0 +1,37 @@
+name: Deploy Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+concurrency:
+  group: Deploy Preview ${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build_and_preview:
+    if: ${{ contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    environment:
+      name: Preview
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build
+        run: flutter build web --wasm
+      - name: Deploy
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
