@@ -1,0 +1,85 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        description: "Deployment environment (Preview or Production)"
+        required: true
+        type: string
+    secrets:
+      VERCEL_TOKEN:
+        required: true
+      VERCEL_ORG_ID:
+        required: true
+      VERCEL_PROJECT_ID:
+        required: true
+      DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT:
+        required: true
+
+concurrency:
+  group: Deploy
+
+jobs:
+  deploy_functions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: ${{ inputs.env }}
+    defaults:
+      run:
+        working-directory: ./functions
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm run build
+      - name: Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action-deploy-functions/providers/github-action
+          service_account: gh-action-deploy-functions@class-clock-40088.iam.gserviceaccount.com
+      - name: Deploy
+        run: pnpm firebase deploy --only functions --force
+
+  deploy_frontend:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.env }}
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Build
+        run: flutter build web --wasm
+      - name: Deploy to Vercel
+        id: deploy_to_vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./frontend
+          vercel-args: ${{ inputs.env == 'Production' && '--prod' || '' }}
+      - name: Set Preview Alias
+        if: inputs.env == 'Preview'
+        run: pnpm dlx vercel alias ${{ steps.deploy_to_vercel.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
+      - name: Deploy to Firebase Hosting (Preview)
+        if: inputs.env == 'Preview'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
+          channelId: live
