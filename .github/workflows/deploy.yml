@@ -26,6 +26,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    environment:
+      name: ${{ inputs.env }}
     defaults:
       run:
         working-directory: ./functions
