@@ -1,10 +1,12 @@
 name: Dependabot auto-merge
 
-on: pull_request
+on:
+  pull_request_target:
+    types: [opened]
 
 jobs:
   dependabot:
-    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'canoypa/nocsis'
     permissions:
       contents: write
       pull-requests: write
