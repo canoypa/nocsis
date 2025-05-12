@@ -67,6 +67,7 @@ jobs:
       id-token: write
     environment:
       name: ${{ inputs.env }}
+      url: deploy_frontend.outputs.urls
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -106,7 +107,7 @@ jobs:
         working-directory: ./frontend
         run: pnpm dlx vercel alias ${{ steps.deploy_to_vercel.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
       - name: Deploy Frontend (Hosting)
-        if: inputs.env == 'Preview'
+        id: deploy_frontend
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
