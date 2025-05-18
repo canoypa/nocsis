@@ -33,6 +33,21 @@ app.get(
 );
 
 if (process.env.NODE_ENV !== "production") {
-  app.get("/openapi.json", openAPISpecs(app));
+  app.get(
+    "/openapi.json",
+    openAPISpecs(app, {
+      documentation: {
+        components: {
+          securitySchemes: {
+            bearer: {
+              type: "http",
+              scheme: "bearer",
+              description: "Firebase JWT token",
+            },
+          },
+        },
+      },
+    }),
+  );
   app.get("/api-doc", Scalar({ url: "/openapi.json" }));
 }
