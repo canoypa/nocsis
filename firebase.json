@@ -4,6 +4,14 @@
     "trailingSlash": false,
     "rewrites": [
       {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "backend",
+          "region": "asia-southeast1",
+          "pinTag": true
+        }
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
