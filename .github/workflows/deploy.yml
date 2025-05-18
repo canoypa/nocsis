@@ -23,6 +23,8 @@ concurrency:
 jobs:
   build_functions:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.env }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,6 +44,8 @@ jobs:
 
   build_frontend:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.env }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
