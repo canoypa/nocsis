@@ -1,12 +1,11 @@
 name: Deploy to Staging
 
 on:
-  pull_request:
+  pull_request_target:
   workflow_dispatch:
 
 concurrency:
   group: Deploy to Staging
-  cancel-in-progress: true
 
 jobs:
   deploy:
