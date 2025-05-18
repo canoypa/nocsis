@@ -85,6 +85,8 @@ jobs:
           name: frontend-build
       - name: Setup Tools
         uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: pnpm install --prefer-frozen-lockfile
       - name: Auth
         uses: google-github-actions/auth@v2
         with:
@@ -109,7 +111,7 @@ jobs:
       - name: Set Preview Alias
         if: inputs.env == 'Preview'
         working-directory: ./frontend
-        run: pnpm dlx vercel alias ${{ steps.deploy_to_vercel.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
+        run: pnpm vercel alias ${{ steps.deploy_to_vercel.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
       - name: Deploy Frontend (Hosting)
         id: deploy_frontend
         uses: FirebaseExtended/action-hosting-deploy@v0
