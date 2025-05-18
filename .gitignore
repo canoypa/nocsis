@@ -1,3 +1,6 @@
+# openapi
+/api-spec.openapi.json
+
 # Logs
 logs
 *.log
