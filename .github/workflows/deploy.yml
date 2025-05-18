@@ -118,7 +118,10 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Deploy Backend
-        run: gcloud run deploy backend --source ./backend --project class-clock-40088 --region asia-northeast1 ${{ inputs.env == 'Preview' && '--no-traffic' || '' }}
+        run: gcloud run deploy backend --source ./backend --project class-clock-40088 --region asia-northeast1 --no-traffic
+      - name: Set Traffic
+        if: inputs.env == 'Production'
+        run: gcloud run services update-traffic backend --to-latest --project class-clock-40088 --region asia-northeast1
 
   deploy_frontend:
     needs: [build_frontend, deploy_functions, deploy_backend]
