@@ -7,6 +7,10 @@ on:
         description: "Deployment environment (Preview or Production)"
         required: true
         type: string
+      channelId:
+        description: "Firebase Hosting channel id (required when env is Preview; Production always uses 'live')"
+        required: false
+        type: string
     secrets:
       VERCEL_TOKEN:
         required: true
@@ -160,4 +164,4 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
-          channelId: ${{ inputs.env == 'Production' && 'live' || '' }}
+          channelId: ${{ inputs.env == 'Production' && 'live' || inputs.channelId }}
