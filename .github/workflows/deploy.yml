@@ -36,7 +36,7 @@ jobs:
         run: ls node_modules/.bin
       - name: run
         run: |
-          pnpm vercel -h
+          pnpm firebase -h
   build_functions:
     if: false
     runs-on: ubuntu-latest
