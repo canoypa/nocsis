@@ -140,11 +140,6 @@ jobs:
         uses: jdx/mise-action@v2
       - name: Install dependencies
         run: pnpm install --prefer-frozen-lockfile
-      - name: Auth
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
-          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
       - name: Deploy Frontend (Vercel)
         id: deploy_to_vercel
         uses: amondnet/vercel-action@v25
