@@ -1,9 +1,6 @@
 # build
 dist/
 
-# openapi
-openapi.json
-
 # dev
 .yarn/
 !.yarn/releases
