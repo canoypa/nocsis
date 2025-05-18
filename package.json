@@ -2,10 +2,9 @@
   "scripts": {
     "emulators:start": "firebase emulators:start --import ./emulator_data --export-on-exit ./emulator_data"
   },
-  "dependencies": {
-    "firebase-tools": "^13.25.0"
-  },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4"
+    "@biomejs/biome": "^1.9.4",
+    "firebase-tools": "^13.25.0",
+    "vercel": "^41.7.8"
   }
 }

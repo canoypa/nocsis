@@ -7,6 +7,10 @@ on:
         description: "Deployment environment (Preview or Production)"
         required: true
         type: string
+      channelId:
+        description: "Firebase Hosting channel id (required when env is Preview; Production always uses 'live')"
+        required: false
+        type: string
     secrets:
       VERCEL_TOKEN:
         required: true
@@ -21,43 +25,86 @@ concurrency:
   group: Deploy
 
 jobs:
-  deploy_functions:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
+  build_functions:
     environment:
       name: ${{ inputs.env }}
-    defaults:
-      run:
-        working-directory: ./functions
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup Tools
         uses: jdx/mise-action@v2
       - name: Install dependencies
-        run: pnpm install
+        working-directory: ./functions
+        run: pnpm install --prefer-frozen-lockfile
       - name: Build
+        working-directory: ./functions
         run: pnpm run build
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: functions-build
+          path: ./functions/dist
+
+  build_frontend:
+    environment:
+      name: ${{ inputs.env }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: flutter pub get --enforce-lockfile
+      - name: Run build_runner
+        working-directory: ./frontend
+        run: flutter pub run build_runner build -d
+      - name: Build
+        working-directory: ./frontend
+        run: flutter build web --wasm
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: ./frontend/build
+
+  deploy_functions:
+    needs: [build_functions]
+    environment:
+      name: ${{ inputs.env }}
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download Functions Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: functions-build
+          path: ./functions/dist
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: pnpm install --prefer-frozen-lockfile; cd functions && pnpm install --prefer-frozen-lockfile
       - name: Auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action-deploy-functions/providers/github-action
-          service_account: gh-action-deploy-functions@class-clock-40088.iam.gserviceaccount.com
-      - name: Deploy
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
+      - name: Deploy Functions
         run: pnpm firebase deploy --only functions --force
 
   deploy_backend:
-    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.env }}
     permissions:
       contents: read
       id-token: write
-    environment:
-      name: ${{ inputs.env }}
-    defaults:
-      run:
-        working-directory: ./backend
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -66,30 +113,34 @@ jobs:
       - name: Auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-cloud-run
-          service_account: gh-action-deploy-cloud-run@class-clock-40088.iam.gserviceaccount.com
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
-      - name: Deploy
-        run: gcloud run deploy backend --source . --project class-clock-40088 --region asia-northeast1 ${{ inputs.env == 'Preview' && '--no-traffic' || '' }}
+      - name: Deploy Backend
+        run: gcloud run deploy backend --source ./backend --project class-clock-40088 --region asia-northeast1 ${{ inputs.env == 'Preview' && '--no-traffic' || '' }}
 
   deploy_frontend:
-    runs-on: ubuntu-latest
+    needs: [build_frontend, deploy_functions, deploy_backend]
     environment:
       name: ${{ inputs.env }}
-    defaults:
-      run:
-        working-directory: ./frontend
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Download Frontend Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: ./frontend/build
       - name: Setup Tools
         uses: jdx/mise-action@v2
       - name: Install dependencies
-        run: flutter pub get
-      - name: Build
-        run: flutter build web --wasm
-      - name: Deploy to Vercel
+        run: pnpm install --prefer-frozen-lockfile
+      - name: Deploy Frontend (Vercel)
         id: deploy_to_vercel
         uses: amondnet/vercel-action@v25
         with:
@@ -100,11 +151,12 @@ jobs:
           vercel-args: ${{ inputs.env == 'Production' && '--prod' || '' }}
       - name: Set Preview Alias
         if: inputs.env == 'Preview'
-        run: pnpm dlx vercel alias ${{ steps.deploy_to_vercel.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
-      - name: Deploy to Firebase Hosting (Preview)
-        if: inputs.env == 'Preview'
+        working-directory: ./frontend
+        run: pnpm vercel alias ${{ steps.deploy_to_vercel.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
+      - name: Deploy Frontend (Hosting)
+        id: deploy_frontend
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
-          channelId: live
+          channelId: ${{ inputs.env == 'Production' && 'live' || inputs.channelId }}
