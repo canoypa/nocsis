@@ -85,7 +85,7 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@v2
       - name: Install dependencies
-        run: pnpm install --prefer-frozen-lockfile
+        run: pnpm install --prefer-frozen-lockfile; cd functions && pnpm install --prefer-frozen-lockfile
       - name: Auth
         uses: google-github-actions/auth@v2
         with:
