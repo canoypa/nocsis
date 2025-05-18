@@ -22,6 +22,8 @@ concurrency:
 
 jobs:
   test:
+    environment:
+      name: ${{ inputs.env }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
