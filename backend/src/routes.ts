@@ -1,11 +1,16 @@
+import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
-import { describeRoute } from "hono-openapi";
+import { describeRoute, openAPISpecs } from "hono-openapi";
 import { resolver } from "hono-openapi/zod";
 import { z } from "zod";
+import "zod-openapi/extend";
 
 export const app = new Hono();
 
-const responseSchema = z.string();
+const responseSchema = z.string().openapi({
+  description: "Example response",
+  example: "Hello Hono!",
+});
 
 app.get(
   "/",
@@ -26,3 +31,8 @@ app.get(
     return c.text("Hello Hono!");
   },
 );
+
+if (process.env.NODE_ENV !== "production") {
+  app.get("/openapi.json", openAPISpecs(app));
+  app.get("/api-doc", Scalar({ url: "/openapi.json" }));
+}
