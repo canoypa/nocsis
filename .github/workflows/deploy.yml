@@ -21,27 +21,10 @@ concurrency:
   group: Deploy
 
 jobs:
-  test:
-    environment:
-      name: ${{ inputs.env }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Tools
-        uses: jdx/mise-action@v2
-      - name: Install dependencies
-        run: pnpm install --prefer-frozen-lockfile
-      - name: ls
-        run: ls node_modules/.bin
-      - name: run
-        run: |
-          pnpm firebase -h
   build_functions:
-    if: false
-    runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.env }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -60,10 +43,9 @@ jobs:
           path: ./functions/dist
 
   build_frontend:
-    if: false
-    runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.env }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -85,15 +67,14 @@ jobs:
           path: ./frontend/build
 
   deploy:
-    if: false
     needs: [build_frontend, build_functions]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     environment:
       name: ${{ inputs.env }}
       url: deploy_frontend.outputs.urls
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -114,9 +95,16 @@ jobs:
           service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+      - name: Install dependencies
+        run: pnpm install --prefer-frozen-lockfile
+      - name: ls
+        run: ls node_modules/.bin
+      - name: run
+        run: |
+          pnpm firebase -h
       - name: Deploy Functions
         working-directory: ./functions
-        run: pnpm dlx firebase-tools deploy --only functions --force
+        run: pnpm firebase deploy --only functions --force
       - name: Deploy Backend
         run: gcloud run deploy backend --source ./backend --project class-clock-40088 --region asia-northeast1 ${{ inputs.env == 'Preview' && '--no-traffic' || '' }}
       - name: Deploy Frontend (Vercel)
@@ -131,7 +119,7 @@ jobs:
       - name: Set Preview Alias
         if: inputs.env == 'Preview'
         working-directory: ./frontend
-        run: pnpm dlx vercel alias ${{ steps.deploy_to_vercel.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
+        run: pnpm vercel alias ${{ steps.deploy_to_vercel.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
       - name: Deploy Frontend (Hosting)
         id: deploy_frontend
         uses: FirebaseExtended/action-hosting-deploy@v0
