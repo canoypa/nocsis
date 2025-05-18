@@ -1,11 +1,10 @@
 import { serve } from "@hono/node-server";
-import { Hono } from "hono";
+import { generateOpenapiSpec } from "./generate_openapi_spec.js";
+import { app } from "./routes.js";
 
-const app = new Hono();
-
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
+if (process.env.NODE_ENV !== "production") {
+  generateOpenapiSpec(app);
+}
 
 const port = 8080;
 console.log(`Server is running on http://localhost:${port}`);
