@@ -66,11 +66,10 @@ jobs:
           name: frontend-build
           path: ./frontend/build
 
-  deploy:
-    needs: [build_frontend, build_functions]
+  deploy_functions:
+    needs: [build_functions]
     environment:
       name: ${{ inputs.env }}
-      url: deploy_frontend.outputs.urls
     permissions:
       contents: read
       id-token: write
@@ -82,6 +81,50 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: functions-build
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
+      - name: Deploy Functions
+        working-directory: ./functions
+        run: pnpm dlx firebase-tools deploy --only functions --force
+
+  deploy_backend:
+    environment:
+      name: ${{ inputs.env }}
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Deploy Backend
+        run: gcloud run deploy backend --source ./backend --project class-clock-40088 --region asia-northeast1 ${{ inputs.env == 'Preview' && '--no-traffic' || '' }}
+
+  deploy_frontend:
+    needs: [build_frontend, deploy_functions, deploy_backend]
+    environment:
+      name: ${{ inputs.env }}
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Download Frontend Build Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -93,20 +136,6 @@ jobs:
         with:
           workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
           service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-      - name: Install dependencies
-        run: pnpm install --prefer-frozen-lockfile
-      - name: ls
-        run: ls node_modules/.bin
-      - name: run
-        run: |
-          pnpm firebase -h
-      - name: Deploy Functions
-        working-directory: ./functions
-        run: pnpm firebase deploy --only functions --force
-      - name: Deploy Backend
-        run: gcloud run deploy backend --source ./backend --project class-clock-40088 --region asia-northeast1 ${{ inputs.env == 'Preview' && '--no-traffic' || '' }}
       - name: Deploy Frontend (Vercel)
         id: deploy_to_vercel
         uses: amondnet/vercel-action@v25
