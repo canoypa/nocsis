@@ -34,7 +34,7 @@ app.get(
 
 if (process.env.NODE_ENV !== "production") {
   app.get(
-    "/openapi.json",
+    "/api-spec",
     openAPISpecs(app, {
       documentation: {
         components: {
@@ -49,5 +49,5 @@ if (process.env.NODE_ENV !== "production") {
       },
     }),
   );
-  app.get("/api-doc", Scalar({ url: "/openapi.json" }));
+  app.get("/api-doc", Scalar({ url: "/api-spec" }));
 }
