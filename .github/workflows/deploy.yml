@@ -21,7 +21,19 @@ concurrency:
   group: Deploy
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Tools
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: pnpm install --prefer-frozen-lockfile
+      - name: ls
+        run: ls node_modules/.bin
   build_functions:
+    if: false
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.env }}
@@ -43,6 +55,7 @@ jobs:
           path: ./functions/dist
 
   build_frontend:
+    if: false
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.env }}
@@ -67,6 +80,7 @@ jobs:
           path: ./frontend/build
 
   deploy:
+    if: false
     needs: [build_frontend, build_functions]
     runs-on: ubuntu-latest
     permissions:
@@ -97,7 +111,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
       - name: Deploy Functions
         working-directory: ./functions
-        run: pnpm dlx firebase deploy --only functions --force
+        run: pnpm dlx firebase-tools deploy --only functions --force
       - name: Deploy Backend
         run: gcloud run deploy backend --source ./backend --project class-clock-40088 --region asia-northeast1 ${{ inputs.env == 'Preview' && '--no-traffic' || '' }}
       - name: Deploy Frontend (Vercel)
