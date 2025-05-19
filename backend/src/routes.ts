@@ -7,8 +7,7 @@ import "zod-openapi/extend";
 
 export const app = new Hono({
   strict: false, // パス末尾のスラッシュ有無を区別しない
-});
-app.basePath("/api");
+}).basePath("/api");
 
 const responseSchema = z.string().openapi({
   description: "Example response",
