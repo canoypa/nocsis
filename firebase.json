@@ -4,14 +4,6 @@
     "trailingSlash": false,
     "rewrites": [
       {
-        "source": "/api",
-        "run": {
-          "serviceId": "backend",
-          "region": "asia-northeast1",
-          "pinTag": true
-        }
-      },
-      {
         "source": "/api/**",
         "run": {
           "serviceId": "backend",
