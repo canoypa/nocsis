@@ -1,6 +1,8 @@
 FROM node:22-slim AS base
 WORKDIR /app
 
+ENV NODE_ENV=production
+
 RUN corepack enable
 
 
