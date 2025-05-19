@@ -2,10 +2,12 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import { describeRoute, openAPISpecs } from "hono-openapi";
 import { resolver } from "hono-openapi/zod";
+import { trimTrailingSlash } from "hono/trailing-slash";
 import { z } from "zod";
 import "zod-openapi/extend";
 
 export const app = new Hono().basePath("/api");
+app.use(trimTrailingSlash());
 
 const responseSchema = z.string().openapi({
   description: "Example response",

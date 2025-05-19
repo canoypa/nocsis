@@ -35,10 +35,10 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/luxon": "^3.6.2",
-    "@types/node": "^22.15.18",
+    "@types/node": "^22.15.19",
     "firebase-functions-test": "^3.4.1",
     "firebase-tools": "^14.4.0",
-    "msw": "^2.8.2",
+    "msw": "^2.8.4",
     "tsup": "^8.4.0",
     "typescript": "^5.8.3",
     "vitest": "^3.1.3"
