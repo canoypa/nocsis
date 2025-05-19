@@ -5,7 +5,7 @@ import { resolver } from "hono-openapi/zod";
 import { z } from "zod";
 import "zod-openapi/extend";
 
-export const app = new Hono();
+export const app = new Hono().basePath("/api");
 
 const responseSchema = z.string().openapi({
   description: "Example response",
@@ -49,5 +49,5 @@ if (process.env.NODE_ENV !== "production") {
       },
     }),
   );
-  app.get("/api-doc", Scalar({ url: "/api-spec" }));
+  app.get("/api-doc", Scalar({ url: "/api/api-spec" }));
 }
