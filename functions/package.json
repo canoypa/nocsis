@@ -24,7 +24,7 @@
     "@google-cloud/functions-framework": "^3.5.1",
     "@google-cloud/secret-manager": "^6.0.1",
     "@googleapis/calendar": "^9.7.9",
-    "@slack/web-api": "^7.9.1",
+    "@slack/web-api": "^7.9.2",
     "axios": "^1.9.0",
     "cron-parser": "^5.2.0",
     "firebase-admin": "^13.4.0",
