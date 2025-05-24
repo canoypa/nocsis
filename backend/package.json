@@ -10,7 +10,7 @@
   "dependencies": {
     "@hono/node-server": "^1.14.2",
     "@hono/zod-validator": "^0.4.1",
-    "@scalar/hono-api-reference": "^0.8.10",
+    "@scalar/hono-api-reference": "^0.9.1",
     "hono": "^4.7.10",
     "hono-openapi": "^0.4.8",
     "zod": "^3.24.4",
