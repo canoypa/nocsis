@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,38 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/models/monthly_events.dart';
-
-class PersonalEventsRoute extends GoRouteData {
-  final String groupId;
-
-  const PersonalEventsRoute(this.groupId);
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    final isMobile = MediaQuery.of(context).size.width < 1200;
-
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const EventsView(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        if (isMobile) {
-          return SharedAxisTransition(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.vertical,
-            child: child,
-          );
-        }
-
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
 
 final eventsProvider = FutureProvider.family<MonthlyEventList, String>((
   ref,

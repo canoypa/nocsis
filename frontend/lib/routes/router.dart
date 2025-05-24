@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:animations/animations.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,54 +16,40 @@ import 'package:nocsis/pages/console/members.dart';
 import 'package:nocsis/pages/console/slack.dart';
 import 'package:nocsis/pages/console/weather.dart';
 import 'package:nocsis/pages/licenses.dart';
+import 'package:nocsis/pages/login.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
-import 'package:nocsis/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+part 'classroom_page_route.dart';
+part 'console/console_calendar_page_route.dart';
+part 'console/console_day_duty_page_route.dart';
+part 'console/console_group_page_route.dart';
+part 'console/console_member_page_route.dart';
+part 'console/console_shell_route.dart';
+part 'console/console_slack_page_route.dart';
+part 'console/console_top_page_route.dart';
+part 'console/console_weather_page_route.dart';
+part 'licenses_page_route.dart';
+part 'login_page_route.dart';
+part 'personal/personal_events_page_route.dart';
+part 'personal/personal_home_page_route.dart';
+part 'personal/personal_shell_route.dart';
 part 'router.g.dart';
+part 'settings/settings_shell_route.dart';
+part 'settings/settings_top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
   routes: [
-    TypedGoRoute<LoginRoute>(path: '/login'),
-
-    // 新Path
-    TypedShellRoute<PersonalShell>(
-      routes: [
-        TypedGoRoute<PersonalHomeRoute>(path: '/groups/:groupId'),
-        TypedGoRoute<PersonalEventsRoute>(path: '/groups/:groupId/events'),
-      ],
-    ),
-    TypedGoRoute<ClassroomRoute>(path: '/groups/:groupId/classroom'),
-    TypedShellRoute<ConsoleShellRoute>(
-      routes: [
-        TypedGoRoute<ConsoleTopRoute>(path: '/groups/:groupId/console'),
-        TypedGoRoute<ConsoleGroupRoute>(path: '/groups/:groupId/console/group'),
-        TypedGoRoute<ConsoleMemberRoute>(
-          path: '/groups/:groupId/console/member',
-        ),
-        TypedGoRoute<ConsoleCalendarRoute>(
-          path: '/groups/:groupId/console/calendar',
-        ),
-        TypedGoRoute<ConsoleDayDutyRoute>(
-          path: '/groups/:groupId/console/day_duty',
-        ),
-        TypedGoRoute<ConsoleWeatherRoute>(
-          path: '/groups/:groupId/console/weather',
-        ),
-        TypedGoRoute<ConsoleSlackRoute>(path: '/groups/:groupId/console/slack'),
-      ],
-    ),
-    TypedShellRoute<SettingsShellRoute>(
-      routes: [
-        TypedGoRoute<SettingsTopRoute>(path: '/groups/:groupId/settings'),
-      ],
-    ),
-
-    TypedGoRoute<LicensesRoute>(path: '/licenses'),
+    classroomPageRoute,
+    consoleShellRoute,
+    licensesPageRoute,
+    loginPageRoute,
+    personalShellRoute,
+    settingsShellRoute,
   ],
 )
 class AppShell extends ShellRouteData {

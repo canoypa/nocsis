@@ -1,31 +1,7 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
-
-class ConsoleShellRoute extends ShellRouteData {
-  const ConsoleShellRoute();
-
-  @override
-  Page<void> pageBuilder(
-    BuildContext context,
-    GoRouterState state,
-    Widget navigator,
-  ) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: ConsoleLayout(child: navigator),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
 
 class ConsoleLayout extends StatelessWidget {
   final Widget child;

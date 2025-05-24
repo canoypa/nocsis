@@ -1,33 +1,8 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/components/select_group_menu.dart';
-import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/routes/router.dart';
-
-class SettingsShellRoute extends ShellRouteData {
-  const SettingsShellRoute();
-
-  @override
-  Page<void> pageBuilder(
-    BuildContext context,
-    GoRouterState state,
-    Widget navigator,
-  ) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: SettingsLayout(child: navigator),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
 
 class SettingsLayout extends StatelessWidget {
   final Widget child;
@@ -47,7 +22,7 @@ class SettingsLayout extends StatelessWidget {
             } else {
               final groupId =
                   GoRouter.of(context).state.pathParameters['groupId']!;
-              PersonalHomeRoute(groupId).go(context);
+              PersonalHomePageRoute(groupId).go(context);
             }
           },
         ),
