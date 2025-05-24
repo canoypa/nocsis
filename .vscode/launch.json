@@ -5,21 +5,24 @@
       "name": "classroom",
       "request": "launch",
       "type": "dart",
-      "program": "frontend/lib/main.dart"
+      "program": "frontend/lib/main.dart",
+      "args": ["--web-experimental-hot-reload"]
     },
     {
       "name": "classroom (profile mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
-      "program": "frontend/lib/main.dart"
+      "program": "frontend/lib/main.dart",
+      "args": ["--web-experimental-hot-reload"]
     },
     {
       "name": "classroom (release mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
-      "program": "frontend/lib/main.dart"
+      "program": "frontend/lib/main.dart",
+      "args": ["--web-experimental-hot-reload"]
     }
   ]
 }
