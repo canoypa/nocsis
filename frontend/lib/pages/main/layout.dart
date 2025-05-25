@@ -1,34 +1,8 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/components/select_group_menu.dart';
-import 'package:nocsis/pages/main/events/page.dart';
-import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/routes/router.dart';
-
-class PersonalShell extends ShellRouteData {
-  const PersonalShell();
-
-  @override
-  Page<void> pageBuilder(
-    BuildContext context,
-    GoRouterState state,
-    Widget navigator,
-  ) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: MainPage(navigationState: state, child: navigator),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {
@@ -96,9 +70,9 @@ class MainPage extends StatelessWidget {
         final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
 
         if (nav == Navigation.home) {
-          PersonalHomeRoute(groupId).go(context);
+          PersonalHomePageRoute(groupId).go(context);
         } else if (nav == Navigation.events) {
-          PersonalEventsRoute(groupId).go(context);
+          PersonalEventsPageRoute(groupId).go(context);
         }
       },
       labelType: NavigationRailLabelType.all,
@@ -124,9 +98,9 @@ class MainPage extends StatelessWidget {
         final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
 
         if (nav == Navigation.home) {
-          PersonalHomeRoute(groupId).go(context);
+          PersonalHomePageRoute(groupId).go(context);
         } else if (nav == Navigation.events) {
-          PersonalEventsRoute(groupId).go(context);
+          PersonalEventsPageRoute(groupId).go(context);
         }
       },
     );

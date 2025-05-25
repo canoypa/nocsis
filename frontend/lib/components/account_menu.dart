@@ -2,10 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/personal/user_avatar.dart';
-import 'package:nocsis/pages/classroom.dart';
-import 'package:nocsis/pages/console/index.dart';
-import 'package:nocsis/pages/licenses.dart';
-import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/routes/router.dart';
 
 class AccountMenu extends StatelessWidget {
@@ -32,7 +28,7 @@ class AccountMenu extends StatelessWidget {
           onTap: () {
             final groupId =
                 GoRouter.of(context).state.pathParameters['groupId']!;
-            SettingsTopRoute(groupId).go(context);
+            SettingsTopPageRoute(groupId).go(context);
           },
         ),
         ListTile(
@@ -48,7 +44,7 @@ class AccountMenu extends StatelessWidget {
             onTap: () {
               final groupId =
                   GoRouter.of(context).state.pathParameters['groupId']!;
-              ConsoleTopRoute(groupId).go(context);
+              ConsoleTopPageRoute(groupId).go(context);
             },
           ),
           ListTile(
@@ -56,7 +52,7 @@ class AccountMenu extends StatelessWidget {
             onTap: () {
               final groupId =
                   GoRouter.of(context).state.pathParameters['groupId']!;
-              ClassroomRoute(groupId).go(context);
+              ClassroomPageRoute(groupId).go(context);
             },
           ),
         ],
@@ -64,7 +60,7 @@ class AccountMenu extends StatelessWidget {
         ListTile(
           title: const Text("ライセンス"),
           onTap: () {
-            const LicensesRoute().go(context);
+            const LicensesPageRoute().go(context);
           },
         ),
       ],

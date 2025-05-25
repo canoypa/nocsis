@@ -1,29 +1,6 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/routes/router.dart';
-
-class ConsoleTopRoute extends GoRouteData {
-  final String groupId;
-
-  const ConsoleTopRoute(this.groupId);
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const ConsoleTopPage(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
 
 class ConsoleTopPage extends StatelessWidget {
   const ConsoleTopPage({super.key});
@@ -46,7 +23,7 @@ class ConsoleTopPage extends StatelessWidget {
               onPressed: () {
                 final groupId =
                     GoRouter.of(context).state.pathParameters['groupId']!;
-                ClassroomRoute(groupId).go(context);
+                ClassroomPageRoute(groupId).go(context);
               },
             ),
           ],
