@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
 
-class ConsoleTopPage extends StatelessWidget {
+class ConsoleTopPage extends ConsumerWidget {
   const ConsoleTopPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groupId = ref.watch(currentGroupIdProvider);
+
     return Align(
       alignment: Alignment.topLeft,
       child: ConstrainedBox(
@@ -20,11 +23,7 @@ class ConsoleTopPage extends StatelessWidget {
             const SizedBox(height: 48),
             OutlinedButton(
               child: const Text('Classroom を起動する'),
-              onPressed: () {
-                final groupId =
-                    GoRouter.of(context).state.pathParameters['groupId']!;
-                ClassroomPageRoute(groupId).go(context);
-              },
+              onPressed: () => ClassroomPageRoute(groupId).go(context),
             ),
           ],
         ),

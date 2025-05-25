@@ -1,10 +1,10 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/models/monthly_events.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 
 final eventsProvider = FutureProvider.family<MonthlyEventList, String>((
   ref,
@@ -30,7 +30,7 @@ class EventsView extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+    final groupId = ref.watch(currentGroupIdProvider);
     final snap = ref.watch(eventsProvider(groupId));
 
     return snap.when(

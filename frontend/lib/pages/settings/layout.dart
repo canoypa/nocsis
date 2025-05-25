@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/components/select_group_menu.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
 
-class SettingsLayout extends StatelessWidget {
+class SettingsLayout extends ConsumerWidget {
   final Widget child;
 
   const SettingsLayout({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groupId = ref.watch(currentGroupIdProvider);
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: AppBar(
@@ -20,8 +24,6 @@ class SettingsLayout extends StatelessWidget {
             if (GoRouter.of(context).canPop()) {
               GoRouter.of(context).pop();
             } else {
-              final groupId =
-                  GoRouter.of(context).state.pathParameters['groupId']!;
               PersonalHomePageRoute(groupId).go(context);
             }
           },

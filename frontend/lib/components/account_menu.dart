@@ -1,14 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/personal/user_avatar.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
 
-class AccountMenu extends StatelessWidget {
+class AccountMenu extends ConsumerWidget {
   const AccountMenu({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groupId = ref.watch(currentGroupIdProvider);
+
     return MenuAnchor(
       builder: (context, controller, child) {
         return IconButton(
@@ -25,11 +28,7 @@ class AccountMenu extends StatelessWidget {
       menuChildren: [
         ListTile(
           title: const Text("設定"),
-          onTap: () {
-            final groupId =
-                GoRouter.of(context).state.pathParameters['groupId']!;
-            SettingsTopPageRoute(groupId).go(context);
-          },
+          onTap: () => SettingsTopPageRoute(groupId).go(context),
         ),
         ListTile(
           title: const Text("ログアウト"),
@@ -41,19 +40,11 @@ class AccountMenu extends StatelessWidget {
           const Divider(),
           ListTile(
             title: const Text("管理コンソール"),
-            onTap: () {
-              final groupId =
-                  GoRouter.of(context).state.pathParameters['groupId']!;
-              ConsoleTopPageRoute(groupId).go(context);
-            },
+            onTap: () => ConsoleTopPageRoute(groupId).go(context),
           ),
           ListTile(
             title: const Text("Classroom を起動"),
-            onTap: () {
-              final groupId =
-                  GoRouter.of(context).state.pathParameters['groupId']!;
-              ClassroomPageRoute(groupId).go(context);
-            },
+            onTap: () => ClassroomPageRoute(groupId).go(context),
           ),
         ],
         const Divider(),
