@@ -105,53 +105,34 @@ Future<String?> _redirectLoggedInUser(GoRouterState state) async {
     return "/";
   }
 
-  return await _redirectFromOldPaths(continueUri) ?? continueUri.toString();
+  return await _redirectFromTopPage(continueUri) ?? continueUri.toString();
 }
 
-Future<String?> _redirectFromOldPaths(Uri uri) async {
-  final oldPaths = [
-    '/',
-    '/events',
-    '/classroom',
-    '/console',
-    '/console/group',
-    '/console/member',
-    '/console/calendar',
-    '/console/day_duty',
-    '/console/weather',
-    '/console/slack',
-    '/settings',
-  ];
-
-  if (oldPaths.contains(uri.path)) {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    final groupId = sharedPreferences.getString('latest_group_id');
-
-    if (groupId != null) {
-      return uri.path == '/'
-          ? "/groups/$groupId"
-          : "/groups/$groupId${uri.path}";
-    }
-
-    final res =
-        await FirebaseFunctions.instanceFor(
-          region: "asia-northeast1",
-        ).httpsCallable("v4-groups-user_joined_groups-get").call();
-    final data = UserJoinedGroups.fromJson(res.data);
-
-    final firstUserJoinedGroup = data.groups.first;
-
-    sharedPreferences.setString(
-      'latest_group_id',
-      firstUserJoinedGroup.groupId,
-    );
-
-    return uri.path == '/'
-        ? "/groups/${firstUserJoinedGroup.groupId}"
-        : "/groups/${firstUserJoinedGroup.groupId}${uri.path}";
+Future<String?> _redirectFromTopPage(Uri uri) async {
+  if (uri.path != '/') {
+    return null;
   }
 
-  return null;
+  final sharedPreferences = await SharedPreferences.getInstance();
+  final groupId = sharedPreferences.getString('latest_group_id');
+
+  if (groupId != null) {
+    return uri.path == '/' ? "/groups/$groupId" : "/groups/$groupId${uri.path}";
+  }
+
+  final res =
+      await FirebaseFunctions.instanceFor(
+        region: "asia-northeast1",
+      ).httpsCallable("v4-groups-user_joined_groups-get").call();
+  final data = UserJoinedGroups.fromJson(res.data);
+
+  final firstUserJoinedGroup = data.groups.first;
+
+  sharedPreferences.setString('latest_group_id', firstUserJoinedGroup.groupId);
+
+  return uri.path == '/'
+      ? "/groups/${firstUserJoinedGroup.groupId}"
+      : "/groups/${firstUserJoinedGroup.groupId}${uri.path}";
 }
 
 final router = GoRouter(
@@ -160,6 +141,6 @@ final router = GoRouter(
   redirect: (context, state) async {
     return await _redirectNotLoggedInUser(state) ??
         await _redirectLoggedInUser(state) ??
-        await _redirectFromOldPaths(state.uri);
+        await _redirectFromTopPage(state.uri);
   },
 );
