@@ -77,7 +77,7 @@ class GoRouterRefresher extends ChangeNotifier {
   }
 }
 
-Future<String?> _redirectNotSignedInUser(GoRouterState state) async {
+Future<String?> _redirectNotLoggedInUser(GoRouterState state) async {
   final user = await FirebaseAuth.instance.authStateChanges().first;
   final isLoggedIn = user != null;
 
@@ -89,7 +89,7 @@ Future<String?> _redirectNotSignedInUser(GoRouterState state) async {
   return LoginPageRoute(continueUri: continueUri).location;
 }
 
-Future<String?> _redirectSignedInUser(GoRouterState state) async {
+Future<String?> _redirectLoggedInUser(GoRouterState state) async {
   final user = await FirebaseAuth.instance.authStateChanges().first;
   final isLoggedIn = user != null;
 
@@ -158,8 +158,8 @@ final router = GoRouter(
   routes: $appRoutes,
   refreshListenable: GoRouterRefresher(),
   redirect: (context, state) async {
-    return await _redirectNotSignedInUser(state) ??
-        await _redirectSignedInUser(state) ??
+    return await _redirectNotLoggedInUser(state) ??
+        await _redirectLoggedInUser(state) ??
         await _redirectFromOldPaths(state.uri);
   },
 );
