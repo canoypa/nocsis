@@ -89,21 +89,23 @@ Future<String?> _redirectNotSignedInUser(GoRouterState state) async {
   return LoginPageRoute(continueUri: continueUri).location;
 }
 
-Future<String?> _redirectSignedInUser(Uri uri) async {
+Future<String?> _redirectSignedInUser(GoRouterState state) async {
   final user = await FirebaseAuth.instance.authStateChanges().first;
   final isLoggedIn = user != null;
 
-  if (isLoggedIn && uri.path == "/login") {
-    final continueUri = Uri.tryParse(uri.queryParameters["continue"] ?? "/");
+  if (!isLoggedIn || state.matchedLocation != LoginPageRoute().location) {
+    return null;
+  }
 
-    if (continueUri != null) {
-      return await _redirectFromOldPaths(continueUri) ?? continueUri.path;
-    }
+  final continueUri = Uri.tryParse(
+    state.uri.queryParameters["continue-uri"] ?? "/",
+  );
 
+  if (continueUri == null) {
     return "/";
   }
 
-  return null;
+  return await _redirectFromOldPaths(continueUri) ?? continueUri.toString();
 }
 
 Future<String?> _redirectFromOldPaths(Uri uri) async {
@@ -157,7 +159,7 @@ final router = GoRouter(
   refreshListenable: GoRouterRefresher(),
   redirect: (context, state) async {
     return await _redirectNotSignedInUser(state) ??
-        await _redirectSignedInUser(state.uri) ??
+        await _redirectSignedInUser(state) ??
         await _redirectFromOldPaths(state.uri);
   },
 );
