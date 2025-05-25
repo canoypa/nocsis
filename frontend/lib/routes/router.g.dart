@@ -263,10 +263,20 @@ extension $LicensesPageRouteExtension on LicensesPageRoute {
 }
 
 extension $LoginPageRouteExtension on LoginPageRoute {
-  static LoginPageRoute _fromState(GoRouterState state) =>
-      const LoginPageRoute();
+  static LoginPageRoute _fromState(GoRouterState state) => LoginPageRoute(
+    continueUri: _$convertMapValue(
+      'continue-uri',
+      state.uri.queryParameters,
+      Uri.tryParse,
+    ),
+  );
 
-  String get location => GoRouteData.$location('/login');
+  String get location => GoRouteData.$location(
+    '/login',
+    queryParams: {
+      if (continueUri != null) 'continue-uri': continueUri!.toString(),
+    },
+  );
 
   void go(BuildContext context) => context.go(location);
 
@@ -337,4 +347,13 @@ extension $SettingsTopPageRouteExtension on SettingsTopPageRoute {
       context.pushReplacement(location);
 
   void replace(BuildContext context) => context.replace(location);
+}
+
+T? _$convertMapValue<T>(
+  String key,
+  Map<String, String> map,
+  T? Function(String) converter,
+) {
+  final value = map[key];
+  return value == null ? null : converter(value);
 }

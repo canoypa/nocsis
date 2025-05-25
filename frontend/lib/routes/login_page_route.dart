@@ -5,7 +5,9 @@ const loginPageRoute = TypedGoRoute<LoginPageRoute>(path: LoginPageRoute.path);
 class LoginPageRoute extends GoRouteData {
   static const path = '/login';
 
-  const LoginPageRoute();
+  final Uri? continueUri;
+
+  const LoginPageRoute({this.continueUri});
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
