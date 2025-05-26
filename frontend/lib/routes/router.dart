@@ -15,6 +15,7 @@ import 'package:nocsis/pages/console/layout.dart';
 import 'package:nocsis/pages/console/members.dart';
 import 'package:nocsis/pages/console/slack.dart';
 import 'package:nocsis/pages/console/weather.dart';
+import 'package:nocsis/pages/group/group_layout.dart';
 import 'package:nocsis/pages/licenses.dart';
 import 'package:nocsis/pages/login.dart';
 import 'package:nocsis/pages/main/events/page.dart';
@@ -33,6 +34,7 @@ part 'console/console_shell_route.dart';
 part 'console/console_slack_page_route.dart';
 part 'console/console_top_page_route.dart';
 part 'console/console_weather_page_route.dart';
+part 'group/group_shell_route.dart';
 part 'licenses_page_route.dart';
 part 'login_page_route.dart';
 part 'personal/personal_events_page_route.dart';
@@ -43,14 +45,7 @@ part 'settings/settings_shell_route.dart';
 part 'settings/settings_top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
-  routes: [
-    classroomPageRoute,
-    consoleShellRoute,
-    licensesPageRoute,
-    loginPageRoute,
-    personalShellRoute,
-    settingsShellRoute,
-  ],
+  routes: [groupShellRoute, licensesPageRoute, loginPageRoute],
 )
 class AppShell extends ShellRouteData {
   @override

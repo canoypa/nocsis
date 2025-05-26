@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/providers/during_class_data.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:nocsis/screens/classroom.dart';
 import 'package:nocsis/screens/during_class.dart';
@@ -42,7 +43,7 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
 
   @override
   Widget build(BuildContext context) {
-    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+    final groupId = ref.watch(currentGroupIdProvider);
     final duringClassData = ref
         .watch(duringClassDataProvider(groupId))
         .maybeWhen(data: (data) => data, orElse: () => null);
@@ -108,10 +109,6 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
                             if (GoRouter.of(context).canPop()) {
                               GoRouter.of(context).pop();
                             } else {
-                              final groupId =
-                                  GoRouter.of(
-                                    context,
-                                  ).state.pathParameters['groupId']!;
                               ConsoleTopPageRoute(groupId).go(context);
                             }
                           },

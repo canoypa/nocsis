@@ -4,8 +4,8 @@ import 'package:collection/collection.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nocsis/models/weather.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/weather.dart';
 
 // 初回読み込み中のデータ
@@ -19,8 +19,7 @@ class WeatherGraph extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
-
+    final groupId = ref.watch(currentGroupIdProvider);
     final weather =
         ref.watch(weatherProvider(groupId)).value?.hourly ?? _initWeatherHourly;
 

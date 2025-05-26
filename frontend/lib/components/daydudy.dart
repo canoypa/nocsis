@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nocsis/providers/daydudy.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 
 class Daydudy extends ConsumerWidget {
   const Daydudy({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+    final groupId = ref.watch(currentGroupIdProvider);
     final daydudy = ref
         .watch(daydudyProvider(groupId))
         .maybeWhen(data: (data) => data, orElse: () => null);
