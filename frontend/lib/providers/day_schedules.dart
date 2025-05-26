@@ -15,7 +15,6 @@ final HttpsCallable getEvents = FirebaseFunctions.instanceFor(
   region: "asia-northeast1",
 ).httpsCallable("v4-events-get");
 
-@freezed
 class DaySchedules {
   final ClassList classes;
   final EventList events;
