@@ -13,8 +13,23 @@ class GroupShellRoute extends ShellRouteData {
   const GroupShellRoute();
 
   @override
-  Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
+  Page<void> pageBuilder(
+    BuildContext context,
+    GoRouterState state,
+    Widget navigator,
+  ) {
     final groupId = state.pathParameters['groupId']!;
-    return GroupLayout(groupId: groupId, navigator: navigator);
+
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: GroupLayout(groupId: groupId, navigator: navigator),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeThroughTransition(
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          child: child,
+        );
+      },
+    );
   }
 }
