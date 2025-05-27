@@ -1,37 +1,15 @@
 import 'dart:async';
 
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/pages/console/index.dart';
 import 'package:nocsis/providers/during_class_data.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:nocsis/screens/classroom.dart';
 import 'package:nocsis/screens/during_class.dart';
 import 'package:nocsis/themes/display.dart';
-
-class ClassroomRoute extends GoRouteData {
-  final String groupId;
-
-  const ClassroomRoute(this.groupId);
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const ClassroomPage(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
 
 class ClassroomPage extends ConsumerStatefulWidget {
   const ClassroomPage({super.key});
@@ -65,7 +43,7 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
 
   @override
   Widget build(BuildContext context) {
-    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+    final groupId = ref.watch(currentGroupIdProvider);
     final duringClassData = ref
         .watch(duringClassDataProvider(groupId))
         .maybeWhen(data: (data) => data, orElse: () => null);
@@ -131,11 +109,7 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
                             if (GoRouter.of(context).canPop()) {
                               GoRouter.of(context).pop();
                             } else {
-                              final groupId =
-                                  GoRouter.of(
-                                    context,
-                                  ).state.pathParameters['groupId']!;
-                              ConsoleTopRoute(groupId).go(context);
+                              ConsoleTopPageRoute(groupId).go(context);
                             }
                           },
                         ),

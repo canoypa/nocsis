@@ -11,85 +11,90 @@ List<RouteBase> get $appRoutes => [$appShell];
 RouteBase get $appShell => ShellRouteData.$route(
   factory: $AppShellExtension._fromState,
   routes: [
-    GoRouteData.$route(
-      path: '/login',
-
-      factory: $LoginRouteExtension._fromState,
-    ),
     ShellRouteData.$route(
-      factory: $PersonalShellExtension._fromState,
+      factory: $GroupShellRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
-          path: '/groups/:groupId',
+          path: '/groups/:groupId/classroom',
 
-          factory: $PersonalHomeRouteExtension._fromState,
+          factory: $ClassroomPageRouteExtension._fromState,
         ),
-        GoRouteData.$route(
-          path: '/groups/:groupId/events',
+        ShellRouteData.$route(
+          factory: $ConsoleShellRouteExtension._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: '/groups/:groupId/console',
 
-          factory: $PersonalEventsRouteExtension._fromState,
+              factory: $ConsoleTopPageRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/groups/:groupId/console/group',
+
+              factory: $ConsoleGroupPageRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/groups/:groupId/console/member',
+
+              factory: $ConsoleMemberPageRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/groups/:groupId/console/calendar',
+
+              factory: $ConsoleCalendarPageRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/groups/:groupId/console/day_duty',
+
+              factory: $ConsoleDayDutyPageRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/groups/:groupId/console/weather',
+
+              factory: $ConsoleWeatherPageRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/groups/:groupId/console/slack',
+
+              factory: $ConsoleSlackPageRouteExtension._fromState,
+            ),
+          ],
         ),
-      ],
-    ),
-    GoRouteData.$route(
-      path: '/groups/:groupId/classroom',
+        ShellRouteData.$route(
+          factory: $PersonalShellRouteExtension._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: '/groups/:groupId',
 
-      factory: $ClassroomRouteExtension._fromState,
-    ),
-    ShellRouteData.$route(
-      factory: $ConsoleShellRouteExtension._fromState,
-      routes: [
-        GoRouteData.$route(
-          path: '/groups/:groupId/console',
+              factory: $PersonalHomePageRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: '/groups/:groupId/events',
 
-          factory: $ConsoleTopRouteExtension._fromState,
+              factory: $PersonalEventsPageRouteExtension._fromState,
+            ),
+          ],
         ),
-        GoRouteData.$route(
-          path: '/groups/:groupId/console/group',
+        ShellRouteData.$route(
+          factory: $SettingsShellRouteExtension._fromState,
+          routes: [
+            GoRouteData.$route(
+              path: '/groups/:groupId/settings',
 
-          factory: $ConsoleGroupRouteExtension._fromState,
-        ),
-        GoRouteData.$route(
-          path: '/groups/:groupId/console/member',
-
-          factory: $ConsoleMemberRouteExtension._fromState,
-        ),
-        GoRouteData.$route(
-          path: '/groups/:groupId/console/calendar',
-
-          factory: $ConsoleCalendarRouteExtension._fromState,
-        ),
-        GoRouteData.$route(
-          path: '/groups/:groupId/console/day_duty',
-
-          factory: $ConsoleDayDutyRouteExtension._fromState,
-        ),
-        GoRouteData.$route(
-          path: '/groups/:groupId/console/weather',
-
-          factory: $ConsoleWeatherRouteExtension._fromState,
-        ),
-        GoRouteData.$route(
-          path: '/groups/:groupId/console/slack',
-
-          factory: $ConsoleSlackRouteExtension._fromState,
-        ),
-      ],
-    ),
-    ShellRouteData.$route(
-      factory: $SettingsShellRouteExtension._fromState,
-      routes: [
-        GoRouteData.$route(
-          path: '/groups/:groupId/settings',
-
-          factory: $SettingsTopRouteExtension._fromState,
+              factory: $SettingsTopPageRouteExtension._fromState,
+            ),
+          ],
         ),
       ],
     ),
     GoRouteData.$route(
       path: '/licenses',
 
-      factory: $LicensesRouteExtension._fromState,
+      factory: $LicensesPageRouteExtension._fromState,
+    ),
+    GoRouteData.$route(
+      path: '/login',
+
+      factory: $LoginPageRouteExtension._fromState,
     ),
   ],
 );
@@ -98,62 +103,14 @@ extension $AppShellExtension on AppShell {
   static AppShell _fromState(GoRouterState state) => AppShell();
 }
 
-extension $LoginRouteExtension on LoginRoute {
-  static LoginRoute _fromState(GoRouterState state) => const LoginRoute();
-
-  String get location => GoRouteData.$location('/login');
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
+extension $GroupShellRouteExtension on GroupShellRoute {
+  static GroupShellRoute _fromState(GoRouterState state) =>
+      const GroupShellRoute();
 }
 
-extension $PersonalShellExtension on PersonalShell {
-  static PersonalShell _fromState(GoRouterState state) => const PersonalShell();
-}
-
-extension $PersonalHomeRouteExtension on PersonalHomeRoute {
-  static PersonalHomeRoute _fromState(GoRouterState state) =>
-      PersonalHomeRoute(state.pathParameters['groupId']!);
-
-  String get location =>
-      GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}');
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
-}
-
-extension $PersonalEventsRouteExtension on PersonalEventsRoute {
-  static PersonalEventsRoute _fromState(GoRouterState state) =>
-      PersonalEventsRoute(state.pathParameters['groupId']!);
-
-  String get location =>
-      GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}/events');
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
-}
-
-extension $ClassroomRouteExtension on ClassroomRoute {
-  static ClassroomRoute _fromState(GoRouterState state) =>
-      ClassroomRoute(state.pathParameters['groupId']!);
+extension $ClassroomPageRouteExtension on ClassroomPageRoute {
+  static ClassroomPageRoute _fromState(GoRouterState state) =>
+      ClassroomPageRoute(state.pathParameters['groupId']!);
 
   String get location => GoRouteData.$location(
     '/groups/${Uri.encodeComponent(groupId)}/classroom',
@@ -174,9 +131,9 @@ extension $ConsoleShellRouteExtension on ConsoleShellRoute {
       const ConsoleShellRoute();
 }
 
-extension $ConsoleTopRouteExtension on ConsoleTopRoute {
-  static ConsoleTopRoute _fromState(GoRouterState state) =>
-      ConsoleTopRoute(state.pathParameters['groupId']!);
+extension $ConsoleTopPageRouteExtension on ConsoleTopPageRoute {
+  static ConsoleTopPageRoute _fromState(GoRouterState state) =>
+      ConsoleTopPageRoute(state.pathParameters['groupId']!);
 
   String get location =>
       GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}/console');
@@ -191,9 +148,9 @@ extension $ConsoleTopRouteExtension on ConsoleTopRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $ConsoleGroupRouteExtension on ConsoleGroupRoute {
-  static ConsoleGroupRoute _fromState(GoRouterState state) =>
-      ConsoleGroupRoute(state.pathParameters['groupId']!);
+extension $ConsoleGroupPageRouteExtension on ConsoleGroupPageRoute {
+  static ConsoleGroupPageRoute _fromState(GoRouterState state) =>
+      ConsoleGroupPageRoute(state.pathParameters['groupId']!);
 
   String get location => GoRouteData.$location(
     '/groups/${Uri.encodeComponent(groupId)}/console/group',
@@ -209,9 +166,9 @@ extension $ConsoleGroupRouteExtension on ConsoleGroupRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $ConsoleMemberRouteExtension on ConsoleMemberRoute {
-  static ConsoleMemberRoute _fromState(GoRouterState state) =>
-      ConsoleMemberRoute(state.pathParameters['groupId']!);
+extension $ConsoleMemberPageRouteExtension on ConsoleMemberPageRoute {
+  static ConsoleMemberPageRoute _fromState(GoRouterState state) =>
+      ConsoleMemberPageRoute(state.pathParameters['groupId']!);
 
   String get location => GoRouteData.$location(
     '/groups/${Uri.encodeComponent(groupId)}/console/member',
@@ -227,9 +184,9 @@ extension $ConsoleMemberRouteExtension on ConsoleMemberRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $ConsoleCalendarRouteExtension on ConsoleCalendarRoute {
-  static ConsoleCalendarRoute _fromState(GoRouterState state) =>
-      ConsoleCalendarRoute(state.pathParameters['groupId']!);
+extension $ConsoleCalendarPageRouteExtension on ConsoleCalendarPageRoute {
+  static ConsoleCalendarPageRoute _fromState(GoRouterState state) =>
+      ConsoleCalendarPageRoute(state.pathParameters['groupId']!);
 
   String get location => GoRouteData.$location(
     '/groups/${Uri.encodeComponent(groupId)}/console/calendar',
@@ -245,9 +202,9 @@ extension $ConsoleCalendarRouteExtension on ConsoleCalendarRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $ConsoleDayDutyRouteExtension on ConsoleDayDutyRoute {
-  static ConsoleDayDutyRoute _fromState(GoRouterState state) =>
-      ConsoleDayDutyRoute(state.pathParameters['groupId']!);
+extension $ConsoleDayDutyPageRouteExtension on ConsoleDayDutyPageRoute {
+  static ConsoleDayDutyPageRoute _fromState(GoRouterState state) =>
+      ConsoleDayDutyPageRoute(state.pathParameters['groupId']!);
 
   String get location => GoRouteData.$location(
     '/groups/${Uri.encodeComponent(groupId)}/console/day_duty',
@@ -263,9 +220,9 @@ extension $ConsoleDayDutyRouteExtension on ConsoleDayDutyRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $ConsoleWeatherRouteExtension on ConsoleWeatherRoute {
-  static ConsoleWeatherRoute _fromState(GoRouterState state) =>
-      ConsoleWeatherRoute(state.pathParameters['groupId']!);
+extension $ConsoleWeatherPageRouteExtension on ConsoleWeatherPageRoute {
+  static ConsoleWeatherPageRoute _fromState(GoRouterState state) =>
+      ConsoleWeatherPageRoute(state.pathParameters['groupId']!);
 
   String get location => GoRouteData.$location(
     '/groups/${Uri.encodeComponent(groupId)}/console/weather',
@@ -281,13 +238,52 @@ extension $ConsoleWeatherRouteExtension on ConsoleWeatherRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $ConsoleSlackRouteExtension on ConsoleSlackRoute {
-  static ConsoleSlackRoute _fromState(GoRouterState state) =>
-      ConsoleSlackRoute(state.pathParameters['groupId']!);
+extension $ConsoleSlackPageRouteExtension on ConsoleSlackPageRoute {
+  static ConsoleSlackPageRoute _fromState(GoRouterState state) =>
+      ConsoleSlackPageRoute(state.pathParameters['groupId']!);
 
   String get location => GoRouteData.$location(
     '/groups/${Uri.encodeComponent(groupId)}/console/slack',
   );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $PersonalShellRouteExtension on PersonalShellRoute {
+  static PersonalShellRoute _fromState(GoRouterState state) =>
+      const PersonalShellRoute();
+}
+
+extension $PersonalHomePageRouteExtension on PersonalHomePageRoute {
+  static PersonalHomePageRoute _fromState(GoRouterState state) =>
+      PersonalHomePageRoute(state.pathParameters['groupId']!);
+
+  String get location =>
+      GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}');
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $PersonalEventsPageRouteExtension on PersonalEventsPageRoute {
+  static PersonalEventsPageRoute _fromState(GoRouterState state) =>
+      PersonalEventsPageRoute(state.pathParameters['groupId']!);
+
+  String get location =>
+      GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}/events');
 
   void go(BuildContext context) => context.go(location);
 
@@ -304,9 +300,9 @@ extension $SettingsShellRouteExtension on SettingsShellRoute {
       const SettingsShellRoute();
 }
 
-extension $SettingsTopRouteExtension on SettingsTopRoute {
-  static SettingsTopRoute _fromState(GoRouterState state) =>
-      SettingsTopRoute(state.pathParameters['groupId']!);
+extension $SettingsTopPageRouteExtension on SettingsTopPageRoute {
+  static SettingsTopPageRoute _fromState(GoRouterState state) =>
+      SettingsTopPageRoute(state.pathParameters['groupId']!);
 
   String get location =>
       GoRouteData.$location('/groups/${Uri.encodeComponent(groupId)}/settings');
@@ -321,8 +317,9 @@ extension $SettingsTopRouteExtension on SettingsTopRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $LicensesRouteExtension on LicensesRoute {
-  static LicensesRoute _fromState(GoRouterState state) => const LicensesRoute();
+extension $LicensesPageRouteExtension on LicensesPageRoute {
+  static LicensesPageRoute _fromState(GoRouterState state) =>
+      const LicensesPageRoute();
 
   String get location => GoRouteData.$location('/licenses');
 
@@ -334,4 +331,39 @@ extension $LicensesRouteExtension on LicensesRoute {
       context.pushReplacement(location);
 
   void replace(BuildContext context) => context.replace(location);
+}
+
+extension $LoginPageRouteExtension on LoginPageRoute {
+  static LoginPageRoute _fromState(GoRouterState state) => LoginPageRoute(
+    continueUri: _$convertMapValue(
+      'continue-uri',
+      state.uri.queryParameters,
+      Uri.tryParse,
+    ),
+  );
+
+  String get location => GoRouteData.$location(
+    '/login',
+    queryParams: {
+      if (continueUri != null) 'continue-uri': continueUri!.toString(),
+    },
+  );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+T? _$convertMapValue<T>(
+  String key,
+  Map<String, String> map,
+  T? Function(String) converter,
+) {
+  final value = map[key];
+  return value == null ? null : converter(value);
 }

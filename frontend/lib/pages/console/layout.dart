@@ -1,33 +1,11 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/custom_icons.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
 
-class ConsoleShellRoute extends ShellRouteData {
-  const ConsoleShellRoute();
-
-  @override
-  Page<void> pageBuilder(
-    BuildContext context,
-    GoRouterState state,
-    Widget navigator,
-  ) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: ConsoleLayout(child: navigator),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
-
-class ConsoleLayout extends StatelessWidget {
+class ConsoleLayout extends ConsumerWidget {
   final Widget child;
 
   const ConsoleLayout({super.key, required this.child});
@@ -52,12 +30,13 @@ class ConsoleLayout extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groupId = ref.watch(currentGroupIdProvider);
+
     return DrawerLayout(
       title: const Text('管理コンソール'),
       navigationIndex: _getNavigationIndex(context),
       onDestinationSelected: (value) {
-        final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
         final route =
             _routeToIndex.entries
                 .firstWhere((entry) => entry.value == value)

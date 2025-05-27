@@ -1,34 +1,10 @@
-import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/components/select_group_menu.dart';
-import 'package:nocsis/pages/main/events/page.dart';
-import 'package:nocsis/pages/main/home/page.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
-
-class PersonalShell extends ShellRouteData {
-  const PersonalShell();
-
-  @override
-  Page<void> pageBuilder(
-    BuildContext context,
-    GoRouterState state,
-    Widget navigator,
-  ) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: MainPage(navigationState: state, child: navigator),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {
@@ -65,7 +41,7 @@ enum Navigation {
   }
 }
 
-class MainPage extends StatelessWidget {
+class MainPage extends ConsumerWidget {
   final Widget child;
   final GoRouterState navigationState;
 
@@ -75,7 +51,11 @@ class MainPage extends StatelessWidget {
     required this.child,
   });
 
-  Widget _buildNavRail(BuildContext context, Navigation navigation) {
+  Widget _buildNavRail(
+    BuildContext context,
+    Navigation navigation,
+    String groupId,
+  ) {
     return NavigationRail(
       // top padding, but it doesn't look like it
       leading: const SizedBox(height: 8),
@@ -93,19 +73,21 @@ class MainPage extends StatelessWidget {
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
-        final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
-
         if (nav == Navigation.home) {
-          PersonalHomeRoute(groupId).go(context);
+          PersonalHomePageRoute(groupId).go(context);
         } else if (nav == Navigation.events) {
-          PersonalEventsRoute(groupId).go(context);
+          PersonalEventsPageRoute(groupId).go(context);
         }
       },
       labelType: NavigationRailLabelType.all,
     );
   }
 
-  Widget _buildNavBar(BuildContext context, Navigation navigation) {
+  Widget _buildNavBar(
+    BuildContext context,
+    Navigation navigation,
+    String groupId,
+  ) {
     return NavigationBar(
       selectedIndex: navigation.index,
       destinations:
@@ -121,20 +103,20 @@ class MainPage extends StatelessWidget {
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
-        final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
-
         if (nav == Navigation.home) {
-          PersonalHomeRoute(groupId).go(context);
+          PersonalHomePageRoute(groupId).go(context);
         } else if (nav == Navigation.events) {
-          PersonalEventsRoute(groupId).go(context);
+          PersonalEventsPageRoute(groupId).go(context);
         }
       },
     );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final nav = Navigation.fromPagePath(navigationState.fullPath!);
+
+    final groupId = ref.watch(currentGroupIdProvider);
 
     return LayoutBuilder(
       builder: ((context, constraints) {
@@ -144,12 +126,12 @@ class MainPage extends StatelessWidget {
           appBar: AppBar(actions: const [SelectGroupMenu(), AccountMenu()]),
           body: Row(
             children: [
-              if (isLargeScreen) _buildNavRail(context, nav),
+              if (isLargeScreen) _buildNavRail(context, nav, groupId),
               Expanded(child: child),
             ],
           ),
           bottomNavigationBar:
-              !isLargeScreen ? _buildNavBar(context, nav) : null,
+              !isLargeScreen ? _buildNavBar(context, nav, groupId) : null,
         );
       }),
     );

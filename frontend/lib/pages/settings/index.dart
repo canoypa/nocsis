@@ -3,31 +3,9 @@ import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/login_form.dart';
 import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/providers/user.dart';
-
-class SettingsTopRoute extends GoRouteData {
-  final String groupId;
-
-  const SettingsTopRoute(this.groupId);
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const SettingsTopPage(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
 
 class SettingsTopPage extends ConsumerWidget {
   const SettingsTopPage({super.key});
