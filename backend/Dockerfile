@@ -19,5 +19,5 @@ FROM base AS runner
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/dist /app/dist
 
-EXPOSE 8080
+EXPOSE 8888
 CMD [ "node", "--enable-source-maps", "dist/main.js" ]
