@@ -2,12 +2,15 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import { describeRoute, openAPISpecs } from "hono-openapi";
 import { resolver } from "hono-openapi/zod";
+import { contextStorage } from "hono/context-storage";
 import { z } from "zod";
 import "zod-openapi/extend";
 
 export const app = new Hono({
   strict: false, // パス末尾のスラッシュ有無を区別しない
-}).basePath("/api");
+})
+  .basePath("/api")
+  .use(contextStorage());
 
 const responseSchema = z.string().openapi({
   description: "Example response",
