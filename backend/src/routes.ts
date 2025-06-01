@@ -15,31 +15,6 @@ export const app = new Hono({
 
 app.route("/v1", v1Routes);
 
-const responseSchema = z.string().openapi({
-  description: "Example response",
-  example: "Hello Hono!",
-});
-
-app.get(
-  "/",
-  describeRoute({
-    description: "Example endpoint",
-    responses: {
-      200: {
-        description: "Successful response",
-        content: {
-          "text/plain": {
-            schema: resolver(responseSchema),
-          },
-        },
-      },
-    },
-  }),
-  (c) => {
-    return c.text("Hello Hono!");
-  },
-);
-
 if (process.env.NODE_ENV !== "production") {
   app.get(
     "/api-spec",
