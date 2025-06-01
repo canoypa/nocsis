@@ -92,7 +92,7 @@ class _CanvasState extends ConsumerState<_Canvas>
       ..forward();
   }
 
-  _updateTweens() {
+  void _updateTweens() {
     final width = widget.constraints.maxWidth;
     final height = widget.constraints.maxHeight;
 

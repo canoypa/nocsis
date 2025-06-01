@@ -31,13 +31,13 @@ class _LoginFormState extends State<LoginForm> {
   final emailFieldController = TextEditingController();
   final passwordFieldController = TextEditingController();
 
-  _togglePasswordVisibility() {
+  void _togglePasswordVisibility() {
     setState(() {
       invisiblePassword = invisiblePassword ? false : true;
     });
   }
 
-  _passwordVisibilityIcon() {
+  IconData _passwordVisibilityIcon() {
     if (invisiblePassword) {
       return Icons.visibility_off_outlined;
     } else {

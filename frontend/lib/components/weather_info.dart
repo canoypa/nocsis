@@ -8,7 +8,7 @@ import 'package:nocsis/providers/weather.dart';
 class WeatherInfo extends ConsumerWidget {
   const WeatherInfo({super.key});
 
-  _getWeatherIconPath(String weather) {
+  String _getWeatherIconPath(String weather) {
     switch (weather) {
       case "Clear":
         return "assets/images/weather/clear.svg";
