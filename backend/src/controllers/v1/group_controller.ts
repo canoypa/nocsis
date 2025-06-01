@@ -52,6 +52,9 @@ groupRoutes
             "application/json": { schema: resolver(groupSchema) },
           },
         },
+        404: {
+          description: "Not Found",
+        },
         401: {
           description: "Unauthorized",
         },
