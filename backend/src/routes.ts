@@ -4,6 +4,7 @@ import { describeRoute, openAPISpecs } from "hono-openapi";
 import { resolver } from "hono-openapi/zod";
 import { contextStorage } from "hono/context-storage";
 import { z } from "zod";
+import { v1Routes } from "./controllers/v1_controller.js";
 import "zod-openapi/extend";
 
 export const app = new Hono({
@@ -11,6 +12,8 @@ export const app = new Hono({
 })
   .basePath("/api")
   .use(contextStorage());
+
+app.route("/v1", v1Routes);
 
 const responseSchema = z.string().openapi({
   description: "Example response",
