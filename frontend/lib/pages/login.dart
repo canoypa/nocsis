@@ -6,7 +6,11 @@ import 'package:nocsis/components/login_form.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  _passwordLogin(BuildContext context, String email, String password) async {
+  void _passwordLogin(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
@@ -28,7 +32,7 @@ class LoginPage extends StatelessWidget {
     }
   }
 
-  _googleLogin(BuildContext context) async {
+  void _googleLogin(BuildContext context) async {
     try {
       final provider = GoogleAuthProvider();
       await FirebaseAuth.instance.signInWithPopup(provider);

@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'licenses.g.dart';
 
 @riverpod
-Stream<Map<String, List<LicenseParagraph>>> licenses(ref) async* {
+Stream<Map<String, List<LicenseParagraph>>> licenses(_) async* {
   Map<String, List<LicenseParagraph>> licenses = {};
 
   await for (final entry in LicenseRegistry.licenses) {

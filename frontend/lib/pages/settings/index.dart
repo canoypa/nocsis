@@ -261,7 +261,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
     );
   }
 
-  _loginForm(User currentUser) {
+  Widget _loginForm(User currentUser) {
     return LoginForm(
       title: "メールアドレスを変更する",
       description: '始めに、現在のアカウントで再認証が必要です。',
@@ -286,7 +286,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
     );
   }
 
-  _changeEmailForm(User currentUser) {
+  Widget _changeEmailForm(User currentUser) {
     final TextEditingController emailController = TextEditingController();
 
     return Container(
@@ -386,19 +386,19 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
     );
   }
 
-  _changePasswordVisibilityCallback() {
+  void _changePasswordVisibilityCallback() {
     setState(() {
       invisiblePassword = invisiblePassword ? false : true;
     });
   }
 
-  _passwordVisibilityIcon() {
+  IconData _passwordVisibilityIcon() {
     return invisiblePassword
         ? Icons.visibility_off_outlined
         : Icons.visibility_outlined;
   }
 
-  _loginForm(User currentUser) {
+  Widget _loginForm(User currentUser) {
     return LoginForm(
       title: "パスワードを設定する",
       description: '始めに、現在のアカウントで再認証が必要です。',
@@ -423,7 +423,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
     );
   }
 
-  _changeEmailForm(User currentUser) {
+  Widget _changeEmailForm(User currentUser) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
