@@ -1,9 +1,7 @@
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
-import { describeRoute, openAPISpecs } from "hono-openapi";
-import { resolver } from "hono-openapi/zod";
+import { openAPISpecs } from "hono-openapi";
 import { contextStorage } from "hono/context-storage";
-import { z } from "zod";
 import { v1Routes } from "./controllers/v1_controller.js";
 import "zod-openapi/extend";
 
