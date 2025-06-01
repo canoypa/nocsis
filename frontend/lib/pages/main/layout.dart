@@ -60,16 +60,15 @@ class MainPage extends ConsumerWidget {
       // top padding, but it doesn't look like it
       leading: const SizedBox(height: 8),
       selectedIndex: navigation.index,
-      destinations:
-          Navigation.values
-              .map(
-                (e) => NavigationRailDestination(
-                  label: Text(e.label),
-                  icon: Icon(e.icon),
-                  selectedIcon: Icon(e.selectedIcon),
-                ),
-              )
-              .toList(),
+      destinations: Navigation.values
+          .map(
+            (e) => NavigationRailDestination(
+              label: Text(e.label),
+              icon: Icon(e.icon),
+              selectedIcon: Icon(e.selectedIcon),
+            ),
+          )
+          .toList(),
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
@@ -90,16 +89,15 @@ class MainPage extends ConsumerWidget {
   ) {
     return NavigationBar(
       selectedIndex: navigation.index,
-      destinations:
-          Navigation.values
-              .map(
-                (e) => NavigationDestination(
-                  label: e.label,
-                  icon: Icon(e.icon),
-                  selectedIcon: Icon(e.selectedIcon),
-                ),
-              )
-              .toList(),
+      destinations: Navigation.values
+          .map(
+            (e) => NavigationDestination(
+              label: e.label,
+              icon: Icon(e.icon),
+              selectedIcon: Icon(e.selectedIcon),
+            ),
+          )
+          .toList(),
       onDestinationSelected: (value) {
         final nav = Navigation.values[value];
 
@@ -130,8 +128,9 @@ class MainPage extends ConsumerWidget {
               Expanded(child: child),
             ],
           ),
-          bottomNavigationBar:
-              !isLargeScreen ? _buildNavBar(context, nav, groupId) : null,
+          bottomNavigationBar: !isLargeScreen
+              ? _buildNavBar(context, nav, groupId)
+              : null,
         );
       }),
     );

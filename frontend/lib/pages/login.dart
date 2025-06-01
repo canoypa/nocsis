@@ -63,9 +63,8 @@ class LoginPage extends StatelessWidget {
             children: <Widget>[
               LoginForm(
                 onGoogleLogin: () => _googleLogin(context),
-                onPasswordLogin:
-                    (email, password) =>
-                        _passwordLogin(context, email, password),
+                onPasswordLogin: (email, password) =>
+                    _passwordLogin(context, email, password),
               ),
             ],
           ),

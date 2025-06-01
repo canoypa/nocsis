@@ -115,10 +115,9 @@ Future<String?> _redirectFromTopPage(Uri uri) async {
     return uri.path == '/' ? "/groups/$groupId" : "/groups/$groupId${uri.path}";
   }
 
-  final res =
-      await FirebaseFunctions.instanceFor(
-        region: "asia-northeast1",
-      ).httpsCallable("v4-groups-user_joined_groups-get").call();
+  final res = await FirebaseFunctions.instanceFor(
+    region: "asia-northeast1",
+  ).httpsCallable("v4-groups-user_joined_groups-get").call();
   final data = UserJoinedGroups.fromJson(res.data);
 
   final firstUserJoinedGroup = data.groups.first;

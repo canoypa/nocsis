@@ -20,12 +20,9 @@ class SettingsTopPage extends ConsumerWidget {
       return const SizedBox();
     }
 
-    final googleEmail =
-        user.providerData
-            .firstWhereOrNull(
-              (e) => e.providerId == GoogleAuthProvider.PROVIDER_ID,
-            )
-            ?.email;
+    final googleEmail = user.providerData
+        .firstWhereOrNull((e) => e.providerId == GoogleAuthProvider.PROVIDER_ID)
+        ?.email;
 
     final hasNonGoogleLoginProvider = user.providerData.any(
       (e) => e.providerId != GoogleAuthProvider.PROVIDER_ID,
@@ -108,10 +105,10 @@ class SettingsTopPage extends ConsumerWidget {
                           },
                           child:
                               user.providerData.any(
-                                    (e) => e.providerId == 'password',
-                                  )
-                                  ? const Text('変更する')
-                                  : const Text('設定する'),
+                                (e) => e.providerId == 'password',
+                              )
+                              ? const Text('変更する')
+                              : const Text('設定する'),
                         ),
                       ],
                     ),
@@ -133,79 +130,74 @@ class SettingsTopPage extends ConsumerWidget {
                                 if (googleEmail != null)
                                   Text(
                                     googleEmail,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium?.copyWith(
-                                      color:
-                                          Theme.of(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
                                             context,
                                           ).colorScheme.onSurfaceVariant,
-                                    ),
+                                        ),
                                   ),
                               ],
                             ),
                           ],
                         ),
                         TextButton(
-                          onPressed:
-                              hasNonGoogleLoginProvider
-                                  ? () async {
-                                    try {
-                                      await user.unlink(
-                                        GoogleAuthProvider.PROVIDER_ID,
-                                      );
-                                    } catch (e) {
-                                      if (e is FirebaseAuthException &&
-                                          e.code == 'no-such-provider') {
-                                        // noop
-                                      } else {
-                                        rethrow;
-                                      }
-                                    }
-
-                                    try {
-                                      await user.linkWithPopup(
-                                        GoogleAuthProvider(),
-                                      );
-                                    } catch (e) {
-                                      if (e is FirebaseAuthException &&
-                                          e.code ==
-                                              'credential-already-in-use') {
-                                        final currentEmail =
-                                            user.providerData
-                                                .firstWhere(
-                                                  (e) =>
-                                                      e.providerId ==
-                                                      GoogleAuthProvider
-                                                          .PROVIDER_ID,
-                                                )
-                                                .email;
-                                        final sameAccount =
-                                            e.email == currentEmail;
-
-                                        if (!sameAccount) {
-                                          ScaffoldMessenger.of(
-                                            // ignore: use_build_context_synchronously
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'この Google アカウントはすでに別のユーザーと連携されています。',
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      } else {
-                                        rethrow;
-                                      }
+                          onPressed: hasNonGoogleLoginProvider
+                              ? () async {
+                                  try {
+                                    await user.unlink(
+                                      GoogleAuthProvider.PROVIDER_ID,
+                                    );
+                                  } catch (e) {
+                                    if (e is FirebaseAuthException &&
+                                        e.code == 'no-such-provider') {
+                                      // noop
+                                    } else {
+                                      rethrow;
                                     }
                                   }
-                                  : null,
+
+                                  try {
+                                    await user.linkWithPopup(
+                                      GoogleAuthProvider(),
+                                    );
+                                  } catch (e) {
+                                    if (e is FirebaseAuthException &&
+                                        e.code == 'credential-already-in-use') {
+                                      final currentEmail = user.providerData
+                                          .firstWhere(
+                                            (e) =>
+                                                e.providerId ==
+                                                GoogleAuthProvider.PROVIDER_ID,
+                                          )
+                                          .email;
+                                      final sameAccount =
+                                          e.email == currentEmail;
+
+                                      if (!sameAccount) {
+                                        ScaffoldMessenger.of(
+                                          // ignore: use_build_context_synchronously
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'この Google アカウントはすでに別のユーザーと連携されています。',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    } else {
+                                      rethrow;
+                                    }
+                                  }
+                                }
+                              : null,
                           child: Tooltip(
-                            message:
-                                !hasNonGoogleLoginProvider
-                                    ? '別アカウントと連携するには、初めにパスワードを設定してください。'
-                                    : '',
+                            message: !hasNonGoogleLoginProvider
+                                ? '別アカウントと連携するには、初めにパスワードを設定してください。'
+                                : '',
                             child: const Text("別アカウントと連携する"),
                           ),
                         ),

@@ -80,9 +80,8 @@ class LicensesPage extends ConsumerWidget {
                 );
               },
               loading: () => const SliverToBoxAdapter(child: SizedBox()),
-              error:
-                  (error, stackTrace) =>
-                      SliverToBoxAdapter(child: Text('Error: $error')),
+              error: (error, stackTrace) =>
+                  SliverToBoxAdapter(child: Text('Error: $error')),
             ),
           ),
         ],
