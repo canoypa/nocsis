@@ -10,8 +10,10 @@ class Cron {
   Cron({this.minutes, this.hours, this.days, this.months, this.weekdays});
 
   factory Cron.parse(String cronFormat) {
-    final p =
-        cronFormat.split(RegExp('\\s+')).where((p) => p.isNotEmpty).toList();
+    final p = cronFormat
+        .split(RegExp('\\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
     assert(p.length == 5 || p.length == 6);
     final parts = [if (p.length == 5) null, ...p];
     return Cron(
@@ -71,12 +73,11 @@ class Cron {
 
       final parts = expression.split(',');
       if (parts.length > 1) {
-        final items =
-            parts
-                .map(_parseExpression)
-                .expand((list) => list!)
-                .toSet()
-                .toList();
+        final items = parts
+            .map(_parseExpression)
+            .expand((list) => list!)
+            .toSet()
+            .toList();
         items.sort();
         return items;
       }

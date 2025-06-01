@@ -31,15 +31,14 @@ class SelectGroupMenu extends ConsumerWidget {
     final groupId = ref.watch(currentGroupIdProvider);
 
     return DropdownButton(
-      items:
-          userJoinedGroups.groups
-              .map(
-                (group) => DropdownMenuItem(
-                  value: group.groupId,
-                  child: Text(group.groupName),
-                ),
-              )
-              .toList(),
+      items: userJoinedGroups.groups
+          .map(
+            (group) => DropdownMenuItem(
+              value: group.groupId,
+              child: Text(group.groupName),
+            ),
+          )
+          .toList(),
       value: groupId,
       onChanged: (value) => _onChangedDropdown(value, context),
       underline: SizedBox(),

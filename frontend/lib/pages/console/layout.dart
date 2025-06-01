@@ -37,10 +37,9 @@ class ConsoleLayout extends ConsumerWidget {
       title: const Text('管理コンソール'),
       navigationIndex: _getNavigationIndex(context),
       onDestinationSelected: (value) {
-        final route =
-            _routeToIndex.entries
-                .firstWhere((entry) => entry.value == value)
-                .key;
+        final route = _routeToIndex.entries
+            .firstWhere((entry) => entry.value == value)
+            .key;
         GoRouter.of(context).go("/groups/$groupId$route");
       },
       navigationItems: const [
