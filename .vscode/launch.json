@@ -2,24 +2,27 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "classroom",
+      "name": "Run Flutter",
       "request": "launch",
       "type": "dart",
-      "program": "frontend/lib/main.dart"
+      "program": "frontend/lib/main.dart",
+      "args": ["--web-experimental-hot-reload"]
     },
     {
-      "name": "classroom (profile mode)",
+      "name": "Run Flutter (profile mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
-      "program": "frontend/lib/main.dart"
+      "program": "frontend/lib/main.dart",
+      "args": ["--web-experimental-hot-reload"]
     },
     {
-      "name": "classroom (release mode)",
+      "name": "Run Flutter (release mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
-      "program": "frontend/lib/main.dart"
+      "program": "frontend/lib/main.dart",
+      "args": ["--web-experimental-hot-reload"]
     }
   ]
 }

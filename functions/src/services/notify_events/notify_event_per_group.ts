@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import {
   type ChatPostMessageArguments,
   WebClient as SlackWebClient,
@@ -26,11 +27,15 @@ export const notifyEventPerGroup = async (
   group: Group,
   timestamp: DateTime,
 ) => {
+  console.info("イベント通知開始", { group: group.id });
+
   const slackToken = await fetchSecret(`group_${group.id}-slack_token`);
   const slackClient = new SlackWebClient(slackToken);
 
   const calendarId = group.events_calendar_id;
   const targetChannelId = group.slack_event_channel_id;
+  assert(group.events_calendar_id, "events_calendar_id is not defined");
+  assert(group.slack_event_channel_id, "slack_event_channel_id is not defined");
 
   // 今日の範囲を取得
   const from = timestamp.startOf("day");
@@ -49,7 +54,7 @@ export const notifyEventPerGroup = async (
   }
 
   // カウントダウンイベントを取得する
-  const countdownSnapshot = await fetchCountdownEvents();
+  const countdownSnapshot = await fetchCountdownEvents(calendarId);
   const countdownSnapshotFiltered =
     countdownSnapshot.items?.filter((e) => isCountdownTarget(e, timestamp)) ??
     [];
@@ -76,5 +81,14 @@ export const notifyEventPerGroup = async (
     unfurl_links: false,
     unfurl_media: false,
   };
-  slackClient.chat.postMessage(options);
+  await slackClient.chat.postMessage(options).catch((error) => {
+    console.error("イベント通知のSlack APIリクエストでエラーが発生しました", {
+      group: group.id,
+      error,
+    });
+
+    throw error;
+  });
+
+  console.info("イベント通知完了", { group: group.id });
 };

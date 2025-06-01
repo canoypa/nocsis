@@ -18,6 +18,10 @@ export const notifyDayDutyPerGroup = async (
   group: Group,
   timestamp: DateTime,
 ) => {
+  console.info("日直通知開始", {
+    group: group.id,
+  });
+
   const slackToken = await fetchSecret(`group_${group.id}-slack_token`);
   const slackClient = new SlackWebClient(slackToken);
 
@@ -32,11 +36,23 @@ export const notifyDayDutyPerGroup = async (
   for (const slackUserId of sendTargets) {
     const options: ChatPostMessageArguments = {
       channel: slackUserId,
-      text: `今日の日直は、${dayduty.lastName}${dayduty.firstName}さんです。`,
+      text: `今日の日直は、${dayduty.name}さんです。`,
       icon_emoji: ":bust_in_silhouette:",
       username: "今日の日直",
       // blocks: [],
     };
-    slackClient.chat.postMessage(options);
+    await slackClient.chat.postMessage(options).catch((error) => {
+      console.error("日直通知のSlack APIリクエストでエラーが発生しました", {
+        group: group.id,
+        slackUserId,
+        error,
+      });
+
+      throw error;
+    });
   }
+
+  console.info("日直通知完了", {
+    group: group.id,
+  });
 };

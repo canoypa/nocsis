@@ -6,7 +6,7 @@ part of 'licenses.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$licensesHash() => r'02a867285e67d352f7e5b31e5dadb0074c1e975a';
+String _$licensesHash() => r'7b3ea29ed0f15f1f7c6bf15f18d09c0dc49862e4';
 
 /// See also [licenses].
 @ProviderFor(licenses)

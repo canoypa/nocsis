@@ -48,14 +48,14 @@ describe("notifyEvent", () => {
       });
     });
 
-    const mockedNotifyEventPerGroup = vi
-      .spyOn(notifyEventPerGroupModule, "notifyEventPerGroup")
-      .mockImplementationOnce(async () => {
-        throw new Error("error");
-      })
-      .mockImplementationOnce(async () => {});
-
     it("処理は最後まで続行されること", async () => {
+      const mockedNotifyEventPerGroup = vi
+        .spyOn(notifyEventPerGroupModule, "notifyEventPerGroup")
+        .mockImplementationOnce(async () => {
+          throw new Error("error");
+        })
+        .mockImplementationOnce(async () => {});
+
       const date = DateTime.local(2025, 1, 1);
       await notifyEvent(date);
 

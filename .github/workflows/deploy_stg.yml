@@ -8,52 +8,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy_functions:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    defaults:
-      run:
-        working-directory: ./functions
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Tools
-        uses: jdx/mise-action@v2
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build
-        run: pnpm run build
-      - name: Auth
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action-deploy-functions/providers/github-action
-          service_account: gh-action-deploy-functions@class-clock-40088.iam.gserviceaccount.com
-      - name: Deploy
-        run: pnpm firebase deploy --only functions --force
-
-  deploy_frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Setup Tools
-        uses: jdx/mise-action@v2
-      - name: Install dependencies
-        run: flutter pub get
-      - name: Build
-        run: flutter build web --wasm
-      - name: Deploy
-        id: deploy
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID}}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
-          working-directory: ./frontend
-      - name: Set alias
-        run: pnpm dlx vercel alias ${{ steps.deploy.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
+  deploy:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      env: Preview
+      channelId: stg
+    secrets: inherit

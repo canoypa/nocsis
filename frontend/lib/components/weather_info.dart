@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/weather.dart';
 
 class WeatherInfo extends ConsumerWidget {
   const WeatherInfo({super.key});
 
-  _getWeatherIconPath(String weather) {
+  String _getWeatherIconPath(String weather) {
     switch (weather) {
       case "Clear":
         return "assets/images/weather/clear.svg";
@@ -26,9 +27,8 @@ class WeatherInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final weather = ref
-        .watch(weatherProvider)
-        .maybeWhen(data: (data) => data, orElse: () => null);
+    final groupId = ref.watch(currentGroupIdProvider);
+    final weather = ref.watch(weatherProvider(groupId)).value;
 
     if (weather == null) {
       return const SizedBox();

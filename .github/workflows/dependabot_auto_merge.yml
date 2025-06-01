@@ -1,0 +1,25 @@
+name: Dependabot auto-merge
+
+on:
+  pull_request_target:
+    types: [opened]
+
+jobs:
+  dependabot:
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'canoypa/nocsis'
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dependabot metadata
+        uses: dependabot/fetch-metadata@v2
+        id: metadata
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Enable auto-merge for Dependabot PRs
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}

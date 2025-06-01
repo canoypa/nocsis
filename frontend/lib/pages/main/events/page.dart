@@ -1,43 +1,10 @@
-import 'package:animations/animations.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/models/monthly_events.dart';
-
-class PersonalEventsRoute extends GoRouteData {
-  final String groupId;
-
-  const PersonalEventsRoute(this.groupId);
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    final isMobile = MediaQuery.of(context).size.width < 1200;
-
-    return CustomTransitionPage(
-      key: state.pageKey,
-      child: const EventsView(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        if (isMobile) {
-          return SharedAxisTransition(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.vertical,
-            child: child,
-          );
-        }
-
-        return FadeThroughTransition(
-          animation: animation,
-          secondaryAnimation: secondaryAnimation,
-          child: child,
-        );
-      },
-    );
-  }
-}
+import 'package:nocsis/providers/current_group_id.dart';
 
 final eventsProvider = FutureProvider.family<MonthlyEventList, String>((
   ref,
@@ -63,7 +30,7 @@ class EventsView extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final groupId = GoRouter.of(context).state.pathParameters['groupId']!;
+    final groupId = ref.watch(currentGroupIdProvider);
     final snap = ref.watch(eventsProvider(groupId));
 
     return snap.when(
@@ -91,20 +58,18 @@ class EventsView extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
-                        children:
-                            (d.items[i].items).map((data) {
-                              return BasicCard(
-                                primary: Text(
-                                  data.title,
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
-                                ),
-                                // TODO: 日を跨いだりする場合の表示に対応する
-                                secondary: Text(
-                                  DateFormat("M月d日").format(data.startAt),
-                                ),
-                              );
-                            }).toList(),
+                        children: (d.items[i].items).map((data) {
+                          return BasicCard(
+                            primary: Text(
+                              data.title,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            // TODO: 日を跨いだりする場合の表示に対応する
+                            secondary: Text(
+                              DateFormat("M月d日").format(data.startAt),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ],

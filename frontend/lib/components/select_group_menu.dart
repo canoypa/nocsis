@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/models/user_joined_groups.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/user_joined_groups.dart';
 
 class SelectGroupMenu extends ConsumerWidget {
@@ -27,17 +28,18 @@ class SelectGroupMenu extends ConsumerWidget {
           orElse: () => UserJoinedGroups(groups: []),
         );
 
+    final groupId = ref.watch(currentGroupIdProvider);
+
     return DropdownButton(
-      items:
-          userJoinedGroups.groups
-              .map(
-                (group) => DropdownMenuItem(
-                  value: group.groupId,
-                  child: Text(group.groupName),
-                ),
-              )
-              .toList(),
-      value: GoRouter.of(context).state.pathParameters['groupId'],
+      items: userJoinedGroups.groups
+          .map(
+            (group) => DropdownMenuItem(
+              value: group.groupId,
+              child: Text(group.groupName),
+            ),
+          )
+          .toList(),
+      value: groupId,
       onChanged: (value) => _onChangedDropdown(value, context),
       underline: SizedBox(),
     );

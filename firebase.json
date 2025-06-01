@@ -1,10 +1,48 @@
 {
+  "hosting": {
+    "public": "./frontend/build/web",
+    "trailingSlash": false,
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "backend",
+          "region": "asia-northeast1",
+          "pinTag": true
+        }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/__/auth/**",
+        "headers": [
+          {
+            "key": "Cross-Origin-Resource-Policy",
+            "value": "same-site"
+          }
+        ]
+      },
+      {
+        "source": "/**",
+        "headers": [
+          {
+            "key": "Cross-Origin-Embedder-Policy",
+            "value": "require-corp"
+          },
+          {
+            "key": "Cross-Origin-Opener-Policy",
+            "value": "same-origin"
+          }
+        ]
+      }
+    ]
+  },
   "functions": {
     "source": "functions",
-    "predeploy": [
-      "pnpm --prefix \"$RESOURCE_DIR\" run lint",
-      "pnpm --prefix \"$RESOURCE_DIR\" run build"
-    ],
     "runtime": "nodejs22"
   },
   "emulators": {
