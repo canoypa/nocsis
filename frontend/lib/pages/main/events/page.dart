@@ -58,20 +58,18 @@ class EventsView extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
-                        children:
-                            (d.items[i].items).map((data) {
-                              return BasicCard(
-                                primary: Text(
-                                  data.title,
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
-                                ),
-                                // TODO: 日を跨いだりする場合の表示に対応する
-                                secondary: Text(
-                                  DateFormat("M月d日").format(data.startAt),
-                                ),
-                              );
-                            }).toList(),
+                        children: (d.items[i].items).map((data) {
+                          return BasicCard(
+                            primary: Text(
+                              data.title,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            // TODO: 日を跨いだりする場合の表示に対応する
+                            secondary: Text(
+                              DateFormat("M月d日").format(data.startAt),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ],

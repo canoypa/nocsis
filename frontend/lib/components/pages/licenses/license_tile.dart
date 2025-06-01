@@ -26,27 +26,26 @@ class LicenseTile extends StatelessWidget {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children:
-                paragraphs.map((paragraph) {
-                  if (paragraph.indent == LicenseParagraph.centeredIndent) {
-                    return Center(
-                      child: Text(
-                        paragraph.text,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    );
-                  } else {
-                    return Padding(
-                      padding: EdgeInsetsDirectional.only(
-                        start: 16.0 * paragraph.indent,
-                      ),
-                      child: Text(
-                        paragraph.text,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    );
-                  }
-                }).toList(),
+            children: paragraphs.map((paragraph) {
+              if (paragraph.indent == LicenseParagraph.centeredIndent) {
+                return Center(
+                  child: Text(
+                    paragraph.text,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                );
+              } else {
+                return Padding(
+                  padding: EdgeInsetsDirectional.only(
+                    start: 16.0 * paragraph.indent,
+                  ),
+                  child: Text(
+                    paragraph.text,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                );
+              }
+            }).toList(),
           ),
         ),
       ],

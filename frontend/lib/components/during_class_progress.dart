@@ -59,16 +59,14 @@ class _DuringClassProgressPainter extends CustomPainter {
   final Color primary;
   final Color secondary;
 
-  late final linePaint =
-      Paint()
-        ..color = secondary
-        ..strokeWidth = 24.sp
-        ..style = PaintingStyle.stroke;
-  late final progressPaint =
-      Paint()
-        ..color = primary
-        ..strokeWidth = 24.sp
-        ..style = PaintingStyle.stroke;
+  late final linePaint = Paint()
+    ..color = secondary
+    ..strokeWidth = 24.sp
+    ..style = PaintingStyle.stroke;
+  late final progressPaint = Paint()
+    ..color = primary
+    ..strokeWidth = 24.sp
+    ..style = PaintingStyle.stroke;
 
   _DuringClassProgressPainter({
     required this.progress,
@@ -78,27 +76,26 @@ class _DuringClassProgressPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final path =
-        Path()
-          ..moveTo(size.width / 2, 36.sp)
-          ..lineTo(size.width - 60.sp, 36.sp)
-          ..arcToPoint(
-            Offset(size.width - 36.sp, 60.sp),
-            radius: Radius.circular(24.sp),
-          )
-          ..lineTo(size.width - 36.sp, size.height - 60.sp)
-          ..arcToPoint(
-            Offset(size.width - 60.sp, size.height - 36.sp),
-            radius: Radius.circular(24.sp),
-          )
-          ..lineTo(60.sp, size.height - 36.sp)
-          ..arcToPoint(
-            Offset(36.sp, size.height - 60.sp),
-            radius: Radius.circular(24.sp),
-          )
-          ..lineTo(36.sp, 60.sp)
-          ..arcToPoint(Offset(60.sp, 36.sp), radius: Radius.circular(24.sp))
-          ..close();
+    final path = Path()
+      ..moveTo(size.width / 2, 36.sp)
+      ..lineTo(size.width - 60.sp, 36.sp)
+      ..arcToPoint(
+        Offset(size.width - 36.sp, 60.sp),
+        radius: Radius.circular(24.sp),
+      )
+      ..lineTo(size.width - 36.sp, size.height - 60.sp)
+      ..arcToPoint(
+        Offset(size.width - 60.sp, size.height - 36.sp),
+        radius: Radius.circular(24.sp),
+      )
+      ..lineTo(60.sp, size.height - 36.sp)
+      ..arcToPoint(
+        Offset(36.sp, size.height - 60.sp),
+        radius: Radius.circular(24.sp),
+      )
+      ..lineTo(36.sp, 60.sp)
+      ..arcToPoint(Offset(60.sp, 36.sp), radius: Radius.circular(24.sp))
+      ..close();
 
     final pathMetric = path.computeMetrics().first;
     final progressPath = pathMetric.extractPath(
