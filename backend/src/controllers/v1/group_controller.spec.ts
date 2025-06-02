@@ -13,9 +13,7 @@ describe("GroupController", () => {
     let loginResult: LoginResult;
 
     beforeEach(async () => {
-      user = await auth.createUser({
-        uid: "test_user_1",
-      });
+      user = await auth.createUser({ uid: "test_user_1" });
       loginResult = await login(user);
 
       await firestore
@@ -31,12 +29,12 @@ describe("GroupController", () => {
         });
 
       await firestore.collection("user_joined_groups").add({
-        user_id: user.uid,
+        user_id: "test_user_1",
         group_id: "test_group_1",
       });
 
       return async () => {
-        await auth.deleteUser(user.uid);
+        await auth.deleteUser("test_user_1");
       };
     });
 
@@ -77,9 +75,7 @@ describe("GroupController", () => {
       let loginResult: LoginResult;
 
       beforeEach(async () => {
-        user = await auth.createUser({
-          uid: "test_user_not_in_group_1",
-        });
+        user = await auth.createUser({ uid: "test_user_not_in_group_1" });
         loginResult = await login(user);
 
         return async () => {
