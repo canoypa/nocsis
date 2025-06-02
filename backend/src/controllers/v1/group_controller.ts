@@ -1,17 +1,18 @@
+import assert from "node:assert";
+import { getFirestore } from "firebase-admin/firestore";
 import { Hono } from "hono";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/zod";
 import { getContext } from "hono/context-storage";
-import { z } from "zod";
-import "zod-openapi/extend";
-import assert from "node:assert";
-import { getFirestore } from "firebase-admin/firestore";
 import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 import { firebaseApp } from "../../clients/firebase_app.js";
 import {
   type AuthenticatedEnv,
   authentication,
 } from "../../middlewares/authenticate.js";
+
+import "zod-openapi/extend";
 
 export const groupRoutes = new Hono();
 

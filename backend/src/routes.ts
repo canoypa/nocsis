@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { openAPISpecs } from "hono-openapi";
 import { contextStorage } from "hono/context-storage";
 import { v1Routes } from "./controllers/v1_controller.js";
+
 import "zod-openapi/extend";
 
 export const app = new Hono({
