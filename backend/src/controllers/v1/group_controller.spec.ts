@@ -125,7 +125,7 @@ describe("GroupController", () => {
 
   describe.todo("POST /v1/groups/:id", () => {});
 
-  describe("PUT /v1/groups", () => {
+  describe("PUT /v1/groups/:id", () => {
     const auth = getAuth();
     const firestore = getFirestore();
 
