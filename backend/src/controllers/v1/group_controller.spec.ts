@@ -42,6 +42,7 @@ describe("GroupController", () => {
       const response = await app.request("/api/v1/groups/test_group_1", {
         headers: {
           Authorization: `Bearer ${loginResult.idToken}`,
+          Accept: "application/json",
         },
       });
       const body = await response.json();
@@ -63,6 +64,7 @@ describe("GroupController", () => {
         const response = await app.request("/api/v1/groups/test_group_2", {
           headers: {
             Authorization: `Bearer ${loginResult.idToken}`,
+            Accept: "application/json",
           },
         });
 
@@ -87,6 +89,7 @@ describe("GroupController", () => {
         const response = await app.request("/api/v1/groups/test_group_1", {
           headers: {
             Authorization: `Bearer ${loginResult.idToken}`,
+            Accept: "application/json",
           },
         });
 
@@ -96,7 +99,11 @@ describe("GroupController", () => {
 
     describe("認証情報がない場合", () => {
       it("401エラーになること", async () => {
-        const response = await app.request("/api/v1/groups/test_group_1");
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          headers: {
+            Accept: "application/json",
+          },
+        });
 
         expect(response.status).toBe(401);
       });
@@ -107,6 +114,7 @@ describe("GroupController", () => {
         const response = await app.request("/api/v1/groups/test_group_1", {
           headers: {
             Authorization: "Bearer invalid_token",
+            Accept: "application/json",
           },
         });
 
@@ -117,7 +125,271 @@ describe("GroupController", () => {
 
   describe.todo("POST /v1/groups/:id", () => {});
 
-  describe.todo("PUT /v1/groups", () => {});
+  describe("PUT /v1/groups", () => {
+    const auth = getAuth();
+    const firestore = getFirestore();
+
+    let user: UserRecord;
+    let loginResult: LoginResult;
+
+    beforeEach(async () => {
+      user = await auth.createUser({ uid: "test_user_1" });
+      loginResult = await login(user);
+
+      await firestore
+        .collection("groups")
+        .doc("test_group_1")
+        .set({
+          name: "Test Group",
+          classes_calendar_id: "classes_calendar_id",
+          events_calendar_id: "events_calendar_id",
+          dayduty_start_date: "2000-01-01",
+          slack_event_channel_id: "slack_event_channel_id",
+          weather_point: { lat: 0, lon: 0 },
+        });
+
+      await firestore.collection("user_joined_groups").add({
+        user_id: "test_user_1",
+        group_id: "test_group_1",
+      });
+
+      return () => {
+        return auth.deleteUser("test_user_1");
+      };
+    });
+
+    it("更新できること", async () => {
+      const response = await app.request("/api/v1/groups/test_group_1", {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${loginResult.idToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: "Updated Test Name",
+          classes_calendar_id: "updated_classes_calendar_id",
+          events_calendar_id: "updated_events_calendar_id",
+          dayduty_start_date: "2099-12-31",
+          slack_event_channel_id: "updated_slack_event_channel_id",
+          weather_point: { lat: 99, lon: 99 },
+        }),
+      });
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body).toEqual({
+        id: "test_group_1",
+        name: "Updated Test Name",
+        classes_calendar_id: "updated_classes_calendar_id",
+        events_calendar_id: "updated_events_calendar_id",
+        dayduty_start_date: "2099-12-31",
+        slack_event_channel_id: "updated_slack_event_channel_id",
+        weather_point: { lat: 99, lon: 99 },
+      });
+    });
+
+    describe("一部のデータを更新する場合", () => {
+      it("更新できること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: "Updated Test Name",
+          }),
+        });
+        const body = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(body).toEqual({
+          id: "test_group_1",
+          name: "Updated Test Name",
+          classes_calendar_id: "classes_calendar_id",
+          events_calendar_id: "events_calendar_id",
+          dayduty_start_date: "2000-01-01",
+          slack_event_channel_id: "slack_event_channel_id",
+          weather_point: { lat: 0, lon: 0 },
+        });
+      });
+    });
+
+    describe("グループが存在しない場合", async () => {
+      it("404エラーになること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_2", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: "Updated Test Name",
+            classes_calendar_id: "updated_classes_calendar_id",
+            events_calendar_id: "updated_events_calendar_id",
+            dayduty_start_date: "2099-12-31",
+            slack_event_channel_id: "updated_slack_event_channel_id",
+            weather_point: { lat: 99, lon: 99 },
+          }),
+        });
+
+        expect(response.status).toBe(404);
+      });
+    });
+
+    describe("データが不正な場合", () => {
+      describe("データが空の場合", async () => {
+        it("エラーになること", async () => {
+          const response = await app.request("/api/v1/groups/test_group_1", {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({}),
+          });
+
+          expect(response.status).toBe(400);
+        });
+      });
+
+      describe("データの型が異なる場合", () => {
+        it("エラーになること", async () => {
+          const response = await app.request("/api/v1/groups/test_group_1", {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify("invalid data"),
+          });
+
+          expect(response.status).toBe(400);
+        });
+      });
+
+      describe("フィールドのデータ型が異なる場合", () => {
+        it("エラーになること", async () => {
+          const response = await app.request("/api/v1/groups/test_group_1", {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              name: 123,
+            }),
+          });
+
+          expect(response.status).toBe(400);
+        });
+      });
+
+      describe("存在しないフィールドが含まれる場合", () => {
+        it("エラーになること", async () => {
+          const response = await app.request("/api/v1/groups/test_group_1", {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              invalid_field: "invalid_field",
+            }),
+          });
+
+          expect(response.status).toBe(400);
+        });
+      });
+    });
+
+    describe("ユーザーが所属していないグループを更新しようとした場合", () => {
+      let user: UserRecord;
+      let loginResult: LoginResult;
+
+      beforeEach(async () => {
+        user = await auth.createUser({ uid: "test_user_not_in_group_1" });
+        loginResult = await login(user);
+
+        return () => {
+          return auth.deleteUser(user.uid);
+        };
+      });
+
+      it("エラーになること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: "Updated Test Name",
+            classes_calendar_id: "updated_classes_calendar_id",
+            events_calendar_id: "updated_events_calendar_id",
+            dayduty_start_date: "2099-12-31",
+            slack_event_channel_id: "updated_slack_event_channel_id",
+            weather_point: { lat: 99, lon: 99 },
+          }),
+        });
+
+        expect(response.status).toBe(403);
+      });
+    });
+
+    describe("認証情報がない場合", () => {
+      it("401エラーになること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: "Updated Test Name",
+            classes_calendar_id: "updated_classes_calendar_id",
+            events_calendar_id: "updated_events_calendar_id",
+            dayduty_start_date: "2099-12-31",
+            slack_event_channel_id: "updated_slack_event_channel_id",
+            weather_point: { lat: 99, lon: 99 },
+          }),
+        });
+
+        expect(response.status).toBe(401);
+      });
+    });
+
+    describe("認証情報が不正な場合", () => {
+      it("401エラーになること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: "Bearer invalid_token",
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: "Updated Test Name",
+            classes_calendar_id: "updated_classes_calendar_id",
+            events_calendar_id: "updated_events_calendar_id",
+            dayduty_start_date: "2099-12-31",
+            slack_event_channel_id: "updated_slack_event_channel_id",
+            weather_point: { lat: 99, lon: 99 },
+          }),
+        });
+
+        expect(response.status).toBe(401);
+      });
+    });
+  });
 
   describe.todo("DELETE /v1/groups/:id", () => {});
 });
