@@ -6,7 +6,8 @@
     "build": "tsup src/main.ts --clean --format esm --sourcemap",
     "generate-openapi": "tsx scripts/generate_openapi.ts",
     "lint": "biome lint",
-    "test": "vitest run --coverage"
+    "test": "vitest run --coverage",
+    "test:watch": "vitest watch --coverage"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.3",

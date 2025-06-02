@@ -16,25 +16,28 @@ describe("GroupController", () => {
       user = await auth.createUser({ uid: "test_user_1" });
       loginResult = await login(user);
 
-      await firestore
-        .collection("groups")
-        .doc("test_group_1")
-        .set({
-          name: "Test Group",
-          classes_calendar_id: "classes_calendar_id",
-          events_calendar_id: "events_calendar_id",
-          dayduty_start_date: "2000-01-01",
-          slack_event_channel_id: "slack_event_channel_id",
-          weather_point: { lat: 0, lon: 0 },
-        });
+      const groupRef = firestore.collection("groups").doc("test_group_1");
 
-      await firestore.collection("user_joined_groups").add({
-        user_id: "test_user_1",
-        group_id: "test_group_1",
+      await groupRef.set({
+        name: "Test Group",
+        classes_calendar_id: "classes_calendar_id",
+        events_calendar_id: "events_calendar_id",
+        dayduty_start_date: "2000-01-01",
+        slack_event_channel_id: "slack_event_channel_id",
+        weather_point: { lat: 0, lon: 0 },
       });
+
+      const userJoinedGroupsRef = await firestore
+        .collection("user_joined_groups")
+        .add({
+          user_id: "test_user_1",
+          group_id: "test_group_1",
+        });
 
       return async () => {
         await auth.deleteUser("test_user_1");
+        await groupRef.delete();
+        await userJoinedGroupsRef.delete();
       };
     });
 
@@ -136,25 +139,28 @@ describe("GroupController", () => {
       user = await auth.createUser({ uid: "test_user_1" });
       loginResult = await login(user);
 
-      await firestore
-        .collection("groups")
-        .doc("test_group_1")
-        .set({
-          name: "Test Group",
-          classes_calendar_id: "classes_calendar_id",
-          events_calendar_id: "events_calendar_id",
-          dayduty_start_date: "2000-01-01",
-          slack_event_channel_id: "slack_event_channel_id",
-          weather_point: { lat: 0, lon: 0 },
-        });
+      const groupRef = firestore.collection("groups").doc("test_group_1");
 
-      await firestore.collection("user_joined_groups").add({
-        user_id: "test_user_1",
-        group_id: "test_group_1",
+      await groupRef.set({
+        name: "Test Group",
+        classes_calendar_id: "classes_calendar_id",
+        events_calendar_id: "events_calendar_id",
+        dayduty_start_date: "2000-01-01",
+        slack_event_channel_id: "slack_event_channel_id",
+        weather_point: { lat: 0, lon: 0 },
       });
 
-      return () => {
-        return auth.deleteUser("test_user_1");
+      const userJoinedGroupsRef = await firestore
+        .collection("user_joined_groups")
+        .add({
+          user_id: "test_user_1",
+          group_id: "test_group_1",
+        });
+
+      return async () => {
+        await auth.deleteUser("test_user_1");
+        await groupRef.delete();
+        await userJoinedGroupsRef.delete();
       };
     });
 
