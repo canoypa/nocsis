@@ -52,11 +52,17 @@ groupRoutes
             "application/json": { schema: resolver(groupSchema) },
           },
         },
+        401: {
+          description: "Unauthorized",
+        },
+        403: {
+          description: "Forbidden",
+        },
         404: {
           description: "Not Found",
         },
-        401: {
-          description: "Unauthorized",
+        500: {
+          description: "Internal Server Error",
         },
       },
       security: [{ bearer: [] }],
@@ -68,32 +74,34 @@ groupRoutes
       const firestore = getFirestore(firebaseApp);
       const user = getContext<AuthenticatedEnv>().get("currentUser");
 
-      try {
-        const userJoinedGroupSnapshot = await firestore
-          .collection("user_joined_groups")
-          .where("user_id", "==", user.uid)
-          .where("group_id", "==", c.req.param("id"))
-          .get();
-        const userJoinedGroup = userJoinedGroupSnapshot.docs.at(0)?.data();
-        assert(
-          userJoinedGroup,
-          "グループが存在しないか、ユーザーがグループに参加していない",
-        );
+      const groupSnapshot = await firestore
+        .collection("groups")
+        .doc(c.req.param("id"))
+        .get();
 
-        const groupSnapshot = await firestore
-          .collection("groups")
-          .doc(c.req.param("id"))
-          .get();
-        const group = groupSnapshot.data();
-        assert(group, "グループが存在しない");
-
-        return c.json({
-          id: groupSnapshot.id,
-          ...group,
-        });
-      } catch (error) {
-        throw new HTTPException(404, { message: "グループが見つかりません。" });
+      if (!groupSnapshot.exists) {
+        throw new HTTPException(404, { message: "グループが存在しません。" });
       }
+
+      const userJoinedGroupSnapshot = await firestore
+        .collection("user_joined_groups")
+        .where("user_id", "==", user.uid)
+        .where("group_id", "==", c.req.param("id"))
+        .get();
+
+      if (userJoinedGroupSnapshot.empty) {
+        throw new HTTPException(403, {
+          message: "グループに参加していません。",
+        });
+      }
+
+      const group = groupSnapshot.data();
+      assert(group);
+
+      return c.json({
+        id: groupSnapshot.id,
+        ...group,
+      });
     },
   )
   .post(async (_c) => {})
