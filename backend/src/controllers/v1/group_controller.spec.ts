@@ -242,7 +242,7 @@ describe("GroupController", () => {
 
     describe("データが不正な場合", () => {
       describe("データが空の場合", async () => {
-        it("エラーになること", async () => {
+        it("400エラーになること", async () => {
           const response = await app.request("/api/v1/groups/test_group_1", {
             method: "PATCH",
             headers: {
@@ -258,7 +258,7 @@ describe("GroupController", () => {
       });
 
       describe("データの型が異なる場合", () => {
-        it("エラーになること", async () => {
+        it("400エラーになること", async () => {
           const response = await app.request("/api/v1/groups/test_group_1", {
             method: "PATCH",
             headers: {
@@ -274,7 +274,7 @@ describe("GroupController", () => {
       });
 
       describe("フィールドのデータ型が異なる場合", () => {
-        it("エラーになること", async () => {
+        it("400エラーになること", async () => {
           const response = await app.request("/api/v1/groups/test_group_1", {
             method: "PATCH",
             headers: {
@@ -292,7 +292,7 @@ describe("GroupController", () => {
       });
 
       describe("存在しないフィールドが含まれる場合", () => {
-        it("エラーになること", async () => {
+        it("400エラーになること", async () => {
           const response = await app.request("/api/v1/groups/test_group_1", {
             method: "PATCH",
             headers: {
@@ -323,7 +323,7 @@ describe("GroupController", () => {
         };
       });
 
-      it("エラーになること", async () => {
+      it("403エラーになること", async () => {
         const response = await app.request("/api/v1/groups/test_group_1", {
           method: "PATCH",
           headers: {
