@@ -1,14 +1,12 @@
-import { type UserRecord, getAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
+import { inspect } from "node:util";
+import type { UserRecord } from "firebase-admin/auth";
 import { beforeEach, describe, expect, it } from "vitest";
 import { type LoginResult, login } from "../../../tests/helpers/users.js";
+import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
 
 describe("GroupController", () => {
   describe("GET /api/v1/groups/:id", async () => {
-    const auth = getAuth();
-    const firestore = getFirestore();
-
     let user: UserRecord;
     let loginResult: LoginResult;
 
@@ -129,9 +127,6 @@ describe("GroupController", () => {
   describe.todo("POST /api/v1/groups/:id", () => {});
 
   describe("PATCH /api/v1/groups/:id", () => {
-    const auth = getAuth();
-    const firestore = getFirestore();
-
     let user: UserRecord;
     let loginResult: LoginResult;
 

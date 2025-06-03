@@ -1,5 +1,6 @@
-import { type UserRecord, getAuth } from "firebase-admin/auth";
+import type { UserRecord } from "firebase-admin/auth";
 import { z } from "zod";
+import { auth } from "../../src/clients/firebase.js";
 
 const LoginResultSchema = z.object({
   idToken: z.string(),
@@ -9,8 +10,6 @@ const LoginResultSchema = z.object({
 export type LoginResult = z.infer<typeof LoginResultSchema>;
 
 export const login = async (user: UserRecord) => {
-  const auth = getAuth();
-
   const customToken = await auth.createCustomToken(user.uid);
 
   const res = await fetch(

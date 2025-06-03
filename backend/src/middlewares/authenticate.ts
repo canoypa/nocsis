@@ -1,6 +1,8 @@
-import { type UserRecord, getAuth } from "firebase-admin/auth";
+import { assert } from "node:console";
+import type { UserRecord } from "firebase-admin/auth";
+import type { Context } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
-import { firebaseApp } from "../clients/firebase_app.js";
+import { auth } from "../clients/firebase.js";
 
 export type AuthenticatedEnv = {
   Variables: {
@@ -11,7 +13,6 @@ export type AuthenticatedEnv = {
 export const authentication = bearerAuth({
   verifyToken: async (token, c) => {
     try {
-      const auth = getAuth(firebaseApp);
       const { uid } = await auth.verifyIdToken(token);
       const user = await auth.getUser(uid);
 
@@ -30,3 +31,10 @@ export const authentication = bearerAuth({
     return true;
   },
 });
+
+export const getUser = (c: Context<AuthenticatedEnv>): UserRecord => {
+  const user = c.get("currentUser");
+  assert(user);
+
+  return user;
+};
