@@ -6,7 +6,7 @@ if (process.env.NODE_ENV !== "production") {
   generateOpenapiSpec(app);
 }
 
-const port = 8888;
+const port = 8080;
 console.log(`Server is running on http://localhost:${port}`);
 
 serve({
