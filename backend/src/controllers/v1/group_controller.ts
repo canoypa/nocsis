@@ -88,7 +88,6 @@ groupRoutes
       });
     },
   )
-  .post(async (_c) => {})
   .patch(
     "/:id",
     describeRoute({
@@ -156,5 +155,4 @@ groupRoutes
         ...updatedGroup,
       });
     },
-  )
-  .delete(async (_c) => {});
+  );
