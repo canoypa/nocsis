@@ -151,8 +151,6 @@ groupRoutes.patch(
     const user = getContext<AuthenticatedEnv>().get("currentUser");
     const data = c.req.valid("json");
 
-    console.log(data);
-
     if (!data || Object.keys(data).length === 0) {
       throw new HTTPException(400, { message: "不正なデータです。" });
     }

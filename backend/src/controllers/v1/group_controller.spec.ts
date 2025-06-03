@@ -5,7 +5,7 @@ import { type LoginResult, login } from "../../../tests/helpers/users.js";
 import { app } from "../../routes.js";
 
 describe("GroupController", () => {
-  describe("GET /v1/groups/:id", async () => {
+  describe("GET /api/v1/groups/:id", async () => {
     const auth = getAuth();
     const firestore = getFirestore();
 
@@ -126,9 +126,9 @@ describe("GroupController", () => {
     });
   });
 
-  describe.todo("POST /v1/groups/:id", () => {});
+  describe.todo("POST /api/v1/groups/:id", () => {});
 
-  describe("PUT /v1/groups/:id", () => {
+  describe("PATCH /api/v1/groups/:id", () => {
     const auth = getAuth();
     const firestore = getFirestore();
 
@@ -316,7 +316,7 @@ describe("GroupController", () => {
       });
     });
 
-    describe("ユーザーが所属していないグループを更新しようとした場合", () => {
+    describe("ユーザーがグループに参加していない場合", () => {
       let user: UserRecord;
       let loginResult: LoginResult;
 
@@ -324,8 +324,8 @@ describe("GroupController", () => {
         user = await auth.createUser({ uid: "test_user_not_in_group_1" });
         loginResult = await login(user);
 
-        return () => {
-          return auth.deleteUser(user.uid);
+        return async () => {
+          await auth.deleteUser(user.uid);
         };
       });
 
@@ -397,5 +397,5 @@ describe("GroupController", () => {
     });
   });
 
-  describe.todo("DELETE /v1/groups/:id", () => {});
+  describe.todo("DELETE /api/v1/groups/:id", () => {});
 });

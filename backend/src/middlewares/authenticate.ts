@@ -17,7 +17,13 @@ export const authentication = bearerAuth({
 
       c.set("currentUser", user);
     } catch (err) {
-      console.warn("ユーザー認証でエラー発生: ", err);
+      if (
+        process.env.NODE_ENV === "development" ||
+        process.env.NODE_ENV === "production"
+      ) {
+        console.warn("ユーザー認証でエラー発生: ", err);
+      }
+
       return false;
     }
 
