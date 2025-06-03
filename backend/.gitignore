@@ -1,6 +1,9 @@
 # build
 dist/
 
+# coverage
+coverage/
+
 # dev
 .yarn/
 !.yarn/releases
