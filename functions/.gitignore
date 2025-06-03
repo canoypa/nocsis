@@ -1,6 +1,9 @@
 # Compiled JavaScript files
 dist/
 
+# coverage
+coverage/
+
 # TypeScript v1 declaration files
 typings/
 
