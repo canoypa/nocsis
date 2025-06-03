@@ -1,3 +1,8 @@
 {
-  "recommendations": ["dart-code.flutter"]
+  "recommendations": [
+    "dart-code.flutter",
+    "biomejs.biome",
+    "vitest.explorer",
+    "streetsidesoftware.code-spell-checker"
+  ]
 }
