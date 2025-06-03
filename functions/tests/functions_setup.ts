@@ -7,7 +7,7 @@ export const functionsTest = firebaseFunctionsTest({
   projectId: PROJECT_ID,
 });
 
-process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
+process.env.FIRESTORE_EMULATOR_HOST = "localhost:8888";
 
 afterEach(async () => {
   await fetch(
