@@ -1,4 +1,4 @@
-import { assert } from "node:console";
+import assert from "node:assert";
 import type { UserRecord } from "firebase-admin/auth";
 import type { Context } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
