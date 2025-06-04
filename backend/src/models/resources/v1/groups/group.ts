@@ -16,9 +16,17 @@ export const groupSchema = z
     slack_event_channel_id: z
       .string()
       .openapi({ description: "Slackイベント通知チャンネルID" }),
-    weather_point: z.object({
-      lat: z.number().openapi({ description: "緯度" }),
-      lon: z.number().openapi({ description: "経度" }),
-    }),
+    weather_point: z
+      .object({
+        lat: z.number().openapi({ description: "緯度" }),
+        lon: z.number().openapi({ description: "経度" }),
+      })
+      .openapi({
+        ref: "WeatherPoint",
+        description: "天気情報を取得する地点",
+      }),
   })
-  .openapi({ description: "グループ" });
+  .openapi({
+    ref: "Group",
+    description: "グループ",
+  });

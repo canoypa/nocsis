@@ -16,14 +16,22 @@ import "zod-openapi/extend";
 
 export const groupRoutes = new Hono<AuthenticatedEnv>();
 
-const paramSchema = z.object({
-  id: z.string().openapi({ description: "ID" }),
-});
+const paramSchema = z
+  .object({
+    id: z.string().openapi({ description: "ID" }),
+  })
+  .openapi({
+    description: "グループのIDを指定するパラメータ",
+  });
 
 const patchJsonSchema = groupSchema
   .omit({ id: true })
   .partial()
-  .refine((data) => Object.keys(data).length > 0);
+  .refine((data) => Object.keys(data).length > 0)
+  .openapi({
+    ref: "GroupPatchJson",
+    description: "グループの更新に使用するJSONデータ",
+  });
 
 groupRoutes
   .use("*", authentication)
