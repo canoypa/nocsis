@@ -1,38 +1,15 @@
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
-import { describeRoute, openAPISpecs } from "hono-openapi";
-import { resolver } from "hono-openapi/zod";
-import { z } from "zod";
+import { openAPISpecs } from "hono-openapi";
+import { v1Routes } from "./controllers/v1_controller.js";
+
 import "zod-openapi/extend";
 
 export const app = new Hono({
   strict: false, // パス末尾のスラッシュ有無を区別しない
 }).basePath("/api");
 
-const responseSchema = z.string().openapi({
-  description: "Example response",
-  example: "Hello Hono!",
-});
-
-app.get(
-  "/",
-  describeRoute({
-    description: "Example endpoint",
-    responses: {
-      200: {
-        description: "Successful response",
-        content: {
-          "text/plain": {
-            schema: resolver(responseSchema),
-          },
-        },
-      },
-    },
-  }),
-  (c) => {
-    return c.text("Hello Hono!");
-  },
-);
+app.route("/v1", v1Routes);
 
 if (process.env.NODE_ENV !== "production") {
   app.get(

@@ -8,6 +8,7 @@
     "strict": true,
     "target": "ESNext",
     "skipLibCheck": true,
+    "erasableSyntaxOnly": true,
 
     "baseUrl": ".",
     "paths": {
@@ -15,8 +16,5 @@
     }
   },
   "compileOnSave": true,
-  "include": [
-    "src",
-    "tests"
-  ]
+  "include": ["src", "tests"]
 }
