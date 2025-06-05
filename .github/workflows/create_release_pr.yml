@@ -22,21 +22,18 @@ jobs:
             release_pr_number=$(gh pr create -H development -B main -t "$pr_title" -b "wip" --label "🚀 リリース" | sed -n 's/.*\///p')
           fi
 
-          prs=$(gh api graphql -f query=''
-            query ($owner: String!, $repo: String!, $prNumber: Int!) {
-              repository(owner: $owner, name: $repo) {
-                pullRequest(number: $prNumber) {
-                  commits(first: 250) {
-                    nodes {
-                      commit {
-                        associatedPullRequests(first: 1) {
-                          nodes {
-                            baseRefName
-                            author {
-                              login
-                            }
-                            number
-                          }
+          GRAPHQL_QUERY="$(cat <<'EOF'
+          query ($owner: String!, $repo: String!, $prNumber: Int!) {
+            repository(owner: $owner, name: $repo) {
+              pullRequest(number: $prNumber) {
+                commits(first: 250) {
+                  nodes {
+                    commit {
+                      associatedPullRequests(first: 1) {
+                        nodes {
+                          baseRefName
+                          author { login }
+                          number
                         }
                       }
                     }
@@ -44,8 +41,11 @@ jobs:
                 }
               }
             }
-          '' -F owner="${{ github.repository_owner }}" -F repo="${{ github.event.repository.name }}" -F prNumber="$release_pr_number" \
-          | jq '[.data.repository.pullRequest.commits.nodes[].commit.associatedPullRequests.nodes[] | select(.baseRefName == "development")] | unique_by(.number)'
+          }
+          EOF
+          )"
+          prs=$(gh api graphql -F query="$GRAPHQL_QUERY" -F owner="${{ github.repository_owner }}" -F repo="${{ github.event.repository.name }}" -F prNumber="$release_pr_number" \
+                | jq '[.data.repository.pullRequest.commits.nodes[].commit.associatedPullRequests.nodes[] | select(.baseRefName == "development")] | unique_by(.number)')
 
           body=$(echo "$prs" | jq -r '.[] | "- #\(.number) @\(.author.login)"')
 
