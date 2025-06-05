@@ -15,8 +15,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       '@googleapis/calendar':
-        specifier: ^9.7.9
-        version: 9.8.0(encoding@0.1.13)
+        specifier: ^10.0.1
+        version: 10.0.1
       '@slack/web-api':
         specifier: ^7.9.2
         version: 7.9.2
@@ -555,8 +555,8 @@ packages:
     resolution: {integrity: sha512-7/5LRgykyOfQENcm6hDKP8SX/u9XxE5YOiWOkgkwcoO+cG8xT/cyOvp9wwN3IxfdYgpHs8CE7Nq2PKX2lNaEXw==}
     engines: {node: '>=14'}
 
-  '@googleapis/calendar@9.8.0':
-    resolution: {integrity: sha512-5IG4x/bOvdDFLEzNX/HyvN4LUtuMFTv4eYqZcgwSWBHiBwCfN1zIVLPP6ENbIOR5sIceLpOS35NqknoaAiTJ1g==}
+  '@googleapis/calendar@10.0.1':
+    resolution: {integrity: sha512-lOYg3r1MkGsLTQfuIjspIaSvFv0a7Ldi/SvRuQnQ5E6d9DdXbILOhlPpXefxN6hi7BIvWKG0F5pLoc6kK12chA==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sqladmin@29.0.0':
@@ -2362,6 +2362,10 @@ packages:
   googleapis-common@7.2.0:
     resolution: {integrity: sha512-/fhDZEJZvOV3X5jmD+fKxMqma5q2Q9nZNSF3kn1F18tpxmA86BcTxAGBQdM0N89Z3bEaIs+HVznSmFJEAmMTjA==}
     engines: {node: '>=14.0.0'}
+
+  googleapis-common@8.0.2-rc.0:
+    resolution: {integrity: sha512-JTcxRvmFa9Ec1uyfMEimEMeeKq1sHNZX3vn2qmoUMtnvixXXvcqTcbDZvEZXkEWpGlPlOf4joyep6/qs0BrLyg==}
+    engines: {node: '>=18.0.0'}
 
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
@@ -5085,11 +5089,10 @@ snapshots:
       - supports-color
     optional: true
 
-  '@googleapis/calendar@9.8.0(encoding@0.1.13)':
+  '@googleapis/calendar@10.0.1':
     dependencies:
-      googleapis-common: 7.2.0(encoding@0.1.13)
+      googleapis-common: 8.0.2-rc.0
     transitivePeerDependencies:
-      - encoding
       - supports-color
 
   '@googleapis/sqladmin@29.0.0(encoding@0.1.13)':
@@ -7324,6 +7327,16 @@ snapshots:
       uuid: 9.0.1
     transitivePeerDependencies:
       - encoding
+      - supports-color
+
+  googleapis-common@8.0.2-rc.0:
+    dependencies:
+      extend: 3.0.2
+      gaxios: 7.0.0-rc.6
+      google-auth-library: 10.0.0-rc.3
+      qs: 6.14.0
+      url-template: 2.0.8
+    transitivePeerDependencies:
       - supports-color
 
   gopd@1.2.0: {}
