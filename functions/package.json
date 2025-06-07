@@ -19,7 +19,7 @@
     "logs": "firebase functions:log"
   },
   "dependencies": {
-    "@google-cloud/functions-framework": "^3.5.1",
+    "@google-cloud/functions-framework": "^4.0.0",
     "@google-cloud/secret-manager": "^6.0.1",
     "@googleapis/calendar": "^10.0.1",
     "@slack/web-api": "^7.9.2",
