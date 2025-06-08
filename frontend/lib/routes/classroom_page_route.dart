@@ -4,7 +4,7 @@ const classroomPageRoute = TypedGoRoute<ClassroomPageRoute>(
   path: ClassroomPageRoute.path,
 );
 
-class ClassroomPageRoute extends GoRouteData {
+class ClassroomPageRoute extends GoRouteData with _$ClassroomPageRoute {
   static const path = '/groups/:groupId/classroom';
 
   final String groupId;

@@ -4,7 +4,7 @@ const consoleTopPageRoute = TypedGoRoute<ConsoleTopPageRoute>(
   path: ConsoleTopPageRoute.path,
 );
 
-class ConsoleTopPageRoute extends GoRouteData {
+class ConsoleTopPageRoute extends GoRouteData with _$ConsoleTopPageRoute {
   static const path = '/groups/:groupId/console';
 
   final String groupId;

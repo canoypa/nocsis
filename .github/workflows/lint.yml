@@ -55,5 +55,7 @@ jobs:
         uses: jdx/mise-action@v2
       - name: Install dependencies
         run: flutter pub get
+      - name: Run build_runner
+        run: flutter pub run build_runner build
       - name: Lint
         run: flutter analyze
