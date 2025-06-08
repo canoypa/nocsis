@@ -60,7 +60,7 @@ jobs:
         run: flutter pub get --enforce-lockfile
       - name: Run build_runner
         working-directory: ./frontend
-        run: flutter pub run build_runner build -d
+        run: flutter pub run build_runner build
       - name: Build
         working-directory: ./frontend
         run: flutter build web --wasm

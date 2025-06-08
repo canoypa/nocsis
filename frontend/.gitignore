@@ -3,6 +3,8 @@
 
 # Flutter
 .fvm/
+lib/**/*.g.dart
+lib/**/*.freezed.dart
 
 # Miscellaneous
 *.class
