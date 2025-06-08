@@ -4,7 +4,8 @@ const consoleWeatherPageRoute = TypedGoRoute<ConsoleWeatherPageRoute>(
   path: ConsoleWeatherPageRoute.path,
 );
 
-class ConsoleWeatherPageRoute extends GoRouteData {
+class ConsoleWeatherPageRoute extends GoRouteData
+    with _$ConsoleWeatherPageRoute {
   static const path = '/groups/:groupId/console/weather';
 
   final String groupId;

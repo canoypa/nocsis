@@ -4,7 +4,7 @@ const licensesPageRoute = TypedGoRoute<LicensesPageRoute>(
   path: LicensesPageRoute.path,
 );
 
-class LicensesPageRoute extends GoRouteData {
+class LicensesPageRoute extends GoRouteData with _$LicensesPageRoute {
   static const path = '/licenses';
 
   const LicensesPageRoute();

@@ -4,7 +4,7 @@ const settingsTopPageRoute = TypedGoRoute<SettingsTopPageRoute>(
   path: SettingsTopPageRoute.path,
 );
 
-class SettingsTopPageRoute extends GoRouteData {
+class SettingsTopPageRoute extends GoRouteData with _$SettingsTopPageRoute {
   static const path = '/groups/:groupId/settings';
 
   final String groupId;
