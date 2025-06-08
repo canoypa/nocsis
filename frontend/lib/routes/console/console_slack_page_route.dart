@@ -4,7 +4,7 @@ const consoleSlackPageRoute = TypedGoRoute<ConsoleSlackPageRoute>(
   path: ConsoleSlackPageRoute.path,
 );
 
-class ConsoleSlackPageRoute extends GoRouteData {
+class ConsoleSlackPageRoute extends GoRouteData with _$ConsoleSlackPageRoute {
   static const path = '/groups/:groupId/console/slack';
 
   final String groupId;

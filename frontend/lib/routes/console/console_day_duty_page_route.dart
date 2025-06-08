@@ -4,7 +4,8 @@ const consoleDayDutyPageRoute = TypedGoRoute<ConsoleDayDutyPageRoute>(
   path: ConsoleDayDutyPageRoute.path,
 );
 
-class ConsoleDayDutyPageRoute extends GoRouteData {
+class ConsoleDayDutyPageRoute extends GoRouteData
+    with _$ConsoleDayDutyPageRoute {
   static const path = '/groups/:groupId/console/day_duty';
 
   final String groupId;
