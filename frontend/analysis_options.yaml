@@ -5,5 +5,4 @@ linter:
 
 analyzer:
   exclude:
-    - "lib/generated/api_client/"
     - "**/*/*.g.dart"
