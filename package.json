@@ -4,7 +4,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "firebase-tools": "^13.25.0",
-    "vercel": "^41.7.8"
+    "firebase-tools": "^13.25.0"
   }
 }

@@ -11,13 +11,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hono/node-server": "^1.14.3",
+    "@hono/node-server": "^1.14.4",
     "@hono/zod-validator": "^0.4.1",
     "@scalar/hono-api-reference": "^0.9.3",
     "firebase-admin": "^13.4.0",
     "hono": "^4.7.11",
     "hono-openapi": "^0.4.8",
-    "zod": "^3.25.53",
+    "zod": "^3.25.58",
     "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
