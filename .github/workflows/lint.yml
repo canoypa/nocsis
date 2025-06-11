@@ -55,6 +55,9 @@ jobs:
         uses: jdx/mise-action@v2
       - name: Install dependencies
         run: flutter pub get
+      - name: Generate OpenAPI spec
+        run: pnpm install && pnpm run generate-openapi
+        working-directory: ./frontend
       - name: Run build_runner
         run: flutter pub run build_runner build
       - name: Lint
