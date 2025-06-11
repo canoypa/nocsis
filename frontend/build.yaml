@@ -2,7 +2,7 @@ targets:
   $default:
     sources:
       - $package$
-      - lib/$lib$
+      - lib/**
       - swagger/api.json
     builders:
       swagger_dart_code_generator:
