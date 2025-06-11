@@ -12,12 +12,6 @@ on:
         required: false
         type: string
     secrets:
-      VERCEL_TOKEN:
-        required: true
-      VERCEL_ORG_ID:
-        required: true
-      VERCEL_PROJECT_ID:
-        required: true
       DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT:
         required: true
 
@@ -143,20 +137,7 @@ jobs:
         uses: jdx/mise-action@v2
       - name: Install dependencies
         run: pnpm install --prefer-frozen-lockfile
-      - name: Deploy Frontend (Vercel)
-        id: deploy_to_vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./frontend
-          vercel-args: ${{ inputs.env == 'Production' && '--prod' || '' }}
-      - name: Set Preview Alias
-        if: inputs.env == 'Preview'
-        working-directory: ./frontend
-        run: pnpm vercel alias ${{ steps.deploy_to_vercel.outputs.preview-url }} stg.nocsis.app --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
-      - name: Deploy Frontend (Hosting)
+      - name: Deploy Frontend
         id: deploy_frontend
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
