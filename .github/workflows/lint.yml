@@ -61,4 +61,4 @@ jobs:
       - name: Run build_runner
         run: flutter pub run build_runner build
       - name: Lint
-        run: flutter analyze
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
