@@ -10,28 +10,28 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: ^1.14.4
-        version: 1.14.4(hono@4.7.11)
+        version: 1.14.4(hono@4.8.0)
       '@hono/zod-validator':
         specifier: ^0.4.1
-        version: 0.4.3(hono@4.7.11)(zod@3.25.62)
+        version: 0.4.3(hono@4.8.0)(zod@3.25.67)
       '@scalar/hono-api-reference':
-        specifier: ^0.9.3
-        version: 0.9.3(hono@4.7.11)
+        specifier: ^0.9.4
+        version: 0.9.4(hono@4.8.0)
       firebase-admin:
         specifier: ^13.4.0
         version: 13.4.0(encoding@0.1.13)
       hono:
-        specifier: ^4.7.11
-        version: 4.7.11
+        specifier: ^4.8.0
+        version: 4.8.0
       hono-openapi:
         specifier: ^0.4.8
-        version: 0.4.8(@hono/zod-validator@0.4.3(hono@4.7.11)(zod@3.25.62))(hono@4.7.11)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.25.62))(zod@3.25.62)
+        version: 0.4.8(@hono/zod-validator@0.4.3(hono@4.8.0)(zod@3.25.67))(hono@4.8.0)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.25.67))(zod@3.25.67)
       zod:
-        specifier: ^3.25.62
-        version: 3.25.62
+        specifier: ^3.25.67
+        version: 3.25.67
       zod-openapi:
         specifier: ^4.2.4
-        version: 4.2.4(zod@3.25.62)
+        version: 4.2.4(zod@3.25.67)
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.9.4
@@ -43,8 +43,8 @@ importers:
         specifier: 3.2.0
         version: 3.2.0(vitest@3.2.0(@types/node@22.15.30)(tsx@4.19.4)(yaml@2.8.0))
       firebase-tools:
-        specifier: ^14.6.0
-        version: 14.6.0(@types/node@22.15.30)(encoding@0.1.13)
+        specifier: ^14.7.0
+        version: 14.7.0(@types/node@22.15.30)(encoding@0.1.13)
       tsup:
         specifier: ^8.5.0
         version: 8.5.0(postcss@8.5.4)(tsx@4.19.4)(typescript@5.8.3)(yaml@2.8.0)
@@ -724,22 +724,22 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@scalar/core@0.3.2':
-    resolution: {integrity: sha512-XxB9/xVEVYpBgVyUoAjoALaFkJMvz+7GjSTYyc1jKVP7o5VAdvNTDWdGMNqlYtzpQmco7LQllb7aAmDo33S4xg==}
+  '@scalar/core@0.3.3':
+    resolution: {integrity: sha512-OedH8YQriBsE7JnCN2ly4p3u7iobjzAoDkxD/o1hiF55m6WRicvtklEdByHlceu9UnJ/znikZ50ymo98uG3aqA==}
     engines: {node: '>=20'}
 
-  '@scalar/hono-api-reference@0.9.3':
-    resolution: {integrity: sha512-UzdciNNyABx3iiqA2H9ljiU/nJaHDHpNbK85ZsOWDLN4QLnpWeBOTzhL5CZr5C8D33B1AKsvTYaqnQGKp1If6w==}
+  '@scalar/hono-api-reference@0.9.4':
+    resolution: {integrity: sha512-pAUWS8MRGcS5VjMjAVd6DrhST63NpVXGel2BbYsKPQAaONwwA3hU30fAFxSs3PUGA8M7q+e76F6w4ALBtHxLRA==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4.0.0
 
-  '@scalar/openapi-types@0.3.2':
-    resolution: {integrity: sha512-O1AnVF29Z34TTiuMPzA8Bi9zAZuxLq5xGbW5vLvm9zUkwtI1v/mUsDNiWF3b0oOdk5LlVkrppKvI3xRFYUiyXg==}
+  '@scalar/openapi-types@0.3.3':
+    resolution: {integrity: sha512-mr3OvbCyvuzSDgv9gR9D3pJAsl82BRNBp1P8ldgRgKF4Wiswfa7nQeKibpX0kHSGXLgiyvxWJULUFwgdWMXNNA==}
     engines: {node: '>=20'}
 
-  '@scalar/types@0.2.2':
-    resolution: {integrity: sha512-56KPwde4+zemnA/Nln6TP0ezBiem7K/UcEk94WhsPZU8PV9DVScyepCPU1xEMCNayMrOGG9OHybYyXKkbqt/fA==}
+  '@scalar/types@0.2.3':
+    resolution: {integrity: sha512-K1/Vp5xaQ8TEGDYwHg88OBuQWJRWrE3ToZ0Z2LJwskcY1Eg+uDiRQXKF4QPngZzu5rrWgRErAq4yte4Y7omqgA==}
     engines: {node: '>=20'}
 
   '@sindresorhus/is@4.6.0':
@@ -1612,8 +1612,8 @@ packages:
     resolution: {integrity: sha512-Y8DcyKK+4pl4B93ooiy1G8qvdyRMkcNFfBSh+8rbVcw4cW8dgG0VXCCTp5NUwub8sn9vSPsOwpb9tE2OuFmcfQ==}
     engines: {node: '>=18'}
 
-  firebase-tools@14.6.0:
-    resolution: {integrity: sha512-EpSwPU9/5LqUnYKyLKr/4oi+klqTqe8Mdyrp95wY3yutws2JoX2TXN8SVGfeZGLwrn31j3+WjWfsvFytsRxvxQ==}
+  firebase-tools@14.7.0:
+    resolution: {integrity: sha512-Vdo7EwaK8CRU3NuFWkNWxDF2k/g/NSSSvglMiuwfvFCb1Hkb+vmoDFnvyWD4z41TH3wDx2GzSpvNCGJGTmRVfQ==}
     engines: {node: '>=20.0.0 || >=22.0.0'}
     hasBin: true
 
@@ -1631,8 +1631,8 @@ packages:
     resolution: {integrity: sha512-XHIrMD0NpDrNM/Ckf7XJiBbLl57KEhT3+i3yY+eWm+cqYZJQTZrKo8Y8AWKnuV5GT4scfuUGt9LzNoIx3dU1nQ==}
     engines: {node: '>= 0.12'}
 
-  form-data@4.0.2:
-    resolution: {integrity: sha512-hGfm/slu0ZabnNt4oaRZ6uREyfCj6P4fT/n6A1rGV+Z0VdGXjfOhVUpkn6qVQONHGIFwmveGXyDs75+nr6FM8w==}
+  form-data@4.0.3:
+    resolution: {integrity: sha512-qsITQPfmvMOSAdeyZ+12I1c+CKSstAFAwu+97zrnWAbIr5u8wfsExUzCesVLC8NgHuRUqNN4Zy6UPWUTRGslcA==}
     engines: {node: '>= 6'}
 
   forwarded@0.2.0:
@@ -1821,8 +1821,8 @@ packages:
       zod-openapi:
         optional: true
 
-  hono@4.7.11:
-    resolution: {integrity: sha512-rv0JMwC0KALbbmwJDEnxvQCeJh+xbS3KEWW5PC9cMJ08Ur9xgatI0HmtgYZfOdOSOeYsp5LO2cOhdI8cLEbDEQ==}
+  hono@4.8.0:
+    resolution: {integrity: sha512-NoiHrqJxoe1MYXqW+/0/Q4NCizKj2Ivm4KmX8mOSBtw9UJ7KYaOGKkO7csIwO5UlZpfvVRdcgiMb0GGyjEjtcw==}
     engines: {node: '>=16.9.0'}
 
   html-entities@2.6.0:
@@ -2923,8 +2923,8 @@ packages:
     resolution: {integrity: sha512-HehCEsotFqbPW9sJ8WVYB6UbmIMv7kUUORIF2Nncq4VQvBfNBLibW9YZR5dlYCSUhwcD628pRllm7n+E+YTzJw==}
     engines: {node: '>= 14'}
 
-  socks@2.8.4:
-    resolution: {integrity: sha512-D3YaD0aRxR3mEcqnidIs7ReYJFVzWdd6fXJYUM8ixcQcJRGTka/b3saV0KflYhyVJXKhb947GndU35SxYNResQ==}
+  socks@2.8.5:
+    resolution: {integrity: sha512-iF+tNDQla22geJdTyJB1wM/qrX9DMRwWrciEPwWLPRWAUEM8sQiyxgckLxWT1f7+9VabJS0jTGGr4QgBuvi6Ww==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
   sort-any@2.0.0:
@@ -2952,8 +2952,8 @@ packages:
   sprintf-js@1.1.3:
     resolution: {integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==}
 
-  sql-formatter@15.6.2:
-    resolution: {integrity: sha512-ZjqOfJGuB97UeHzTJoTbadlM0h9ynehtSTHNUbGfXR4HZ4rCIoD2oIW91W+A5oE76k8hl0Uz5GD8Sx3Pt9Xa3w==}
+  sql-formatter@15.6.4:
+    resolution: {integrity: sha512-osSvFAtUu/SqT4ywdPTraCHR/VzMjeG+cXFEGwJJtm2SoA/uewU6Sm2HYyqo6W7VTGSWUWx7WT8KkE3HJq51cA==}
     hasBin: true
 
   ssri@12.0.0:
@@ -2972,6 +2972,10 @@ packages:
 
   statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
+    engines: {node: '>= 0.8'}
+
+  statuses@2.0.2:
+    resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
 
   std-env@3.9.0:
@@ -3492,8 +3496,8 @@ packages:
   zod@3.24.1:
     resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
-  zod@3.25.62:
-    resolution: {integrity: sha512-YCxsr4DmhPcrKPC9R1oBHQNlQzlJEyPAId//qTau/vBee9uO8K6prmRq4eMkOyxvBfH4wDPIPdLx9HVMWIY3xA==}
+  zod@3.25.67:
+    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
 
 snapshots:
 
@@ -3792,14 +3796,14 @@ snapshots:
       protobufjs: 7.5.3
       yargs: 17.7.2
 
-  '@hono/node-server@1.14.4(hono@4.7.11)':
+  '@hono/node-server@1.14.4(hono@4.8.0)':
     dependencies:
-      hono: 4.7.11
+      hono: 4.8.0
 
-  '@hono/zod-validator@0.4.3(hono@4.7.11)(zod@3.25.62)':
+  '@hono/zod-validator@0.4.3(hono@4.8.0)(zod@3.25.67)':
     dependencies:
-      hono: 4.7.11
-      zod: 3.25.62
+      hono: 4.8.0
+      zod: 3.25.67
 
   '@inquirer/checkbox@4.1.8(@types/node@22.15.30)':
     dependencies:
@@ -3965,8 +3969,8 @@ snapshots:
       express-rate-limit: 7.5.0(express@5.1.0)
       pkce-challenge: 5.0.0
       raw-body: 3.0.0
-      zod: 3.25.62
-      zod-to-json-schema: 3.24.5(zod@3.25.62)
+      zod: 3.25.67
+      zod-to-json-schema: 3.24.5(zod@3.25.67)
     transitivePeerDependencies:
       - supports-color
 
@@ -4088,22 +4092,22 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.41.0':
     optional: true
 
-  '@scalar/core@0.3.2':
+  '@scalar/core@0.3.3':
     dependencies:
-      '@scalar/types': 0.2.2
+      '@scalar/types': 0.2.3
 
-  '@scalar/hono-api-reference@0.9.3(hono@4.7.11)':
+  '@scalar/hono-api-reference@0.9.4(hono@4.8.0)':
     dependencies:
-      '@scalar/core': 0.3.2
-      hono: 4.7.11
+      '@scalar/core': 0.3.3
+      hono: 4.8.0
 
-  '@scalar/openapi-types@0.3.2':
+  '@scalar/openapi-types@0.3.3':
     dependencies:
       zod: 3.24.1
 
-  '@scalar/types@0.2.2':
+  '@scalar/types@0.2.3':
     dependencies:
-      '@scalar/openapi-types': 0.3.2
+      '@scalar/openapi-types': 0.3.3
       nanoid: 5.1.5
       zod: 3.24.1
 
@@ -5030,7 +5034,7 @@ snapshots:
       router: 2.2.0
       send: 1.2.0
       serve-static: 2.2.0
-      statuses: 2.0.1
+      statuses: 2.0.2
       type-is: 2.0.1
       vary: 1.1.2
     transitivePeerDependencies:
@@ -5106,7 +5110,7 @@ snapshots:
       escape-html: 1.0.3
       on-finished: 2.4.1
       parseurl: 1.3.3
-      statuses: 2.0.1
+      statuses: 2.0.2
     transitivePeerDependencies:
       - supports-color
 
@@ -5129,7 +5133,7 @@ snapshots:
       - encoding
       - supports-color
 
-  firebase-tools@14.6.0(@types/node@22.15.30)(encoding@0.1.13):
+  firebase-tools@14.7.0(@types/node@22.15.30)(encoding@0.1.13):
     dependencies:
       '@electric-sql/pglite': 0.2.17
       '@google-cloud/cloud-sql-connector': 1.8.1(encoding@0.1.13)
@@ -5157,7 +5161,7 @@ snapshots:
       exegesis-express: 4.0.0
       express: 4.21.2
       filesize: 6.4.0
-      form-data: 4.0.2
+      form-data: 4.0.3
       fs-extra: 10.1.0
       fuzzy: 0.1.3
       gaxios: 6.7.1(encoding@0.1.13)
@@ -5186,7 +5190,7 @@ snapshots:
       proxy-agent: 6.5.0
       retry: 0.13.1
       semver: 7.7.2
-      sql-formatter: 15.6.2
+      sql-formatter: 15.6.4
       stream-chain: 2.2.5
       stream-json: 1.9.1
       superstatic: 9.2.0(encoding@0.1.13)
@@ -5201,8 +5205,8 @@ snapshots:
       winston-transport: 4.9.0
       ws: 7.5.10
       yaml: 2.8.0
-      zod: 3.25.62
-      zod-to-json-schema: 3.24.5(zod@3.25.62)
+      zod: 3.25.67
+      zod-to-json-schema: 3.24.5(zod@3.25.67)
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
@@ -5232,11 +5236,12 @@ snapshots:
       mime-types: 2.1.35
       safe-buffer: 5.2.1
 
-  form-data@4.0.2:
+  form-data@4.0.3:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       es-set-tostringtag: 2.1.0
+      hasown: 2.0.2
       mime-types: 2.1.35
 
   forwarded@0.2.0: {}
@@ -5423,17 +5428,17 @@ snapshots:
 
   highlight.js@10.7.3: {}
 
-  hono-openapi@0.4.8(@hono/zod-validator@0.4.3(hono@4.7.11)(zod@3.25.62))(hono@4.7.11)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.25.62))(zod@3.25.62):
+  hono-openapi@0.4.8(@hono/zod-validator@0.4.3(hono@4.8.0)(zod@3.25.67))(hono@4.8.0)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.25.67))(zod@3.25.67):
     dependencies:
       json-schema-walker: 2.0.0
       openapi-types: 12.1.3
     optionalDependencies:
-      '@hono/zod-validator': 0.4.3(hono@4.7.11)(zod@3.25.62)
-      hono: 4.7.11
-      zod: 3.25.62
-      zod-openapi: 4.2.4(zod@3.25.62)
+      '@hono/zod-validator': 0.4.3(hono@4.8.0)(zod@3.25.67)
+      hono: 4.8.0
+      zod: 3.25.67
+      zod-openapi: 4.2.4(zod@3.25.67)
 
-  hono@4.7.11: {}
+  hono@4.8.0: {}
 
   html-entities@2.6.0:
     optional: true
@@ -6514,7 +6519,7 @@ snapshots:
       ms: 2.1.3
       on-finished: 2.4.1
       range-parser: 1.2.1
-      statuses: 2.0.1
+      statuses: 2.0.2
     transitivePeerDependencies:
       - supports-color
 
@@ -6592,11 +6597,11 @@ snapshots:
     dependencies:
       agent-base: 7.1.3
       debug: 4.4.1
-      socks: 2.8.4
+      socks: 2.8.5
     transitivePeerDependencies:
       - supports-color
 
-  socks@2.8.4:
+  socks@2.8.5:
     dependencies:
       ip-address: 9.0.5
       smart-buffer: 4.2.0
@@ -6620,7 +6625,7 @@ snapshots:
 
   sprintf-js@1.1.3: {}
 
-  sql-formatter@15.6.2:
+  sql-formatter@15.6.4:
     dependencies:
       argparse: 2.0.1
       nearley: 2.20.1
@@ -6637,6 +6642,8 @@ snapshots:
   statuses@1.5.0: {}
 
   statuses@2.0.1: {}
+
+  statuses@2.0.2: {}
 
   std-env@3.9.0: {}
 
@@ -7207,14 +7214,14 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.7.0
 
-  zod-openapi@4.2.4(zod@3.25.62):
+  zod-openapi@4.2.4(zod@3.25.67):
     dependencies:
-      zod: 3.25.62
+      zod: 3.25.67
 
-  zod-to-json-schema@3.24.5(zod@3.25.62):
+  zod-to-json-schema@3.24.5(zod@3.25.67):
     dependencies:
-      zod: 3.25.62
+      zod: 3.25.67
 
   zod@3.24.1: {}
 
-  zod@3.25.62: {}
+  zod@3.25.67: {}
