@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@googleapis/calendar": "^10.0.1",
     "@hono/node-server": "^1.14.4",
     "@hono/zod-validator": "^0.4.1",
     "@scalar/hono-api-reference": "^0.9.4",
