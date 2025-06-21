@@ -10,7 +10,7 @@ import {
   authentication,
   getUser,
 } from "../../middlewares/authenticate.js";
-import { groupSchema } from "../../models/resources/v1/groups/group.js";
+import { groupSchema } from "../../models/groups.js";
 
 import "zod-openapi/extend";
 
