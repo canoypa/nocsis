@@ -2,6 +2,8 @@ import { serve } from "@hono/node-server";
 import { generateOpenapiSpec } from "./generate_openapi_spec.js";
 import { app } from "./routes.js";
 
+import "./config/luxon.js";
+
 if (process.env.NODE_ENV !== "production") {
   generateOpenapiSpec(app);
 }
