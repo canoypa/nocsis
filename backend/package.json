@@ -15,7 +15,7 @@
     "@hono/zod-validator": "^0.4.1",
     "@scalar/hono-api-reference": "^0.9.5",
     "firebase-admin": "^13.4.0",
-    "hono": "^4.8.1",
+    "hono": "^4.8.2",
     "hono-openapi": "^0.4.8",
     "zod": "^3.25.67",
     "zod-openapi": "^4.2.4"
