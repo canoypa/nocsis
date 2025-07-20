@@ -1,3 +1,7 @@
+# openapi
+swagger/api.json
+lib/generated/api_client/
+
 # Flutter
 .fvm/
 lib/**/*.g.dart

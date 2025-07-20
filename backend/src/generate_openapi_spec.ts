@@ -5,6 +5,6 @@ import { generateSpecs } from "hono-openapi";
 
 export const generateOpenapiSpec = async (app: Hono) => {
   const spec = await generateSpecs(app);
-  const path = resolve("../api-spec.openapi.json");
+  const path = resolve("../frontend/swagger/api.json");
   fs.writeFileSync(path, JSON.stringify(spec, null, 2));
 };
