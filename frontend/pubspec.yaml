@@ -32,6 +32,7 @@ dependencies:
   gap: ^3.0.1
   shared_preferences: ^2.5.3
   nil: ^1.1.1
+  chopper: ^8.1.0
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +46,8 @@ dev_dependencies:
   freezed: ^3.0.6
   json_serializable: ^6.9.5
   go_router_builder: ^3.0.0
+  chopper_generator: ^8.1.0
+  swagger_dart_code_generator: ^3.0.3
 
 flutter:
   uses-material-design: true
