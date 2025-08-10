@@ -1,11 +1,23 @@
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
 import { fetchWeather } from "./open_weather_map_service.js";
+import { fetchSecret } from "./secret_manager_service.js";
 
+// Secret Manager Service をモック
 vi.mock("./secret_manager_service.js", () => ({
-  fetchSecret: vi.fn().mockResolvedValue("dummy_token"),
+  fetchSecret: vi.fn(),
 }));
+
+const mockFetchSecret = vi.mocked(fetchSecret);
 
 describe("fetchWeather", () => {
   const handlers = [
@@ -46,6 +58,11 @@ describe("fetchWeather", () => {
     return () => {
       server.resetHandlers();
     };
+  });
+
+  beforeEach(() => {
+    // モックを確実に設定（他のテストによる汚染を防ぐため）
+    mockFetchSecret.mockResolvedValue("dummy_token");
   });
 
   afterAll(() => {

@@ -3,10 +3,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { type LoginResult, login } from "../../../tests/helpers/users.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
+import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
 
+// Google Calendar Service をモック
 vi.mock("../../services/google_calendar_service.js", () => ({
-  fetchGoogleCalendarEvents: vi.fn().mockResolvedValue({ items: [] }),
+  fetchGoogleCalendarEvents: vi.fn(),
 }));
+
+const mockFetchGoogleCalendarEvents = vi.mocked(fetchGoogleCalendarEvents);
 
 describe("ClassesController", () => {
   describe("GET /api/v1/groups/:groupId/classes", () => {
@@ -14,6 +18,9 @@ describe("ClassesController", () => {
     let loginResult: LoginResult;
 
     beforeEach(async () => {
+      // モックを確実に設定
+      mockFetchGoogleCalendarEvents.mockResolvedValue({ items: [] });
+
       user = await auth.createUser({ uid: "test_user_1" });
       loginResult = await login(user);
 
