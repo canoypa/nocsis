@@ -6,7 +6,6 @@ import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
 
-// Google Calendar Service をモック
 vi.mock("../../services/google_calendar_service.js", () => ({
   fetchGoogleCalendarEvents: vi.fn(),
 }));
@@ -18,7 +17,6 @@ describe("Events Controller", () => {
   let loginResult: LoginResult;
 
   beforeEach(async () => {
-    // モックを確実に設定
     mockFetchGoogleCalendarEvents.mockResolvedValue({ items: [] });
 
     user = await auth.createUser({ uid: "test_user_1" });

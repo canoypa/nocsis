@@ -12,7 +12,6 @@ import {
 import { fetchWeather } from "./open_weather_map_service.js";
 import { fetchSecret } from "./secret_manager_service.js";
 
-// Secret Manager Service をモック
 vi.mock("./secret_manager_service.js", () => ({
   fetchSecret: vi.fn(),
 }));
@@ -61,7 +60,6 @@ describe("fetchWeather", () => {
   });
 
   beforeEach(() => {
-    // モックを確実に設定（他のテストによる汚染を防ぐため）
     mockFetchSecret.mockResolvedValue("dummy_token");
   });
 
