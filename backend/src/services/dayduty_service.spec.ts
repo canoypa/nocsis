@@ -92,6 +92,43 @@ describe("getDaydutyStuNo", () => {
     expect(result).toBe(1);
   });
 
+  describe("教師ロールが混在している場合", () => {
+    beforeEach(async () => {
+      // 教師を追加
+      await firestore.collection("classmates").add({
+        group_id: "test_group_1",
+        role: "teacher",
+        stuNo: 99,
+        name: "Teacher",
+        email: "teacher@example.com",
+        slackUserId: "teacher",
+      });
+
+      return async () => {
+        const teacherSnapshot = await firestore
+          .collection("classmates")
+          .where("group_id", "==", "test_group_1")
+          .where("role", "==", "teacher")
+          .get();
+
+        const batch = firestore.batch();
+        for (const doc of teacherSnapshot.docs) {
+          batch.delete(doc.ref);
+        }
+        await batch.commit();
+      };
+    });
+
+    it("学生のみがカウントされること", async () => {
+      // 学生が4人なので、5日目（4 % 4 + 1 = 1）は出席番号1が返される
+      const result = await getDaydutyStuNo(
+        "test_group_1",
+        DateTime.local(2025, 1, 5),
+      );
+      expect(result).toBe(1);
+    });
+  });
+
   describe("グループが存在しない場合", () => {
     it("エラーが発生すること", async () => {
       await expect(
