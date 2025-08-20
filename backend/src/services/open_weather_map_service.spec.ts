@@ -9,7 +9,10 @@ import {
   it,
   vi,
 } from "vitest";
-import { fetchWeather } from "./open_weather_map_service.js";
+import {
+  fetchWeather,
+  getWeatherNameById,
+} from "./open_weather_map_service.js";
 import { fetchSecret } from "./secret_manager_service.js";
 
 vi.mock("./secret_manager_service.js", () => ({
@@ -96,20 +99,72 @@ describe("fetchWeather", () => {
     });
   });
 
-  it("APIレスポンスが500の場合", async () => {
-    server.use(
-      http.get("https://api.openweathermap.org/data/2.5/weather", () => {
-        return HttpResponse.json(
-          {
-            cod: "500",
-            message: "Internal Server Error",
-          },
-          { status: 500 },
-        );
-      }),
-    );
-    await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
-      "Failed to fetch weather data",
-    );
+  describe("APIレスポンスが500の場合", () => {
+    it("current weather APIでエラーがthrowされること", async () => {
+      server.use(
+        http.get("https://api.openweathermap.org/data/2.5/weather", () => {
+          return HttpResponse.json(
+            {
+              cod: "500",
+              message: "Internal Server Error",
+            },
+            { status: 500 },
+          );
+        }),
+      );
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
+        "Failed to fetch weather data",
+      );
+    });
+
+    it("forecast APIでエラーがthrowされること", async () => {
+      server.use(
+        http.get("https://api.openweathermap.org/data/2.5/forecast", () => {
+          return HttpResponse.json(
+            {
+              cod: "500",
+              message: "Internal Server Error",
+            },
+            { status: 500 },
+          );
+        }),
+      );
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
+        "Failed to fetch weather data",
+      );
+    });
+  });
+});
+
+describe("getWeatherNameById", () => {
+  it("雨の天候IDでRainが返されること", () => {
+    expect(getWeatherNameById(200)).toBe("Rain");
+    expect(getWeatherNameById(300)).toBe("Rain");
+    expect(getWeatherNameById(500)).toBe("Rain");
+  });
+
+  it("雪の天候IDでSnowが返されること", () => {
+    expect(getWeatherNameById(600)).toBe("Snow");
+    expect(getWeatherNameById(620)).toBe("Snow");
+  });
+
+  it("大気現象の天候IDでAtmosphereが返されること", () => {
+    expect(getWeatherNameById(700)).toBe("Atmosphere");
+    expect(getWeatherNameById(781)).toBe("Atmosphere");
+  });
+
+  it("晴れの天候IDでClearが返されること", () => {
+    expect(getWeatherNameById(800)).toBe("Clear");
+    expect(getWeatherNameById(801)).toBe("Clear");
+    expect(getWeatherNameById(802)).toBe("Clear");
+  });
+
+  it("曇りの天候IDでCloudsが返されること", () => {
+    expect(getWeatherNameById(803)).toBe("Clouds");
+    expect(getWeatherNameById(804)).toBe("Clouds");
+  });
+
+  it("不明な天候IDでUnknownが返されること", () => {
+    expect(getWeatherNameById(999)).toBe("Unknown");
   });
 });
