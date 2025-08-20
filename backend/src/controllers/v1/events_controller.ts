@@ -6,6 +6,7 @@ import { HTTPException } from "hono/http-exception";
 import { DateTime } from "luxon";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
+import { AppConfig } from "../../config/app_config.js";
 import {
   type AuthenticatedEnv,
   authentication,
@@ -80,8 +81,8 @@ eventsRoutes.get(
     const groupId = c.req.param("groupId");
     const { from: fromStr, to: toStr } = c.req.valid("query");
 
-    const from = DateTime.fromISO(fromStr, { zone: "asia/tokyo" });
-    const to = DateTime.fromISO(toStr, { zone: "asia/tokyo" });
+    const from = DateTime.fromISO(fromStr, { zone: AppConfig.TIMEZONE });
+    const to = DateTime.fromISO(toStr, { zone: AppConfig.TIMEZONE });
 
     if (!from.isValid || !to.isValid) {
       throw new HTTPException(400, {

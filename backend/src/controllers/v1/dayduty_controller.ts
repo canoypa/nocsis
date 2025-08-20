@@ -5,6 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import { DateTime } from "luxon";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
+import { AppConfig } from "../../config/app_config.js";
 import {
   type AuthenticatedEnv,
   authentication,
@@ -88,8 +89,8 @@ daydutRoutes.get(
       }
 
       const targetDate = date
-        ? DateTime.fromISO(date, { zone: "Asia/Tokyo" })
-        : DateTime.now().setZone("Asia/Tokyo");
+        ? DateTime.fromISO(date, { zone: AppConfig.TIMEZONE })
+        : DateTime.now().setZone(AppConfig.TIMEZONE);
 
       if (!targetDate.isValid) {
         throw new HTTPException(400, {

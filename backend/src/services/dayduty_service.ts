@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { firestore } from "../clients/firebase.js";
+import { AppConfig } from "../config/app_config.js";
 
 /**
  * 指定された日時の日直の出席番号を取得する
@@ -21,10 +22,12 @@ export const getDaydutyStuNo = async (
     throw new Error("dayduty_start_date is not set");
   }
 
-  const startDate = DateTime.fromISO(startDateEnv, { zone: "Asia/Tokyo" });
+  const startDate = DateTime.fromISO(startDateEnv, {
+    zone: AppConfig.TIMEZONE,
+  });
 
   const elapseDays = Math.floor(
-    date.setZone("asia/tokyo").diff(startDate).as("days"),
+    date.setZone(AppConfig.TIMEZONE).diff(startDate).as("days"),
   );
 
   const classmateCountSnapshot = await firestore
