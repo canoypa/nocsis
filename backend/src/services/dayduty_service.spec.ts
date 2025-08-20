@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { firestore } from "../clients/firebase.js";
 import { getDaydutyStuNo } from "./dayduty_service.js";
 
@@ -51,21 +51,21 @@ describe("getDaydutyStuNo", () => {
       batch.set(ref, classmate);
     }
     await batch.commit();
-  });
 
-  afterEach(async () => {
-    await firestore.collection("groups").doc("test_group_1").delete();
+    return async () => {
+      await firestore.collection("groups").doc("test_group_1").delete();
 
-    const classmatesSnapshot = await firestore
-      .collection("classmates")
-      .where("group_id", "==", "test_group_1")
-      .get();
+      const classmatesSnapshot = await firestore
+        .collection("classmates")
+        .where("group_id", "==", "test_group_1")
+        .get();
 
-    const batch = firestore.batch();
-    for (const doc of classmatesSnapshot.docs) {
-      batch.delete(doc.ref);
-    }
-    await batch.commit();
+      const batch = firestore.batch();
+      for (const doc of classmatesSnapshot.docs) {
+        batch.delete(doc.ref);
+      }
+      await batch.commit();
+    };
   });
 
   it("開始日（2025-01-01）は出席番号1が返されること", async () => {
