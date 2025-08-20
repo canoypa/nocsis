@@ -12,8 +12,8 @@ import {
   getUser,
 } from "../../middlewares/authenticate.js";
 import {
-  daydudyQuerySchema,
-  daydudyResponseSchema,
+  daydutyQuerySchema,
+  daydutyResponseSchema,
 } from "../../resources/v1/dayduty.js";
 import { getDaydutyStuNo } from "../../services/dayduty_service.js";
 
@@ -35,7 +35,7 @@ daydutRoutes.get(
       200: {
         description: "Successful response",
         content: {
-          "application/json": { schema: resolver(daydudyResponseSchema) },
+          "application/json": { schema: resolver(daydutyResponseSchema) },
         },
       },
       400: {
@@ -58,7 +58,7 @@ daydutRoutes.get(
     validateResponse: true,
   }),
   validator("param", paramSchema),
-  validator("query", daydudyQuerySchema),
+  validator("query", daydutyQuerySchema),
   authentication,
   async (c) => {
     const groupId = c.req.param("groupId");
@@ -120,7 +120,7 @@ daydutRoutes.get(
         ...classmateDoc.data(),
       };
 
-      const validatedResponse = daydudyResponseSchema.parse(classmate);
+      const validatedResponse = daydutyResponseSchema.parse(classmate);
 
       return c.json(validatedResponse, 200);
     } catch (error) {
