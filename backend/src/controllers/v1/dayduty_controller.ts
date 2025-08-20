@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/zod";
+import { HTTPException } from "hono/http-exception";
 import { DateTime } from "luxon";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
@@ -70,7 +71,7 @@ daydutRoutes.get(
         .doc(groupId)
         .get();
       if (!groupSnapshot.exists) {
-        return c.json({ error: "Group not found" }, 404);
+        throw new HTTPException(404, { message: "グループが存在しません。" });
       }
 
       // グループ参加チェック
@@ -81,7 +82,9 @@ daydutRoutes.get(
         .get();
 
       if (userJoinedGroupsSnapshot.empty) {
-        return c.json({ error: "Forbidden" }, 403);
+        throw new HTTPException(403, {
+          message: "グループに参加していません。",
+        });
       }
 
       const targetDate = date
@@ -89,7 +92,9 @@ daydutRoutes.get(
         : DateTime.now().setZone("Asia/Tokyo");
 
       if (!targetDate.isValid) {
-        return c.json({ error: "Invalid date format" }, 400);
+        throw new HTTPException(400, {
+          message: "日付のフォーマットが正しくありません。",
+        });
       }
 
       // 出席番号取得
@@ -103,7 +108,9 @@ daydutRoutes.get(
         .get();
 
       if (classmateSnapshot.empty) {
-        return c.json({ error: "Student not found" }, 500);
+        throw new HTTPException(500, {
+          message: "学生が見つかりません。",
+        });
       }
 
       const classmateDoc = classmateSnapshot.docs[0];
@@ -117,17 +124,7 @@ daydutRoutes.get(
       return c.json(validatedResponse, 200);
     } catch (error) {
       console.error("Error in dayduty controller:", error);
-
-      if (error instanceof Error) {
-        if (
-          error.message.includes("start date not set") ||
-          error.message.includes("No students found")
-        ) {
-          return c.json({ error: error.message }, 500);
-        }
-      }
-
-      return c.json({ error: "Internal server error" }, 500);
+      throw error;
     }
   },
 );
