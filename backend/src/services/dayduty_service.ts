@@ -7,7 +7,7 @@ import { AppConfig } from "../config/app_config.js";
  */
 export const getDaydutyStuNo = async (
   groupId: string,
-  date: DateTime,
+  date: DateTime<true>,
 ): Promise<number> => {
   const groupSnapshot = await firestore.collection("groups").doc(groupId).get();
   const group = groupSnapshot.data();
@@ -25,6 +25,10 @@ export const getDaydutyStuNo = async (
   const startDate = DateTime.fromISO(startDateEnv, {
     zone: AppConfig.TIMEZONE,
   });
+
+  if (!startDate.isValid) {
+    throw new Error("日直開始日のフォーマットが正しくありません");
+  }
 
   const elapseDays = Math.floor(
     date.setZone(AppConfig.TIMEZONE).diff(startDate).as("days"),

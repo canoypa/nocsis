@@ -71,7 +71,7 @@ describe("getDaydutyStuNo", () => {
   it("開始日（2025-01-01）は出席番号1が返されること", async () => {
     const result = await getDaydutyStuNo(
       "test_group_1",
-      DateTime.local(2025, 1, 1),
+      DateTime.local(2025, 1, 1) as DateTime<true>,
     );
     expect(result).toBe(1);
   });
@@ -79,7 +79,7 @@ describe("getDaydutyStuNo", () => {
   it("開始日の翌日（2025-01-02）は出席番号2が返されること", async () => {
     const result = await getDaydutyStuNo(
       "test_group_1",
-      DateTime.local(2025, 1, 2),
+      DateTime.local(2025, 1, 2) as DateTime<true>,
     );
     expect(result).toBe(2);
   });
@@ -87,7 +87,7 @@ describe("getDaydutyStuNo", () => {
   it("開始日の4日後（2025-01-05）は出席番号1が返されること（4人なので周回）", async () => {
     const result = await getDaydutyStuNo(
       "test_group_1",
-      DateTime.local(2025, 1, 5),
+      DateTime.local(2025, 1, 5) as DateTime<true>,
     );
     expect(result).toBe(1);
   });
@@ -123,7 +123,7 @@ describe("getDaydutyStuNo", () => {
       // 学生が4人なので、5日目（4 % 4 + 1 = 1）は出席番号1が返される
       const result = await getDaydutyStuNo(
         "test_group_1",
-        DateTime.local(2025, 1, 5),
+        DateTime.local(2025, 1, 5) as DateTime<true>,
       );
       expect(result).toBe(1);
     });
@@ -132,7 +132,10 @@ describe("getDaydutyStuNo", () => {
   describe("グループが存在しない場合", () => {
     it("エラーが発生すること", async () => {
       await expect(
-        getDaydutyStuNo("non_existent_group", DateTime.local(2025, 1, 1)),
+        getDaydutyStuNo(
+          "non_existent_group",
+          DateTime.local(2025, 1, 1) as DateTime<true>,
+        ),
       ).rejects.toThrow("Group not found");
     });
   });
@@ -144,7 +147,10 @@ describe("getDaydutyStuNo", () => {
       });
 
       await expect(
-        getDaydutyStuNo("test_group_no_start", DateTime.local(2025, 1, 1)),
+        getDaydutyStuNo(
+          "test_group_no_start",
+          DateTime.local(2025, 1, 1) as DateTime<true>,
+        ),
       ).rejects.toThrow("dayduty_start_date is not set");
 
       await firestore.collection("groups").doc("test_group_no_start").delete();
@@ -159,7 +165,10 @@ describe("getDaydutyStuNo", () => {
       });
 
       await expect(
-        getDaydutyStuNo("test_group_no_students", DateTime.local(2025, 1, 1)),
+        getDaydutyStuNo(
+          "test_group_no_students",
+          DateTime.local(2025, 1, 1) as DateTime<true>,
+        ),
       ).rejects.toThrow("No students found in group");
 
       await firestore
