@@ -10,7 +10,7 @@ export type WeatherData = {
   }[];
 };
 
-interface Arg {
+interface FetchWeatherParams {
   lat: number;
   lon: number;
 }
@@ -37,7 +37,10 @@ const FIVE_DAY_WEATHER_FORECAST_ENDPOINT =
 /**
  * OpenWeatherMap API から天気情報を取得する
  */
-export const fetchWeather = async ({ lat, lon }: Arg): Promise<WeatherData> => {
+export const fetchWeather = async ({
+  lat,
+  lon,
+}: FetchWeatherParams): Promise<WeatherData> => {
   const token = await fetchSecret("OPENWEATHERMAP_TOKEN");
 
   const currentWeatherApiUrl = new URL(CURRENT_WEATHER_ENDPOINT);
@@ -56,11 +59,10 @@ export const fetchWeather = async ({ lat, lon }: Arg): Promise<WeatherData> => {
   const [currentRes, forecastRes] = await Promise.all([
     fetch(currentWeatherApiUrl),
     fetch(forecastApiUrl),
-  ]).catch((error) => {
-    throw error;
-  });
+  ]);
+
   if (!currentRes.ok || !forecastRes.ok) {
-    throw new Error("Failed to fetch weather data");
+    throw new Error("天気データの取得に失敗しました");
   }
 
   const currentJson = await currentRes.json();
@@ -117,6 +119,8 @@ export const getWeatherNameById = (id: number): string => {
   for (const [pattern, name] of WeatherIdToName) {
     if (pattern.test(id.toString())) return name;
   }
-  console.error(`Unknown weather code: ${id}`);
+
+  console.error(`[DEBUG] 未知の天気コード: ${id}`);
+
   return "Unknown";
 };

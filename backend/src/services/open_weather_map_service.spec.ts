@@ -113,7 +113,7 @@ describe("fetchWeather", () => {
         }),
       );
       await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
-        "Failed to fetch weather data",
+        "天気データの取得に失敗しました",
       );
     });
 
@@ -130,7 +130,7 @@ describe("fetchWeather", () => {
         }),
       );
       await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
-        "Failed to fetch weather data",
+        "天気データの取得に失敗しました",
       );
     });
   });
