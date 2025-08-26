@@ -128,10 +128,7 @@ eventsRoutes.get(
       orderBy: "startTime",
       fields: "items(id,start,end,summary,description,location)",
     });
-
-    if (!events.items || events.items.length === 0) {
-      throw new HTTPException(404, { message: "イベントが存在しません。" });
-    }
+    assert(events.items, "イベントが存在しません。");
 
     const eventItems = events.items.map((item) => {
       return eventSchema.parse({
