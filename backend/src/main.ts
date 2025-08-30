@@ -3,6 +3,9 @@ import { generateOpenapiSpec } from "./generate_openapi_spec.js";
 import { app } from "./routes.js";
 
 if (process.env.NODE_ENV !== "production") {
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099";
+  process.env.FIRESTORE_EMULATOR_HOST = "localhost:8888";
+
   generateOpenapiSpec(app);
 }
 
