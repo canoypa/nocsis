@@ -21,7 +21,6 @@ describe("WeatherController", () => {
 
       const groupRef = firestore.collection("groups").doc("test_group_1");
       await groupRef.set({
-        id: "test_group_1",
         name: "Test Group",
         classes_calendar_id: "",
         events_calendar_id: "",

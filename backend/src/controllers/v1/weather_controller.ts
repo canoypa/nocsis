@@ -70,7 +70,10 @@ weatherRoutes.get(
       throw new HTTPException(403, { message: "グループに参加していません。" });
     }
 
-    const parseGroup = groupSchema.safeParse(groupSnapshot.data());
+    const parseGroup = groupSchema.safeParse({
+      id: groupSnapshot.id,
+      ...groupSnapshot.data(),
+    });
     if (!parseGroup.success) {
       throw new HTTPException(500, { message: "グループのデータが不正です。" });
     }
