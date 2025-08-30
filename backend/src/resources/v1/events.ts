@@ -6,12 +6,10 @@ export const eventSchema = z
   .object({
     id: z.string().openapi({ description: "ID" }),
     startAt: z
-      .string()
-      .datetime({ offset: true })
+      .union([z.string().date(), z.string().datetime({ offset: true })])
       .openapi({ description: "開始日時" }),
     endAt: z
-      .string()
-      .datetime({ offset: true })
+      .union([z.string().date(), z.string().datetime({ offset: true })])
       .openapi({ description: "終了日時" }),
     title: z.string().openapi({ description: "タイトル" }),
     description: z.string().optional().openapi({ description: "説明" }),
