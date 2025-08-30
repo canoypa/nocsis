@@ -61,7 +61,7 @@ describe("Events Controller", () => {
   describe("GET /:groupId/events", () => {
     it("認証が必要であること", async () => {
       const response = await app.request(
-        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&to=2024-01-02T00:00:00%2B09:00",
+        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&limit=10",
         {
           method: "GET",
         },
@@ -72,7 +72,7 @@ describe("Events Controller", () => {
 
     it("グループが存在しない場合は404が返されること", async () => {
       const response = await app.request(
-        "/api/v1/groups/non-existent-group/events?from=2024-01-01T00:00:00%2B09:00&to=2024-01-02T00:00:00%2B09:00",
+        "/api/v1/groups/non-existent-group/events?from=2024-01-01T00:00:00%2B09:00&limit=10",
         {
           method: "GET",
           headers: {
@@ -89,7 +89,7 @@ describe("Events Controller", () => {
       const unauthorizedLoginResult = await login(unauthorizedUser);
 
       const response = await app.request(
-        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&to=2024-01-02T00:00:00%2B09:00",
+        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&limit=10",
         {
           method: "GET",
           headers: {
@@ -123,7 +123,7 @@ describe("Events Controller", () => {
       });
 
       const response = await app.request(
-        "/api/v1/groups/test_group_2/events?from=2024-01-01T00:00:00%2B09:00&to=2024-01-02T00:00:00%2B09:00",
+        "/api/v1/groups/test_group_2/events?from=2024-01-01T00:00:00%2B09:00&limit=10",
         {
           method: "GET",
           headers: {
@@ -150,7 +150,35 @@ describe("Events Controller", () => {
 
     it("不正な日付フォーマットの場合は400が返されること", async () => {
       const response = await app.request(
-        "/api/v1/groups/test_group_1/events?from=invalid-date&to=2024-01-02T00:00:00%2B09:00",
+        "/api/v1/groups/test_group_1/events?from=invalid-date&limit=10",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+          },
+        },
+      );
+
+      expect(response.status).toBe(400);
+    });
+
+    it("不正なtoパラメータの場合は400が返されること", async () => {
+      const response = await app.request(
+        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&to=invalid-date&limit=10",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+          },
+        },
+      );
+
+      expect(response.status).toBe(400);
+    });
+
+    it("不正なlimitの場合は400が返されること", async () => {
+      const response = await app.request(
+        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&limit=invalid",
         {
           method: "GET",
           headers: {
@@ -164,7 +192,24 @@ describe("Events Controller", () => {
 
     it("正常にイベント一覧を取得できること", async () => {
       const response = await app.request(
-        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&to=2024-01-02T00:00:00%2B09:00",
+        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&limit=10",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+          },
+        },
+      );
+
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toHaveProperty("items");
+      expect(Array.isArray(json.items)).toBe(true);
+    });
+
+    it("toパラメータありで正常にイベント一覧を取得できること", async () => {
+      const response = await app.request(
+        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&to=2024-01-02T00:00:00%2B09:00&limit=10",
         {
           method: "GET",
           headers: {

@@ -34,7 +34,15 @@ const querySchema = z
     to: z
       .string()
       .datetime({ offset: true })
+      .optional()
       .openapi({ description: "取得終了日時" }),
+    limit: z
+      .string()
+      .transform((val) => Number.parseInt(val, 10))
+      .refine((val) => !Number.isNaN(val) && val > 0, {
+        message: "limitは正の整数である必要があります",
+      })
+      .openapi({ description: "取得件数上限" }),
   })
   .openapi({ description: "イベントの一覧を取得する際のクエリパラメータ" });
 
@@ -79,12 +87,14 @@ eventsRoutes.get(
   authentication,
   async (c) => {
     const groupId = c.req.param("groupId");
-    const { from: fromStr, to: toStr } = c.req.valid("query");
+    const { from: fromStr, to: toStr, limit } = c.req.valid("query");
 
     const from = DateTime.fromISO(fromStr, { zone: AppConfig.TIMEZONE });
-    const to = DateTime.fromISO(toStr, { zone: AppConfig.TIMEZONE });
+    const to = toStr
+      ? DateTime.fromISO(toStr, { zone: AppConfig.TIMEZONE })
+      : undefined;
 
-    if (!from.isValid || !to.isValid) {
+    if (!from.isValid || (to && !to.isValid)) {
       throw new HTTPException(400, {
         message: "日付のフォーマットが正しくありません。",
       });
@@ -125,6 +135,7 @@ eventsRoutes.get(
       singleEvents: true,
       timeMin: from,
       timeMax: to,
+      maxResults: limit,
       orderBy: "startTime",
       fields: "items(id,start,end,summary,description,location)",
     });
