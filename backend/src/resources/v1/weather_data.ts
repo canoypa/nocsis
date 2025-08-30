@@ -24,8 +24,10 @@ export const weatherDataSchema = z
       })
       .openapi({ description: "時間別天気予報" }),
 
+    // NOTE: 本来は tuple が適切だが、swagger_dart_code_generator が正しく型を生成できないため array を使用
     threeHour: z
-      .tuple([WeatherNameSchema, WeatherNameSchema, WeatherNameSchema])
+      .array(WeatherNameSchema)
+      .length(3)
       .openapi({ description: "3時間先までの天気" }),
   })
   .openapi({
