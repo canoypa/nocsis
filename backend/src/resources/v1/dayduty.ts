@@ -10,7 +10,5 @@ export const daydutyQuerySchema = z.object({
   }),
 });
 
-export const daydutyResponseSchema = classmateSchema.openapi({
-  ref: "DaydutyResponse",
-  description: "日直情報",
-});
+// dayduty は classmate をそのまま返す
+export const daydutyResponseSchema = classmateSchema;
