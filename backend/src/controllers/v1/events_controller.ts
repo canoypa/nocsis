@@ -36,12 +36,11 @@ const querySchema = z
       .datetime({ offset: true })
       .optional()
       .openapi({ description: "取得終了日時" }),
-    limit: z
-      .string()
-      .transform((val) => Number.parseInt(val, 10))
-      .refine((val) => !Number.isNaN(val) && val > 0, {
-        message: "limitは正の整数である必要があります",
-      })
+    limit: z.coerce
+      .number()
+      .int()
+      .positive({ message: "limitは正の整数である必要があります" })
+      .optional()
       .openapi({ description: "取得件数上限" }),
   })
   .openapi({ description: "イベントの一覧を取得する際のクエリパラメータ" });
