@@ -4,6 +4,7 @@ import 'package:animations/animations.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/models/user_joined_groups.dart';
 import 'package:nocsis/pages/classroom.dart';
@@ -23,6 +24,8 @@ import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
+import 'package:nocsis/providers/user.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'classroom_page_route.dart';
@@ -72,69 +75,74 @@ class GoRouterRefresher extends ChangeNotifier {
   }
 }
 
-Future<String?> _redirectNotLoggedInUser(GoRouterState state) async {
-  final user = await FirebaseAuth.instance.authStateChanges().first;
-  final isLoggedIn = user != null;
+@riverpod
+GoRouter router(Ref ref) {
+  final currentUser = ref.watch(currentUserProvider);
+  final isLoggedIn = currentUser != null;
 
-  if (isLoggedIn || state.matchedLocation == LoginPageRoute().location) {
-    return null;
+  Future<String?> redirectFromTopPage(Uri uri) async {
+    if (uri.path != '/') {
+      return null;
+    }
+
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final groupId = sharedPreferences.getString('latest_group_id');
+
+    if (groupId != null) {
+      return uri.path == '/'
+          ? "/groups/$groupId"
+          : "/groups/$groupId${uri.path}";
+    }
+
+    final res = await FirebaseFunctions.instanceFor(
+      region: "asia-northeast1",
+    ).httpsCallable("v4-groups-user_joined_groups-get").call();
+    final data = UserJoinedGroups.fromJson(res.data);
+
+    final firstUserJoinedGroup = data.groups.first;
+
+    sharedPreferences.setString(
+      'latest_group_id',
+      firstUserJoinedGroup.groupId,
+    );
+
+    return uri.path == '/'
+        ? "/groups/${firstUserJoinedGroup.groupId}"
+        : "/groups/${firstUserJoinedGroup.groupId}${uri.path}";
   }
 
-  final continueUri = state.uri.toString() == "/" ? null : state.uri;
-  return LoginPageRoute(continueUri: continueUri).location;
-}
+  Future<String?> redirectNotLoggedInUser(GoRouterState state) async {
+    if (isLoggedIn || state.matchedLocation == LoginPageRoute().location) {
+      return null;
+    }
 
-Future<String?> _redirectLoggedInUser(GoRouterState state) async {
-  final user = await FirebaseAuth.instance.authStateChanges().first;
-  final isLoggedIn = user != null;
-
-  if (!isLoggedIn || state.matchedLocation != LoginPageRoute().location) {
-    return null;
+    final continueUri = state.uri.toString() == "/" ? null : state.uri;
+    return LoginPageRoute(continueUri: continueUri).location;
   }
 
-  final continueUri = Uri.tryParse(
-    state.uri.queryParameters["continue-uri"] ?? "/",
+  Future<String?> redirectLoggedInUser(GoRouterState state) async {
+    if (!isLoggedIn || state.matchedLocation != LoginPageRoute().location) {
+      return null;
+    }
+
+    final continueUri = Uri.tryParse(
+      state.uri.queryParameters["continue-uri"] ?? "/",
+    );
+
+    if (continueUri == null) {
+      return "/";
+    }
+
+    return await redirectFromTopPage(continueUri) ?? continueUri.toString();
+  }
+
+  return GoRouter(
+    routes: $appRoutes,
+    refreshListenable: GoRouterRefresher(),
+    redirect: (context, state) async {
+      return await redirectNotLoggedInUser(state) ??
+          await redirectLoggedInUser(state) ??
+          await redirectFromTopPage(state.uri);
+    },
   );
-
-  if (continueUri == null) {
-    return "/";
-  }
-
-  return await _redirectFromTopPage(continueUri) ?? continueUri.toString();
 }
-
-Future<String?> _redirectFromTopPage(Uri uri) async {
-  if (uri.path != '/') {
-    return null;
-  }
-
-  final sharedPreferences = await SharedPreferences.getInstance();
-  final groupId = sharedPreferences.getString('latest_group_id');
-
-  if (groupId != null) {
-    return uri.path == '/' ? "/groups/$groupId" : "/groups/$groupId${uri.path}";
-  }
-
-  final res = await FirebaseFunctions.instanceFor(
-    region: "asia-northeast1",
-  ).httpsCallable("v4-groups-user_joined_groups-get").call();
-  final data = UserJoinedGroups.fromJson(res.data);
-
-  final firstUserJoinedGroup = data.groups.first;
-
-  sharedPreferences.setString('latest_group_id', firstUserJoinedGroup.groupId);
-
-  return uri.path == '/'
-      ? "/groups/${firstUserJoinedGroup.groupId}"
-      : "/groups/${firstUserJoinedGroup.groupId}${uri.path}";
-}
-
-final router = GoRouter(
-  routes: $appRoutes,
-  refreshListenable: GoRouterRefresher(),
-  redirect: (context, state) async {
-    return await _redirectNotLoggedInUser(state) ??
-        await _redirectLoggedInUser(state) ??
-        await _redirectFromTopPage(state.uri);
-  },
-);
