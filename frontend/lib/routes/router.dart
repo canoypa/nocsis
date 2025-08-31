@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:animations/animations.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -57,28 +56,16 @@ class AppShell extends ShellRouteData {
   }
 }
 
-class GoRouterRefresher extends ChangeNotifier {
-  late final StreamSubscription<dynamic> _auth;
-
-  GoRouterRefresher() {
+class _RouterRefresher extends ChangeNotifier {
+  void refresh() {
     notifyListeners();
-
-    _auth = FirebaseAuth.instance.authStateChanges().asBroadcastStream().listen(
-      (_) => notifyListeners(),
-    );
-  }
-
-  @override
-  void dispose() {
-    _auth.cancel();
-    super.dispose();
   }
 }
 
 @riverpod
 GoRouter router(Ref ref) {
-  final currentUser = ref.watch(currentUserProvider);
-  final isLoggedIn = currentUser != null;
+  final refresher = _RouterRefresher();
+  ref.listen(userChangesStreamProvider, (_, _) => refresher.refresh());
 
   Future<String?> redirectFromTopPage(Uri uri) async {
     if (uri.path != '/') {
@@ -112,6 +99,9 @@ GoRouter router(Ref ref) {
   }
 
   Future<String?> redirectNotLoggedInUser(GoRouterState state) async {
+    final currentUser = ref.read(currentUserProvider);
+    final isLoggedIn = currentUser != null;
+
     if (isLoggedIn || state.matchedLocation == LoginPageRoute().location) {
       return null;
     }
@@ -121,6 +111,9 @@ GoRouter router(Ref ref) {
   }
 
   Future<String?> redirectLoggedInUser(GoRouterState state) async {
+    final currentUser = ref.read(currentUserProvider);
+    final isLoggedIn = currentUser != null;
+
     if (!isLoggedIn || state.matchedLocation != LoginPageRoute().location) {
       return null;
     }
@@ -138,7 +131,7 @@ GoRouter router(Ref ref) {
 
   return GoRouter(
     routes: $appRoutes,
-    refreshListenable: GoRouterRefresher(),
+    refreshListenable: refresher,
     redirect: (context, state) async {
       return await redirectNotLoggedInUser(state) ??
           await redirectLoggedInUser(state) ??
