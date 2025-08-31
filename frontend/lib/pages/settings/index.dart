@@ -12,9 +12,7 @@ class SettingsTopPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref
-        .watch(userProvider)
-        .maybeWhen(data: (data) => data, orElse: () => null);
+    final user = ref.watch(currentUserProvider);
 
     if (user == null) {
       return const SizedBox();
@@ -228,9 +226,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref
-        .watch(userProvider)
-        .maybeWhen(data: (data) => data, orElse: () => null);
+    final user = ref.watch(currentUserProvider);
 
     if (user == null) {
       return const SizedBox.shrink();
@@ -353,9 +349,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref
-        .watch(userProvider)
-        .maybeWhen(data: (data) => data, orElse: () => null);
+    final user = ref.watch(currentUserProvider);
 
     if (user == null) {
       return const SizedBox.shrink();
