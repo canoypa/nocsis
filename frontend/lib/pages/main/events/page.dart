@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/models/monthly_events.dart';
+import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 
 final eventsProvider = FutureProvider.family<MonthlyEventList, String>((
@@ -12,6 +14,19 @@ final eventsProvider = FutureProvider.family<MonthlyEventList, String>((
 ) async {
   final DateTime now = DateTime.now();
   final DateTime today = DateTime(now.year, now.month, now.day);
+
+  // 新しいAPIの呼び出しテスト
+  try {
+    final client = await ref.read(apiClientProvider.future);
+    unawaited(
+      client
+          .apiV1GroupsGroupIdEventsGet(groupId: groupId, from: today, limit: 3)
+          .then((_) => print('[Events] New API test success'))
+          .catchError((error) => print('[Events] New API test error: $error')),
+    );
+  } catch (e) {
+    print('[Events] New API client initialization failed');
+  }
 
   final HttpsCallable getEvents = FirebaseFunctions.instanceFor(
     region: "asia-northeast1",

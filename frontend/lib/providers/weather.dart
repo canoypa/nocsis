@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/models/weather.dart';
+import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/cron.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -14,6 +16,19 @@ final fn = FirebaseFunctions.instanceFor(
 Future<Weather> weather(Ref ref, String groupId) async {
   // 15分ごとに更新
   ref.watch(cronProvider("*/15 * * * *"));
+
+  // 新しいAPIの呼び出しテスト
+  try {
+    final client = await ref.read(apiClientProvider.future);
+    unawaited(
+      client
+          .apiV1GroupsGroupIdWeatherNowGet(groupId: groupId)
+          .then((_) => print('[Weather] New API test success'))
+          .catchError((error) => print('[Weather] New API test error: $error')),
+    );
+  } catch (error) {
+    print('[Weather] New API client initialization failed');
+  }
 
   final res = await fn.call({'groupId': groupId});
 
