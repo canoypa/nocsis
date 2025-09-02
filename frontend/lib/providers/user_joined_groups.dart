@@ -19,12 +19,14 @@ Future<UserJoinedGroups> userJoinedGroups(Ref ref) async {
     unawaited(
       client
           .apiV1UsersMeGroupsGet()
-          .then((_) => print('[UserJoinedGroups] New API test success'))
-          .catchError(
-            (error) => print('[UserJoinedGroups] New API test error: $error'),
-          ),
+          .then((_) {})
+          .catchError((error) {
+            // ignore: avoid_print
+            print('[UserJoinedGroups] New API test error: $error');
+          }),
     );
   } catch (error) {
+    // ignore: avoid_print
     print('[UserJoinedGroups] New API client initialization failed');
   }
 

@@ -40,10 +40,14 @@ Future<EventList> events(Ref ref, String groupId) async {
             from: newApiFrom,
             to: newApiTo,
           )
-          .then((_) => print('[Events] New API test success'))
-          .catchError((error) => print('[Events] New API test error: $error')),
+          .then((_) {})
+          .catchError((error) {
+            // ignore: avoid_print
+            print('[Events] New API test error: $error');
+          }),
     );
   } catch (error) {
+    // ignore: avoid_print
     print('[Events] New API client initialization failed');
   }
 

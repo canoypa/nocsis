@@ -21,10 +21,14 @@ final eventsProvider = FutureProvider.family<MonthlyEventList, String>((
     unawaited(
       client
           .apiV1GroupsGroupIdEventsGet(groupId: groupId, from: today, limit: 3)
-          .then((_) => print('[Events] New API test success'))
-          .catchError((error) => print('[Events] New API test error: $error')),
+          .then((_) {})
+          .catchError((error) {
+            // ignore: avoid_print
+            print('[Events] New API test error: $error');
+          }),
     );
   } catch (e) {
+    // ignore: avoid_print
     print('[Events] New API client initialization failed');
   }
 

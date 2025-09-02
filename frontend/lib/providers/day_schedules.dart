@@ -45,11 +45,11 @@ Future<DaySchedules> daySchedules(Ref ref, String groupId, int epochDay) async {
             from: newApiFromDate,
             to: newApiToDate,
           )
-          .then((_) => print('[DaySchedules] New API classes test success'))
-          .catchError(
-            (error) =>
-                print('[DaySchedules] New API classes test error: $error'),
-          ),
+          .then((_) {})
+          .catchError((error) {
+            // ignore: avoid_print
+            print('[DaySchedules] New API classes test error: $error');
+          }),
     );
 
     unawaited(
@@ -59,13 +59,14 @@ Future<DaySchedules> daySchedules(Ref ref, String groupId, int epochDay) async {
             from: newApiFromDate,
             to: newApiToDate,
           )
-          .then((_) => print('[DaySchedules] New API events test success'))
-          .catchError(
-            (error) =>
-                print('[DaySchedules] New API events test error: $error'),
-          ),
+          .then((_) {})
+          .catchError((error) {
+            // ignore: avoid_print
+            print('[DaySchedules] New API events test error: $error');
+          }),
     );
   } catch (e) {
+    // ignore: avoid_print
     print('[DaySchedules] New API client initialization failed');
   }
 

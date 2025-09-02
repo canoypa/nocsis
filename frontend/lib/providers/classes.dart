@@ -32,10 +32,14 @@ Future<ClassList> classes(Ref ref, String groupId) async {
             from: newApiFrom,
             to: newApiTo,
           )
-          .then((_) => print('[Classes] New API test success'))
-          .catchError((error) => print('[Classes] New API test error: $error')),
+          .then((_) {})
+          .catchError((error) {
+            // ignore: avoid_print
+            print('[Classes] New API test error: $error');
+          }),
     );
   } catch (error) {
+    // ignore: avoid_print
     print('[Classes] New API client initialization failed');
   }
 

@@ -23,10 +23,14 @@ Future<Weather> weather(Ref ref, String groupId) async {
     unawaited(
       client
           .apiV1GroupsGroupIdWeatherNowGet(groupId: groupId)
-          .then((_) => print('[Weather] New API test success'))
-          .catchError((error) => print('[Weather] New API test error: $error')),
+          .then((_) {})
+          .catchError((error) {
+            // ignore: avoid_print
+            print('[Weather] New API test error: $error');
+          }),
     );
   } catch (error) {
+    // ignore: avoid_print
     print('[Weather] New API client initialization failed');
   }
 

@@ -24,10 +24,14 @@ Future<Daydudy> daydudy(Ref ref, String groupId) async {
     unawaited(
       client
           .apiV1GroupsGroupIdDaydutyGet(groupId: groupId, date: DateTime.now())
-          .then((_) => print('[Dayduty] New API test success'))
-          .catchError((error) => print('[Dayduty] New API test error: $error')),
+          .then((_) {})
+          .catchError((error) {
+            // ignore: avoid_print
+            print('[Dayduty] New API test error: $error');
+          }),
     );
   } catch (error) {
+    // ignore: avoid_print
     print('[Dayduty] New API client initialization failed');
   }
 

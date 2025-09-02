@@ -90,12 +90,14 @@ GoRouter router(Ref ref) {
       unawaited(
         client
             .apiV1UsersMeGroupsGet()
-            .then((_) => print('[Router] New API test success'))
-            .catchError(
-              (error) => print('[Router] New API test error: $error'),
-            ),
+            .then((_) {})
+            .catchError((error) {
+              // ignore: avoid_print
+              print('[Router] New API test error: $error');
+            }),
       );
     } catch (e) {
+      // ignore: avoid_print
       print('[Router] New API client initialization failed');
     }
 
