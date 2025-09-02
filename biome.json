@@ -1,8 +1,9 @@
 {
+  "root": true,
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
 
   "files": {
-    "ignore": ["coverage/", "dist/", "frontend/"]
+    "includes": ["**", "!**/coverage/", "!**/dist/", "!**/frontend/"]
   },
 
   "linter": {
@@ -19,8 +20,12 @@
     }
   },
 
-  "organizeImports": {
-    "enabled": true
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
   "formatter": {
     "enabled": true,
