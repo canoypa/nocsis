@@ -48,6 +48,7 @@ dev_dependencies:
   go_router_builder: ^3.0.0
   chopper_generator: ^8.1.0
   swagger_dart_code_generator: ^3.0.3
+  firebase_auth_mocks: ^0.14.1
 
 flutter:
   uses-material-design: true
