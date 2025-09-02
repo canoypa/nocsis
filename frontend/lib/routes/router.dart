@@ -23,6 +23,7 @@ import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
+import 'package:nocsis/providers/auth.dart';
 import 'package:nocsis/providers/user.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -65,7 +66,7 @@ class _RouterRefresher extends ChangeNotifier {
 @riverpod
 GoRouter router(Ref ref) {
   final refresher = _RouterRefresher();
-  ref.listen(userChangesStreamProvider, (_, _) => refresher.refresh());
+  ref.listen(authProvider, (_, _) => refresher.refresh());
 
   Future<String?> redirectFromTopPage(Uri uri) async {
     if (uri.path != '/') {
@@ -99,7 +100,7 @@ GoRouter router(Ref ref) {
   }
 
   Future<String?> redirectNotLoggedInUser(GoRouterState state) async {
-    final currentUser = ref.read(currentUserProvider);
+    final currentUser = await ref.read(userChangesStreamProvider.future);
     final isLoggedIn = currentUser != null;
 
     if (isLoggedIn || state.matchedLocation == LoginPageRoute().location) {
@@ -111,7 +112,7 @@ GoRouter router(Ref ref) {
   }
 
   Future<String?> redirectLoggedInUser(GoRouterState state) async {
-    final currentUser = ref.read(currentUserProvider);
+    final currentUser = await ref.read(userChangesStreamProvider.future);
     final isLoggedIn = currentUser != null;
 
     if (!isLoggedIn || state.matchedLocation != LoginPageRoute().location) {
