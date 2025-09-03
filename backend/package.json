@@ -15,7 +15,7 @@
     "@googleapis/calendar": "^10.0.1",
     "@hono/node-server": "^1.18.1",
     "@hono/zod-validator": "^0.4.1",
-    "@scalar/hono-api-reference": "^0.9.13",
+    "@scalar/hono-api-reference": "^0.9.16",
     "firebase-admin": "^13.4.0",
     "hono": "^4.9.4",
     "hono-openapi": "^0.4.8",
