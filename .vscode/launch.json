@@ -13,16 +13,14 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
-      "program": "frontend/lib/main.dart",
-      "args": ["--web-experimental-hot-reload"]
+      "program": "frontend/lib/main.dart"
     },
     {
       "name": "Run Flutter (release mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
-      "program": "frontend/lib/main.dart",
-      "args": ["--web-experimental-hot-reload"]
+      "program": "frontend/lib/main.dart"
     }
   ]
 }
