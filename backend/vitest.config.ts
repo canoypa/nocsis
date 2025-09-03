@@ -5,13 +5,18 @@ export default defineConfig({
     name: "default",
     include: ["src/**/*.spec.ts"],
     setupFiles: ["tests/setup.ts"],
-    // TODO: 必要そうだったらコメントアウトを外す
-    // fileParallelism: false,
-    // poolOptions: {
-    //   forks: {
-    //     singleFork: true,
-    //     isolate: false,
-    //   },
-    // },
+    fileParallelism: false,
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+        isolate: true,
+      },
+    },
+    sequence: {
+      concurrent: false,
+    },
+    mockReset: true,
+    clearMocks: true,
   },
 });
