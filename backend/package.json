@@ -16,7 +16,7 @@
     "@hono/node-server": "^1.18.1",
     "@hono/zod-validator": "^0.4.1",
     "@scalar/hono-api-reference": "^0.9.16",
-    "firebase-admin": "^13.4.0",
+    "firebase-admin": "^13.5.0",
     "hono": "^4.9.6",
     "hono-openapi": "^0.4.8",
     "luxon": "^3.6.1",
