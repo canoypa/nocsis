@@ -10,7 +10,7 @@ import {
   authentication,
   getUser,
 } from "../../middlewares/authenticate.js";
-import { groupSchema } from "../../models/resources/v1/groups/group.js";
+import { groupSchema } from "../../resources/v1/groups.js";
 
 import "zod-openapi/extend";
 
@@ -34,7 +34,6 @@ const patchJsonSchema = groupSchema
   });
 
 groupRoutes
-  .use("*", authentication)
   .get(
     "/:id",
     describeRoute({
@@ -63,6 +62,7 @@ groupRoutes
       validateResponse: true,
     }),
     validator("param", paramSchema),
+    authentication,
     async (c) => {
       const groupId = c.req.param("id");
 
@@ -128,6 +128,7 @@ groupRoutes
     }),
     validator("param", paramSchema),
     validator("json", patchJsonSchema),
+    authentication,
     async (c) => {
       const groupId = c.req.param("id");
       const data = c.req.valid("json");
