@@ -23,7 +23,11 @@ Future<ClassList> classes(Ref ref, String groupId) async {
   try {
     final client = await ref.read(apiClientProvider.future);
     final newApiFrom = DateTime(now.year, now.month, now.day);
-    final newApiTo = DateTime(now.year, now.month, now.day + 1);
+    final newApiTo = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).add(Duration(days: 1));
 
     unawaited(
       client

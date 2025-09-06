@@ -31,7 +31,11 @@ Future<EventList> events(Ref ref, String groupId) async {
   try {
     final client = await ref.read(apiClientProvider.future);
     final newApiFrom = DateTime(now.year, now.month, now.day);
-    final newApiTo = DateTime(now.year, now.month, now.day + 30); // 1か月分
+    final newApiTo = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).add(Duration(days: 30)); // 1か月分
 
     unawaited(
       client
