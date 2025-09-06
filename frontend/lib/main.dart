@@ -1,4 +1,3 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -24,9 +23,6 @@ void main() async {
 
   if (kDebugMode) {
     await FirebaseAuth.instance.useAuthEmulator("localhost", 9099);
-    FirebaseFunctions.instanceFor(
-      region: "asia-northeast1",
-    ).useFunctionsEmulator("localhost", 5001);
   }
 
   runApp(const ProviderScope(child: MyApp()));

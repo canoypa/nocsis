@@ -1,11 +1,9 @@
 import 'dart:async';
 
 import 'package:animations/animations.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/models/user_joined_groups.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
@@ -83,39 +81,23 @@ GoRouter router(Ref ref) {
           : "/groups/$groupId${uri.path}";
     }
 
-    // 新しいAPIの呼び出しテスト
-    try {
-      final client = await ref.read(apiClientProvider.future);
+    final client = await ref.read(apiClientProvider.future);
+    final response = await client.apiV1UsersMeGroupsGet();
 
-      unawaited(
-        client
-            .apiV1UsersMeGroupsGet()
-            .then((_) {})
-            .catchError((error) {
-              // ignore: avoid_print
-              print('[Router] New API test error: $error');
-            }),
+    if (!response.isSuccessful || response.body == null) {
+      throw Exception(
+        'User joined groups fetch failed: ${response.statusCode}',
       );
-    } catch (e) {
-      // ignore: avoid_print
-      print('[Router] New API client initialization failed');
     }
 
-    final res = await FirebaseFunctions.instanceFor(
-      region: "asia-northeast1",
-    ).httpsCallable("v4-groups-user_joined_groups-get").call();
-    final data = UserJoinedGroups.fromJson(res.data);
+    final data = response.body!;
+    final firstUserJoinedGroup = data.items.first;
 
-    final firstUserJoinedGroup = data.groups.first;
-
-    sharedPreferences.setString(
-      'latest_group_id',
-      firstUserJoinedGroup.groupId,
-    );
+    sharedPreferences.setString('latest_group_id', firstUserJoinedGroup.id);
 
     return uri.path == '/'
-        ? "/groups/${firstUserJoinedGroup.groupId}"
-        : "/groups/${firstUserJoinedGroup.groupId}${uri.path}";
+        ? "/groups/${firstUserJoinedGroup.id}"
+        : "/groups/${firstUserJoinedGroup.id}${uri.path}";
   }
 
   Future<String?> redirectNotLoggedInUser(GoRouterState state) async {
