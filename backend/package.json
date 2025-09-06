@@ -13,7 +13,7 @@
   "dependencies": {
     "@google-cloud/secret-manager": "^6.0.1",
     "@googleapis/calendar": "^10.0.1",
-    "@hono/node-server": "^1.18.1",
+    "@hono/node-server": "^1.19.1",
     "@hono/zod-validator": "^0.4.1",
     "@scalar/hono-api-reference": "^0.9.16",
     "firebase-admin": "^13.5.0",
