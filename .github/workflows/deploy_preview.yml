@@ -27,7 +27,7 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@v2
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
       - name: Build
         run: flutter build web --wasm
       - name: Deploy
