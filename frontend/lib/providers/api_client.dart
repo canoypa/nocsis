@@ -10,7 +10,7 @@ part 'api_client.g.dart';
 
 const String _baseUrl = kDebugMode
     ? 'http://localhost:8080'
-    : 'https://nocsis.app/api';
+    : 'https://nocsis.app';
 
 class BearerAuthInterceptor implements Interceptor {
   final String token;
@@ -30,10 +30,7 @@ class BearerAuthInterceptor implements Interceptor {
 
 @riverpod
 Future<BearerAuthInterceptor> firebaseAuthInterceptor(Ref ref) async {
-  final user = ref.watch(currentUserProvider);
-  if (user == null) {
-    throw Exception('User not authenticated');
-  }
+  final user = ref.watch(authenticatedUserProvider);
 
   final token = await user.getIdToken();
   if (token == null) {

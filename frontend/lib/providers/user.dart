@@ -13,6 +13,19 @@ Stream<User?> userChangesStream(Ref ref) {
 
 @riverpod
 User? currentUser(Ref ref) {
-  final userAsync = ref.watch(userChangesStreamProvider);
-  return userAsync.maybeWhen(data: (user) => user, orElse: () => null);
+  ref.watch(userChangesStreamProvider);
+
+  final auth = ref.watch(firebaseAuthProvider);
+  return auth.currentUser;
+}
+
+@riverpod
+User authenticatedUser(Ref ref) {
+  final user = ref.watch(currentUserProvider);
+
+  if (user == null) {
+    throw Exception('User not authenticated');
+  }
+
+  return user;
 }
