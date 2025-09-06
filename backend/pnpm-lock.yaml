@@ -12,8 +12,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       '@googleapis/calendar':
-        specifier: ^10.0.1
-        version: 10.0.1
+        specifier: ^11.0.1
+        version: 11.0.1
       '@hono/node-server':
         specifier: ^1.18.1
         version: 1.18.1(hono@4.9.6)
@@ -568,8 +568,8 @@ packages:
     resolution: {integrity: sha512-5m9GoZqKh52a1UqkxDBu/+WVFDALNtHg5up5gNmNbXQWBcV813tzJKsyDtKjOPrlR1em1TxtD7NSPCrObH7koQ==}
     engines: {node: '>=14'}
 
-  '@googleapis/calendar@10.0.1':
-    resolution: {integrity: sha512-lOYg3r1MkGsLTQfuIjspIaSvFv0a7Ldi/SvRuQnQ5E6d9DdXbILOhlPpXefxN6hi7BIvWKG0F5pLoc6kK12chA==}
+  '@googleapis/calendar@11.0.1':
+    resolution: {integrity: sha512-XR6/V8SjuOyGMMx5shcKB2Ouyqkw2OG5a1srCb6ifPkIJG5qu/aocQ4VVizPc89izgdCGaKqcSpRFNJUsUuizg==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sqladmin@31.1.0':
@@ -1969,6 +1969,10 @@ packages:
 
   gaxios@7.1.0:
     resolution: {integrity: sha512-y1Q0MX1Ba6eg67Zz92kW0MHHhdtWksYckQy1KJsI6P4UlDQ8cvdvpLEPslD/k7vFkdPppMESFGTvk7XpSiKj8g==}
+    engines: {node: '>=18'}
+
+  gaxios@7.1.1:
+    resolution: {integrity: sha512-Odju3uBUJyVCkW64nLD4wKLhbh93bh6vIg/ZIXkWiLPBrdgtc65+tls/qml+un3pr6JqYVFDZbbmLDQT68rTOQ==}
     engines: {node: '>=18'}
 
   gcp-metadata@6.1.1:
@@ -4265,7 +4269,7 @@ snapshots:
       - supports-color
     optional: true
 
-  '@googleapis/calendar@10.0.1':
+  '@googleapis/calendar@11.0.1':
     dependencies:
       googleapis-common: 8.0.2-rc.0
     transitivePeerDependencies:
@@ -5911,6 +5915,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  gaxios@7.1.1:
+    dependencies:
+      extend: 3.0.2
+      https-proxy-agent: 7.0.6
+      node-fetch: 3.3.2
+    transitivePeerDependencies:
+      - supports-color
+
   gcp-metadata@6.1.1(encoding@0.1.13):
     dependencies:
       gaxios: 6.7.1(encoding@0.1.13)
@@ -5922,7 +5934,7 @@ snapshots:
 
   gcp-metadata@7.0.1:
     dependencies:
-      gaxios: 7.1.0
+      gaxios: 7.1.1
       google-logging-utils: 1.1.1
       json-bigint: 1.0.0
     transitivePeerDependencies:
@@ -5989,7 +6001,7 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 7.1.0
+      gaxios: 7.1.1
       gcp-metadata: 7.0.1
       google-logging-utils: 1.1.1
       gtoken: 8.0.0
@@ -6051,7 +6063,7 @@ snapshots:
   googleapis-common@8.0.2-rc.0:
     dependencies:
       extend: 3.0.2
-      gaxios: 7.1.0
+      gaxios: 7.1.1
       google-auth-library: 10.3.0
       qs: 6.14.0
       url-template: 2.0.8
@@ -6076,7 +6088,7 @@ snapshots:
 
   gtoken@8.0.0:
     dependencies:
-      gaxios: 7.1.0
+      gaxios: 7.1.1
       jws: 4.0.0
     transitivePeerDependencies:
       - supports-color
