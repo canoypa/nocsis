@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/models/user_joined_groups.dart';
+import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
@@ -80,6 +81,24 @@ GoRouter router(Ref ref) {
       return uri.path == '/'
           ? "/groups/$groupId"
           : "/groups/$groupId${uri.path}";
+    }
+
+    // 新しいAPIの呼び出しテスト
+    try {
+      final client = await ref.read(apiClientProvider.future);
+
+      unawaited(
+        client
+            .apiV1UsersMeGroupsGet()
+            .then((_) {})
+            .catchError((error) {
+              // ignore: avoid_print
+              print('[Router] New API test error: $error');
+            }),
+      );
+    } catch (e) {
+      // ignore: avoid_print
+      print('[Router] New API client initialization failed');
     }
 
     final res = await FirebaseFunctions.instanceFor(

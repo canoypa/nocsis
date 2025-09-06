@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/models/events.dart';
+import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/cron.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -23,6 +25,34 @@ Future<EventList> events(Ref ref, String groupId) async {
 
   if (res.data == null) {
     throw Exception("No data");
+  }
+
+  // 新しいAPIの呼び出しテスト
+  try {
+    final client = await ref.read(apiClientProvider.future);
+    final newApiFrom = DateTime(now.year, now.month, now.day);
+    final newApiTo = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).add(Duration(days: 30)); // 1か月分
+
+    unawaited(
+      client
+          .apiV1GroupsGroupIdEventsGet(
+            groupId: groupId,
+            from: newApiFrom,
+            to: newApiTo,
+          )
+          .then((_) {})
+          .catchError((error) {
+            // ignore: avoid_print
+            print('[Events] New API test error: $error');
+          }),
+    );
+  } catch (error) {
+    // ignore: avoid_print
+    print('[Events] New API client initialization failed');
   }
 
   return EventList.fromJson(res.data);
