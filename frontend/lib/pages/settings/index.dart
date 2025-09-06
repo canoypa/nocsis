@@ -12,11 +12,7 @@ class SettingsTopPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(currentUserProvider);
-
-    if (user == null) {
-      return const SizedBox();
-    }
+    final user = ref.watch(authenticatedUserProvider);
 
     final googleEmail = user.providerData
         .firstWhereOrNull((e) => e.providerId == GoogleAuthProvider.PROVIDER_ID)
