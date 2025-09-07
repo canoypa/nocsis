@@ -40,7 +40,7 @@ class WeatherInfo extends ConsumerWidget {
         Row(
           children: [
             SvgPicture.asset(
-              _getWeatherIconPath(weather.current.name),
+              _getWeatherIconPath(weather.current.name.value ?? 'Unknown'),
               width: 80.sp,
               height: 80.sp,
             ),
@@ -50,7 +50,7 @@ class WeatherInfo extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  weather.current.temp.toString(),
+                  weather.current.temp.round().toString(),
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
                 Text("℃", style: Theme.of(context).textTheme.titleMedium),
@@ -63,7 +63,7 @@ class WeatherInfo extends ConsumerWidget {
               weather.threeHour
                   .map(
                     (e) => SvgPicture.asset(
-                      _getWeatherIconPath(e),
+                      _getWeatherIconPath(e.value ?? 'Unknown'),
                       width: 48.sp,
                       height: 48.sp,
                     ),

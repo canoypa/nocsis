@@ -1,59 +1,33 @@
-import 'dart:async';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nocsis/models/events.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/cron.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'events.g.dart';
 
-final fn = FirebaseFunctions.instanceFor(
-  region: "asia-northeast1",
-).httpsCallable("v4-events-get");
-
 @riverpod
-Future<EventList> events(Ref ref, String groupId) async {
+Future<ApiV1GroupsGroupIdEventsGet$Response> events(
+  Ref ref,
+  String groupId,
+) async {
   // 一日ごとに取得
   ref.watch(cronProvider("0 0 * * *"));
 
   final now = DateTime.now();
-  final from = DateTime(now.year, now.month, now.day).toIso8601String();
-  const limit = 3;
+  final from = DateTime(now.year, now.month, now.day);
+  final to = DateTime(now.year, now.month, now.day + 30); // 1か月分取得
 
-  final res = await fn.call({'groupId': groupId, "from": from, "limit": limit});
+  final client = await ref.read(apiClientProvider.future);
+  final response = await client.apiV1GroupsGroupIdEventsGet(
+    groupId: groupId,
+    from: from,
+    to: to,
+  );
 
-  if (res.data == null) {
-    throw Exception("No data");
+  if (response.isSuccessful && response.body != null) {
+    return response.body!;
+  } else {
+    throw Exception('Events fetch failed: ${response.statusCode}');
   }
-
-  // 新しいAPIの呼び出しテスト
-  try {
-    final client = await ref.read(apiClientProvider.future);
-    final newApiFrom = DateTime(now.year, now.month, now.day);
-    final newApiTo = DateTime(
-      now.year,
-      now.month,
-      now.day,
-    ).add(Duration(days: 30)); // 1か月分
-
-    unawaited(
-      client
-          .apiV1GroupsGroupIdEventsGet(
-            groupId: groupId,
-            from: newApiFrom,
-            to: newApiTo,
-          )
-          .then((_) {})
-          .catchError((error) {
-            // ignore: avoid_print
-            print('[Events] New API test error: $error');
-          }),
-    );
-  } catch (error) {
-    // ignore: avoid_print
-    print('[Events] New API client initialization failed');
-  }
-
-  return EventList.fromJson(res.data);
 }

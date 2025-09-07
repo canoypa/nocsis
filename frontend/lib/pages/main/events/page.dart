@@ -1,47 +1,58 @@
-import 'dart:async';
-import 'package:cloud_functions/cloud_functions.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
-import 'package:nocsis/models/monthly_events.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 
-final eventsProvider = FutureProvider.family<MonthlyEventList, String>((
+// 月毎のイベントグループ
+class MonthEventGroup {
+  final String month;
+  final List<Event> items;
+
+  MonthEventGroup({required this.month, required this.items});
+}
+
+final eventsProvider = FutureProvider.family<List<MonthEventGroup>, String>((
   ref,
   groupId,
 ) async {
   final DateTime now = DateTime.now();
   final DateTime today = DateTime(now.year, now.month, now.day);
 
-  // 新しいAPIの呼び出しテスト
-  try {
-    final client = await ref.read(apiClientProvider.future);
-    unawaited(
-      client
-          .apiV1GroupsGroupIdEventsGet(groupId: groupId, from: today, limit: 3)
-          .then((_) {})
-          .catchError((error) {
-            // ignore: avoid_print
-            print('[Events] New API test error: $error');
-          }),
-    );
-  } catch (e) {
-    // ignore: avoid_print
-    print('[Events] New API client initialization failed');
+  final client = await ref.read(apiClientProvider.future);
+
+  final response = await client.apiV1GroupsGroupIdEventsGet(
+    groupId: groupId,
+    from: today,
+    limit: 3,
+  );
+
+  if (response.isSuccessful && response.body != null) {
+    final events = response.body!.items;
+
+    // 月毎にグループ化
+    final monthGroups = groupBy(events, (Event event) {
+      final DateTime? startDate = DateTime.tryParse(event.startAt as String);
+      return DateFormat('yyyy-MM').format(startDate!);
+    });
+
+    // MonthEventGroupのリストに変換
+    final result = monthGroups.entries.map((entry) {
+      final date = DateTime.parse('${entry.key}-01');
+      final monthName = DateFormat('yyyy-MM').format(date);
+      return MonthEventGroup(month: monthName, items: entry.value);
+    }).toList();
+
+    // 日付順にソート
+    result.sort((a, b) => a.month.compareTo(b.month));
+
+    return result;
+  } else {
+    throw Exception('Events fetch failed: ${response.statusCode}');
   }
-
-  final HttpsCallable getEvents = FirebaseFunctions.instanceFor(
-    region: "asia-northeast1",
-  ).httpsCallable("v4-events-monthly");
-
-  final res = await getEvents.call({
-    'groupId': groupId,
-    "date": today.toIso8601String(),
-  });
-
-  return MonthlyEventList.fromJson({"items": res.data});
 });
 
 class EventsView extends ConsumerWidget {
@@ -53,8 +64,8 @@ class EventsView extends ConsumerWidget {
     final snap = ref.watch(eventsProvider(groupId));
 
     return snap.when(
-      data: (d) {
-        if (d.items.isEmpty) {
+      data: (monthGroups) {
+        if (monthGroups.isEmpty) {
           return const Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -65,27 +76,32 @@ class EventsView extends ConsumerWidget {
 
         return ListView.builder(
           controller: ScrollController(),
-          itemCount: d.items.length,
+          itemCount: monthGroups.length,
           itemBuilder: (c, i) {
+            final monthGroup = monthGroups[i];
             return Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 800),
                 child: Column(
                   children: [
-                    ListTile(title: Text("${d.items[i].month}月")),
+                    ListTile(title: Text("${monthGroup.month.split('-')[1]}月")),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
-                        children: (d.items[i].items).map((data) {
+                        children: monthGroup.items.map((event) {
+                          final DateTime? startDate = DateTime.tryParse(
+                            event.startAt as String,
+                          );
+
                           return BasicCard(
                             primary: Text(
-                              data.title,
+                              event.title,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             // TODO: 日を跨いだりする場合の表示に対応する
                             secondary: Text(
-                              DateFormat("M月d日").format(data.startAt),
+                              DateFormat("M月d日").format(startDate!),
                             ),
                           );
                         }).toList(),

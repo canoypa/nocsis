@@ -1,17 +1,15 @@
-import 'dart:math';
-
 import 'package:collection/collection.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nocsis/models/weather.dart';
+import 'package:nocsis/generated/api_client/api.swagger.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/weather.dart';
 
 // 初回読み込み中のデータ
-final _initWeatherHourly = WeatherHourly(
-  temp: List.generate(8, (index) => 0),
-  pop: List.generate(8, (index) => 0),
+final _initWeatherHourly = WeatherData$Hourly(
+  temp: List.generate(8, (index) => 0.0),
+  pop: List.generate(8, (index) => 0.0),
 );
 
 class WeatherGraph extends ConsumerWidget {
@@ -39,8 +37,8 @@ class WeatherGraph extends ConsumerWidget {
 
 class _Canvas extends ConsumerStatefulWidget {
   final BoxConstraints constraints;
-  final List<num> temp;
-  final List<num> pop;
+  final List<double> temp;
+  final List<double> pop;
 
   const _Canvas({
     required this.constraints,
@@ -96,8 +94,8 @@ class _CanvasState extends ConsumerState<_Canvas>
     final width = widget.constraints.maxWidth;
     final height = widget.constraints.maxHeight;
 
-    final tempMax = widget.temp.reduce(max);
-    final tempMin = widget.temp.reduce(min);
+    final tempMax = widget.temp.reduce((a, b) => a > b ? a : b);
+    final tempMin = widget.temp.reduce((a, b) => a < b ? a : b);
     final tempRange = tempMax - tempMin;
     final isInitial = widget.temp.every((e) => e == 0);
 

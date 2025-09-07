@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:nocsis/models/classes.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 
 class DuringClassProgress extends StatefulWidget {
-  final ClassData data;
+  final Class data;
 
   const DuringClassProgress({super.key, required this.data});
 
