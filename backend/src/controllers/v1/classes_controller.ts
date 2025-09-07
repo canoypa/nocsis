@@ -128,9 +128,28 @@ classesRoutes.get(
     assert(events.items, "イベントが存在しません。");
 
     const classes = events.items.map((item, index) => {
+      // Google Calendar から取得した日時を DateTime で統一処理
+      const startDate = item.start?.dateTime || item.start?.date;
+      const endDate = item.end?.dateTime || item.end?.date;
+
+      if (!startDate || !endDate) {
+        throw new HTTPException(500, {
+          message: "イベントの開始日時または終了日時が取得できませんでした。",
+        });
+      }
+
+      const startAt = DateTime.fromISO(startDate, { zone: AppConfig.TIMEZONE });
+      const endAt = DateTime.fromISO(endDate, { zone: AppConfig.TIMEZONE });
+
+      if (!startAt.isValid || !endAt.isValid) {
+        throw new HTTPException(500, {
+          message: "日時の変換に失敗しました。",
+        });
+      }
+
       return classSchema.parse({
-        startAt: item.start?.dateTime,
-        endAt: item.end?.dateTime,
+        startAt: startAt.toISO(),
+        endAt: endAt.toISO(),
         title: item.summary,
         period: index + 1,
       });
