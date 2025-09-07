@@ -101,23 +101,20 @@ eventsRoutes.get(
 
     const uid = getCurrentUserId(c);
 
-    const groupSnapshot = await firestore
-      .collection("groups")
-      .doc(groupId)
-      .get();
+    // Firestore 並列クエリ: グループ存在 & 参加チェック
+    const [groupSnapshot, userJoinedGroupSnapshot] = await Promise.all([
+      firestore.collection("groups").doc(groupId).get(),
+      firestore
+        .collection("user_joined_groups")
+        .where("user_id", "==", uid)
+        .where("group_id", "==", groupId)
+        .get(),
+    ]);
     if (!groupSnapshot.exists) {
       throw new HTTPException(404, { message: "グループが存在しません。" });
     }
-
-    const userJoinedGroupSnapshot = await firestore
-      .collection("user_joined_groups")
-      .where("user_id", "==", uid)
-      .where("group_id", "==", groupId)
-      .get();
     if (userJoinedGroupSnapshot.empty) {
-      throw new HTTPException(403, {
-        message: "グループに参加していません。",
-      });
+      throw new HTTPException(403, { message: "グループに参加していません。" });
     }
 
     const group = groupSnapshot.data();
