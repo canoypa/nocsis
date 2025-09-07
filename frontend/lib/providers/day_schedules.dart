@@ -23,21 +23,32 @@ Future<DaySchedules> daySchedules(Ref ref, String groupId, int epochDay) async {
 
   final client = await ref.read(apiClientProvider.future);
 
-  final result = await Future.wait([
-    client.apiV1GroupsGroupIdClassesGet(groupId: groupId, from: from, to: to),
-    client.apiV1GroupsGroupIdEventsGet(groupId: groupId, from: from, to: to),
-  ]);
+  final classesRequest = client.apiV1GroupsGroupIdClassesGet(
+    groupId: groupId,
+    from: from,
+    to: to,
+  );
+  final eventsRequest = client.apiV1GroupsGroupIdEventsGet(
+    groupId: groupId,
+    from: from,
+    to: to,
+  );
 
-  if (!result[0].isSuccessful || result[0].body == null) {
-    throw Exception('Classes fetch failed: ${result[0].statusCode}');
+  final (classesResponse, eventsResponse) = await (
+    classesRequest,
+    eventsRequest,
+  ).wait;
+
+  if (!classesResponse.isSuccessful || classesResponse.body == null) {
+    throw Exception('Classes fetch failed: ${classesResponse.statusCode}');
   }
-  if (!result[1].isSuccessful || result[1].body == null) {
-    throw Exception('Events fetch failed: ${result[1].statusCode}');
+  if (!eventsResponse.isSuccessful || eventsResponse.body == null) {
+    throw Exception('Events fetch failed: ${eventsResponse.statusCode}');
   }
 
   final newData = DaySchedules(
-    classes: result[0].body! as ApiV1GroupsGroupIdClassesGet$Response,
-    events: result[1].body! as ApiV1GroupsGroupIdEventsGet$Response,
+    classes: classesResponse.body!,
+    events: eventsResponse.body!,
   );
 
   return newData;
