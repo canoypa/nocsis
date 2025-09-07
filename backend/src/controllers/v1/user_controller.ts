@@ -5,7 +5,7 @@ import { firestore } from "../../clients/firebase.js";
 import {
   type AuthenticatedEnv,
   authentication,
-  getUser,
+  getCurrentUserId,
 } from "../../middlewares/authenticate.js";
 import { userJoinedGroupsSchema } from "../../resources/v1/user_joined_groups.js";
 
@@ -35,11 +35,11 @@ userRoutes.use("*", authentication).get(
     validateResponse: true,
   }),
   async (c) => {
-    const user = getUser(c);
+    const uid = getCurrentUserId(c);
 
     const userJoinedGroupsSnapshot = await firestore
       .collection("user_joined_groups")
-      .where("user_id", "==", user.uid)
+      .where("user_id", "==", uid)
       .get();
 
     // 参加しているグループIDを取得

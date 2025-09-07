@@ -1,12 +1,11 @@
 import assert from "node:assert";
-import type { UserRecord } from "firebase-admin/auth";
 import type { Context } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 import { auth } from "../clients/firebase.js";
 
 export type AuthenticatedEnv = {
   Variables: {
-    currentUser: UserRecord;
+    currentUserId: string;
   };
 };
 
@@ -14,9 +13,8 @@ export const authentication = bearerAuth({
   verifyToken: async (token, c) => {
     try {
       const { uid } = await auth.verifyIdToken(token);
-      const user = await auth.getUser(uid);
 
-      c.set("currentUser", user);
+      c.set("currentUserId", uid);
     } catch (err) {
       if (
         process.env.NODE_ENV === "development" ||
@@ -32,9 +30,9 @@ export const authentication = bearerAuth({
   },
 });
 
-export const getUser = (c: Context<AuthenticatedEnv>): UserRecord => {
-  const user = c.get("currentUser");
-  assert(user);
+export const getCurrentUserId = (c: Context<AuthenticatedEnv>): string => {
+  const uid = c.get("currentUserId");
+  assert(uid);
 
-  return user;
+  return uid;
 };
