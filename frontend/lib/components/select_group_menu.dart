@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/models/user_joined_groups.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/user_joined_groups.dart';
 
@@ -25,17 +25,17 @@ class SelectGroupMenu extends ConsumerWidget {
         .watch(userJoinedGroupsProvider)
         .maybeWhen(
           data: (data) => data,
-          orElse: () => UserJoinedGroups(groups: []),
+          orElse: () => UserJoinedGroups(items: []),
         );
 
     final groupId = ref.watch(currentGroupIdProvider);
 
     return DropdownButton(
-      items: userJoinedGroups.groups
+      items: userJoinedGroups.items
           .map(
             (group) => DropdownMenuItem(
-              value: group.groupId,
-              child: Text(group.groupName),
+              value: group.id,
+              child: Text(group.name),
             ),
           )
           .toList(),
