@@ -1,4 +1,3 @@
-import { inspect } from "node:util";
 import type { UserRecord } from "firebase-admin/auth";
 import { beforeEach, describe, expect, it } from "vitest";
 import { type LoginResult, login } from "../../../tests/helpers/users.js";
