@@ -20,7 +20,7 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@v2
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --prefer-frozen-lockfile
       - name: Test
         run: pnpm run test
 
@@ -35,7 +35,7 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@v2
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --prefer-frozen-lockfile
       - name: Test
         run: pnpm run test
 
@@ -50,9 +50,9 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@v2
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
       - name: Generate OpenAPI spec
-        run: pnpm install && pnpm run generate-openapi
+        run: pnpm install --prefer-frozen-lockfile && pnpm run generate-openapi
         working-directory: ./backend
       - name: Run build_runner
         run: flutter pub run build_runner build
