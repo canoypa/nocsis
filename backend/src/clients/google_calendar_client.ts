@@ -1,6 +1,6 @@
 import {
-  type calendar_v3 as CalendarV3,
   auth,
+  type calendar_v3 as CalendarV3,
   calendar,
 } from "@googleapis/calendar";
 import { fetchSecret } from "../services/secret_manager_service.js";
@@ -16,7 +16,7 @@ const authorize = async () => {
   let key: { client_email?: string; private_key?: string };
   try {
     key = JSON.parse(keyJson);
-  } catch (error) {
+  } catch (_error) {
     throw new Error("Failed to parse CALENDAR_ACCOUNT_KEY as JSON");
   }
 
