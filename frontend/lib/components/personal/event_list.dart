@@ -22,7 +22,7 @@ class EventListView extends StatelessWidget {
               // FIXME: swagger-dart-code-generator の制限により anyOf が dynamic 型になってしまうので、String として扱う
               final DateTime? startDate = DateTime.tryParse(
                 data.startAt as String,
-              );
+              )?.toLocal();
 
               final String dateText = startDate != null
                   ? DateFormat("M月d日").format(startDate)
