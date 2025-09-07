@@ -1,14 +1,14 @@
 import assert from "node:assert";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/zod";
-import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
 import {
   type AuthenticatedEnv,
   authentication,
-  getUser,
+  getCurrentUserId,
 } from "../../middlewares/authenticate.js";
 import { groupSchema } from "../../resources/v1/groups.js";
 
@@ -66,7 +66,7 @@ groupRoutes
     async (c) => {
       const groupId = c.req.param("id");
 
-      const user = getUser(c);
+      const uid = getCurrentUserId(c);
 
       const groupSnapshot = await firestore
         .collection("groups")
@@ -78,7 +78,7 @@ groupRoutes
 
       const userJoinedGroupSnapshot = await firestore
         .collection("user_joined_groups")
-        .where("user_id", "==", user.uid)
+        .where("user_id", "==", uid)
         .where("group_id", "==", groupId)
         .get();
       if (userJoinedGroupSnapshot.empty) {
@@ -133,7 +133,7 @@ groupRoutes
       const groupId = c.req.param("id");
       const data = c.req.valid("json");
 
-      const user = getUser(c);
+      const uid = getCurrentUserId(c);
 
       const groupRef = firestore.collection("groups").doc(groupId);
 
@@ -144,7 +144,7 @@ groupRoutes
 
       const userJoinedGroupSnapshot = await firestore
         .collection("user_joined_groups")
-        .where("user_id", "==", user.uid)
+        .where("user_id", "==", uid)
         .where("group_id", "==", groupId)
         .get();
       if (userJoinedGroupSnapshot.empty) {

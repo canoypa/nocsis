@@ -1,14 +1,13 @@
-import assert from "node:assert";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/zod";
-import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
 import {
   type AuthenticatedEnv,
   authentication,
-  getUser,
+  getCurrentUserId,
 } from "../../middlewares/authenticate.js";
 import { weatherDataSchema } from "../../resources/v1/weather_data.js";
 import {
@@ -51,7 +50,7 @@ weatherRoutes.get(
   authentication,
   async (c) => {
     const groupId = c.req.param("groupId");
-    const user = getUser(c);
+    const uid = getCurrentUserId(c);
 
     const groupSnapshot = await firestore
       .collection("groups")
@@ -63,7 +62,7 @@ weatherRoutes.get(
 
     const userJoinedGroupSnapshot = await firestore
       .collection("user_joined_groups")
-      .where("user_id", "==", user.uid)
+      .where("user_id", "==", uid)
       .where("group_id", "==", groupId)
       .get();
     if (userJoinedGroupSnapshot.empty) {

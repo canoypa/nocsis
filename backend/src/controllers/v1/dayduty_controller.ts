@@ -1,7 +1,7 @@
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/zod";
-import { HTTPException } from "hono/http-exception";
 import { DateTime } from "luxon";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
@@ -9,7 +9,7 @@ import { AppConfig } from "../../config/app_config.js";
 import {
   type AuthenticatedEnv,
   authentication,
-  getUser,
+  getCurrentUserId,
 } from "../../middlewares/authenticate.js";
 import {
   daydutyQuerySchema,
@@ -63,7 +63,7 @@ daydutRoutes.get(
   async (c) => {
     const groupId = c.req.param("groupId");
     const { date } = c.req.valid("query");
-    const user = getUser(c);
+    const uid = getCurrentUserId(c);
 
     try {
       // グループ存在チェック
@@ -78,7 +78,7 @@ daydutRoutes.get(
       // グループ参加チェック
       const userJoinedGroupsSnapshot = await firestore
         .collection("user_joined_groups")
-        .where("user_id", "==", user.uid)
+        .where("user_id", "==", uid)
         .where("group_id", "==", groupId)
         .get();
 
