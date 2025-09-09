@@ -8,14 +8,48 @@ updates:
   - package-ecosystem: "npm"
     directory: "/functions"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "friday"
+    groups:
+      patch-updates:
+        update-types:
+          - "patch"
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "npm"
     directory: "/backend"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "friday"
+    groups:
+      patch-updates:
+        update-types:
+          - "patch"
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "pub"
     directory: "/frontend"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "friday"
+    groups:
+      patch-updates:
+        update-types:
+          - "patch"
+      minor-updates:
+        update-types:
+          - "minor"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+    groups:
+      actions-updates:
+        update-types:
+          - "patch"

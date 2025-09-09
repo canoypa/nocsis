@@ -27,7 +27,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup Tools
-        uses: jdx/mise-action@v2
+        uses: jdx/mise-action@v3
       - name: Install dependencies
         working-directory: ./functions
         run: pnpm install --prefer-frozen-lockfile
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup Tools
-        uses: jdx/mise-action@v2
+        uses: jdx/mise-action@v3
       - name: Install dependencies
         working-directory: ./frontend
         run: flutter pub get --enforce-lockfile
@@ -84,7 +84,7 @@ jobs:
           name: functions-build
           path: ./functions/dist
       - name: Setup Tools
-        uses: jdx/mise-action@v2
+        uses: jdx/mise-action@v3
       - name: Install dependencies
         run: pnpm install --prefer-frozen-lockfile; cd functions && pnpm install --prefer-frozen-lockfile
       - name: Auth
@@ -106,7 +106,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup Tools
-        uses: jdx/mise-action@v2
+        uses: jdx/mise-action@v3
       - name: Auth
         uses: google-github-actions/auth@v2
         with:
@@ -137,7 +137,7 @@ jobs:
           name: frontend-build
           path: ./frontend/build
       - name: Setup Tools
-        uses: jdx/mise-action@v2
+        uses: jdx/mise-action@v3
       - name: Install dependencies
         run: pnpm install --prefer-frozen-lockfile
       - name: Deploy Frontend
