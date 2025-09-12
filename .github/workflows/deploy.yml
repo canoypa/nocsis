@@ -113,7 +113,7 @@ jobs:
           workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
           service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@e427ad8a34f8676edf47cf7d7925499adf3eb74f # v2.2.1
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
       - name: Deploy Backend
         run: gcloud run deploy backend --source ./backend --project class-clock-40088 --region asia-northeast1 --no-traffic
       - name: Set Traffic
