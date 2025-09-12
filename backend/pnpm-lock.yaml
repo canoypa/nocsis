@@ -12,8 +12,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       '@googleapis/calendar':
-        specifier: ^10.0.1
-        version: 10.0.1
+        specifier: ^11.0.1
+        version: 11.0.1
       '@hono/node-server':
         specifier: ^1.19.2
         version: 1.19.2(hono@4.9.6)
@@ -565,8 +565,8 @@ packages:
     resolution: {integrity: sha512-5m9GoZqKh52a1UqkxDBu/+WVFDALNtHg5up5gNmNbXQWBcV813tzJKsyDtKjOPrlR1em1TxtD7NSPCrObH7koQ==}
     engines: {node: '>=14'}
 
-  '@googleapis/calendar@10.0.1':
-    resolution: {integrity: sha512-lOYg3r1MkGsLTQfuIjspIaSvFv0a7Ldi/SvRuQnQ5E6d9DdXbILOhlPpXefxN6hi7BIvWKG0F5pLoc6kK12chA==}
+  '@googleapis/calendar@11.0.1':
+    resolution: {integrity: sha512-XR6/V8SjuOyGMMx5shcKB2Ouyqkw2OG5a1srCb6ifPkIJG5qu/aocQ4VVizPc89izgdCGaKqcSpRFNJUsUuizg==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sqladmin@31.1.0':
@@ -4343,7 +4343,7 @@ snapshots:
       - supports-color
     optional: true
 
-  '@googleapis/calendar@10.0.1':
+  '@googleapis/calendar@11.0.1':
     dependencies:
       googleapis-common: 8.0.2-rc.0
     transitivePeerDependencies:
