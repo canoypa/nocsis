@@ -142,7 +142,7 @@ jobs:
         run: pnpm install --prefer-frozen-lockfile
       - name: Deploy Frontend
         id: deploy_frontend
-        uses: FirebaseExtended/action-hosting-deploy@73212fc153444869d3e433816aab02624792fcef # v0.10.0
+        uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0.10.0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
