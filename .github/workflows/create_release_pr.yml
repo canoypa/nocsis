@@ -6,9 +6,6 @@ on:
 
 permissions: {}
 
-env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   create_release_pr:
     runs-on: ubuntu-latest
@@ -19,6 +16,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Create Release Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.CREATE_RELEASE_PR_TOKEN }}
         run: |
           pr_title=$(echo "Release $(TZ=Asia/Tokyo date +'%Y-%m-%d')")
 
