@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@google-cloud/secret-manager": "^6.0.1",
-    "@googleapis/calendar": "^10.0.1",
+    "@googleapis/calendar": "^12.0.0",
     "@hono/node-server": "^1.19.2",
     "@hono/zod-validator": "^0.4.1",
     "@scalar/hono-api-reference": "^0.9.18",

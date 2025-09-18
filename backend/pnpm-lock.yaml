@@ -12,8 +12,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       '@googleapis/calendar':
-        specifier: ^10.0.1
-        version: 10.0.1
+        specifier: ^12.0.0
+        version: 12.0.0
       '@hono/node-server':
         specifier: ^1.19.2
         version: 1.19.2(hono@4.9.7)
@@ -565,8 +565,8 @@ packages:
     resolution: {integrity: sha512-5m9GoZqKh52a1UqkxDBu/+WVFDALNtHg5up5gNmNbXQWBcV813tzJKsyDtKjOPrlR1em1TxtD7NSPCrObH7koQ==}
     engines: {node: '>=14'}
 
-  '@googleapis/calendar@10.0.1':
-    resolution: {integrity: sha512-lOYg3r1MkGsLTQfuIjspIaSvFv0a7Ldi/SvRuQnQ5E6d9DdXbILOhlPpXefxN6hi7BIvWKG0F5pLoc6kK12chA==}
+  '@googleapis/calendar@12.0.0':
+    resolution: {integrity: sha512-/EdGnw1b7XOo4PGx8i+zrpXxSAnaMZp5d3TFn7+d1qiyEi1x+oVnZF4IqcEodYBj68+3uvWFnch6H8X8zGJDcA==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sqladmin@31.1.0':
@@ -2117,6 +2117,10 @@ packages:
   google-logging-utils@1.1.1:
     resolution: {integrity: sha512-rcX58I7nqpu4mbKztFeOAObbomBbHU2oIb/d3tJfF3dizGSApqtSwYJigGCooHdnMyQBIw8BrWyK96w3YXgr6A==}
     engines: {node: '>=14'}
+
+  googleapis-common@8.0.0:
+    resolution: {integrity: sha512-66if47It7y+Sab3HMkwEXx1kCq9qUC9px8ZXoj1CMrmLmUw81GpbnsNlXnlyZyGbGPGcj+tDD9XsZ23m7GLaJQ==}
+    engines: {node: '>=18.0.0'}
 
   googleapis-common@8.0.2-rc.0:
     resolution: {integrity: sha512-JTcxRvmFa9Ec1uyfMEimEMeeKq1sHNZX3vn2qmoUMtnvixXXvcqTcbDZvEZXkEWpGlPlOf4joyep6/qs0BrLyg==}
@@ -4343,9 +4347,9 @@ snapshots:
       - supports-color
     optional: true
 
-  '@googleapis/calendar@10.0.1':
+  '@googleapis/calendar@12.0.0':
     dependencies:
-      googleapis-common: 8.0.2-rc.0
+      googleapis-common: 8.0.0
     transitivePeerDependencies:
       - supports-color
 
@@ -6163,6 +6167,16 @@ snapshots:
   google-logging-utils@0.0.2: {}
 
   google-logging-utils@1.1.1: {}
+
+  googleapis-common@8.0.0:
+    dependencies:
+      extend: 3.0.2
+      gaxios: 7.1.1
+      google-auth-library: 10.3.0
+      qs: 6.14.0
+      url-template: 2.0.8
+    transitivePeerDependencies:
+      - supports-color
 
   googleapis-common@8.0.2-rc.0:
     dependencies:
