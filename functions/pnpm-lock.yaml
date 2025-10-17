@@ -15,8 +15,8 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       '@googleapis/calendar':
-        specifier: ^10.0.1
-        version: 10.0.1
+        specifier: ^12.0.0
+        version: 12.0.0
       '@slack/web-api':
         specifier: ^7.10.0
         version: 7.10.0
@@ -558,8 +558,8 @@ packages:
     resolution: {integrity: sha512-5m9GoZqKh52a1UqkxDBu/+WVFDALNtHg5up5gNmNbXQWBcV813tzJKsyDtKjOPrlR1em1TxtD7NSPCrObH7koQ==}
     engines: {node: '>=14'}
 
-  '@googleapis/calendar@10.0.1':
-    resolution: {integrity: sha512-lOYg3r1MkGsLTQfuIjspIaSvFv0a7Ldi/SvRuQnQ5E6d9DdXbILOhlPpXefxN6hi7BIvWKG0F5pLoc6kK12chA==}
+  '@googleapis/calendar@12.0.0':
+    resolution: {integrity: sha512-/EdGnw1b7XOo4PGx8i+zrpXxSAnaMZp5d3TFn7+d1qiyEi1x+oVnZF4IqcEodYBj68+3uvWFnch6H8X8zGJDcA==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sqladmin@31.1.0':
@@ -2340,6 +2340,10 @@ packages:
     resolution: {integrity: sha512-UcO3kefx6dCcZkgcTGgVOTFb7b1LlQ02hY1omMjjrrBzkajRMCFgYOjs7J71WqnuG1k2b+9ppGL7FsOfhZMQKQ==}
     engines: {node: '>=18'}
 
+  gcp-metadata@8.1.1:
+    resolution: {integrity: sha512-dTCcAe9fRQf06ELwel6lWWFrEbstwjUBYEhr5VRGoC+iPDZQucHppCowaIp8b8v92tU1G4X4H3b/Y6zXZxkMsQ==}
+    engines: {node: '>=18'}
+
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
@@ -2394,6 +2398,10 @@ packages:
     resolution: {integrity: sha512-CmIrSy1bqMQUsPmA9+hcSbAXL80cFhu40cGMUjCaLpNKVzzvi+0uAHq8GNZxkoGYIsTX4ZQ7e4aInAqWxgn4fg==}
     engines: {node: '>=18'}
 
+  google-auth-library@10.4.1:
+    resolution: {integrity: sha512-VlvZ+QDWng3aPh++0BSQlSJyjn4qgLLTmqylAR3as0dr6YwPkZpHcZAngAFr68TDVCUSQVRTkV73K/D3m7vEIg==}
+    engines: {node: '>=18'}
+
   google-auth-library@9.15.1:
     resolution: {integrity: sha512-Jb6Z0+nvECVz+2lzSMt9u98UsoakXxA2HGHMCxh+so3n90XgYWkq5dur19JAJV7ONiJY22yBTyJB1TSkvPq9Ng==}
     engines: {node: '>=14'}
@@ -2413,6 +2421,10 @@ packages:
   google-logging-utils@1.1.1:
     resolution: {integrity: sha512-rcX58I7nqpu4mbKztFeOAObbomBbHU2oIb/d3tJfF3dizGSApqtSwYJigGCooHdnMyQBIw8BrWyK96w3YXgr6A==}
     engines: {node: '>=14'}
+
+  googleapis-common@8.0.0:
+    resolution: {integrity: sha512-66if47It7y+Sab3HMkwEXx1kCq9qUC9px8ZXoj1CMrmLmUw81GpbnsNlXnlyZyGbGPGcj+tDD9XsZ23m7GLaJQ==}
+    engines: {node: '>=18.0.0'}
 
   googleapis-common@8.0.2-rc.0:
     resolution: {integrity: sha512-JTcxRvmFa9Ec1uyfMEimEMeeKq1sHNZX3vn2qmoUMtnvixXXvcqTcbDZvEZXkEWpGlPlOf4joyep6/qs0BrLyg==}
@@ -5118,9 +5130,9 @@ snapshots:
       - supports-color
     optional: true
 
-  '@googleapis/calendar@10.0.1':
+  '@googleapis/calendar@12.0.0':
     dependencies:
-      googleapis-common: 8.0.2-rc.0
+      googleapis-common: 8.0.0
     transitivePeerDependencies:
       - supports-color
 
@@ -7247,6 +7259,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  gcp-metadata@8.1.1:
+    dependencies:
+      gaxios: 7.1.2
+      google-logging-utils: 1.1.1
+      json-bigint: 1.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   gensync@1.0.0-beta.2: {}
 
   get-caller-file@2.0.5: {}
@@ -7327,6 +7347,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  google-auth-library@10.4.1:
+    dependencies:
+      base64-js: 1.5.1
+      ecdsa-sig-formatter: 1.0.11
+      gaxios: 7.1.2
+      gcp-metadata: 8.1.1
+      google-logging-utils: 1.1.1
+      gtoken: 8.0.0
+      jws: 4.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   google-auth-library@9.15.1(encoding@0.1.13):
     dependencies:
       base64-js: 1.5.1
@@ -7378,11 +7410,21 @@ snapshots:
 
   google-logging-utils@1.1.1: {}
 
+  googleapis-common@8.0.0:
+    dependencies:
+      extend: 3.0.2
+      gaxios: 7.1.2
+      google-auth-library: 10.4.1
+      qs: 6.14.0
+      url-template: 2.0.8
+    transitivePeerDependencies:
+      - supports-color
+
   googleapis-common@8.0.2-rc.0:
     dependencies:
       extend: 3.0.2
       gaxios: 7.1.2
-      google-auth-library: 10.4.0
+      google-auth-library: 10.4.1
       qs: 6.14.0
       url-template: 2.0.8
     transitivePeerDependencies:
