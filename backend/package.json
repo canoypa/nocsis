@@ -15,7 +15,7 @@
     "@googleapis/calendar": "^10.0.1",
     "@hono/node-server": "^1.19.5",
     "@hono/zod-validator": "^0.4.1",
-    "@scalar/hono-api-reference": "^0.9.21",
+    "@scalar/hono-api-reference": "^0.9.22",
     "firebase-admin": "^13.5.0",
     "hono": "^4.9.10",
     "hono-openapi": "^0.4.8",
@@ -24,9 +24,9 @@
     "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.5",
+    "@biomejs/biome": "^2.2.6",
     "@types/luxon": "^3.7.1",
-    "@types/node": "^22.18.9",
+    "@types/node": "^22.18.11",
     "@vitest/coverage-v8": "3.2.4",
     "firebase-tools": "^14.19.1",
     "tsup": "^8.5.0",
