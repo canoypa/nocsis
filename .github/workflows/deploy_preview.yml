@@ -27,8 +27,8 @@ jobs:
         working-directory: ./frontend
         run: flutter pub get --enforce-lockfile
       - name: Generate OpenAPI spec
-        run: pnpm install --prefer-frozen-lockfile && pnpm run generate-openapi
         working-directory: ./backend
+        run: pnpm install --prefer-frozen-lockfile && pnpm run generate-openapi
       - name: Run build_runner
         working-directory: ./frontend
         run: flutter pub run build_runner build
