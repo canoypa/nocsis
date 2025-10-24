@@ -1,4 +1,4 @@
 [tools]
 node = "22"
 pnpm = "10"
-flutter = "3.32"
+flutter = "3.35"
