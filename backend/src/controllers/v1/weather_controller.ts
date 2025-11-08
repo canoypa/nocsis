@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { describeRoute } from "hono-openapi";
-import { resolver, validator } from "hono-openapi/zod";
+import { describeRoute, resolver, validator } from "hono-openapi";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
 import {
@@ -44,7 +43,6 @@ weatherRoutes.get(
       500: { description: "Internal Server Error" },
     },
     security: [{ bearer: [] }],
-    validateResponse: true,
   }),
   validator("param", paramSchema),
   authentication,

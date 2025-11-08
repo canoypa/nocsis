@@ -1,6 +1,5 @@
 import { Hono } from "hono";
-import { describeRoute } from "hono-openapi";
-import { resolver } from "hono-openapi/zod";
+import { describeRoute, resolver } from "hono-openapi";
 import { firestore } from "../../clients/firebase.js";
 import {
   type AuthenticatedEnv,
@@ -32,7 +31,6 @@ userRoutes.use("*", authentication).get(
       },
     },
     security: [{ bearer: [] }],
-    validateResponse: true,
   }),
   async (c) => {
     const uid = getCurrentUserId(c);
