@@ -18,7 +18,7 @@
     "@scalar/hono-api-reference": "^0.9.24",
     "firebase-admin": "^13.5.0",
     "hono": "^4.10.4",
-    "hono-openapi": "^0.4.8",
+    "hono-openapi": "^1.1.1",
     "luxon": "^3.7.2",
     "zod": "^3.25.76",
     "zod-openapi": "^4.2.4"
