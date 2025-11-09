@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { describeRoute } from "hono-openapi";
-import { resolver, validator } from "hono-openapi/zod";
+import { describeRoute, resolver, validator } from "hono-openapi";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
 import {
@@ -25,6 +24,7 @@ const paramSchema = z
     groupId: z.string().openapi({ description: "グループのID" }),
   })
   .openapi({ description: "パスパラメータ" });
+type WeatherDataResponse = z.infer<typeof weatherDataSchema>;
 
 weatherRoutes.get(
   "/:groupId/weather/now",
@@ -44,7 +44,6 @@ weatherRoutes.get(
       500: { description: "Internal Server Error" },
     },
     security: [{ bearer: [] }],
-    validateResponse: true,
   }),
   validator("param", paramSchema),
   authentication,
@@ -100,6 +99,6 @@ weatherRoutes.get(
       .slice(1, 4)
       .map((v) => getWeatherNameById(v.weather[0].id));
 
-    return c.json({ current, hourly, threeHour });
+    return c.json<WeatherDataResponse>({ current, hourly, threeHour });
   },
 );

@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { describeRoute } from "hono-openapi";
-import { resolver, validator } from "hono-openapi/zod";
+import { describeRoute, resolver, validator } from "hono-openapi";
 import { DateTime } from "luxon";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
@@ -26,6 +25,7 @@ const paramSchema = z
     groupId: z.string().openapi({ description: "グループのID" }),
   })
   .openapi({ description: "日直情報を取得する際のパラメータ" });
+type DaydutyResponse = z.infer<typeof daydutyResponseSchema>;
 
 daydutRoutes.get(
   "/:groupId/dayduty",
@@ -55,7 +55,6 @@ daydutRoutes.get(
       },
     },
     security: [{ bearer: [] }],
-    validateResponse: true,
   }),
   validator("param", paramSchema),
   validator("query", daydutyQuerySchema),
@@ -118,7 +117,7 @@ daydutRoutes.get(
 
       const validatedResponse = daydutyResponseSchema.parse(classmate);
 
-      return c.json(validatedResponse, 200);
+      return c.json<DaydutyResponse>(validatedResponse, 200);
     } catch (error) {
       console.error("Error in dayduty controller:", error);
       throw error;

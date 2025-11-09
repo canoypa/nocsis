@@ -1,7 +1,7 @@
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
-import { openAPISpecs } from "hono-openapi";
 import { cors } from "hono/cors";
+import { openAPIRouteHandler } from "hono-openapi";
 import { v1Routes } from "./controllers/v1_controller.js";
 
 import "zod-openapi/extend";
@@ -31,7 +31,7 @@ app.route("/v1", v1Routes);
 if (process.env.NODE_ENV !== "production") {
   app.get(
     "/api-spec",
-    openAPISpecs(app, {
+    openAPIRouteHandler(app, {
       documentation: {
         components: {
           securitySchemes: {
