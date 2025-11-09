@@ -1,16 +1,20 @@
 import { Hono } from "hono";
 import { describeRoute, resolver } from "hono-openapi";
+import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
 import {
   type AuthenticatedEnv,
   authentication,
   getCurrentUserId,
 } from "../../middlewares/authenticate.js";
+import { groupSchema } from "../../resources/v1/groups.js";
 import { userJoinedGroupsSchema } from "../../resources/v1/user_joined_groups.js";
 
 import "zod-openapi/extend";
 
 export const userRoutes = new Hono<AuthenticatedEnv>();
+
+type UserJoinedGroupsResponse = z.infer<typeof userJoinedGroupsSchema>;
 
 userRoutes.use("*", authentication).get(
   "/me/groups",
@@ -46,7 +50,7 @@ userRoutes.use("*", authentication).get(
     );
 
     if (groupIds.length === 0) {
-      return c.json({ items: [] });
+      return c.json<UserJoinedGroupsResponse>({ items: [] });
     }
 
     // グループの詳細情報を取得
@@ -55,11 +59,13 @@ userRoutes.use("*", authentication).get(
       .where("__name__", "in", groupIds)
       .get();
 
-    const items = groupsSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const items = z.array(groupSchema).parse(
+      groupsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })),
+    );
 
-    return c.json({ items });
+    return c.json<UserJoinedGroupsResponse>({ items });
   },
 );

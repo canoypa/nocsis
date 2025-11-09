@@ -42,6 +42,7 @@ const classesResponseSchema = z
     items: z.array(classSchema).openapi({ description: "授業のリスト" }),
   })
   .openapi({ description: "授業の一覧を取得する際のレスポンス" });
+type ClassesResponse = z.infer<typeof classesResponseSchema>;
 
 classesRoutes.get(
   "/:groupId/classes",
@@ -157,7 +158,7 @@ classesRoutes.get(
       });
     });
 
-    return c.json({
+    return c.json<ClassesResponse>({
       items: classes,
     });
   },
