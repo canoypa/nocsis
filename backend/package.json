@@ -14,11 +14,11 @@
     "@google-cloud/secret-manager": "^6.1.1",
     "@googleapis/calendar": "^12.0.0",
     "@hono/node-server": "^1.19.6",
-    "@hono/zod-validator": "^0.4.1",
+    "@hono/standard-validator": "^0.1.5",
     "@scalar/hono-api-reference": "^0.9.24",
     "firebase-admin": "^13.5.0",
     "hono": "^4.10.4",
-    "hono-openapi": "^0.4.8",
+    "hono-openapi": "^1.1.1",
     "luxon": "^3.7.2",
     "zod": "^3.25.76",
     "zod-openapi": "^4.2.4"
@@ -29,10 +29,10 @@
     "@types/node": "^22.18.13",
     "@vitest/coverage-v8": "3.2.4",
     "firebase-tools": "^14.24.0",
+    "msw": "^2.11.6",
     "tsup": "^8.5.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4",
-    "msw": "^2.11.6"
+    "vitest": "^3.2.4"
   }
 }

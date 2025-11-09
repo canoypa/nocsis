@@ -1,8 +1,7 @@
 import assert from "node:assert";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { describeRoute } from "hono-openapi";
-import { resolver, validator } from "hono-openapi/zod";
+import { describeRoute, resolver, validator } from "hono-openapi";
 import { DateTime } from "luxon";
 import { z } from "zod";
 import { firestore } from "../../clients/firebase.js";
@@ -72,7 +71,6 @@ classesRoutes.get(
       },
     },
     security: [{ bearer: [] }],
-    validateResponse: true,
   }),
   validator("param", paramSchema),
   validator("query", querySchema),
@@ -105,7 +103,9 @@ classesRoutes.get(
       throw new HTTPException(404, { message: "グループが存在しません。" });
     }
     if (userJoinedGroupSnapshot.empty) {
-      throw new HTTPException(403, { message: "グループに参加していません。" });
+      throw new HTTPException(403, {
+        message: "グループに参加していません。",
+      });
     }
 
     const group = groupSnapshot.data();
@@ -138,7 +138,9 @@ classesRoutes.get(
         });
       }
 
-      const startAt = DateTime.fromISO(startDate, { zone: AppConfig.TIMEZONE });
+      const startAt = DateTime.fromISO(startDate, {
+        zone: AppConfig.TIMEZONE,
+      });
       const endAt = DateTime.fromISO(endDate, { zone: AppConfig.TIMEZONE });
 
       if (!startAt.isValid || !endAt.isValid) {
