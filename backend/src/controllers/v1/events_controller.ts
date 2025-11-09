@@ -49,6 +49,7 @@ const eventsResponseSchema = z
     items: z.array(eventSchema).openapi({ description: "イベントのリスト" }),
   })
   .openapi({ description: "イベントの一覧を取得する際のレスポンス" });
+type EventsResponse = z.infer<typeof eventsResponseSchema>;
 
 eventsRoutes.get(
   "/:groupId/events",
@@ -147,7 +148,7 @@ eventsRoutes.get(
       });
     });
 
-    return c.json({
+    return c.json<EventsResponse>({
       items: eventItems,
     });
   },

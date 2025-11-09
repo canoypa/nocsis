@@ -1,4 +1,3 @@
-import assert from "node:assert";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
@@ -31,6 +30,7 @@ const patchJsonSchema = groupSchema
     ref: "GroupPatchJson",
     description: "グループの更新に使用するJSONデータ",
   });
+type GroupResponse = z.infer<typeof groupSchema>;
 
 groupRoutes
   .get(
@@ -84,13 +84,12 @@ groupRoutes
         });
       }
 
-      const group = groupSnapshot.data();
-      assert(group);
-
-      return c.json({
+      const group = groupSchema.parse({
         id: groupSnapshot.id,
-        ...group,
+        ...groupSnapshot.data(),
       });
+
+      return c.json<GroupResponse>(group);
     },
   )
   .patch(
@@ -154,12 +153,11 @@ groupRoutes
       await groupRef.update(data);
 
       const updatedGroupSnapshot = await groupRef.get();
-      const updatedGroup = updatedGroupSnapshot.data();
-      assert(updatedGroup);
-
-      return c.json({
+      const updatedGroup = groupSchema.parse({
         id: updatedGroupSnapshot.id,
-        ...updatedGroup,
+        ...updatedGroupSnapshot.data(),
       });
+
+      return c.json<GroupResponse>(updatedGroup);
     },
   );

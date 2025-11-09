@@ -25,6 +25,7 @@ const paramSchema = z
     groupId: z.string().openapi({ description: "グループのID" }),
   })
   .openapi({ description: "日直情報を取得する際のパラメータ" });
+type DaydutyResponse = z.infer<typeof daydutyResponseSchema>;
 
 daydutRoutes.get(
   "/:groupId/dayduty",
@@ -116,7 +117,7 @@ daydutRoutes.get(
 
       const validatedResponse = daydutyResponseSchema.parse(classmate);
 
-      return c.json(validatedResponse, 200);
+      return c.json<DaydutyResponse>(validatedResponse, 200);
     } catch (error) {
       console.error("Error in dayduty controller:", error);
       throw error;

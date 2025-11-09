@@ -115,7 +115,7 @@ const WeatherIdToName = [
  *
  * ID 一覧: https://openweathermap.org/weather-conditions
  */
-export const getWeatherNameById = (id: number): string => {
+export const getWeatherNameById = (id: number): WeatherName => {
   for (const [pattern, name] of WeatherIdToName) {
     if (pattern.test(id.toString())) return name;
   }

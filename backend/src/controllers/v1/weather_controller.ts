@@ -24,6 +24,7 @@ const paramSchema = z
     groupId: z.string().openapi({ description: "グループのID" }),
   })
   .openapi({ description: "パスパラメータ" });
+type WeatherDataResponse = z.infer<typeof weatherDataSchema>;
 
 weatherRoutes.get(
   "/:groupId/weather/now",
@@ -98,6 +99,6 @@ weatherRoutes.get(
       .slice(1, 4)
       .map((v) => getWeatherNameById(v.weather[0].id));
 
-    return c.json({ current, hourly, threeHour });
+    return c.json<WeatherDataResponse>({ current, hourly, threeHour });
   },
 );
