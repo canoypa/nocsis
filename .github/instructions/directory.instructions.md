@@ -6,11 +6,6 @@ applyTo: "**"
 
 ```
 nocsis/
-├── .agent/                     # AI エージェント用ワークスペース
-│   ├── instructions/           # instructions.md ファイル
-│   ├── prompts/                # prompt.md ファイル
-│   ├── scripts/                # 特定のタスクを実行するスクリプト
-│   └── tasks/                  # タスク作業ファイル
 ├── emulator_data/              # Firebase エミュレーターデータ
 │   ├── auth_export/            # Authentication データ
 │   └── firestore_export/        # Firestore データ
