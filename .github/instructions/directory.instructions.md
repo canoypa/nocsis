@@ -6,6 +6,9 @@ applyTo: "**"
 
 ```
 nocsis/
+├── .github/
+│   ├── instructions/           # Copilot Instructions
+│   └── workflows/               # GitHub Actions ワークフロー
 ├── scripts/                    # 開発用スクリプト
 ├── backend/                    # Hono ベースの REST API サーバー
 │   ├── scripts/                # 開発用スクリプト
