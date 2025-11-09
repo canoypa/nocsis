@@ -6,9 +6,6 @@ applyTo: "**"
 
 ```
 nocsis/
-├── emulator_data/              # Firebase エミュレーターデータ
-│   ├── auth_export/            # Authentication データ
-│   └── firestore_export/        # Firestore データ
 ├── scripts/                    # 開発用スクリプト
 ├── backend/                    # Hono ベースの REST API サーバー
 │   ├── scripts/                # 開発用スクリプト
