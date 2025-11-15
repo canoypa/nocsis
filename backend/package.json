@@ -28,7 +28,7 @@
     "@types/luxon": "^3.7.1",
     "@types/node": "^22.18.13",
     "@vitest/coverage-v8": "3.2.4",
-    "firebase-tools": "^14.24.0",
+    "firebase-tools": "^14.25.0",
     "msw": "^2.11.6",
     "tsup": "^8.5.1",
     "tsx": "^4.20.6",
