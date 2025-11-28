@@ -18,8 +18,8 @@ importers:
         specifier: ^14.0.0
         version: 14.0.0
       '@slack/web-api':
-        specifier: ^7.12.0
-        version: 7.12.0
+        specifier: ^7.13.0
+        version: 7.13.0
       cron-parser:
         specifier: ^5.4.0
         version: 5.4.0
@@ -1253,12 +1253,12 @@ packages:
     resolution: {integrity: sha512-Wz7QYfPAlG/DR+DfABddUZeNgoeY7d1J39OCR2jR+v7VBsB8ezulDK5szTnDDPDwLH5IWhLvXIHlCFZV7MSKgA==}
     engines: {node: '>= 18', npm: '>= 8.6.0'}
 
-  '@slack/types@2.18.0':
-    resolution: {integrity: sha512-ZKrdeoppbM+3l2KKOi4/3oFYKCEwiW3dQfdHZDcecJ9rAmEqWPnARYmac9taZNitb0xnSgu6GOpHgwaKI8se2g==}
+  '@slack/types@2.19.0':
+    resolution: {integrity: sha512-7+QZ38HGcNh/b/7MpvPG6jnw7mliV6UmrquJLqgdxkzJgQEYUcEztvFWRU49z0x4vthF0ixL5lTK601AXrS8IA==}
     engines: {node: '>= 12.13.0', npm: '>= 6.12.0'}
 
-  '@slack/web-api@7.12.0':
-    resolution: {integrity: sha512-LrDxjYyqjeYYQGVdVZ6EYHunFmzveOr2pFpShr6TzW4KNFpdNNnpKekjtMg0PJlOsMibSySLGQqiBZQDasmRCA==}
+  '@slack/web-api@7.13.0':
+    resolution: {integrity: sha512-ERcExbWrnkDN8ovoWWe6Wgt/usanj1dWUd18dJLpctUI4mlPS0nKt81Joh8VI+OPbNnY1lIilVt9gdMBD9U2ig==}
     engines: {node: '>= 18', npm: '>= 8.6.0'}
 
   '@so-ric/colorspace@1.1.6':
@@ -1657,8 +1657,8 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
-  axios@1.12.2:
-    resolution: {integrity: sha512-vMJzPewAlRyOgxV2dU0Cuz2O8zzzx9VYtbJOaBgXFeLc4IV/Eg50n4LowmehOOR61S8ZMpc2K5Sa7g6A4jfkUw==}
+  axios@1.13.2:
+    resolution: {integrity: sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==}
 
   b4a@1.7.3:
     resolution: {integrity: sha512-5Q2mfq2WfGuFp3uS//0s6baOJLMoVduPYVeNmDYxu5OUA1/cBfvr2RIS7vi62LdNj/urk1hfmj867I3qt6uZ7Q==}
@@ -2536,6 +2536,10 @@ packages:
 
   form-data@4.0.4:
     resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
+    engines: {node: '>= 6'}
+
+  form-data@4.0.5:
+    resolution: {integrity: sha512-8RipRLol37bNs2bhoV67fiTEvdTrbMUYcFTiy3+wuuOnUog2QBHCZWXDRijWQfAkhBj2Uf5UnVaiWwA5vdd82w==}
     engines: {node: '>= 6'}
 
   formdata-polyfill@4.0.10:
@@ -6134,17 +6138,17 @@ snapshots:
     dependencies:
       '@types/node': 22.19.1
 
-  '@slack/types@2.18.0': {}
+  '@slack/types@2.19.0': {}
 
-  '@slack/web-api@7.12.0':
+  '@slack/web-api@7.13.0':
     dependencies:
       '@slack/logger': 4.0.0
-      '@slack/types': 2.18.0
+      '@slack/types': 2.19.0
       '@types/node': 22.19.1
       '@types/retry': 0.12.0
-      axios: 1.12.2
+      axios: 1.13.2
       eventemitter3: 5.0.1
-      form-data: 4.0.4
+      form-data: 4.0.5
       is-electron: 2.2.2
       is-stream: 2.0.1
       p-queue: 6.6.2
@@ -6569,10 +6573,10 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.1.0
 
-  axios@1.12.2:
+  axios@1.13.2:
     dependencies:
       follow-redirects: 1.15.11
-      form-data: 4.0.4
+      form-data: 4.0.5
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -7690,6 +7694,14 @@ snapshots:
     optional: true
 
   form-data@4.0.4:
+    dependencies:
+      asynckit: 0.4.0
+      combined-stream: 1.0.8
+      es-set-tostringtag: 2.1.0
+      hasown: 2.0.2
+      mime-types: 2.1.35
+
+  form-data@4.0.5:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
