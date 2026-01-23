@@ -15,11 +15,15 @@ on:
       DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT:
         required: true
 
+permissions: {}
+
 concurrency:
   group: Deploy
 
 jobs:
   build_functions:
+    permissions:
+      contents: read
     environment:
       name: ${{ inputs.env }}
     runs-on: ubuntu-latest
@@ -41,6 +45,8 @@ jobs:
           path: ./functions/dist
 
   build_frontend:
+    permissions:
+      contents: read
     environment:
       name: ${{ inputs.env }}
     runs-on: ubuntu-latest
