@@ -30,7 +30,7 @@ jobs:
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
       - name: Install dependencies
         working-directory: ./functions
-        run: pnpm install --prefer-frozen-lockfile
+        run: pnpm install
       - name: Build
         working-directory: ./functions
         run: pnpm run build
@@ -53,7 +53,7 @@ jobs:
         working-directory: ./frontend
         run: flutter pub get --enforce-lockfile
       - name: Generate OpenAPI spec
-        run: pnpm install --prefer-frozen-lockfile && pnpm run generate-openapi
+        run: pnpm install && pnpm run generate-openapi
         working-directory: ./backend
       - name: Run build_runner
         working-directory: ./frontend
@@ -86,7 +86,7 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
       - name: Install dependencies
-        run: pnpm install --prefer-frozen-lockfile; cd functions && pnpm install --prefer-frozen-lockfile
+        run: pnpm install; cd functions && pnpm install
       - name: Auth
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
@@ -139,7 +139,7 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
       - name: Install dependencies
-        run: pnpm install --prefer-frozen-lockfile
+        run: pnpm install
       - name: Deploy Frontend
         id: deploy_frontend
         uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0.10.0
