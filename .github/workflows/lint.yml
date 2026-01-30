@@ -20,7 +20,7 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
@@ -37,7 +37,7 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # v3.5.1
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
@@ -56,7 +56,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
       - name: Generate OpenAPI spec
-        run: pnpm install && pnpm run generate-openapi
+        run: pnpm install --frozen-lockfile && pnpm run generate-openapi
         working-directory: ./backend
       - name: Run build_runner
         run: flutter pub run build_runner build
