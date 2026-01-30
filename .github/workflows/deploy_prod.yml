@@ -5,12 +5,18 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions: {}
+
 concurrency:
   group: Deploy to Production
   cancel-in-progress: true
 
 jobs:
   deploy:
+    permissions:
+      contents: read
+      id-token: write
+      checks: write
     uses: ./.github/workflows/deploy.yml
     with:
       env: Production
