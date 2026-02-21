@@ -16,22 +16,22 @@ importers:
         version: 14.2.0
       '@hono/node-server':
         specifier: ^1.19.6
-        version: 1.19.9(hono@4.11.9)
+        version: 1.19.9(hono@4.11.10)
       '@hono/standard-validator':
         specifier: ^0.2.2
-        version: 0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.9)
+        version: 0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.10)
       '@scalar/hono-api-reference':
         specifier: ^0.9.44
-        version: 0.9.44(hono@4.11.9)
+        version: 0.9.44(hono@4.11.10)
       firebase-admin:
         specifier: ^13.6.1
         version: 13.6.1(encoding@0.1.13)
       hono:
-        specifier: ^4.11.9
-        version: 4.11.9
+        specifier: ^4.11.10
+        version: 4.11.10
       hono-openapi:
         specifier: ^1.1.1
-        version: 1.2.0(@hono/standard-validator@0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.9))(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76))(@standard-schema/spec@1.0.0)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.25.76))(zod@3.25.76))(@types/json-schema@7.0.15)(hono@4.11.9)(openapi-types@12.1.3)
+        version: 1.2.0(@hono/standard-validator@0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.10))(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76))(@standard-schema/spec@1.0.0)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.25.76))(zod@3.25.76))(@types/json-schema@7.0.15)(hono@4.11.10)(openapi-types@12.1.3)
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
@@ -56,7 +56,7 @@ importers:
         version: 3.2.4(vitest@3.2.4(@types/node@22.19.11)(msw@2.12.10(@types/node@22.19.11)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.2))
       firebase-tools:
         specifier: ^15.5.1
-        version: 15.5.1(@types/node@22.19.11)(encoding@0.1.13)(hono@4.11.9)(typescript@5.9.3)
+        version: 15.5.1(@types/node@22.19.11)(encoding@0.1.13)(hono@4.11.10)(typescript@5.9.3)
       msw:
         specifier: ^2.12.10
         version: 2.12.10(@types/node@22.19.11)(typescript@5.9.3)
@@ -2042,8 +2042,8 @@ packages:
       hono:
         optional: true
 
-  hono@4.11.9:
-    resolution: {integrity: sha512-Eaw2YTGM6WOxA6CXbckaEvslr2Ne4NFsKrvc0v97JD5awbmeBLO5w9Ho9L9kmKonrwF9RJlW6BxT1PVv/agBHQ==}
+  hono@4.11.10:
+    resolution: {integrity: sha512-kyWP5PAiMooEvGrA9jcD3IXF7ATu8+o7B3KCbPXid5se52NPqnOpM/r9qeW2heMnOekF4kqR1fXJqCYeCLKrZg==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@7.0.2:
@@ -4150,14 +4150,14 @@ snapshots:
       protobufjs: 7.5.4
       yargs: 17.7.2
 
-  '@hono/node-server@1.19.9(hono@4.11.9)':
+  '@hono/node-server@1.19.9(hono@4.11.10)':
     dependencies:
-      hono: 4.11.9
+      hono: 4.11.10
 
-  '@hono/standard-validator@0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.9)':
+  '@hono/standard-validator@0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.10)':
     dependencies:
       '@standard-schema/spec': 1.0.0
-      hono: 4.11.9
+      hono: 4.11.10
 
   '@inquirer/ansi@1.0.2': {}
 
@@ -4331,9 +4331,9 @@ snapshots:
 
   '@jsdevtools/ono@7.1.3': {}
 
-  '@modelcontextprotocol/sdk@1.25.3(hono@4.11.9)(zod@3.25.76)':
+  '@modelcontextprotocol/sdk@1.25.3(hono@4.11.10)(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 1.19.9(hono@4.11.9)
+      '@hono/node-server': 1.19.9(hono@4.11.10)
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
       content-type: 1.0.5
@@ -4521,10 +4521,10 @@ snapshots:
 
   '@scalar/helpers@0.2.15': {}
 
-  '@scalar/hono-api-reference@0.9.44(hono@4.11.9)':
+  '@scalar/hono-api-reference@0.9.44(hono@4.11.10)':
     dependencies:
       '@scalar/core': 0.3.41
-      hono: 4.11.9
+      hono: 4.11.10
 
   '@scalar/types@0.6.6':
     dependencies:
@@ -5555,7 +5555,7 @@ snapshots:
       - encoding
       - supports-color
 
-  firebase-tools@15.5.1(@types/node@22.19.11)(encoding@0.1.13)(hono@4.11.9)(typescript@5.9.3):
+  firebase-tools@15.5.1(@types/node@22.19.11)(encoding@0.1.13)(hono@4.11.10)(typescript@5.9.3):
     dependencies:
       '@apphosting/build': 0.1.7(@types/node@22.19.11)(typescript@5.9.3)
       '@apphosting/common': 0.0.8
@@ -5564,7 +5564,7 @@ snapshots:
       '@google-cloud/cloud-sql-connector': 1.9.0
       '@google-cloud/pubsub': 5.2.2
       '@inquirer/prompts': 7.10.1(@types/node@22.19.11)
-      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.9)(zod@3.25.76)
+      '@modelcontextprotocol/sdk': 1.25.3(hono@4.11.10)(zod@3.25.76)
       abort-controller: 3.0.0
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
@@ -5926,17 +5926,17 @@ snapshots:
 
   highlight.js@10.7.3: {}
 
-  hono-openapi@1.2.0(@hono/standard-validator@0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.9))(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76))(@standard-schema/spec@1.0.0)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.25.76))(zod@3.25.76))(@types/json-schema@7.0.15)(hono@4.11.9)(openapi-types@12.1.3):
+  hono-openapi@1.2.0(@hono/standard-validator@0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.10))(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76))(@standard-schema/spec@1.0.0)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.25.76))(zod@3.25.76))(@types/json-schema@7.0.15)(hono@4.11.10)(openapi-types@12.1.3):
     dependencies:
       '@standard-community/standard-json': 0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76)
       '@standard-community/standard-openapi': 0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.0.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.1(zod@3.25.76))(zod@3.25.76))(@standard-schema/spec@1.0.0)(openapi-types@12.1.3)(zod-openapi@4.2.4(zod@3.25.76))(zod@3.25.76)
       '@types/json-schema': 7.0.15
       openapi-types: 12.1.3
     optionalDependencies:
-      '@hono/standard-validator': 0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.9)
-      hono: 4.11.9
+      '@hono/standard-validator': 0.2.2(@standard-schema/spec@1.0.0)(hono@4.11.10)
+      hono: 4.11.10
 
-  hono@4.11.9: {}
+  hono@4.11.10: {}
 
   hosted-git-info@7.0.2:
     dependencies:
