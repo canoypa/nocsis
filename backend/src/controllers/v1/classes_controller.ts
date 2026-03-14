@@ -25,12 +25,10 @@ const paramSchema = z
 const querySchema = z
   .object({
     from: z
-      .string()
-      .datetime({ offset: true })
+      .iso.datetime({ offset: true })
       .meta({ description: "取得開始日時" }),
     to: z
-      .string()
-      .datetime({ offset: true })
+      .iso.datetime({ offset: true })
       .meta({ description: "取得終了日時" }),
   })
   .meta({ description: "授業の一覧を取得する際のクエリパラメータ" });
