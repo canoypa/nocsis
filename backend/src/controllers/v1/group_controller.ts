@@ -10,15 +10,13 @@ import {
 } from "../../middlewares/authenticate.js";
 import { groupSchema } from "../../resources/v1/groups.js";
 
-import "zod-openapi/extend";
-
 export const groupRoutes = new Hono<AuthenticatedEnv>();
 
 const paramSchema = z
   .object({
-    id: z.string().openapi({ description: "ID" }),
+    id: z.string().meta({ description: "ID" }),
   })
-  .openapi({
+  .meta({
     description: "グループのIDを指定するパラメータ",
   });
 
@@ -26,8 +24,8 @@ const patchJsonSchema = groupSchema
   .omit({ id: true })
   .partial()
   .refine((data) => Object.keys(data).length > 0)
-  .openapi({
-    ref: "GroupPatchJson",
+  .meta({
+    id: "GroupPatchJson",
     description: "グループの更新に使用するJSONデータ",
   });
 type GroupResponse = z.infer<typeof groupSchema>;

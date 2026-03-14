@@ -1,32 +1,28 @@
 import { z } from "zod";
 
-import "zod-openapi/extend";
-
 export const groupSchema = z
   .object({
-    id: z.string().openapi({ description: "ID" }),
-    name: z.string().openapi({ description: "名前" }),
-    classes_calendar_id: z
-      .string()
-      .openapi({ description: "授業カレンダーID" }),
+    id: z.string().meta({ description: "ID" }),
+    name: z.string().meta({ description: "名前" }),
+    classes_calendar_id: z.string().meta({ description: "授業カレンダーID" }),
     events_calendar_id: z
       .string()
-      .openapi({ description: "イベントカレンダーID" }),
-    dayduty_start_date: z.string().openapi({ description: "日直開始日" }),
+      .meta({ description: "イベントカレンダーID" }),
+    dayduty_start_date: z.string().meta({ description: "日直開始日" }),
     slack_event_channel_id: z
       .string()
-      .openapi({ description: "Slackイベント通知チャンネルID" }),
+      .meta({ description: "Slackイベント通知チャンネルID" }),
     weather_point: z
       .object({
-        lat: z.number().openapi({ description: "緯度" }),
-        lon: z.number().openapi({ description: "経度" }),
+        lat: z.number().meta({ description: "緯度" }),
+        lon: z.number().meta({ description: "経度" }),
       })
-      .openapi({
-        ref: "WeatherPoint",
+      .meta({
+        id: "WeatherPoint",
         description: "天気情報を取得する地点",
       }),
   })
-  .openapi({
-    ref: "Group",
+  .meta({
+    id: "Group",
     description: "グループ",
   });
