@@ -6,7 +6,7 @@ export const classmateSchema = z
     role: z.enum(["student", "teacher"]).meta({ description: "役割" }),
     stuNo: z.number().int().meta({ description: "出席番号" }),
     name: z.string().meta({ description: "名前" }),
-    email: z.string().email().meta({ description: "メールアドレス" }),
+    email: z.email().meta({ description: "メールアドレス" }),
     slackUserId: z.string().meta({ description: "SlackユーザーID" }),
   })
   .meta({

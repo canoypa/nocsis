@@ -4,10 +4,10 @@ export const eventSchema = z
   .object({
     id: z.string().meta({ description: "ID" }),
     startAt: z
-      .union([z.string().date(), z.iso.datetime({ offset: true })])
+      .union([z.iso.date(), z.iso.datetime({ offset: true })])
       .meta({ description: "開始日時" }),
     endAt: z
-      .union([z.string().date(), z.iso.datetime({ offset: true })])
+      .union([z.iso.date(), z.iso.datetime({ offset: true })])
       .meta({ description: "終了日時" }),
     title: z.string().meta({ description: "タイトル" }),
     description: z.string().optional().meta({ description: "説明" }),
