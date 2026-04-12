@@ -22,7 +22,7 @@ import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/providers/auth.dart';
-import 'package:nocsis/providers/user.dart';
+import 'package:nocsis/providers/firebase.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -99,8 +99,8 @@ GoRouter router(Ref ref) {
         : "/groups/${firstUserJoinedGroup.id}${uri.path}";
   }
 
-  Future<String?> redirectNotLoggedInUser(GoRouterState state) async {
-    final currentUser = await ref.read(userChangesStreamProvider.future);
+  String? redirectNotLoggedInUser(GoRouterState state) {
+    final currentUser = ref.read(firebaseAuthProvider).currentUser;
     final isLoggedIn = currentUser != null;
 
     if (isLoggedIn || state.matchedLocation == LoginPageRoute().location) {
@@ -112,7 +112,7 @@ GoRouter router(Ref ref) {
   }
 
   Future<String?> redirectLoggedInUser(GoRouterState state) async {
-    final currentUser = await ref.read(userChangesStreamProvider.future);
+    final currentUser = ref.read(firebaseAuthProvider).currentUser;
     final isLoggedIn = currentUser != null;
 
     if (!isLoggedIn || state.matchedLocation != LoginPageRoute().location) {
@@ -134,7 +134,7 @@ GoRouter router(Ref ref) {
     routes: $appRoutes,
     refreshListenable: refresher,
     redirect: (context, state) async {
-      return await redirectNotLoggedInUser(state) ??
+      return redirectNotLoggedInUser(state) ??
           await redirectLoggedInUser(state) ??
           await redirectFromTopPage(state.uri);
     },

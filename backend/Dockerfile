@@ -3,10 +3,14 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-RUN corepack enable
+FROM base AS builder-base
+
+ENV PNPM_VERSION=10.11.0
+
+RUN npm install --global pnpm@${PNPM_VERSION}
 
 
-FROM base AS builder
+FROM builder-base AS builder
 
 COPY . .
 RUN pnpm install --frozen-lockfile && \
