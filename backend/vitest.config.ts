@@ -7,12 +7,8 @@ export default defineConfig({
     setupFiles: ["tests/setup.ts"],
     fileParallelism: false,
     pool: "forks",
-    poolOptions: {
-      forks: {
-        singleFork: true,
-        isolate: true,
-      },
-    },
+    maxWorkers: 1,
+    isolate: true,
     sequence: {
       concurrent: false,
     },
