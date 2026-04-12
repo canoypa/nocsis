@@ -135,7 +135,7 @@ GoRouter router(Ref ref) {
     refreshListenable: refresher,
     redirect: (context, state) async {
       return redirectNotLoggedInUser(state) ??
-          redirectLoggedInUser(state) ??
+          await redirectLoggedInUser(state) ??
           await redirectFromTopPage(state.uri);
     },
   );
