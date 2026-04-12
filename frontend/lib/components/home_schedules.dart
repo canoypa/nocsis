@@ -13,7 +13,7 @@ class HomeSchedules extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // 毎分更新
-    ref.watch(CronProvider("* * * * *"));
+    ref.watch(cronProvider("* * * * *"));
 
     final groupId = ref.watch(currentGroupIdProvider);
 
