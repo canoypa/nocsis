@@ -5,15 +5,9 @@ ENV NODE_ENV=production
 
 FROM base AS builder-base
 
-ENV PNPM_HOME=/root/.local/share/pnpm
-ENV PATH=${PNPM_HOME}:${PATH}
 ENV PNPM_VERSION=10.11.0
 
-RUN apt-get update && \
-    apt-get install --yes --no-install-recommends wget ca-certificates && \
-    wget -qO- https://get.pnpm.io/install.sh | env PNPM_VERSION=${PNPM_VERSION} ENV="$HOME/.shrc" SHELL="$(which sh)" sh - && \
-    apt-get purge --yes --auto-remove wget && \
-    rm -rf /var/lib/apt/lists/*
+RUN npm install --global pnpm@${PNPM_VERSION}
 
 
 FROM builder-base AS builder
