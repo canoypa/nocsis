@@ -5,7 +5,7 @@ const consoleCalendarPageRoute = TypedGoRoute<ConsoleCalendarPageRoute>(
 );
 
 class ConsoleCalendarPageRoute extends GoRouteData
-    with _$ConsoleCalendarPageRoute {
+    with $ConsoleCalendarPageRoute {
   static const path = '/groups/:groupId/console/calendar';
 
   final String groupId;

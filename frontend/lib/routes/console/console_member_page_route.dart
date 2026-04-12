@@ -4,7 +4,7 @@ const consoleMemberPageRoute = TypedGoRoute<ConsoleMemberPageRoute>(
   path: ConsoleMemberPageRoute.path,
 );
 
-class ConsoleMemberPageRoute extends GoRouteData with _$ConsoleMemberPageRoute {
+class ConsoleMemberPageRoute extends GoRouteData with $ConsoleMemberPageRoute {
   static const path = '/groups/:groupId/console/member';
 
   final String groupId;

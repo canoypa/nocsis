@@ -5,7 +5,7 @@ const personalEventsPageRoute = TypedGoRoute<PersonalEventsPageRoute>(
 );
 
 class PersonalEventsPageRoute extends GoRouteData
-    with _$PersonalEventsPageRoute {
+    with $PersonalEventsPageRoute {
   final String groupId;
 
   static const path = '/groups/:groupId/events';
