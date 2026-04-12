@@ -5,85 +5,101 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nocsis/providers/firebase.dart';
 import 'package:nocsis/providers/user.dart';
 
+ProviderContainer createContainerWithUserChangesKeepAlive(
+  FirebaseAuth mockAuth,
+) {
+  final container = ProviderContainer(
+    overrides: [firebaseAuthProvider.overrideWithValue(mockAuth)],
+  );
+  final userChangesSubscription = container.listen<AsyncValue<User?>>(
+    userChangesStreamProvider,
+    (previous, next) {},
+  );
+
+  addTearDown(userChangesSubscription.close);
+  addTearDown(container.dispose);
+  return container;
+}
+
+Future<void> waitForUserChanges(ProviderContainer container) async {
+  await container.read(userChangesStreamProvider.future);
+}
+
 void main() {
   group('currentUserProvider', () {
     group('ログインしていない場合', () {
       test('nullを返すこと', () async {
+        // Arrange
         final mockAuth = MockFirebaseAuth(signedIn: false);
-        final container = ProviderContainer(
-          overrides: [firebaseAuthProvider.overrideWithValue(mockAuth)],
-        );
+        final container = createContainerWithUserChangesKeepAlive(mockAuth);
 
-        await container.read(userChangesStreamProvider.future);
+        // Act
+        await waitForUserChanges(container);
 
+        // Assert
         final currentUser = container.read(currentUserProvider);
         expect(currentUser, isNull);
-
-        container.dispose();
       });
 
       test('ログインするとUserを返すようになること', () async {
+        // Arrange
         final mockUser = MockUser(uid: 'test-user', email: 'test@example.com');
         final mockAuth = MockFirebaseAuth(signedIn: false, mockUser: mockUser);
-        final container = ProviderContainer(
-          overrides: [firebaseAuthProvider.overrideWithValue(mockAuth)],
-        );
+        final container = createContainerWithUserChangesKeepAlive(mockAuth);
 
-        await container.read(userChangesStreamProvider.future);
+        await waitForUserChanges(container);
         expect(container.read(currentUserProvider), isNull);
 
+        // Act
         await mockAuth.signInWithEmailAndPassword(
           email: 'test@example.com',
           password: 'password',
         );
 
-        await container.read(userChangesStreamProvider.future);
+        await waitForUserChanges(container);
 
+        // Assert
         final user = container.read(currentUserProvider);
         expect(user, isNotNull);
         expect(user, isA<User>());
         expect(user?.uid, equals('test-user'));
-
-        container.dispose();
       });
     });
 
     group('ログインしている場合', () {
       test('Userを返すこと', () async {
+        // Arrange
         final mockUser = MockUser(uid: 'test-user', email: 'test@example.com');
         final mockAuth = MockFirebaseAuth(signedIn: true, mockUser: mockUser);
-        final container = ProviderContainer(
-          overrides: [firebaseAuthProvider.overrideWithValue(mockAuth)],
-        );
+        final container = createContainerWithUserChangesKeepAlive(mockAuth);
 
-        await container.read(userChangesStreamProvider.future);
+        // Act
+        await waitForUserChanges(container);
 
+        // Assert
         final user = container.read(currentUserProvider);
         expect(user, isNotNull);
         expect(user, isA<User>());
         expect(user?.uid, equals('test-user'));
-
-        container.dispose();
       });
 
       test('ログアウトするとnullを返すようになること', () async {
+        // Arrange
         final mockUser = MockUser(uid: 'test-user', email: 'test@example.com');
         final mockAuth = MockFirebaseAuth(signedIn: true, mockUser: mockUser);
-        final container = ProviderContainer(
-          overrides: [firebaseAuthProvider.overrideWithValue(mockAuth)],
-        );
+        final container = createContainerWithUserChangesKeepAlive(mockAuth);
 
-        await container.read(userChangesStreamProvider.future);
+        await waitForUserChanges(container);
         expect(container.read(currentUserProvider), isNotNull);
 
+        // Act
         await mockAuth.signOut();
 
-        await container.read(userChangesStreamProvider.future);
+        await waitForUserChanges(container);
 
+        // Assert
         final user = container.read(currentUserProvider);
         expect(user, isNull);
-
-        container.dispose();
       });
     });
   });

@@ -2,7 +2,7 @@ part of 'package:nocsis/routes/router.dart';
 
 const loginPageRoute = TypedGoRoute<LoginPageRoute>(path: LoginPageRoute.path);
 
-class LoginPageRoute extends GoRouteData with _$LoginPageRoute {
+class LoginPageRoute extends GoRouteData with $LoginPageRoute {
   static const path = '/login';
 
   final Uri? continueUri;

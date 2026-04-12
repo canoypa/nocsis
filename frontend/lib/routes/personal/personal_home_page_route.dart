@@ -4,7 +4,7 @@ const personalHomePageRoute = TypedGoRoute<PersonalHomePageRoute>(
   path: PersonalHomePageRoute.path,
 );
 
-class PersonalHomePageRoute extends GoRouteData with _$PersonalHomePageRoute {
+class PersonalHomePageRoute extends GoRouteData with $PersonalHomePageRoute {
   final String groupId;
 
   static const path = '/groups/:groupId';
