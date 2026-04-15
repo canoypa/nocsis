@@ -31,6 +31,35 @@ describe("notifyDayduty", () => {
     );
   });
 
+  describe("dayduty_notification_enabledがfalseのグループがある場合", async () => {
+    beforeEach(async () => {
+      const firestore = getFirestore(firebaseApp);
+
+      await firestore
+        .doc("groups/group_disabled")
+        .set({ dayduty_notification_enabled: false });
+    });
+
+    it("そのグループの通知処理は呼び出されないこと", async () => {
+      const mockedNotifyDayDutyPerGroup = vi
+        .spyOn(notifyDayDutyPerGroupModule, "notifyDayDutyPerGroup")
+        .mockImplementation(async () => {});
+
+      const date = DateTime.local(2025, 1, 1);
+      await notifyDayDuty(date);
+
+      expect(mockedNotifyDayDutyPerGroup).toHaveBeenCalledTimes(1);
+      expect(mockedNotifyDayDutyPerGroup).toHaveBeenCalledWith(
+        { id: "group_1" },
+        date,
+      );
+      expect(mockedNotifyDayDutyPerGroup).not.toHaveBeenCalledWith(
+        { id: "group_disabled" },
+        date,
+      );
+    });
+  });
+
   describe("通知処理でエラーが発生した場合", async () => {
     beforeEach(async () => {
       const firestore = getFirestore(firebaseApp);
