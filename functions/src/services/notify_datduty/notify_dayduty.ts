@@ -10,9 +10,9 @@ export const notifyDayDuty: CrontabHandler = async (timestamp) => {
   const firestore = getFirestore(firebaseApp);
 
   const groupsSnapshot = await firestore.collection("groups").get();
-  const groups = groupsSnapshot.docs.map((doc) => ({
-    id: doc.id,
-  }));
+  const groups = groupsSnapshot.docs
+    .filter((doc) => doc.get("dayduty_notification_enabled") !== false)
+    .map((doc) => ({ id: doc.id }));
 
   await Promise.allSettled(
     groups.map((group) =>
