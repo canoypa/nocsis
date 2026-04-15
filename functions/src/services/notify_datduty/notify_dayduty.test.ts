@@ -31,7 +31,7 @@ describe("notifyDayduty", () => {
     );
   });
 
-  describe("dayduty_notification_enabledがfalseのグループがある場合", async () => {
+  describe("dayduty_notification_enabledがfalseのグループがある場合", () => {
     beforeEach(async () => {
       const firestore = getFirestore(firebaseApp);
 
