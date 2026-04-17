@@ -1,3 +1,7 @@
+import { config } from "dotenv";
+
+config({ path: ".env.test" });
+
 // Firebaseエミュレーターへの接続設定
 process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099";
 process.env.FIRESTORE_EMULATOR_HOST = "localhost:8888";
