@@ -2,7 +2,7 @@ name: Deploy to Production
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions: {}
@@ -30,7 +30,7 @@ jobs:
       environment: Production
 
   deploy_frontend:
-    needs: [deploy_backend, deploy_functions]
+    needs: [ deploy_backend, deploy_functions ]
     permissions:
       checks: write
       contents: read
