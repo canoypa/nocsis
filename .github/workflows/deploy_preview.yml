@@ -2,41 +2,33 @@ name: Deploy Preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, labeled, unlabeled]
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+    inputs:
+      channel_id:
+        description: "Firebase Hosting channel ID"
+        required: false
+        default: preview
+
+permissions: {}
 
 concurrency:
-  group: Deploy Preview ${{ github.event.pull_request.number }}
+  group: Deploy Preview ${{ github.event.pull_request.number || inputs.channel_id }}
   cancel-in-progress: true
 
 jobs:
-  build_and_preview:
-    if: ${{ contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
-    runs-on: ubuntu-latest
-    permissions:
-      checks: write
-      contents: read
-      pull-requests: write
-    environment:
-      name: Preview
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Setup Tools
-        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
-      - name: Install dependencies
-        working-directory: ./frontend
-        run: flutter pub get --enforce-lockfile
-      - name: Generate OpenAPI spec
-        working-directory: ./backend
-        run: pnpm install --frozen-lockfile && pnpm run generate-openapi
-      - name: Run build_runner
-        working-directory: ./frontend
-        run: flutter pub run build_runner build
-      - name: Build
-        working-directory: ./frontend
-        run: flutter build web --wasm
-      - name: Deploy
-        uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0.10.0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
+  deploy_backend:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
+    uses: ./.github/workflows/_deploy_backend.yml
+    with:
+      environment: Preview
+      tag: ${{ github.event_name == 'workflow_dispatch' && inputs.channel_id || format('pr-{0}', github.event.pull_request.number) }}
+
+  deploy_frontend:
+    needs: [deploy_backend]
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
+    uses: ./.github/workflows/_deploy_frontend.yml
+    with:
+      environment: Preview
+      channel_id: ${{ github.event_name == 'workflow_dispatch' && inputs.channel_id || format('pr-{0}', github.event.pull_request.number) }}
+    secrets: inherit

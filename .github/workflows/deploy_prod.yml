@@ -9,15 +9,24 @@ permissions: {}
 
 concurrency:
   group: Deploy to Production
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  deploy:
-    permissions:
-      contents: read
-      id-token: write
-      checks: write
-    uses: ./.github/workflows/deploy.yml
+  deploy_backend:
+    uses: ./.github/workflows/_deploy_backend.yml
     with:
-      env: Production
+      environment: Production
+      promote: true
+
+  deploy_functions:
+    uses: ./.github/workflows/_deploy_functions.yml
+    with:
+      environment: Production
+
+  deploy_frontend:
+    needs: [deploy_backend, deploy_functions]
+    uses: ./.github/workflows/_deploy_frontend.yml
+    with:
+      environment: Production
+      channel_id: live
     secrets: inherit

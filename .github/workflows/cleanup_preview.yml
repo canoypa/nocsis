@@ -1,0 +1,41 @@
+name: Cleanup Preview
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  cleanup:
+    if: ${{ contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: Preview
+    env:
+      CHANNEL_ID: pr-${{ github.event.pull_request.number }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+      - name: Delete Cloud Run tag
+        run: |
+          gcloud run services update-traffic backend \
+            --remove-tags ${{ env.CHANNEL_ID }} \
+            --project class-clock-40088 \
+            --region asia-northeast1
+      - name: Setup Tools
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Delete Firebase Hosting channel
+        run: pnpm firebase hosting:channel:delete ${{ env.CHANNEL_ID }} --force
