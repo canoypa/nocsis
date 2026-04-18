@@ -3,7 +3,7 @@
     "emulators:start": "firebase emulators:start --import ./emulator_data --export-on-exit ./emulator_data"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.2",
-    "firebase-tools": "^13.25.0"
+    "@biomejs/biome": "^2.4.12",
+    "firebase-tools": "^15.15.0"
   }
 }

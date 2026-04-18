@@ -33,7 +33,7 @@ describe("getStudentByStuNo", () => {
   });
 
   it("該当するレコードがない場合、エラーが発生する", async () => {
-    await expect(getStudentByStuNo("group_1", 2)).rejects.toThrowError(
+    await expect(getStudentByStuNo("group_1", 2)).rejects.toThrow(
       "Classmate not found: 2",
     );
   });
@@ -62,7 +62,7 @@ describe("getStudentByStuNo", () => {
     });
 
     it("該当するレコードがない場合、エラーが発生する", async () => {
-      await expect(getStudentByStuNo("group_1", 3, 4)).rejects.toThrowError(
+      await expect(getStudentByStuNo("group_1", 3, 4)).rejects.toThrow(
         "Classmate not found: 3,4",
       );
     });
