@@ -7,9 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'api_client.g.dart';
 
-const String _baseUrl = kDebugMode
-    ? 'http://localhost:8080'
-    : 'https://nocsis.app';
+final String _baseUrl = kDebugMode ? 'http://localhost:8080' : Uri.base.origin;
 
 class BearerAuthInterceptor implements Interceptor {
   final String token;

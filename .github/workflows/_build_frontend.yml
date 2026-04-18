@@ -1,0 +1,41 @@
+name: Build Frontend
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  build:
+    environment:
+      name: ${{ inputs.environment }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup Tools
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: flutter pub get --enforce-lockfile
+      - name: Generate OpenAPI spec
+        working-directory: ./backend
+        run: pnpm install --frozen-lockfile && pnpm run generate-openapi
+      - name: Run build_runner
+        working-directory: ./frontend
+        run: flutter pub run build_runner build
+      - name: Build
+        working-directory: ./frontend
+        run: flutter build web --wasm
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: frontend-build
+          path: ./frontend/build/web
