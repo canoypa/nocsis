@@ -6,13 +6,6 @@ export default defineConfig({
     include: ["src/**/*.spec.ts"],
     setupFiles: ["tests/setup.ts"],
     fileParallelism: false,
-    pool: "forks",
-    maxWorkers: 1,
-    isolate: true,
-    sequence: {
-      concurrent: false,
-    },
     mockReset: true,
-    clearMocks: true,
   },
 });

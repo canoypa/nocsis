@@ -23,8 +23,6 @@ export default defineConfig({
           include: ["src/{controllers,services}/**/*.test.ts"],
           setupFiles: ["tests/functions_setup.ts"],
           fileParallelism: false,
-          maxWorkers: 1,
-          isolate: true,
         },
       },
     ],

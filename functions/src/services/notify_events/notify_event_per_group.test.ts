@@ -13,7 +13,7 @@ vi.mock("@slack/web-api", () => ({
   },
 }));
 
-describe("notifyDayDutyPerGroup", () => {
+describe("notifyEventPerGroup", () => {
   const group = {
     id: "group_1",
     events_calendar_id: "events_calendar_1",

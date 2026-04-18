@@ -1,6 +1,6 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { firebaseApp } from "~/client/firebaseApp.js";
 import type { Student, Teacher } from "~/types/classmates.js";
 import * as fetchSecretModule from "../fetch_secret.js";
@@ -42,6 +42,10 @@ describe("notifyDayDutyPerGroup", () => {
     await firestore.collection("groups").doc(group.id).set(group);
     await firestore.collection("classmates").add(student);
     await firestore.collection("classmates").add(teacher);
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
   });
 
   it("通知されること", async () => {
