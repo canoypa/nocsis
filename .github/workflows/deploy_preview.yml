@@ -19,6 +19,9 @@ concurrency:
 jobs:
   deploy_backend:
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
+    permissions:
+      contents: read
+      id-token: write
     uses: ./.github/workflows/_deploy_backend.yml
     with:
       environment: Preview
@@ -27,6 +30,10 @@ jobs:
   deploy_frontend:
     needs: [deploy_backend]
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
     uses: ./.github/workflows/_deploy_frontend.yml
     with:
       environment: Preview
