@@ -29,8 +29,15 @@ jobs:
     with:
       environment: Production
 
+  build_frontend:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_frontend.yml
+    with:
+      environment: Production
+
   deploy_frontend:
-    needs: [ deploy_backend, deploy_functions ]
+    needs: [build_frontend, deploy_backend, deploy_functions]
     permissions:
       checks: write
       contents: read
