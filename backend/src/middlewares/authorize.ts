@@ -101,7 +101,9 @@ export const requireGroupMembership = (
       throw new HTTPException(404, { message: "グループが存在しません。" });
     }
 
-    c.set("group", { id: groupSnapshot.id, ...groupData });
+    // ドキュメントデータに id フィールドが含まれていても
+    // ドキュメントID (groupSnapshot.id) を優先する
+    c.set("group", { ...groupData, id: groupSnapshot.id });
     c.set("groupRole", role);
 
     await next();
