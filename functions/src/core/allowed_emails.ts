@@ -1,8 +1,8 @@
 /**
- * サインアップ許可リスト（environment/allowed_emails.value）に対して
+ * サインアップ許可リスト（environment/allowed_emails.values）に対して
  * email がいずれかのパターンに一致するか判定する。
  *
- * value の各要素は "^...$" で完全一致にアンカーされた正規表現文字列で
+ * values の各要素は "^...$" で完全一致にアンカーされた正規表現文字列で
  * あることを前提とする。アンカーされていないパターンは部分一致による
  * バイパス（例: "^user@example\\.com$" のつもりが "user@example\\.com"
  * のみだと "user@example.com.attacker.com" にもマッチしてしまう）の

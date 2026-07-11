@@ -18,7 +18,7 @@ export const beforeUserCreate = beforeUserCreated(
       .doc("environment/allowed_emails")
       .get();
 
-    const patterns = snapshot.data()?.value;
+    const patterns = snapshot.data()?.values;
 
     if (!isAllowedEmail(user.email, patterns)) {
       throw new Error("Invalid user.");
