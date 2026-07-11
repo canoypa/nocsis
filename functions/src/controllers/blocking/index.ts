@@ -17,12 +17,25 @@ export const beforeUserCreate = beforeUserCreated(
       .doc("environment/allowed_emails")
       .get();
 
-    const data = snapshot.data() as { value: string[] };
+    const data = snapshot.data();
+    const patterns = data?.value;
 
-    // FIXME: wow
-    const isAllowedUser = data.value.every((pattern) => {
-      return user.email && RegExp(pattern).test(user.email);
-    });
+    // 許可リストが取得できない・空・不正な場合は fail-closed で拒否する
+    if (!Array.isArray(patterns) || patterns.length === 0) {
+      throw new Error("Invalid user.");
+    }
+
+    const email = user.email;
+
+    // いずれかのパターンに一致すれば許可（部分一致を避けるため完全一致にアンカーする）
+    const isAllowedUser =
+      !!email &&
+      patterns.some((pattern) => {
+        if (typeof pattern !== "string") {
+          return false;
+        }
+        return new RegExp(`^(?:${pattern})$`).test(email);
+      });
     if (!isAllowedUser) {
       throw new Error("Invalid user.");
     }
