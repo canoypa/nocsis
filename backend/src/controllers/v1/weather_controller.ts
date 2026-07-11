@@ -2,12 +2,14 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { z } from "zod";
-import { firestore } from "../../clients/firebase.js";
 import {
   type AuthenticatedEnv,
   authentication,
-  getCurrentUserId,
 } from "../../middlewares/authenticate.js";
+import {
+  type GroupAuthzEnv,
+  requireGroupMembership,
+} from "../../middlewares/authorize.js";
 import { weatherDataSchema } from "../../resources/v1/weather_data.js";
 import {
   fetchWeather,
@@ -17,7 +19,10 @@ import {
 import "zod-openapi/extend";
 import { groupSchema } from "../../resources/v1/groups.js";
 
-export const weatherRoutes = new Hono<AuthenticatedEnv>();
+export const weatherRoutes = new Hono<AuthenticatedEnv & GroupAuthzEnv>();
+
+// 認証を検証より先に実行する
+weatherRoutes.use("*", authentication);
 
 const paramSchema = z
   .object({
@@ -46,31 +51,9 @@ weatherRoutes.get(
     security: [{ bearer: [] }],
   }),
   validator("param", paramSchema),
-  authentication,
+  requireGroupMembership(),
   async (c) => {
-    const groupId = c.req.param("groupId");
-    const uid = getCurrentUserId(c);
-
-    // Firestore 並列クエリ: グループ存在 & 参加チェック
-    const [groupSnapshot, userJoinedGroupSnapshot] = await Promise.all([
-      firestore.collection("groups").doc(groupId).get(),
-      firestore
-        .collection("user_joined_groups")
-        .where("user_id", "==", uid)
-        .where("group_id", "==", groupId)
-        .get(),
-    ]);
-    if (!groupSnapshot.exists) {
-      throw new HTTPException(404, { message: "グループが存在しません。" });
-    }
-    if (userJoinedGroupSnapshot.empty) {
-      throw new HTTPException(403, { message: "グループに参加していません。" });
-    }
-
-    const parseGroup = groupSchema.safeParse({
-      id: groupSnapshot.id,
-      ...groupSnapshot.data(),
-    });
+    const parseGroup = groupSchema.safeParse(c.get("group"));
     if (!parseGroup.success) {
       throw new HTTPException(500, { message: "グループのデータが不正です。" });
     }

@@ -149,6 +149,7 @@ describe("GroupController", () => {
         .add({
           user_id: "test_user_1",
           group_id: "test_group_1",
+          role: "admin",
         });
 
       return async () => {
@@ -342,6 +343,69 @@ describe("GroupController", () => {
         });
 
         expect(response.status).toBe(403);
+      });
+    });
+
+    // member ロール（および role 未設定の後方互換）では更新を拒否する。
+    // これは「参加者なら誰でも全フィールドを書き換えられた」権限昇格バグの回帰テスト。
+    describe.each([
+      { label: "member ロールの場合", role: "member" as const },
+      { label: "role 未設定の場合（後方互換）", role: undefined },
+    ])("$label", ({ role }) => {
+      let memberUser: UserRecord;
+      let memberLoginResult: LoginResult;
+
+      beforeEach(async () => {
+        memberUser = await auth.createUser({ uid: "test_member_user_1" });
+        memberLoginResult = await login(memberUser);
+
+        const membership: {
+          user_id: string;
+          group_id: string;
+          role?: string;
+        } = {
+          user_id: memberUser.uid,
+          group_id: "test_group_1",
+        };
+        if (role !== undefined) {
+          membership.role = role;
+        }
+
+        const membershipRef = await firestore
+          .collection("user_joined_groups")
+          .add(membership);
+
+        return async () => {
+          await auth.deleteUser(memberUser.uid);
+          await membershipRef.delete();
+        };
+      });
+
+      it("403エラーになり、グループが変更されないこと", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${memberLoginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: "Hacked Name",
+            slack_event_channel_id: "hacked_channel",
+          }),
+        });
+
+        expect(response.status).toBe(403);
+
+        // 部分書き込みが起きていないこと
+        const snapshot = await firestore
+          .collection("groups")
+          .doc("test_group_1")
+          .get();
+        expect(snapshot.data()).toMatchObject({
+          name: "Test Group",
+          slack_event_channel_id: "slack_event_channel_id",
+        });
       });
     });
 
