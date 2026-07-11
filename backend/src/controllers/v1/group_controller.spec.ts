@@ -409,6 +409,49 @@ describe("GroupController", () => {
       });
     });
 
+    // 同一ユーザーのメンバーシップ文書が重複して存在する場合、
+    // クエリの順序に関わらず決定的に判定されること（安全側に倒れること）。
+    describe("メンバーシップ文書が重複している場合（admin と member が混在）", () => {
+      let duplicateUser: UserRecord;
+      let duplicateLoginResult: LoginResult;
+
+      beforeEach(async () => {
+        duplicateUser = await auth.createUser({ uid: "test_duplicate_user_1" });
+        duplicateLoginResult = await login(duplicateUser);
+
+        const adminRef = await firestore.collection("user_joined_groups").add({
+          user_id: duplicateUser.uid,
+          group_id: "test_group_1",
+          role: "admin",
+        });
+        const memberRef = await firestore.collection("user_joined_groups").add({
+          user_id: duplicateUser.uid,
+          group_id: "test_group_1",
+          role: "member",
+        });
+
+        return async () => {
+          await auth.deleteUser(duplicateUser.uid);
+          await adminRef.delete();
+          await memberRef.delete();
+        };
+      });
+
+      it("403エラーになること（全文書が admin の場合のみ admin 扱い）", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${duplicateLoginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ name: "Updated Test Name" }),
+        });
+
+        expect(response.status).toBe(403);
+      });
+    });
+
     describe("認証情報がない場合", () => {
       it("401エラーになること", async () => {
         const response = await app.request("/api/v1/groups/test_group_1", {

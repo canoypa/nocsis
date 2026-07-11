@@ -67,7 +67,6 @@ export const requireGroupMembership = (
         .collection("user_joined_groups")
         .where("user_id", "==", uid)
         .where("group_id", "==", groupId)
-        .limit(1)
         .get(),
     ]);
 
@@ -80,9 +79,15 @@ export const requireGroupMembership = (
       });
     }
 
-    // role 未設定の既存ドキュメントは member として扱う（後方互換）
-    const rawRole = userJoinedGroupSnapshot.docs[0].data().role;
-    const role: GroupRole = rawRole === "admin" ? "admin" : "member";
+    // 同一ユーザーのメンバーシップ文書が複数存在する場合でも判定が
+    // クエリの順序に依存しないよう、全件を見て決定的に判定する。
+    // role 未設定の文書は member として扱う（後方互換）ため、
+    // 全ての文書が admin の場合のみ admin、それ以外は安全側で member とする。
+    const role: GroupRole = userJoinedGroupSnapshot.docs.every(
+      (doc) => doc.data().role === "admin",
+    )
+      ? "admin"
+      : "member";
 
     if (roleRank[role] < roleRank[requiredRole]) {
       throw new HTTPException(403, {
