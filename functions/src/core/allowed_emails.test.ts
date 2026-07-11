@@ -4,8 +4,8 @@ import { isAllowedEmail } from "./allowed_emails.js";
 describe("isAllowedEmail", () => {
   describe("複数パターンの許可リスト", () => {
     const patterns = [
-      "student@school\\.example\\.com",
-      "teacher@school\\.example\\.com",
+      "^student@school\\.example\\.com$",
+      "^teacher@school\\.example\\.com$",
     ];
 
     it("いずれか 1 つのパターンに一致すれば許可する（.some の回帰）", () => {
@@ -24,20 +24,20 @@ describe("isAllowedEmail", () => {
     });
   });
 
-  describe("正規表現のアンカー", () => {
-    const patterns = ["[a-z]+@school\\.example\\.com"];
+  describe("完全一致（アンカーされたパターン）", () => {
+    const patterns = ["^[a-z]+@school\\.example\\.com$"];
 
-    it("部分一致によるバイパスを拒否する（未アンカーだと通ってしまうケース）", () => {
+    it("完全一致は許可する", () => {
+      expect(isAllowedEmail("user@school.example.com", patterns)).toBe(true);
+    });
+
+    it("完全一致でなければ拒否する", () => {
       expect(
         isAllowedEmail("user@school.example.com.attacker.com", patterns),
       ).toBe(false);
       expect(
         isAllowedEmail("prefix.user@school.example.com", patterns),
       ).toBe(false);
-    });
-
-    it("完全一致は許可する", () => {
-      expect(isAllowedEmail("user@school.example.com", patterns)).toBe(true);
     });
   });
 
@@ -60,19 +60,35 @@ describe("isAllowedEmail", () => {
 
     it("email が無ければ拒否する", () => {
       expect(
-        isAllowedEmail(undefined, ["[a-z]+@school\\.example\\.com"]),
+        isAllowedEmail(undefined, ["^[a-z]+@school\\.example\\.com$"]),
       ).toBe(false);
     });
 
+    it("アンカーされていないパターンが含まれる場合は拒否する（他のパターンが有効でも通さない）", () => {
+      // value は "^...$" で完全一致にアンカーされている前提のため、
+      // アンカーの無いパターンはデータ不整合として拒否する
+      // （部分一致バイパスの温床になるため信頼しない）。
+      const patterns = [
+        "^user@school\\.example\\.com$",
+        "other@school\\.example\\.com",
+      ];
+      expect(isAllowedEmail("user@school.example.com", patterns)).toBe(
+        false,
+      );
+      expect(isAllowedEmail("other@school.example.com", patterns)).toBe(
+        false,
+      );
+    });
+
     it("不正な正規表現パターンが含まれる場合は拒否する（他のパターンが有効でも通さない）", () => {
-      const patterns = ["user@school\\.example\\.com", "(unbalanced["];
+      const patterns = ["^user@school\\.example\\.com$", "^(unbalanced[$"];
       expect(isAllowedEmail("user@school.example.com", patterns)).toBe(
         false,
       );
     });
 
     it("文字列でないパターンが含まれる場合は拒否する", () => {
-      const patterns = ["user@school\\.example\\.com", 123];
+      const patterns = ["^user@school\\.example\\.com$", 123];
       expect(isAllowedEmail("user@school.example.com", patterns)).toBe(
         false,
       );
