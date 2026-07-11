@@ -214,6 +214,33 @@ describe("GroupController", () => {
       });
     });
 
+    describe("ドキュメントに不正な id フィールドが含まれる場合", () => {
+      beforeEach(async () => {
+        // groups ドキュメント自体に id フィールドが紛れ込んでいても、
+        // レスポンスの id は常にドキュメントID (test_group_1) を優先すること
+        await firestore
+          .collection("groups")
+          .doc("test_group_1")
+          .update({ id: "malicious_id" });
+      });
+
+      it("レスポンスの id はドキュメントIDになること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ name: "Updated Test Name" }),
+        });
+        const body = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(body.id).toBe("test_group_1");
+      });
+    });
+
     describe("一部のデータを更新する場合", () => {
       it("更新できること", async () => {
         const response = await app.request("/api/v1/groups/test_group_1", {

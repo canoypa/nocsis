@@ -7,6 +7,7 @@ import {
   authentication,
 } from "../../middlewares/authenticate.js";
 import {
+  getGroup,
   type GroupAuthzEnv,
   requireGroupMembership,
   requireGroupRole,
@@ -68,7 +69,7 @@ groupRoutes
     validator("param", paramSchema),
     requireGroupMembership({ param: "id" }),
     async (c) => {
-      const group = groupSchema.parse(c.get("group"));
+      const group = groupSchema.parse(getGroup(c));
 
       return c.json<GroupResponse>(group);
     },
@@ -116,8 +117,8 @@ groupRoutes
 
       const updatedGroupSnapshot = await groupRef.get();
       const updatedGroup = groupSchema.parse({
-        id: updatedGroupSnapshot.id,
         ...updatedGroupSnapshot.data(),
+        id: updatedGroupSnapshot.id,
       });
 
       return c.json<GroupResponse>(updatedGroup);

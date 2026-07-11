@@ -7,6 +7,7 @@ import {
   authentication,
 } from "../../middlewares/authenticate.js";
 import {
+  getGroup,
   type GroupAuthzEnv,
   requireGroupMembership,
 } from "../../middlewares/authorize.js";
@@ -53,7 +54,7 @@ weatherRoutes.get(
   validator("param", paramSchema),
   requireGroupMembership(),
   async (c) => {
-    const parseGroup = groupSchema.safeParse(c.get("group"));
+    const parseGroup = groupSchema.safeParse(getGroup(c));
     if (!parseGroup.success) {
       throw new HTTPException(500, { message: "グループのデータが不正です。" });
     }

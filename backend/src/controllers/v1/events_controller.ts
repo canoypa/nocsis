@@ -10,6 +10,7 @@ import {
   authentication,
 } from "../../middlewares/authenticate.js";
 import {
+  getGroup,
   type GroupAuthzEnv,
   requireGroupMembership,
 } from "../../middlewares/authorize.js";
@@ -102,7 +103,7 @@ eventsRoutes.get(
       });
     }
 
-    const group = c.get("group");
+    const group = getGroup(c);
 
     const calendarId = group.events_calendar_id;
     if (!calendarId) {

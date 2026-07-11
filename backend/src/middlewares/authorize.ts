@@ -1,4 +1,6 @@
+import assert from "node:assert";
 import type { DocumentData } from "firebase-admin/firestore";
+import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { firestore } from "../clients/firebase.js";
@@ -12,11 +14,39 @@ export type GroupRole = "member" | "admin";
 
 export type GroupAuthzEnv = {
   Variables: {
-    /** requireGroupMembership が取得したグループのドキュメントデータ */
-    group: DocumentData;
-    /** 呼び出しユーザーの当該グループにおけるロール */
-    groupRole: GroupRole;
+    /**
+     * requireGroupMembership が取得したグループのドキュメントデータ。
+     * optional にしているのは、requireGroupMembership の適用を
+     * 型システムで強制できないため（付け忘れても router 全体の
+     * Hono<... & GroupAuthzEnv> により c.get("group") が
+     * DocumentData 型に見えてしまう問題を避けるため）。
+     * ハンドラからは c.get() ではなく getGroup(c) を使うこと。
+     */
+    group?: DocumentData;
+    /** 呼び出しユーザーの当該グループにおけるロール。取得には getGroupRole(c) を使うこと */
+    groupRole?: GroupRole;
   };
+};
+
+/**
+ * requireGroupMembership 系ミドルウェアが設定した group を取得する。
+ * ミドルウェアの適用漏れがあれば実行時にエラーになる（getCurrentUserId と同様の方針）。
+ */
+export const getGroup = <E extends GroupAuthzEnv>(c: Context<E>): DocumentData => {
+  const group = c.get("group");
+  assert(group, "requireGroupMembership middleware が適用されていません。");
+  return group;
+};
+
+/**
+ * requireGroupMembership 系ミドルウェアが設定した groupRole を取得する。
+ */
+export const getGroupRole = <E extends GroupAuthzEnv>(
+  c: Context<E>,
+): GroupRole => {
+  const role = c.get("groupRole");
+  assert(role, "requireGroupMembership middleware が適用されていません。");
+  return role;
 };
 
 const roleRank: Record<GroupRole, number> = {
