@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  functions:
+  test-functions:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,12 +27,22 @@ jobs:
           java-version: '21'
       - name: Setup Tools
         uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-functions-${{ hashFiles('functions/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-functions-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Test
         run: pnpm run test
 
-  backend:
+  test-backend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -47,12 +57,22 @@ jobs:
           java-version: '21'
       - name: Setup Tools
         uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-backend-${{ hashFiles('backend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-backend-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Test
         run: pnpm run test
 
-  frontend:
+  test-frontend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -62,11 +82,25 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup Tools
         uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+      - name: Setup pub cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-cache-${{ hashFiles('frontend/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-cache-
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
       - name: Generate OpenAPI spec
         run: pnpm install --frozen-lockfile && pnpm run generate-openapi
         working-directory: ./backend
+      - name: Setup build_runner cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: frontend/.dart_tool/build
+          key: ${{ runner.os }}-build-runner-${{ hashFiles('frontend/pubspec.lock', 'frontend/lib/**/*.dart', 'frontend/swagger/api.json', 'frontend/build.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-runner-
       - name: Run build_runner
         run: flutter pub run build_runner build
       - name: Test

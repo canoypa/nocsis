@@ -1,4 +1,7 @@
-name: Lint
+name: Build
+
+# ビルドゲート: 静的解析(Lint)・振る舞いのテスト(Test)とは別カテゴリの検証。
+# assertion は実行せず「デプロイ可能な成果物としてコンパイルできるか」だけを確認する。
 
 on:
   pull_request:
@@ -12,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-functions:
+  build-functions:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,12 +37,10 @@ jobs:
             ${{ runner.os }}-pnpm-store-functions-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Type Check
-        run: pnpm run typecheck
-      - name: Lint
-        run: pnpm run lint
+      - name: Build
+        run: pnpm run build
 
-  lint-backend:
+  build-backend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -61,12 +62,13 @@ jobs:
             ${{ runner.os }}-pnpm-store-backend-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Type Check
-        run: pnpm run typecheck
-      - name: Lint
-        run: pnpm run lint
+      - name: Build
+        run: pnpm run build
 
-  lint-frontend:
+  build-frontend:
+    # 重い wasm ビルドは release PR(development→main)でのみ検証する。
+    # feature→development の通常PRではこのジョブ自体を丸ごとスキップする。
+    if: ${{ github.base_ref == 'main' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -97,5 +99,5 @@ jobs:
             ${{ runner.os }}-build-runner-
       - name: Run build_runner
         run: flutter pub run build_runner build
-      - name: Lint
-        run: flutter analyze
+      - name: Build web (wasm)
+        run: flutter build web --wasm
