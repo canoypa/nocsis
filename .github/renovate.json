@@ -13,7 +13,7 @@
   },
   "packageRules": [
     {
-      "description": "パッチ・SHA ピン更新は自動マージ（旧 dependabot_auto_merge.yml 相当。CI が通ったものだけマージされる）",
+      "description": "パッチ・SHA ピン更新は CI が通ったものだけ自動マージする",
       "matchUpdateTypes": ["patch", "pin", "digest"],
       "automerge": true
     },
@@ -42,7 +42,7 @@
       "groupName": "github-actions patch updates"
     },
     {
-      "description": "@types/node のメジャーは runtime に追従させず追わない（旧 dependabot ignore 相当）",
+      "description": "@types/node のメジャーは runtime に追従させず追わない",
       "matchPackageNames": ["@types/node"],
       "matchUpdateTypes": ["major"],
       "enabled": false
