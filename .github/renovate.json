@@ -47,6 +47,12 @@
       "addLabels": ["mise"]
     },
     {
+      "description": "mise管理ツールのpatchはビルド・実行環境全体への変更のため自動マージせず人間レビューを挟む",
+      "matchManagers": ["mise"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": false
+    },
+    {
       "description": "node ランタイムのメジャー更新と @types/node のメジャー更新をまとめる",
       "matchManagers": ["mise", "npm"],
       "matchDepNames": ["node", "@types/node"],
