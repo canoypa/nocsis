@@ -11,6 +11,9 @@
     "enabled": true,
     "labels": ["security"]
   },
+  "dockerfile": {
+    "enabled": false
+  },
   "packageRules": [
     {
       "description": "パッチ・SHAダイジェスト更新は CI が通ったものだけ自動マージする",
@@ -20,18 +23,21 @@
     {
       "description": "functions(npm) のパッチをまとめる",
       "matchFileNames": ["functions/**"],
+      "matchManagers": ["npm"],
       "matchUpdateTypes": ["patch"],
       "groupName": "functions patch updates"
     },
     {
       "description": "backend(npm) のパッチをまとめる",
       "matchFileNames": ["backend/**"],
+      "matchManagers": ["npm"],
       "matchUpdateTypes": ["patch"],
       "groupName": "backend patch updates"
     },
     {
       "description": "frontend(pub) のパッチをまとめる",
       "matchFileNames": ["frontend/**"],
+      "matchManagers": ["pub"],
       "matchUpdateTypes": ["patch"],
       "groupName": "frontend patch updates"
     },
@@ -51,6 +57,15 @@
       "matchManagers": ["mise"],
       "matchUpdateTypes": ["patch"],
       "automerge": false
+    },
+    {
+      "description": "flutter(mise) 更新は frontend/pubspec.lock の再生成が必要なためマージ前に手動対応を促す",
+      "matchManagers": ["mise"],
+      "matchDepNames": ["flutter"],
+      "automerge": false,
+      "prBodyNotes": [
+        "⚠️ flutter バージョン更新時は `frontend/pubspec.lock` の再生成が必要です。マージ前に `cd frontend && flutter pub get` を実行し、変更されたロックファイルをこのPRにコミットしてください。"
+      ]
     },
     {
       "description": "node ランタイムのメジャー更新と @types/node のメジャー更新をまとめる",
