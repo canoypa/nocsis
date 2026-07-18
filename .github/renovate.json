@@ -11,9 +11,6 @@
     "enabled": true,
     "labels": ["security"]
   },
-  "dockerfile": {
-    "enabled": false
-  },
   "packageRules": [
     {
       "description": "パッチ・SHAダイジェスト更新は CI が通ったものだけ自動マージする",
