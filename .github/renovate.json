@@ -13,8 +13,8 @@
   },
   "packageRules": [
     {
-      "description": "パッチ・SHA ピン更新は CI が通ったものだけ自動マージする",
-      "matchUpdateTypes": ["patch", "pin", "digest"],
+      "description": "パッチ・SHAダイジェスト更新は CI が通ったものだけ自動マージする",
+      "matchUpdateTypes": ["patch", "digest"],
       "automerge": true
     },
     {
