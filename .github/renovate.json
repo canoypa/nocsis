@@ -16,54 +16,21 @@
   },
   "packageRules": [
     {
-      "description": "パッチ・SHAダイジェスト更新はリリースから3日以上経過しCIが通ったものだけ自動マージする（npmはsecurity:minimumReleaseAgeNpmでも同条件を担保）",
+      "description": "npm/pub/github-actions/dockerfileのパッチ・SHAダイジェスト更新はリリースから3日以上経過しCIが通ったものだけ自動マージする（mise管理ツールはそもそもこのルールの対象外なので別途falseで打ち消す必要が無い。npmはsecurity:minimumReleaseAgeNpmでも同条件を担保）",
+      "matchManagers": ["npm", "pub", "github-actions", "dockerfile"],
       "matchUpdateTypes": ["patch", "digest"],
       "minimumReleaseAge": "3 days",
       "automerge": true
     },
     {
-      "description": "functions(npm) のパッチをまとめる",
-      "matchFileNames": ["functions/**"],
-      "matchManagers": ["npm"],
-      "matchUpdateTypes": ["patch"],
-      "groupName": "functions patch updates"
-    },
-    {
-      "description": "backend(npm) のパッチをまとめる",
-      "matchFileNames": ["backend/**"],
-      "matchManagers": ["npm"],
-      "matchUpdateTypes": ["patch"],
-      "groupName": "backend patch updates"
-    },
-    {
-      "description": "frontend(pub) のパッチをまとめる",
-      "matchFileNames": ["frontend/**"],
-      "matchManagers": ["pub"],
-      "matchUpdateTypes": ["patch"],
-      "groupName": "frontend patch updates"
-    },
-    {
-      "description": "GitHub Actions のパッチをまとめる",
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["patch"],
-      "groupName": "github-actions patch updates"
-    },
-    {
-      "description": "mise が管理するツール(flutter/node/pnpm)。CI の mise-action と同じ版を Renovate が追従させる",
+      "description": "mise が管理するツール(flutter/node/pnpm)。CI の mise-action と同じ版を Renovate が追従させる。ビルド・実行環境全体への変更のため自動マージ対象外(上のルールにmatchManagersが無いため既定でfalse)とし人間レビューを挟む",
       "matchManagers": ["mise"],
       "addLabels": ["mise"]
-    },
-    {
-      "description": "mise管理ツールのpatchはビルド・実行環境全体への変更のため自動マージせず人間レビューを挟む",
-      "matchManagers": ["mise"],
-      "matchUpdateTypes": ["patch"],
-      "automerge": false
     },
     {
       "description": "flutter(mise) 更新は frontend/pubspec.lock の再生成が必要なためマージ前に手動対応を促す",
       "matchManagers": ["mise"],
       "matchDepNames": ["flutter"],
-      "automerge": false,
       "prBodyNotes": [
         "⚠️ flutter バージョン更新時は `frontend/pubspec.lock` の再生成が必要です。マージ前に `cd frontend && flutter pub get` を実行し、変更されたロックファイルをこのPRにコミットしてください。"
       ]
