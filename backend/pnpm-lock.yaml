@@ -16,7 +16,7 @@ importers:
         version: 14.2.0
       '@hono/node-server':
         specifier: ^2.0.1
-        version: 2.0.1(hono@4.12.25)
+        version: 2.0.9(hono@4.12.25)
       '@hono/standard-validator':
         specifier: ^0.2.2
         version: 0.2.2(@standard-schema/spec@1.1.0)(hono@4.12.25)
@@ -463,8 +463,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/node-server@2.0.1':
-    resolution: {integrity: sha512-jI9yMDyFpqBeSighf/zlXnQG/nl9AyBc6aAgy4XtxJMyt/CNyJpvPfzDD+bCc2zAOmhhqtF6TnmIaY+xV4mIrw==}
+  '@hono/node-server@2.0.9':
+    resolution: {integrity: sha512-cNMw3ziCdDcx0+ldta60zvUL5XO0OLt521n2hjPp0PB0ugczDCEczXsf33qQbkKIXWGFQ03f0LC85u6YK8pCLA==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -4380,7 +4380,7 @@ snapshots:
     dependencies:
       hono: 4.12.25
 
-  '@hono/node-server@2.0.1(hono@4.12.25)':
+  '@hono/node-server@2.0.9(hono@4.12.25)':
     dependencies:
       hono: 4.12.25
 
