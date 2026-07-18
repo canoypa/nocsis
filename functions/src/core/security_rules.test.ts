@@ -73,7 +73,9 @@ describe("Storage security rules (deny-all)", () => {
   it("認証済みユーザーでも書き込みできない", async () => {
     const authed = testEnv.authenticatedContext("alice");
     await assertFails(
-      authed.storage().ref("avatars/alice.png").putString("dGVzdA=="),
+      Promise.resolve(
+        authed.storage().ref("avatars/alice.png").putString("dGVzdA=="),
+      ),
     );
   });
 });
