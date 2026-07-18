@@ -14,6 +14,9 @@ concurrency:
 jobs:
   test-functions:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      code-quality: write
     defaults:
       run:
         working-directory: ./functions
@@ -41,9 +44,18 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Test
         run: pnpm run test
+      - name: Upload coverage report
+        uses: actions/upload-code-coverage@82c7aee3fb2ad768e00b00a0a8d749c5815085b6 # v1.4.0
+        with:
+          file: functions/coverage/cobertura-coverage.xml
+          language: TypeScript
+          label: code-coverage/functions
 
   test-backend:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      code-quality: write
     defaults:
       run:
         working-directory: ./backend
@@ -71,6 +83,12 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Test
         run: pnpm run test
+      - name: Upload coverage report
+        uses: actions/upload-code-coverage@82c7aee3fb2ad768e00b00a0a8d749c5815085b6 # v1.4.0
+        with:
+          file: backend/coverage/cobertura-coverage.xml
+          language: TypeScript
+          label: code-coverage/backend
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -107,7 +125,4 @@ jobs:
         run: flutter test --coverage
       - name: Check coverage threshold
         run: |
-          threshold=10
-          covered=$(awk -F: '/^LF:/{lf+=$2} /^LH:/{lh+=$2} END{printf "%.2f", (lh/lf)*100}' coverage/lcov.info)
-          echo "Line coverage: ${covered}% (threshold: ${threshold}%)"
-          awk -v covered="$covered" -v threshold="$threshold" 'BEGIN { exit (covered+0 >= threshold+0) ? 0 : 1 }'
+          awk -F: '/^LF:/{lf+=$2} /^LH:/{lh+=$2} END{c=(lh/lf)*100; printf "Line coverage: %.2f%% (threshold: 10%%)\n", c; exit (c>=10)?0:1}' coverage/lcov.info

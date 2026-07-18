@@ -5,7 +5,7 @@
     "dev": "tsx watch src/main.ts",
     "build": "tsup src/main.ts --clean --format esm --sourcemap",
     "generate-openapi": "tsx scripts/generate_openapi.ts",
-    "lint": "biome ci",
+    "ci": "biome ci",
     "test": "firebase emulators:exec 'pnpm vitest run --coverage'",
     "test:watch": "vitest watch --coverage",
     "typecheck": "tsc --noEmit"

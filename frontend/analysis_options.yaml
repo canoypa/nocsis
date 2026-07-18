@@ -7,5 +7,11 @@ analyzer:
   exclude:
     - "lib/generated/**"
     - "**/*/*.g.dart"
+  # custom_lint はプラグインのホストに過ぎず、ルール自体は devDependencies の
+  # riverpod_lint (AsyncValueNullablePattern, AvoidBuildContextInProviders,
+  # MissingProviderScope, NotifierBuild/Extends, ProviderDependencies/Parameters
+  # など計15ルール、custom_lint のデフォルト方針で全ルール有効) から供給される。
+  # `flutter analyze`/`dart analyze` はこれらを拾わないため、
+  # 別途 `flutter pub run custom_lint` の実行が必要(lint.yml で実施)。
   plugins:
     - custom_lint
