@@ -42,15 +42,16 @@
       "groupName": "github-actions patch updates"
     },
     {
-      "description": "@types/node のメジャーは runtime に追従させず追わない",
-      "matchPackageNames": ["@types/node"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
-    },
-    {
       "description": "mise が管理するツール(flutter/node/pnpm)。CI の mise-action と同じ版を Renovate が追従させる",
       "matchManagers": ["mise"],
       "addLabels": ["mise"]
+    },
+    {
+      "description": "node ランタイムのメジャー更新と @types/node のメジャー更新をまとめる",
+      "matchManagers": ["mise", "npm"],
+      "matchDepNames": ["node", "@types/node"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "node major"
     }
   ]
 }
