@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 import 'package:nocsis/generated/api_client/api.enums.swagger.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
+import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/weather.dart';
 
 import '../helpers/mock_api_client.dart';
@@ -34,7 +35,7 @@ void main() {
       );
 
       final container = ProviderContainer(
-        overrides: [overrideApiClient(mockApi)],
+        overrides: [apiClientProvider.overrideWith((ref) async => mockApi)],
       );
       addTearDown(container.dispose);
 
@@ -57,7 +58,7 @@ void main() {
       // Riverpod 3.x はデフォルトで失敗時にリトライするため、
       // リトライを無効化して即座に AsyncError へ落とす。
       final container = ProviderContainer(
-        overrides: [overrideApiClient(mockApi)],
+        overrides: [apiClientProvider.overrideWith((ref) async => mockApi)],
         retry: (retryCount, error) => null,
       );
       addTearDown(container.dispose);
