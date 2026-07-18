@@ -7,6 +7,14 @@ const alias = {
 
 export default defineConfig({
   test: {
+    coverage: {
+      thresholds: {
+        statements: 70,
+        branches: 62,
+        functions: 78,
+        lines: 70,
+      },
+    },
     projects: [
       {
         resolve: { alias },

@@ -97,5 +97,9 @@ jobs:
             ${{ runner.os }}-build-runner-
       - name: Run build_runner
         run: flutter pub run build_runner build
+      - name: Format
+        run: dart format --output=none --set-exit-if-changed .
       - name: Lint
         run: flutter analyze
+      - name: Custom lint
+        run: flutter pub run custom_lint

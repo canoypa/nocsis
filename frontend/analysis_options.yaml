@@ -7,3 +7,5 @@ analyzer:
   exclude:
     - "lib/generated/**"
     - "**/*/*.g.dart"
+  plugins:
+    - custom_lint

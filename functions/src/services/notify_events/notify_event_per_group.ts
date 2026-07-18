@@ -5,10 +5,10 @@ import {
 } from "@slack/web-api";
 import type { DateTime } from "luxon";
 import { fetchSecret } from "~/services/fetch_secret.js";
-import { fetchCalendar } from "../../core/calendar.js";
 import { getDisplayTitle } from "../../core/calendar/get_display_title.js";
 import { parseEvents } from "../../core/calendar/parseEvents.js";
 import { eventsToSlackBlock } from "../../core/calendar/slack_block.js";
+import { fetchCalendar } from "../../core/calendar.js";
 import {
   fetchCountdownEvents,
   isCountdownTarget,

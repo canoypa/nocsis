@@ -7,5 +7,13 @@ export default defineConfig({
     setupFiles: ["tests/setup.ts"],
     fileParallelism: false,
     mockReset: true,
+    coverage: {
+      thresholds: {
+        statements: 85,
+        branches: 68,
+        functions: 80,
+        lines: 85,
+      },
+    },
   },
 });
