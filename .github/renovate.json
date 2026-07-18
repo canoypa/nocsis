@@ -11,21 +11,23 @@
   "labels": ["dependencies"],
   "vulnerabilityAlerts": {
     "enabled": true,
-    "labels": ["security"],
     "schedule": ["at any time"]
   },
   "packageRules": [
     {
-      "description": "npm/pub/github-actions/dockerfileのパッチ・SHAダイジェスト更新はリリースから3日以上経過しCIが通ったものだけ自動マージする（mise管理ツールはそもそもこのルールの対象外なので別途falseで打ち消す必要が無い。npmはsecurity:minimumReleaseAgeNpmでも同条件を担保）",
-      "matchManagers": ["npm", "pub", "github-actions", "dockerfile"],
+      "description": "npm/pub/github-actionsのパッチ・SHAダイジェスト更新はリリースから3日以上経過しCIが通ったものだけ自動マージする（mise・dockerfileはそもそもこのルールの対象外なので別途falseで打ち消す必要が無い。npmはsecurity:minimumReleaseAgeNpmでも同条件を担保）",
+      "matchManagers": ["npm", "pub", "github-actions"],
       "matchUpdateTypes": ["patch", "digest"],
       "minimumReleaseAge": "3 days",
       "automerge": true
     },
     {
-      "description": "mise が管理するツール(flutter/node/pnpm)。CI の mise-action と同じ版を Renovate が追従させる。ビルド・実行環境全体への変更のため自動マージ対象外(上のルールにmatchManagersが無いため既定でfalse)とし人間レビューを挟む",
-      "matchManagers": ["mise"],
-      "addLabels": ["mise"]
+      "description": "mise が管理するツール(flutter/node/pnpm)。CI の mise-action と同じ版を Renovate が追従させる。実行環境全体への変更で影響範囲が大きいため自動マージ対象外(上のルールにmatchManagersが無いため既定でfalse)とし人間レビューを挟む",
+      "matchManagers": ["mise"]
+    },
+    {
+      "description": "backend/Dockerfileのベースイメージ更新。本番の実行環境そのものを変える影響範囲の大きい変更であり、かつCI(lint/test)はDockerイメージをビルドしないため「CI合格」が検証として機能しない。自動マージ対象外とし人間レビューを挟む",
+      "matchManagers": ["dockerfile"]
     },
     {
       "description": "flutter(mise) 更新は frontend/pubspec.lock の再生成が必要なためマージ前に手動対応を促す",
