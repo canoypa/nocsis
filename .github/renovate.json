@@ -7,6 +7,10 @@
   "timezone": "Asia/Tokyo",
   "schedule": ["before 6am on friday"],
   "labels": ["dependencies"],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  },
   "packageRules": [
     {
       "description": "パッチ・SHA ピン更新は自動マージ（旧 dependabot_auto_merge.yml 相当。CI が通ったものだけマージされる）",
