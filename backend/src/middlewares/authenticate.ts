@@ -10,7 +10,7 @@ export type AuthenticatedEnv = {
 };
 
 export const authentication = bearerAuth({
-  verifyToken: async (token, c) => {
+  verifyToken: async (token, c: Context<AuthenticatedEnv>) => {
     try {
       const { uid } = await auth.verifyIdToken(token);
 
