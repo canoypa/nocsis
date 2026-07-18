@@ -2,10 +2,12 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    ":semanticCommitTypeAll(chore)"
+    ":semanticCommitTypeAll(chore)",
+    "security:minimumReleaseAgeNpm",
+    ":maintainLockFilesWeekly",
+    ":configMigration"
   ],
   "timezone": "Asia/Tokyo",
-  "schedule": ["before 6am on friday"],
   "labels": ["dependencies"],
   "vulnerabilityAlerts": {
     "enabled": true,
@@ -14,8 +16,9 @@
   },
   "packageRules": [
     {
-      "description": "パッチ・SHAダイジェスト更新は CI が通ったものだけ自動マージする",
+      "description": "パッチ・SHAダイジェスト更新はリリースから3日以上経過しCIが通ったものだけ自動マージする（npmはsecurity:minimumReleaseAgeNpmでも同条件を担保）",
       "matchUpdateTypes": ["patch", "digest"],
+      "minimumReleaseAge": "3 days",
       "automerge": true
     },
     {
