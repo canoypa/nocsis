@@ -2,6 +2,7 @@ name: Build
 
 # ビルドゲート: 静的解析(Lint)・振る舞いのテスト(Test)とは別カテゴリの検証。
 # assertion は実行せず「デプロイ可能な成果物としてコンパイルできるか」だけを確認する。
+# 毎PRで実行する(functions/backend/frontend で一貫)。
 
 on:
   pull_request:
@@ -66,38 +67,12 @@ jobs:
         run: pnpm run build
 
   build-frontend:
-    # 重い wasm ビルドは release PR(development→main)でのみ検証する。
-    # feature→development の通常PRではこのジョブ自体を丸ごとスキップする。
-    if: ${{ github.base_ref == 'main' }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Setup Tools
-        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
-      - name: Setup pub cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ~/.pub-cache
-          key: ${{ runner.os }}-pub-cache-${{ hashFiles('frontend/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pub-cache-
-      - name: Install dependencies
-        run: flutter pub get --enforce-lockfile
-      - name: Generate OpenAPI spec
-        run: pnpm install --frozen-lockfile && pnpm run generate-openapi
-        working-directory: ./backend
-      - name: Setup build_runner cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: frontend/.dart_tool/build
-          key: ${{ runner.os }}-build-runner-${{ hashFiles('frontend/pubspec.lock', 'frontend/lib/**/*.dart', 'frontend/swagger/api.json', 'frontend/build.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-build-runner-
-      - name: Run build_runner
-        run: flutter pub run build_runner build
-      - name: Build web (wasm)
-        run: flutter build web --wasm
+    # _build_frontend.yml(本番/プレビューデプロイでも使う再利用ワークフロー)を
+    # そのまま呼び出す。ビルド手順を二重管理しないための構成。
+    # Preview environment には保護ルール(必須レビュー等)が無いため、
+    # 通常のPRチェックとして毎回自動実行される。
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_frontend.yml
+    with:
+      environment: Preview
