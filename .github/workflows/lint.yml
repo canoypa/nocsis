@@ -37,7 +37,7 @@ jobs:
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
-        run: pnpm run lint
+        run: pnpm run ci
 
   lint-backend:
     runs-on: ubuntu-latest
@@ -64,7 +64,7 @@ jobs:
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
-        run: pnpm run lint
+        run: pnpm run ci
 
   lint-frontend:
     runs-on: ubuntu-latest
@@ -97,9 +97,8 @@ jobs:
             ${{ runner.os }}-build-runner-
       - name: Run build_runner
         run: flutter pub run build_runner build
-      - name: Format
-        run: dart format --output=none --set-exit-if-changed .
       - name: Lint
-        run: flutter analyze
-      - name: Custom lint
-        run: flutter pub run custom_lint
+        run: |
+          dart format --output=none --set-exit-if-changed .
+          flutter analyze
+          flutter pub run custom_lint

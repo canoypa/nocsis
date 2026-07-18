@@ -7,14 +7,6 @@ const alias = {
 
 export default defineConfig({
   test: {
-    coverage: {
-      thresholds: {
-        statements: 70,
-        branches: 62,
-        functions: 78,
-        lines: 70,
-      },
-    },
     projects: [
       {
         resolve: { alias },
@@ -34,5 +26,15 @@ export default defineConfig({
         },
       },
     ],
+    coverage: {
+      // cobertura: GitHub Code Coverage (actions/upload-code-coverage) へ渡すため。
+      reporter: ["text", "html", "clover", "json", "cobertura"],
+      thresholds: {
+        statements: 70,
+        branches: 62,
+        functions: 78,
+        lines: 70,
+      },
+    },
   },
 });
