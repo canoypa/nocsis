@@ -1,12 +1,13 @@
 name: Build
 
-# ビルドゲート: 静的解析(Lint)・振る舞いのテスト(Test)とは別カテゴリの検証。
-# assertion は実行せず「デプロイ可能な成果物としてコンパイルできるか」だけを確認する。
-# 毎PRで実行する(functions/backend/frontend で一貫)。
+# なぜ lint/test と別ワークフローで、かつ main 向けPRだけで走るのか:
+# build はデプロイ成果物のコンパイル(重い検証)で、lint/test を全PRで回すのとは
+# 別の境界で必要になる。development→main のリリースPRで一度だけ、production 昇格の
+# 可否として検証すればよい ── feature PR ごとに重い build をばら撒かないための分離。
 
 on:
   pull_request:
-  workflow_call:
+    branches: [main]
 
 permissions:
   contents: read
@@ -67,10 +68,9 @@ jobs:
         run: pnpm run build
 
   build-frontend:
-    # _build_frontend.yml(本番/プレビューデプロイでも使う再利用ワークフロー)を
-    # そのまま呼び出す。ビルド手順を二重管理しないための構成。
-    # Preview environment には保護ルール(必須レビュー等)が無いため、
-    # 通常のPRチェックとして毎回自動実行される。
+    # deploy と同じ _build_frontend.yml を使い「PRビルド == デプロイビルド」を保つ
+    # (ビルド手順を二重管理しない)。environment は Production だと保護ルールで
+    # ジョブが承認待ちに入り得るため、保護ルールの無い Preview を渡して止めない。
     permissions:
       contents: read
     uses: ./.github/workflows/_build_frontend.yml
