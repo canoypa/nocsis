@@ -1,9 +1,12 @@
 name: Build
 
-# なぜ lint/test と別ワークフローで、かつ main 向けPRだけで走るのか:
-# build はデプロイ成果物のコンパイル(重い検証)で、lint/test を全PRで回すのとは
-# 別の境界で必要になる。development→main のリリースPRで一度だけ、production 昇格の
-# 可否として検証すればよい ── feature PR ごとに重い build をばら撒かないための分離。
+# main へのマージ前に「3つとも本番と同じ手順でビルドできるか」を見るゲート。
+# ビルド手順は持たず、デプロイと同じ _build_*.yml を呼ぶだけ ── 手順を
+# 二重管理しないため。ここは成果物を配らないので backend は push しない。
+#
+# main 向けPR(development→main のリリースPR)でのみ実行する。build は
+# デプロイ成果物のコンパイルで、feature PR ごとに回すのは時間とコストに
+# 見合わず、リリース前に検知できれば目的を満たす。
 
 on:
   pull_request:
@@ -17,62 +20,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-functions:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./functions
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Setup Tools
-        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-      - name: Setup pnpm cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-functions-${{ hashFiles('functions/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-functions-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm run build
-
   build-backend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Setup Tools
-        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-      - name: Setup pnpm cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-backend-${{ hashFiles('backend/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-backend-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm run build
+    permissions:
+      contents: read
+      # _build_backend.yml が push 経路で要求する。呼び出し先の権限は
+      # 呼び出し側が上限になるため、push しないここでも付与が必要。
+      id-token: write
+    uses: ./.github/workflows/_build_backend.yml
+
+  build-functions:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_functions.yml
 
   build-frontend:
-    # deploy と同じ _build_frontend.yml を使い「PRビルド == デプロイビルド」を保つ
-    # (ビルド手順を二重管理しない)。environment は Production だと保護ルールで
-    # ジョブが承認待ちに入り得るため、保護ルールの無い Preview を渡して止めない。
     permissions:
       contents: read
     uses: ./.github/workflows/_build_frontend.yml
-    with:
-      environment: Preview

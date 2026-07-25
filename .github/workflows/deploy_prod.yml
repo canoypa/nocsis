@@ -1,5 +1,8 @@
 name: Deploy to Production
 
+# 3つとも「ビルド → デプロイ」の2段。ビルドは _build_*.yml、デプロイは
+# _deploy_*.yml で、ビルド側はリリースPRのゲート(build.yml)と共有する。
+
 on:
   push:
     branches: [ main ]
@@ -12,27 +15,41 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build_backend:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_build_backend.yml
+    with:
+      push: true
+
+  build_functions:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_functions.yml
+
+  build_frontend:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_frontend.yml
+
   deploy_backend:
+    needs: [build_backend]
     permissions:
       contents: read
       id-token: write
     uses: ./.github/workflows/_deploy_backend.yml
     with:
       environment: Production
+      image: ${{ needs.build_backend.outputs.image }}
       promote: true
 
   deploy_functions:
+    needs: [build_functions]
     permissions:
       contents: read
       id-token: write
     uses: ./.github/workflows/_deploy_functions.yml
-    with:
-      environment: Production
-
-  build_frontend:
-    permissions:
-      contents: read
-    uses: ./.github/workflows/_build_frontend.yml
     with:
       environment: Production
 

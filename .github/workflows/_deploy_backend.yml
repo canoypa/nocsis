@@ -7,6 +7,10 @@ on:
         description: "Deployment environment"
         required: true
         type: string
+      image:
+        description: "Image built by _build_backend.yml"
+        required: true
+        type: string
       tag:
         description: "Cloud Run revision tag (omit for production)"
         required: false
@@ -31,10 +35,8 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Setup Tools
-        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+      # ビルドはしない(_build_backend.yml が Artifact Registry に
+      # 載せたイメージをそのまま deploy する)。
       - name: Auth
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
@@ -45,7 +47,7 @@ jobs:
       - name: Deploy Backend
         run: |
           gcloud run deploy backend \
-            --source ./backend \
+            --image ${{ inputs.image }} \
             --project class-clock-40088 \
             --region asia-northeast1 \
             --no-traffic \
