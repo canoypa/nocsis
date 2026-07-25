@@ -91,6 +91,17 @@ jobs:
             ${{ runner.os }}-pub-cache-
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+        working-directory: ./backend
+      - name: Setup pnpm cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-backend-${{ hashFiles('backend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-backend-
       - name: Generate OpenAPI spec
         run: pnpm install --frozen-lockfile && pnpm run generate-openapi
         working-directory: ./backend

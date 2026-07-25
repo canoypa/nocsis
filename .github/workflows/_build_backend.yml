@@ -35,7 +35,8 @@ jobs:
       - name: Resolve image tag
         run: echo "IMAGE=${IMAGE_REPO}:${GITHUB_SHA}" >> "$GITHUB_ENV"
       - name: Build image
-        # Cloud Run は amd64 イメージのみ動かせる。runner の arch に依存させない。
+        # Cloud Run は amd64 イメージのみ動かせる。runner が amd64 でなくなったら、
+        # 黙って動かないイメージを積むのではなくここで落とす(QEMU は用意しない)。
         run: docker build --platform linux/amd64 --tag "$IMAGE" ./backend
       - name: Auth
         if: ${{ inputs.persist }}
