@@ -1,8 +1,5 @@
 name: Build Frontend
 
-# environment input を戻さない。成果物は environment に依存せず、持っていた頃は
-# 保護ルールで止まらないよう呼び出し側が Preview を渡す回避策が必要になっていた。
-
 on:
   workflow_call:
 
