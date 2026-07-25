@@ -14,7 +14,7 @@ on:
         default: false
     outputs:
       image:
-        description: "Built image reference (only pushed when push is true)"
+        description: "Pushed image reference (empty unless push is true)"
         value: ${{ jobs.build.outputs.image }}
 
 permissions: {}
@@ -26,7 +26,9 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     outputs:
-      image: ${{ steps.image.outputs.ref }}
+      # push しなければレジストリに実体が無い。参照を返すと、存在しない
+      # イメージを指す文字列を deploy 側が受け取れてしまう。
+      image: ${{ inputs.push && steps.image.outputs.ref || '' }}
     env:
       IMAGE_REPO: asia-northeast1-docker.pkg.dev/class-clock-40088/cloud-run-source-deploy/backend
     steps:
