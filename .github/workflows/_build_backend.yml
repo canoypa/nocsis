@@ -26,20 +26,14 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     outputs:
-      # push しなければレジストリに実体が無い。参照を返すと、存在しない
-      # イメージを指す文字列を deploy 側が受け取れてしまう。
-      image: ${{ inputs.push && steps.image.outputs.ref || '' }}
+      image: ${{ steps.push.outputs.digest }}
     env:
       IMAGE_REPO: asia-northeast1-docker.pkg.dev/class-clock-40088/cloud-run-source-deploy/backend
     steps:
       - name: Checkout code
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Resolve image reference
-        id: image
-        run: |
-          ref="${IMAGE_REPO}:${GITHUB_SHA}"
-          echo "IMAGE=${ref}" >> "$GITHUB_ENV"
-          echo "ref=${ref}" >> "$GITHUB_OUTPUT"
+      - name: Resolve image tag
+        run: echo "IMAGE=${IMAGE_REPO}:${GITHUB_SHA}" >> "$GITHUB_ENV"
       - name: Build image
         # Cloud Run は amd64 イメージのみ動かせる。runner の arch に依存させない。
         run: docker build --platform linux/amd64 --tag "$IMAGE" ./backend
@@ -55,6 +49,13 @@ jobs:
       - name: Configure Docker credentials
         if: ${{ inputs.push }}
         run: gcloud auth configure-docker "${IMAGE_REPO%%/*}" --quiet
+      # deploy にはタグではなくダイジェストを渡す。タグは可変で、同じ SHA を
+      # ビルドする run が並行すると上書きし合う(base image が動くタグなので
+      # 同じ SHA でも中身は変わりうる)。ゲートが検証した実体をそのまま deploy
+      # させるには、内容で一意な参照でなければならない。
       - name: Push image
+        id: push
         if: ${{ inputs.push }}
-        run: docker push "$IMAGE"
+        run: |
+          docker push "$IMAGE"
+          echo "digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE")" >> "$GITHUB_OUTPUT"
