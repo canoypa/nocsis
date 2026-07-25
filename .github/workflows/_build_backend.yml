@@ -7,14 +7,14 @@ name: Build Backend
 on:
   workflow_call:
     inputs:
-      push:
-        description: "Push the built image to Artifact Registry"
+      persist:
+        description: "Keep the built image beyond this job (pushes to Artifact Registry)"
         required: false
         type: boolean
         default: false
     outputs:
       image:
-        description: "Pushed image reference (empty unless push is true)"
+        description: "Built image reference (empty unless persist is true)"
         value: ${{ jobs.build.outputs.image }}
 
 permissions: {}
@@ -38,16 +38,16 @@ jobs:
         # Cloud Run は amd64 イメージのみ動かせる。runner の arch に依存させない。
         run: docker build --platform linux/amd64 --tag "$IMAGE" ./backend
       - name: Auth
-        if: ${{ inputs.push }}
+        if: ${{ inputs.persist }}
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
           service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
       - name: Set up Cloud SDK
-        if: ${{ inputs.push }}
+        if: ${{ inputs.persist }}
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
       - name: Configure Docker credentials
-        if: ${{ inputs.push }}
+        if: ${{ inputs.persist }}
         run: gcloud auth configure-docker "${IMAGE_REPO%%/*}" --quiet
       # deploy にはタグではなくダイジェストを渡す。タグは可変で、同じ SHA を
       # ビルドする run が並行すると上書きし合う(base image が動くタグなので
@@ -55,7 +55,7 @@ jobs:
       # させるには、内容で一意な参照でなければならない。
       - name: Push image
         id: push
-        if: ${{ inputs.push }}
+        if: ${{ inputs.persist }}
         run: |
           docker push "$IMAGE"
           echo "digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE")" >> "$GITHUB_OUTPUT"

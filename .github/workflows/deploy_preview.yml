@@ -24,13 +24,15 @@ jobs:
       id-token: write
     uses: ./.github/workflows/_build_backend.yml
     with:
-      push: true
+      persist: true
 
   build_frontend:
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
     permissions:
       contents: read
     uses: ./.github/workflows/_build_frontend.yml
+    with:
+      persist: true
 
   deploy_backend:
     needs: [build_backend]

@@ -18,8 +18,8 @@ jobs:
   build-backend:
     permissions:
       contents: read
-      # ここは push しないが、_build_backend.yml が宣言する権限を渡さないと
-      # call 自体が失敗する(呼び出し先の permissions は呼び出し側が上限)。
+      # ここは persist しないので使わないが、_build_backend.yml が宣言する権限を
+      # 渡さないと call 自体が失敗する(呼び出し先の permissions は呼び出し側が上限)。
       id-token: write
     uses: ./.github/workflows/_build_backend.yml
 

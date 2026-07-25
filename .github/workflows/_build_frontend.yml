@@ -2,6 +2,12 @@ name: Build Frontend
 
 on:
   workflow_call:
+    inputs:
+      persist:
+        description: "Keep the build output beyond this job (uploads a workflow artifact)"
+        required: false
+        type: boolean
+        default: false
 
 permissions: {}
 
@@ -28,6 +34,7 @@ jobs:
         working-directory: ./frontend
         run: flutter build web --wasm
       - name: Upload Artifacts
+        if: ${{ inputs.persist }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: frontend-build

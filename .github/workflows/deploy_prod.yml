@@ -18,17 +18,21 @@ jobs:
       id-token: write
     uses: ./.github/workflows/_build_backend.yml
     with:
-      push: true
+      persist: true
 
   build_functions:
     permissions:
       contents: read
     uses: ./.github/workflows/_build_functions.yml
+    with:
+      persist: true
 
   build_frontend:
     permissions:
       contents: read
     uses: ./.github/workflows/_build_frontend.yml
+    with:
+      persist: true
 
   deploy_backend:
     needs: [build_backend]
