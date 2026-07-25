@@ -1,9 +1,5 @@
 name: Build Functions
 
-# functions のビルドはここだけに書く。リリースPRのゲート(build.yml)と
-# デプロイ(deploy_prod / deploy_preview)が同じこのワークフローを呼ぶ。
-# 成果物は environment 非依存なので input を持たない。
-
 on:
   workflow_call:
 

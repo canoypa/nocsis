@@ -1,8 +1,7 @@
 name: Build Frontend
 
-# frontend のビルドはここだけに書く。リリースPRのゲート(build.yml)と
-# デプロイ(deploy_prod / deploy_preview)が同じこのワークフローを呼ぶ。
-# 成果物は environment 非依存なので input を持たない。
+# environment input を戻さない。成果物は environment に依存せず、持っていた頃は
+# 保護ルールで止まらないよう呼び出し側が Preview を渡す回避策が必要になっていた。
 
 on:
   workflow_call:

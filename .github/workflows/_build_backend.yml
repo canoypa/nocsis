@@ -1,10 +1,8 @@
 name: Build Backend
 
-# backend のビルドはここだけに書く(手順の実体は backend/Dockerfile)。
-# リリースPRのゲート(build.yml)は「ビルドできるか」だけを見るので push せず、
-# デプロイ(deploy_prod / deploy_preview)は push: true でイメージを
-# Artifact Registry に載せ、_deploy_backend.yml がそのイメージを deploy する。
-# これで「ビルドは1回、デプロイはそのイメージを使う」になる。
+# Cloud Run のソースデプロイ(--source)を使わない。ビルドが deploy 側で起きると
+# リリースPRのゲートは本番に出るイメージを検証できず、Dockerfile の破綻が
+# デプロイ時まで露見しない。ここでビルドしたイメージを deploy が参照する。
 
 on:
   workflow_call:
@@ -16,7 +14,7 @@ on:
         default: false
     outputs:
       image:
-        description: "Built image reference"
+        description: "Built image reference (only pushed when push is true)"
         value: ${{ jobs.build.outputs.image }}
 
 permissions: {}
@@ -25,20 +23,24 @@ jobs:
   build:
     permissions:
       contents: read
-      # push 時のみ使う。呼び出し先の権限は呼び出し側が上限になるため、
-      # push しない呼び出し元(build.yml)でも付与が必要。
       id-token: write
     runs-on: ubuntu-latest
     outputs:
       image: ${{ steps.image.outputs.ref }}
+    env:
+      IMAGE_REPO: asia-northeast1-docker.pkg.dev/class-clock-40088/cloud-run-source-deploy/backend
     steps:
       - name: Checkout code
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Resolve image reference
         id: image
-        run: echo "ref=asia-northeast1-docker.pkg.dev/class-clock-40088/cloud-run-source-deploy/backend:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+        run: |
+          ref="${IMAGE_REPO}:${GITHUB_SHA}"
+          echo "IMAGE=${ref}" >> "$GITHUB_ENV"
+          echo "ref=${ref}" >> "$GITHUB_OUTPUT"
       - name: Build image
-        run: docker build --tag "${{ steps.image.outputs.ref }}" ./backend
+        # Cloud Run は amd64 イメージのみ動かせる。runner の arch に依存させない。
+        run: docker build --platform linux/amd64 --tag "$IMAGE" ./backend
       - name: Auth
         if: ${{ inputs.push }}
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
@@ -50,7 +52,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
       - name: Configure Docker credentials
         if: ${{ inputs.push }}
-        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
+        run: gcloud auth configure-docker "${IMAGE_REPO%%/*}" --quiet
       - name: Push image
         if: ${{ inputs.push }}
-        run: docker push "${{ steps.image.outputs.ref }}"
+        run: docker push "$IMAGE"

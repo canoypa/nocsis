@@ -1,8 +1,5 @@
 name: Deploy to Production
 
-# 3つとも「ビルド → デプロイ」の2段。ビルドは _build_*.yml、デプロイは
-# _deploy_*.yml で、ビルド側はリリースPRのゲート(build.yml)と共有する。
-
 on:
   push:
     branches: [ main ]
