@@ -1,0 +1,34 @@
+name: Build
+
+# feature PR では走らせない。build はデプロイ成果物のコンパイルで、PR ごとに
+# 回すコストに見合わない。main 向けPR(リリースPR)で検知できれば目的を満たす。
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}_${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-backend:
+    permissions:
+      contents: read
+      # ここは persist しないので使わないが、_build_backend.yml が宣言する権限を
+      # 渡さないと call 自体が失敗する(呼び出し先の permissions は呼び出し側が上限)。
+      id-token: write
+    uses: ./.github/workflows/_build_backend.yml
+
+  build-functions:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_functions.yml
+
+  build-frontend:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_frontend.yml
