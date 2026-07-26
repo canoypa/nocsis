@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommitTypeAll(chore)",
+    "security:minimumReleaseAgeNpm",
+    ":maintainLockFilesWeekly",
+    ":configMigration"
+  ],
+  "enabledManagers": ["mise", "github-actions", "dockerfile", "npm", "pub"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "description": "パッチ・SHAダイジェスト更新の自動マージ",
+      "matchManagers": ["npm", "pub", "github-actions"],
+      "matchUpdateTypes": ["patch", "digest"],
+      "minimumReleaseAge": "3 days",
+      "automerge": true
+    },
+    {
+      "description": "node ランタイムのメジャー更新と @types/node のメジャー更新をまとめる",
+      "matchManagers": ["mise", "npm"],
+      "matchDepNames": ["node", "@types/node"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "node major"
+    }
+  ]
+}
