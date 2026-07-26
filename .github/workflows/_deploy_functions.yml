@@ -35,4 +35,4 @@ jobs:
                   workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
                   service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
             - name: Deploy Functions and Security Rules
-              run: pnpm firebase deploy --only functions,firestore:rules,firestore:indexes,storage --force
+              run: pnpm firebase deploy --only functions,firestore:rules,firestore:indexes --force
