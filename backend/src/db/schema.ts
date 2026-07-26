@@ -1,78 +1,24 @@
-import {
-  boolean,
-  date,
-  doublePrecision,
-  integer,
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-  unique,
-} from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { bigint, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
-// ユーザー（Firebase Auth の参照）
-export const usersTable = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  firebaseUid: text().notNull().unique(),
-  createdAt: timestamp().notNull().defaultNow(),
-  updatedAt: timestamp().notNull().defaultNow(),
-});
-
-// グループ
-export const groupsTable = pgTable("groups", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  publicId: text().notNull().unique(),
-  name: text().notNull(),
-  classesCalendarId: text().notNull(),
-  eventsCalendarId: text().notNull(),
-  daydutyStartDate: date().notNull(),
-  slackEventChannelId: text().notNull(),
-  weatherLat: doublePrecision().notNull(),
-  weatherLon: doublePrecision().notNull(),
-  daydutyNotificationEnabled: boolean().notNull().default(true),
-  createdAt: timestamp().notNull().defaultNow(),
-  updatedAt: timestamp().notNull().defaultNow(),
-});
-
-// グループとユーザーの中間テーブル
-export const groupUsersTable = pgTable(
-  "group_users",
+/**
+ * ユーザー。Firebase Auth の uid と email を Postgres 側に固定するアンカー。
+ *
+ * 主キーは bigint（integer は 21 億で枯渇し、後から広げると全ての参照側に波及する）。
+ * 日時は timestamptz（timestamp without time zone は JST 運用で事故る）。
+ * updated_at は Postgres が自動更新しないため、共通トリガーで更新する（マイグレーション参照）。
+ */
+export const usersTable = pgTable(
+  "users",
   {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    userId: integer()
-      .notNull()
-      .references(() => usersTable.id),
-    groupId: integer()
-      .notNull()
-      .references(() => groupsTable.id),
-    createdAt: timestamp().notNull().defaultNow(),
-    updatedAt: timestamp().notNull().defaultNow(),
-  },
-  (t) => [unique().on(t.userId, t.groupId)],
-);
-
-export const classmateRoleEnum = pgEnum("classmate_role", [
-  "student",
-  "teacher",
-]);
-
-// クラスメイト
-export const classmatesTable = pgTable(
-  "classmates",
-  {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    groupId: integer()
-      .notNull()
-      .references(() => groupsTable.id),
-    // アカウントとのリンク（任意）
-    userId: integer().references(() => usersTable.id),
-    role: classmateRoleEnum().notNull(),
-    stuNo: integer(),
-    name: text().notNull(),
+    id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+    firebaseUid: text().notNull().unique("users_firebase_uid_key"),
     email: text().notNull(),
-    slackUserId: text().notNull(),
-    createdAt: timestamp().notNull().defaultNow(),
-    updatedAt: timestamp().notNull().defaultNow(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [unique().on(t.userId, t.groupId)],
+  (t) => [
+    // メールアドレスは大文字小文字を区別せず一意
+    uniqueIndex("users_email_key").on(sql`lower(${t.email})`),
+  ],
 );

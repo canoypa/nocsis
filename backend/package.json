@@ -5,6 +5,8 @@
     "dev": "tsx watch --env-file .env src/main.ts",
     "build": "tsup src/main.ts --clean --format esm --sourcemap",
     "generate-openapi": "tsx scripts/generate_openapi.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "lint": "biome lint",
     "test": "firebase emulators:exec 'pnpm vitest run --coverage'",
     "test:watch": "vitest watch --coverage",
