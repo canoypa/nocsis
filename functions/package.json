@@ -3,6 +3,7 @@
   "name": "nocsis-functions",
   "type": "module",
   "main": "dist/main.js",
+  "packageManager": "pnpm@10.11.0",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "biome lint src",
@@ -45,6 +46,10 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "msw"
+    ],
+    "ignoredBuiltDependencies": [
+      "@firebase/util",
+      "protobufjs"
     ]
   }
 }
