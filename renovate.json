@@ -12,9 +12,9 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "backend/Dockerfile の pnpm バージョンを追跡する",
+      "description": "dockerfile マネージャは FROM のイメージしか見ず Dockerfile の pnpm が更新から取り残されるため、renovate の管理下に入れる",
       "managerFilePatterns": ["backend/Dockerfile"],
-      "matchStrings": ["ENV PNPM_VERSION=(?<currentValue>\\S+)"],
+      "matchStrings": ["(^|\\n)ENV PNPM_VERSION=(?<currentValue>\\S+)"],
       "depNameTemplate": "pnpm",
       "datasourceTemplate": "npm"
     }
@@ -35,7 +35,8 @@
       "groupName": "node major"
     },
     {
-      "description": "3箇所に分かれた pnpm のバージョン指定をまとめる",
+      "description": "pnpm がビルド環境ごとに食い違うと CI が検証した成果物と本番の成果物を別バージョンが作ることになるため、3箇所を必ず同時に更新する",
+      "matchManagers": ["mise", "npm", "custom.regex"],
       "matchDepNames": ["pnpm"],
       "groupName": "pnpm"
     }
