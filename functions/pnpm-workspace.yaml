@@ -1,0 +1,16 @@
+onlyBuiltDependencies:
+  - esbuild
+  - msw
+ignoredBuiltDependencies:
+  - "@firebase/util"
+  - "@swc/core"
+  - protobufjs
+  - re2
+
+allowBuilds:
+  esbuild: true
+  msw: true
+  "@firebase/util": false
+  "@swc/core": false
+  protobufjs: false
+  re2: false

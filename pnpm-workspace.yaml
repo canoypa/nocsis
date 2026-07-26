@@ -1,0 +1,7 @@
+ignoredBuiltDependencies:
+  - protobufjs
+  - re2
+
+allowBuilds:
+  protobufjs: false
+  re2: false
