@@ -14,7 +14,7 @@
     "@google-cloud/secret-manager": "^6.1.2",
     "@googleapis/calendar": "^14.0.0",
     "@hono/node-server": "^2.0.1",
-    "@hono/standard-validator": "^0.2.2",
+    "@hono/standard-validator": "^0.3.0",
     "@scalar/hono-api-reference": "^0.10.14",
     "firebase-admin": "^13.8.0",
     "hono": "^4.12.25",
