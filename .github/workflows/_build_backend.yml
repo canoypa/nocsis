@@ -1,0 +1,62 @@
+name: Build Backend
+
+# Cloud Run のソースデプロイ(--source)を使わない。ビルドが deploy 側で起きると
+# リリースPRのゲートは本番に出るイメージを検証できず、Dockerfile の破綻が
+# デプロイ時まで露見しない。ここでビルドしたイメージを deploy が参照する。
+
+on:
+  workflow_call:
+    inputs:
+      persist:
+        description: "Keep the built image beyond this job (pushes to Artifact Registry)"
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      image:
+        description: "Built image reference (empty unless persist is true)"
+        value: ${{ jobs.build.outputs.image }}
+
+permissions: {}
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.push.outputs.digest }}
+    env:
+      IMAGE_REPO: asia-northeast1-docker.pkg.dev/class-clock-40088/cloud-run-source-deploy/backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Resolve image tag
+        run: echo "IMAGE=${IMAGE_REPO}:${GITHUB_SHA}" >> "$GITHUB_ENV"
+      - name: Build image
+        # Cloud Run は amd64 イメージのみ動かせる。runner が amd64 でなくなったら、
+        # 黙って動かないイメージを積むのではなくここで落とす(QEMU は用意しない)。
+        run: docker build --platform linux/amd64 --tag "$IMAGE" ./backend
+      - name: Auth
+        if: ${{ inputs.persist }}
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        if: ${{ inputs.persist }}
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+      - name: Configure Docker credentials
+        if: ${{ inputs.persist }}
+        run: gcloud auth configure-docker "${IMAGE_REPO%%/*}" --quiet
+      # deploy にはタグではなくダイジェストを渡す。タグは可変で、同じ SHA を
+      # ビルドする run が並行すると上書きし合う(base image が動くタグなので
+      # 同じ SHA でも中身は変わりうる)。ゲートが検証した実体をそのまま deploy
+      # させるには、内容で一意な参照でなければならない。
+      - name: Push image
+        id: push
+        if: ${{ inputs.persist }}
+        run: |
+          docker push "$IMAGE"
+          echo "digest=$(docker inspect --format '{{index .RepoDigests 0}}' "$IMAGE")" >> "$GITHUB_OUTPUT"

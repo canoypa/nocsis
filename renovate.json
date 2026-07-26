@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommitTypeAll(chore)",
+    "security:minimumReleaseAgeNpm",
+    ":maintainLockFilesWeekly",
+    ":configMigration"
+  ],
+  "enabledManagers": ["mise", "github-actions", "dockerfile", "npm", "pub", "custom.regex"],
+  "labels": ["dependencies"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "dockerfile マネージャが見ない backend/Dockerfile の pnpm バージョンを追跡する",
+      "managerFilePatterns": ["backend/Dockerfile"],
+      "matchStrings": ["(^|\\n)ENV PNPM_VERSION=(?<currentValue>\\S+)"],
+      "depNameTemplate": "pnpm",
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "パッチ・SHAダイジェスト更新の自動マージ",
+      "matchManagers": ["npm", "pub", "github-actions"],
+      "matchUpdateTypes": ["patch", "digest"],
+      "minimumReleaseAge": "3 days",
+      "automerge": true
+    },
+    {
+      "description": "node ランタイムのメジャー更新と @types/node のメジャー更新をまとめる",
+      "matchManagers": ["mise", "npm"],
+      "matchDepNames": ["node", "@types/node"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "node major"
+    },
+    {
+      "description": "pnpm のバージョンを定義している3箇所をまとめる",
+      "matchManagers": ["mise", "npm", "custom.regex"],
+      "matchDepNames": ["pnpm"],
+      "groupName": "pnpm"
+    }
+  ]
+}

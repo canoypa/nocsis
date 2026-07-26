@@ -1,4 +1,4 @@
-name: Build Frontend
+name: Build Functions
 
 on:
   workflow_call:
@@ -22,20 +22,14 @@ jobs:
       - name: Setup Tools
         uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
       - name: Install dependencies
-        working-directory: ./frontend
-        run: flutter pub get --enforce-lockfile
-      - name: Generate OpenAPI spec
-        working-directory: ./backend
-        run: pnpm install --frozen-lockfile && pnpm run generate-openapi
-      - name: Run build_runner
-        working-directory: ./frontend
-        run: flutter pub run build_runner build
+        working-directory: ./functions
+        run: pnpm install --frozen-lockfile
       - name: Build
-        working-directory: ./frontend
-        run: flutter build web --wasm
+        working-directory: ./functions
+        run: pnpm run build
       - name: Upload Artifacts
         if: ${{ inputs.persist }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: frontend-build
-          path: ./frontend/build/web
+          name: functions-build
+          path: ./functions/dist
