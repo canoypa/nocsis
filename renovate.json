@@ -28,6 +28,12 @@
       "automerge": true
     },
     {
+      "description": "lockfile を共有する minor 更新をディレクトリ単位でまとめる",
+      "matchManagers": ["npm", "pub"],
+      "matchUpdateTypes": ["minor"],
+      "groupName": "minor dependencies ({{packageFileDir}})"
+    },
+    {
       "description": "node ランタイムのメジャー更新と @types/node のメジャー更新をまとめる",
       "matchManagers": ["mise", "npm"],
       "matchDepNames": ["node", "@types/node"],
