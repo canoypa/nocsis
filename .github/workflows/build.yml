@@ -1,12 +1,11 @@
 name: Build
 
-# ビルドゲート: 静的解析(Lint)・振る舞いのテスト(Test)とは別カテゴリの検証。
-# assertion は実行せず「デプロイ可能な成果物としてコンパイルできるか」だけを確認する。
-# 毎PRで実行する(functions/backend/frontend で一貫)。
+# feature PR では走らせない。build はデプロイ成果物のコンパイルで、PR ごとに
+# 回すコストに見合わない。main 向けPR(リリースPR)で検知できれば目的を満たす。
 
 on:
   pull_request:
-  workflow_call:
+    branches: [main]
 
 permissions:
   contents: read
@@ -16,63 +15,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-functions:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./functions
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Setup Tools
-        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-      - name: Setup pnpm cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-functions-${{ hashFiles('functions/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-functions-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm run build
-
   build-backend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Setup Tools
-        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-      - name: Setup pnpm cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-backend-${{ hashFiles('backend/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-backend-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build
-        run: pnpm run build
+    permissions:
+      contents: read
+      # ここは persist しないので使わないが、_build_backend.yml が宣言する権限を
+      # 渡さないと call 自体が失敗する(呼び出し先の permissions は呼び出し側が上限)。
+      id-token: write
+    uses: ./.github/workflows/_build_backend.yml
+
+  build-functions:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_functions.yml
 
   build-frontend:
-    # _build_frontend.yml(本番/プレビューデプロイでも使う再利用ワークフロー)を
-    # そのまま呼び出す。ビルド手順を二重管理しないための構成。
-    # Preview environment には保護ルール(必須レビュー等)が無いため、
-    # 通常のPRチェックとして毎回自動実行される。
     permissions:
       contents: read
     uses: ./.github/workflows/_build_frontend.yml
-    with:
-      environment: Preview

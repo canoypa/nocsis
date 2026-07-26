@@ -14,15 +14,12 @@ concurrency:
 jobs:
   test-functions:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      code-quality: write
     defaults:
       run:
         working-directory: ./functions
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Java
         uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5.4.0
         with:
@@ -44,28 +41,29 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Test
         run: pnpm run test
-      - name: Upload coverage report
-        # GitHub Code Quality はこのリポジトリではまだ有効化されておらず
-        # (2026-07-18 時点で HTTP 404 を確認済み)、機能公開までは
-        # アップロード失敗を CI 失敗にしない。
-        uses: actions/upload-code-coverage@82c7aee3fb2ad768e00b00a0a8d749c5815085b6 # v1.4.0
-        with:
-          file: functions/coverage/cobertura-coverage.xml
-          language: TypeScript
-          label: code-coverage/functions
-          fail-on-error: false
+      # 閾値割れでも数値を残すため、Test が落ちても実行する。
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: |
+          {
+            echo "### functions coverage"
+            echo
+            echo "| metric | % | covered/total |"
+            echo "| --- | --- | --- |"
+            jq -r '.total | to_entries[]
+              | select(.key | IN("statements","branches","functions","lines"))
+              | "| \(.key) | \(.value.pct)% | \(.value.covered)/\(.value.total) |"' \
+              coverage/coverage-summary.json
+          } >> "$GITHUB_STEP_SUMMARY"
 
   test-backend:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      code-quality: write
     defaults:
       run:
         working-directory: ./backend
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Java
         uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5.4.0
         with:
@@ -87,16 +85,20 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Test
         run: pnpm run test
-      - name: Upload coverage report
-        # GitHub Code Quality はこのリポジトリではまだ有効化されておらず
-        # (2026-07-18 時点で HTTP 404 を確認済み)、機能公開までは
-        # アップロード失敗を CI 失敗にしない。
-        uses: actions/upload-code-coverage@82c7aee3fb2ad768e00b00a0a8d749c5815085b6 # v1.4.0
-        with:
-          file: backend/coverage/cobertura-coverage.xml
-          language: TypeScript
-          label: code-coverage/backend
-          fail-on-error: false
+      # 閾値割れでも数値を残すため、Test が落ちても実行する。
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: |
+          {
+            echo "### backend coverage"
+            echo
+            echo "| metric | % | covered/total |"
+            echo "| --- | --- | --- |"
+            jq -r '.total | to_entries[]
+              | select(.key | IN("statements","branches","functions","lines"))
+              | "| \(.key) | \(.value.pct)% | \(.value.covered)/\(.value.total) |"' \
+              coverage/coverage-summary.json
+          } >> "$GITHUB_STEP_SUMMARY"
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -105,7 +107,7 @@ jobs:
         working-directory: ./frontend
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Tools
         uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
       - name: Setup pub cache
@@ -117,6 +119,17 @@ jobs:
             ${{ runner.os }}-pub-cache-
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+        working-directory: ./backend
+      - name: Setup pnpm cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-backend-${{ hashFiles('backend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-backend-
       - name: Generate OpenAPI spec
         run: pnpm install --frozen-lockfile && pnpm run generate-openapi
         working-directory: ./backend
@@ -132,5 +145,15 @@ jobs:
       - name: Test
         run: flutter test --coverage
       - name: Check coverage threshold
+        env:
+          THRESHOLD: "10"
         run: |
-          awk -F: '/^LF:/{lf+=$2} /^LH:/{lh+=$2} END{c=(lh/lf)*100; printf "Line coverage: %.2f%% (threshold: 10%%)\n", c; exit (c>=10)?0:1}' coverage/lcov.info
+          pct=$(awk -F: '/^LF:/{lf+=$2} /^LH:/{lh+=$2} END{printf "%.2f", (lh/lf)*100}' coverage/lcov.info)
+          {
+            echo "### frontend coverage"
+            echo
+            echo "| metric | % | threshold |"
+            echo "| --- | --- | --- |"
+            echo "| lines | ${pct}% | ${THRESHOLD}% |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          awk -v p="$pct" -v t="$THRESHOLD" 'BEGIN { printf "Line coverage: %s%% (threshold: %s%%)\n", p, t; exit (p + 0 >= t + 0) ? 0 : 1 }'

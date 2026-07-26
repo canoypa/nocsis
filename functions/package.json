@@ -3,6 +3,7 @@
   "name": "nocsis-functions",
   "type": "module",
   "main": "dist/main.js",
+  "packageManager": "pnpm@10.11.0",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "ci": "biome ci src",
@@ -31,21 +32,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.4",
-    "@firebase/rules-unit-testing": "^5.0.1",
     "@types/luxon": "^3.7.1",
     "@types/node": "^22.19.13",
-    "@vitest/coverage-v8": "4.1.4",
+    "@vitest/coverage-v8": "4.1.10",
     "firebase-functions-test": "^3.4.1",
     "firebase-tools": "^15.8.0",
     "msw": "^2.12.10",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.4"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "msw"
-    ]
   }
 }

@@ -27,12 +27,11 @@ export default defineConfig({
       },
     ],
     coverage: {
-      // cobertura: GitHub Code Coverage (actions/upload-code-coverage) へ渡すため。
-      reporter: ["text", "html", "clover", "json", "cobertura"],
+      reporter: ["text", "html", "json-summary"],
       thresholds: {
         statements: 70,
-        branches: 62,
-        functions: 78,
+        branches: 65,
+        functions: 80,
         lines: 70,
       },
     },

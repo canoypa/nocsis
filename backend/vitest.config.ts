@@ -8,11 +8,10 @@ export default defineConfig({
     fileParallelism: false,
     mockReset: true,
     coverage: {
-      // cobertura: GitHub Code Coverage (actions/upload-code-coverage) へ渡すため。
-      reporter: ["text", "html", "clover", "json", "cobertura"],
+      reporter: ["text", "html", "json-summary"],
       thresholds: {
         statements: 85,
-        branches: 68,
+        branches: 70,
         functions: 80,
         lines: 85,
       },
