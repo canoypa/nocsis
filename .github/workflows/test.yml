@@ -154,7 +154,7 @@ jobs:
         run: flutter test --coverage
       - name: Check coverage threshold
         env:
-          THRESHOLD: "10"
+          THRESHOLD: "15"
         run: |
           # 計測対象が 0 行のときは 0% ではなく計測失敗として扱う。
           pct=$(awk -F: '
