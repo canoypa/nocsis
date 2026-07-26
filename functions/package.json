@@ -6,7 +6,7 @@
   "packageManager": "pnpm@10.11.0",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "lint": "biome lint src",
+    "ci": "biome ci src",
     "format": "biome format src",
     "test": "firebase emulators:exec 'pnpm vitest run --coverage'",
     "test:watch": "vitest watch --coverage",

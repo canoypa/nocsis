@@ -7,3 +7,7 @@ analyzer:
   exclude:
     - "lib/generated/**"
     - "**/*/*.g.dart"
+  # ここに書いてもルールは flutter analyze では評価されない。custom_lint は
+  # プラグインのホストで、検査には別途 `flutter pub run custom_lint` が要る。
+  plugins:
+    - custom_lint
