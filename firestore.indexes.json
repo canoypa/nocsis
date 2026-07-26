@@ -1,0 +1,13 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "classmates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "group_id", "order": "ASCENDING" },
+        { "fieldPath": "stuNo", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

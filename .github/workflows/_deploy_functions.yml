@@ -20,9 +20,9 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Setup Tools
-              uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+              uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
             - name: Install dependencies
               run: pnpm install --frozen-lockfile; cd functions && pnpm install
                   --frozen-lockfile
@@ -34,5 +34,5 @@ jobs:
               with:
                   workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
                   service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
-            - name: Deploy Functions
-              run: pnpm firebase deploy --only functions --force
+            - name: Deploy Functions and Security Rules
+              run: pnpm firebase deploy --only functions,firestore:rules,firestore:indexes,storage --force

@@ -1,6 +1,7 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { beforeUserCreated } from "firebase-functions/identity";
 import { firebaseApp } from "~/client/firebaseApp.js";
+import { isAllowedEmail } from "~/core/allowed_emails.js";
 
 export const beforeUserCreate = beforeUserCreated(
   {
@@ -17,13 +18,9 @@ export const beforeUserCreate = beforeUserCreated(
       .doc("environment/allowed_emails")
       .get();
 
-    const data = snapshot.data() as { value: string[] };
+    const patterns = snapshot.data()?.values;
 
-    // FIXME: wow
-    const isAllowedUser = data.value.every((pattern) => {
-      return user.email && RegExp(pattern).test(user.email);
-    });
-    if (!isAllowedUser) {
+    if (!isAllowedEmail(user.email, patterns)) {
       throw new Error("Invalid user.");
     }
 
