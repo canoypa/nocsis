@@ -7,8 +7,18 @@
     ":maintainLockFilesWeekly",
     ":configMigration"
   ],
-  "enabledManagers": ["mise", "github-actions", "dockerfile", "npm", "pub"],
+  "enabledManagers": ["mise", "github-actions", "dockerfile", "npm", "pub", "custom.regex"],
   "labels": ["dependencies"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "backend/Dockerfile の pnpm バージョンを追跡する",
+      "managerFilePatterns": ["backend/Dockerfile"],
+      "matchStrings": ["ENV PNPM_VERSION=(?<currentValue>\\S+)"],
+      "depNameTemplate": "pnpm",
+      "datasourceTemplate": "npm"
+    }
+  ],
   "packageRules": [
     {
       "description": "パッチ・SHAダイジェスト更新の自動マージ",
@@ -23,6 +33,11 @@
       "matchDepNames": ["node", "@types/node"],
       "matchUpdateTypes": ["major"],
       "groupName": "node major"
+    },
+    {
+      "description": "3箇所に分かれた pnpm のバージョン指定をまとめる",
+      "matchDepNames": ["pnpm"],
+      "groupName": "pnpm"
     }
   ]
 }
