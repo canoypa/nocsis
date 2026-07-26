@@ -6,20 +6,22 @@ import 'package:nocsis/providers/firebase.dart';
 import 'package:nocsis/routes/router.dart';
 
 void main() {
-  testWidgets('未ログインで保護ページを開くとログイン画面へ直接遷移する', (
-    tester,
-  ) async {
+  testWidgets('未ログインで保護ページを開くとログイン画面へ直接遷移する', (tester) async {
     tester.binding.platformDispatcher.defaultRouteNameTestValue =
         '/groups/test-group/console';
 
     final container = ProviderContainer(
       overrides: [
-        firebaseAuthProvider.overrideWithValue(MockFirebaseAuth(signedIn: false)),
+        firebaseAuthProvider.overrideWithValue(
+          MockFirebaseAuth(signedIn: false),
+        ),
       ],
     );
 
     addTearDown(container.dispose);
-    addTearDown(tester.binding.platformDispatcher.clearDefaultRouteNameTestValue);
+    addTearDown(
+      tester.binding.platformDispatcher.clearDefaultRouteNameTestValue,
+    );
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -38,7 +40,12 @@ void main() {
     await tester.pump();
 
     expect(
-      container.read(routerProvider).routeInformationProvider.value.uri.toString(),
+      container
+          .read(routerProvider)
+          .routeInformationProvider
+          .value
+          .uri
+          .toString(),
       startsWith('/login?continue-uri='),
     );
     expect(find.text('ログイン'), findsWidgets);

@@ -46,6 +46,8 @@ dev_dependencies:
   chopper_generator: ^8.6.2
   swagger_dart_code_generator: ^4.1.1
   firebase_auth_mocks: ^0.15.1
+  mocktail: ^1.0.5
+  http: ^1.6.0
 
 flutter:
   uses-material-design: true

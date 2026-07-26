@@ -33,10 +33,8 @@ class SelectGroupMenu extends ConsumerWidget {
     return DropdownButton(
       items: userJoinedGroups.items
           .map(
-            (group) => DropdownMenuItem(
-              value: group.id,
-              child: Text(group.name),
-            ),
+            (group) =>
+                DropdownMenuItem(value: group.id, child: Text(group.name)),
           )
           .toList(),
       value: groupId,

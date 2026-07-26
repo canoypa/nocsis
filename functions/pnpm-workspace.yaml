@@ -1,0 +1,8 @@
+onlyBuiltDependencies:
+  - esbuild
+  - msw
+ignoredBuiltDependencies:
+  - "@firebase/util"
+  - "@swc/core"
+  - protobufjs
+  - re2

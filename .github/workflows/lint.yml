@@ -12,6 +12,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check-root-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Tools
+        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-root-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-root-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Verify Firebase CLI
+        run: pnpm firebase --version
+
   lint-functions:
     runs-on: ubuntu-latest
     defaults:
@@ -37,7 +59,7 @@ jobs:
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
-        run: pnpm run lint
+        run: pnpm run ci
 
   lint-backend:
     runs-on: ubuntu-latest
@@ -64,7 +86,7 @@ jobs:
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
-        run: pnpm run lint
+        run: pnpm run ci
 
   lint-frontend:
     runs-on: ubuntu-latest
@@ -109,4 +131,7 @@ jobs:
       - name: Run build_runner
         run: flutter pub run build_runner build
       - name: Lint
-        run: flutter analyze
+        run: |
+          dart format --output=none --set-exit-if-changed .
+          flutter analyze
+          flutter pub run custom_lint
