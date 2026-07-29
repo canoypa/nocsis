@@ -39,7 +39,7 @@
     "firebase-tools": "^15.8.0",
     "msw": "^2.12.10",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.0",
     "vitest": "^4.1.4"
   }
 }
