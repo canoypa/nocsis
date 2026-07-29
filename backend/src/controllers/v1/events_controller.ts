@@ -4,19 +4,25 @@ import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { DateTime } from "luxon";
 import { z } from "zod";
-import { firestore } from "../../clients/firebase.js";
 import { AppConfig } from "../../config/app_config.js";
 import {
   type AuthenticatedEnv,
   authentication,
-  getCurrentUserId,
 } from "../../middlewares/authenticate.js";
+import {
+  getGroup,
+  type GroupAuthzEnv,
+  requireGroupMembership,
+} from "../../middlewares/authorize.js";
 import { eventSchema } from "../../resources/v1/events.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
 
 import "zod-openapi/extend";
 
-export const eventsRoutes = new Hono<AuthenticatedEnv>();
+export const eventsRoutes = new Hono<AuthenticatedEnv & GroupAuthzEnv>();
+
+// 認証を検証より先に実行する
+eventsRoutes.use("*", authentication);
 
 const paramSchema = z
   .object({
@@ -82,9 +88,8 @@ eventsRoutes.get(
   }),
   validator("param", paramSchema),
   validator("query", querySchema),
-  authentication,
+  requireGroupMembership(),
   async (c) => {
-    const groupId = c.req.param("groupId");
     const { from: fromStr, to: toStr, limit } = c.req.valid("query");
 
     const from = DateTime.fromISO(fromStr, { zone: AppConfig.TIMEZONE });
@@ -98,26 +103,7 @@ eventsRoutes.get(
       });
     }
 
-    const uid = getCurrentUserId(c);
-
-    // Firestore 並列クエリ: グループ存在 & 参加チェック
-    const [groupSnapshot, userJoinedGroupSnapshot] = await Promise.all([
-      firestore.collection("groups").doc(groupId).get(),
-      firestore
-        .collection("user_joined_groups")
-        .where("user_id", "==", uid)
-        .where("group_id", "==", groupId)
-        .get(),
-    ]);
-    if (!groupSnapshot.exists) {
-      throw new HTTPException(404, { message: "グループが存在しません。" });
-    }
-    if (userJoinedGroupSnapshot.empty) {
-      throw new HTTPException(403, { message: "グループに参加していません。" });
-    }
-
-    const group = groupSnapshot.data();
-    assert(group);
+    const group = getGroup(c);
 
     const calendarId = group.events_calendar_id;
     if (!calendarId) {

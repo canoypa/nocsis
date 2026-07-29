@@ -8,8 +8,11 @@ import { AppConfig } from "../../config/app_config.js";
 import {
   type AuthenticatedEnv,
   authentication,
-  getCurrentUserId,
 } from "../../middlewares/authenticate.js";
+import {
+  type GroupAuthzEnv,
+  requireGroupMembership,
+} from "../../middlewares/authorize.js";
 import {
   daydutyQuerySchema,
   daydutyResponseSchema,
@@ -18,7 +21,10 @@ import { getDaydutyStuNo } from "../../services/dayduty_service.js";
 
 import "zod-openapi/extend";
 
-export const daydutRoutes = new Hono<AuthenticatedEnv>();
+export const daydutRoutes = new Hono<AuthenticatedEnv & GroupAuthzEnv>();
+
+// 認証を検証より先に実行する
+daydutRoutes.use("*", authentication);
 
 const paramSchema = z
   .object({
@@ -58,31 +64,12 @@ daydutRoutes.get(
   }),
   validator("param", paramSchema),
   validator("query", daydutyQuerySchema),
-  authentication,
+  requireGroupMembership(),
   async (c) => {
     const groupId = c.req.param("groupId");
     const { date } = c.req.valid("query");
-    const uid = getCurrentUserId(c);
 
     try {
-      // Firestore 並列クエリ: グループ存在 & 参加チェック
-      const [groupSnapshot, userJoinedGroupsSnapshot] = await Promise.all([
-        firestore.collection("groups").doc(groupId).get(),
-        firestore
-          .collection("user_joined_groups")
-          .where("user_id", "==", uid)
-          .where("group_id", "==", groupId)
-          .get(),
-      ]);
-      if (!groupSnapshot.exists) {
-        throw new HTTPException(404, { message: "グループが存在しません。" });
-      }
-      if (userJoinedGroupsSnapshot.empty) {
-        throw new HTTPException(403, {
-          message: "グループに参加していません。",
-        });
-      }
-
       const targetDate = date
         ? DateTime.fromISO(date, { zone: AppConfig.TIMEZONE })
         : DateTime.now().setZone(AppConfig.TIMEZONE);

@@ -30,7 +30,9 @@ export const authentication = bearerAuth({
   },
 });
 
-export const getCurrentUserId = (c: Context<AuthenticatedEnv>): string => {
+export const getCurrentUserId = <E extends AuthenticatedEnv>(
+  c: Context<E>,
+): string => {
   const uid = c.get("currentUserId");
   assert(uid);
 
