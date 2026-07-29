@@ -10,9 +10,8 @@
     "skipLibCheck": true,
     "erasableSyntaxOnly": true,
 
-    "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["./src/*"]
     }
   },
   "compileOnSave": true,
