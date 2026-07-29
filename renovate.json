@@ -45,6 +45,12 @@
       "matchManagers": ["mise", "npm", "custom.regex"],
       "matchDepNames": ["pnpm"],
       "groupName": "pnpm"
+    },
+    {
+      "description": "flutter のバージョンを定義している2箇所をまとめる",
+      "matchManagers": ["mise", "pub"],
+      "matchDepNames": ["flutter"],
+      "groupName": "flutter"
     }
   ]
 }
