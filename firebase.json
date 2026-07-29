@@ -18,6 +18,9 @@
     ],
     "headers": []
   },
+  // Cloud Run functions のランタイムにはサポート期限がある。
+  // 上げる前に対応状況を確認する:
+  // https://cloud.google.com/functions/docs/runtime-support#node.js
   "functions": {
     "source": "functions",
     "runtime": "nodejs22"
