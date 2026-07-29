@@ -17,6 +17,15 @@
       "matchStrings": ["(^|\\n)ENV PNPM_VERSION=(?<currentValue>\\S+)"],
       "depNameTemplate": "pnpm",
       "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "どのマネージャも見ない firebase.json の functions ランタイムを追跡する",
+      "managerFilePatterns": ["firebase.json"],
+      "matchStrings": ["\"runtime\"\\s*:\\s*\"nodejs(?<currentValue>\\d+)\""],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version",
+      "versioningTemplate": "node"
     }
   ],
   "packageRules": [
@@ -34,8 +43,8 @@
       "groupName": "minor dependencies ({{packageFileDir}})"
     },
     {
-      "description": "node ランタイムのメジャー更新と @types/node のメジャー更新をまとめる",
-      "matchManagers": ["mise", "npm"],
+      "description": "node のバージョンを定義している5箇所のメジャー更新をまとめる",
+      "matchManagers": ["mise", "npm", "dockerfile", "custom.regex"],
       "matchDepNames": ["node", "@types/node"],
       "matchUpdateTypes": ["major"],
       "groupName": "node major"
