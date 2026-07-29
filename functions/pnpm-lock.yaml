@@ -15,8 +15,8 @@ importers:
         specifier: ^6.1.1
         version: 6.3.0
       '@googleapis/calendar':
-        specifier: ^14.2.0
-        version: 14.3.0
+        specifier: ^15.0.0
+        version: 15.0.0
       '@slack/web-api':
         specifier: ^7.14.1
         version: 7.19.0
@@ -585,8 +585,8 @@ packages:
     resolution: {integrity: sha512-l+IFTkd+6Y5LoAuXyYCKNAKtw/Ci+rAMqgdTB1jv4iZiLhw0rtq+0qjIRbBizXkNzEFmXiXUW0H7sZQQvk1ffA==}
     engines: {node: '>=14'}
 
-  '@googleapis/calendar@14.3.0':
-    resolution: {integrity: sha512-sPPwuIBKNN0ifmvbYTOPXdrjjRRBNTC7gz81kanjXLffnuIqRNt2vzAO8Q6KXzgYXyTApuJZrryUVL4ZncQDiQ==}
+  '@googleapis/calendar@15.0.0':
+    resolution: {integrity: sha512-K5FVIhFOgAaNsfshvOEmGkT7kkowM69MzMYATGDA6Ol3ZwqIK0nZJnS9/keFVYkId6MT2elAy+omcAMUdadHww==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sqladmin@37.0.0':
@@ -5414,7 +5414,7 @@ snapshots:
       - supports-color
     optional: true
 
-  '@googleapis/calendar@14.3.0':
+  '@googleapis/calendar@15.0.0':
     dependencies:
       googleapis-common: 8.0.3
     transitivePeerDependencies:
@@ -7654,7 +7654,7 @@ snapshots:
   gcp-metadata@8.1.2:
     dependencies:
       gaxios: 7.3.0
-      google-logging-utils: 1.1.3
+      google-logging-utils: 1.2.0
       json-bigint: 1.0.0
     transitivePeerDependencies:
       - supports-color
@@ -7741,9 +7741,9 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 7.1.3
+      gaxios: 7.3.0
       gcp-metadata: 8.1.4
-      google-logging-utils: 1.1.3
+      google-logging-utils: 1.2.0
       gtoken: 8.0.0
       jws: 4.0.1
     transitivePeerDependencies:
@@ -7842,7 +7842,7 @@ snapshots:
 
   gtoken@8.0.0:
     dependencies:
-      gaxios: 7.1.3
+      gaxios: 7.3.0
       jws: 4.0.1
     transitivePeerDependencies:
       - supports-color
