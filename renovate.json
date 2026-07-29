@@ -22,7 +22,7 @@
       "customType": "regex",
       "description": "どのマネージャも見ない firebase.json の functions ランタイムを追跡する",
       "managerFilePatterns": ["firebase.json"],
-      "matchStrings": ["\"runtime\": \"nodejs(?<currentValue>\\d+)\""],
+      "matchStrings": ["\"runtime\"\\s*:\\s*\"nodejs(?<currentValue>\\d+)\""],
       "depNameTemplate": "node",
       "datasourceTemplate": "node-version",
       "versioningTemplate": "node"
