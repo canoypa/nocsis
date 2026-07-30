@@ -1,5 +1,5 @@
 import { eq, sql } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { db } from "../../tests/helpers/db.js";
 import { usersTable } from "../db/schema.js";
 
@@ -71,5 +71,29 @@ describe("users テーブルの制約", () => {
       { column_name: "created_at", data_type: "timestamp with time zone" },
       { column_name: "updated_at", data_type: "timestamp with time zone" },
     ]);
+  });
+});
+
+// 遅延生成は OpenAPI 生成が routes.ts の import だけで落ちないために必要で、
+// import 時に throw する形へ戻ると気付けないため振る舞いを固定する。
+// モジュール変数を持つので、各テストでモジュールごと作り直す。
+describe("getDb", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("import 時ではなく初回呼び出しで DATABASE_URL を要求すること", async () => {
+    vi.stubEnv("DATABASE_URL", undefined);
+
+    const { getDb } = await import("./drizzle.js");
+
+    expect(() => getDb()).toThrow("DATABASE_URL is not set");
+  });
+
+  it("同じインスタンスを返すこと", async () => {
+    const { getDb } = await import("./drizzle.js");
+
+    expect(getDb()).toBe(getDb());
   });
 });

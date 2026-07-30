@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { openAPIRouteHandler } from "hono-openapi";
-import { db } from "./clients/drizzle.js";
+import { getDb } from "./clients/drizzle.js";
 import { v1Routes } from "./controllers/v1_controller.js";
 
 export const app = new Hono({
@@ -29,7 +29,7 @@ app.use(
 app.route("/v1", v1Routes);
 
 app.get("/neon-ping", async (c) => {
-  await db.execute(sql`SELECT 1`);
+  await getDb().execute(sql`SELECT 1`);
   return c.json({ status: "ok" });
 });
 
