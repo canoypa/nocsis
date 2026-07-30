@@ -96,16 +96,24 @@ describe("fetchSecret", () => {
       );
 
       // test-secret
-      await expect(fetchSecret("test-secret")).resolves.toBe("test-secret-value");
+      await expect(fetchSecret("test-secret")).resolves.toBe(
+        "test-secret-value",
+      );
       expect(secretManagerClient.accessSecretVersion).toHaveBeenCalledTimes(1);
 
       // another-secret
-      await expect(fetchSecret("another-secret")).resolves.toBe("another-secret-value");
+      await expect(fetchSecret("another-secret")).resolves.toBe(
+        "another-secret-value",
+      );
       expect(secretManagerClient.accessSecretVersion).toHaveBeenCalledTimes(2);
 
       // 再度同じシークレットを呼び出すとキャッシュが使われる
-      await expect(fetchSecret("test-secret")).resolves.toBe("test-secret-value");
-      await expect(fetchSecret("another-secret")).resolves.toBe("another-secret-value");
+      await expect(fetchSecret("test-secret")).resolves.toBe(
+        "test-secret-value",
+      );
+      await expect(fetchSecret("another-secret")).resolves.toBe(
+        "another-secret-value",
+      );
       expect(secretManagerClient.accessSecretVersion).toHaveBeenCalledTimes(2);
     });
   });

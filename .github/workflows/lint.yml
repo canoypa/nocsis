@@ -12,56 +12,121 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  functions:
+  check-root-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Tools
+        uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-root-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-root-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Verify Firebase CLI
+        run: pnpm firebase --version
+
+  lint-functions:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./functions
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-functions-${{ hashFiles('functions/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-functions-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
-        run: pnpm run lint
+        run: pnpm run ci
 
-  backend:
+  lint-backend:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./backend
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-backend-${{ hashFiles('backend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-backend-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
-        run: pnpm run lint
+        run: pnpm run ci
+      # frontend のコード生成はコミット済みの api.json を入力にするため、
+      # 古いままだと backend と食い違ったクライアントが生成される。
+      - name: Check OpenAPI spec
+        run: |
+          pnpm run generate-openapi
+          git diff --exit-code -- ../frontend/swagger/api.json || {
+            echo "::error::api.json が古くなっています。backend で pnpm run generate-openapi を実行してコミットしてください。"
+            exit 1
+          }
 
-  frontend:
+  lint-frontend:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./frontend
     steps:
       - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
+      - name: Setup pub cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-cache-${{ hashFiles('frontend/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-cache-
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
-      - name: Generate OpenAPI spec
-        run: pnpm install --frozen-lockfile && pnpm run generate-openapi
-        working-directory: ./backend
+      - name: Setup build_runner cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: frontend/.dart_tool/build
+          key: ${{ runner.os }}-build-runner-${{ hashFiles('frontend/pubspec.lock', 'frontend/lib/**/*.dart', 'frontend/swagger/api.json', 'frontend/build.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-runner-
       - name: Run build_runner
         run: flutter pub run build_runner build
       - name: Lint
-        run: flutter analyze
+        run: |
+          dart format --output=none --set-exit-if-changed .
+          flutter analyze
+          flutter pub run custom_lint

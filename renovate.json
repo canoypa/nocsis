@@ -1,0 +1,65 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommitTypeAll(chore)",
+    "security:minimumReleaseAgeNpm",
+    ":maintainLockFilesWeekly",
+    ":configMigration"
+  ],
+  "enabledManagers": ["mise", "github-actions", "dockerfile", "npm", "pub", "custom.regex"],
+  "labels": ["dependencies"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "dockerfile マネージャが見ない backend/Dockerfile の pnpm バージョンを追跡する",
+      "managerFilePatterns": ["backend/Dockerfile"],
+      "matchStrings": ["(^|\\n)ENV PNPM_VERSION=(?<currentValue>\\S+)"],
+      "depNameTemplate": "pnpm",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "どのマネージャも見ない firebase.json の functions ランタイムを追跡する",
+      "managerFilePatterns": ["firebase.json"],
+      "matchStrings": ["\"runtime\"\\s*:\\s*\"nodejs(?<currentValue>\\d+)\""],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version",
+      "versioningTemplate": "node"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "パッチ・SHAダイジェスト更新の自動マージ",
+      "matchManagers": ["npm", "pub", "github-actions"],
+      "matchUpdateTypes": ["patch", "digest"],
+      "minimumReleaseAge": "3 days",
+      "automerge": true
+    },
+    {
+      "description": "lockfile を共有する minor 更新をディレクトリ単位でまとめる",
+      "matchManagers": ["npm", "pub"],
+      "matchUpdateTypes": ["minor"],
+      "groupName": "minor dependencies ({{packageFileDir}})"
+    },
+    {
+      "description": "node のバージョンを定義している5箇所のメジャー更新をまとめる",
+      "matchManagers": ["mise", "npm", "dockerfile", "custom.regex"],
+      "matchDepNames": ["node", "@types/node"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "node major"
+    },
+    {
+      "description": "pnpm のバージョンを定義している3箇所をまとめる",
+      "matchManagers": ["mise", "npm", "custom.regex"],
+      "matchDepNames": ["pnpm"],
+      "groupName": "pnpm"
+    },
+    {
+      "description": "flutter のバージョンを定義している2箇所をまとめる",
+      "matchManagers": ["mise", "pub"],
+      "matchDepNames": ["flutter"],
+      "groupName": "flutter"
+    }
+  ]
+}

@@ -1,5 +1,4 @@
 # openapi
-swagger/api.json
 lib/generated/api_client/
 
 # Flutter
@@ -40,6 +39,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+coverage/
 
 # Symbolication related
 app.*.symbols

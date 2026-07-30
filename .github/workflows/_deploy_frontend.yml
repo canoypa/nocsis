@@ -1,42 +1,42 @@
 name: Deploy Frontend
 
 on:
-    workflow_call:
-        inputs:
-            environment:
-                description: "Deployment environment"
-                required: true
-                type: string
-            channel_id:
-                description: "Firebase Hosting channel ID"
-                required: true
-                type: string
-        secrets:
-            DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT:
-                required: true
+  workflow_call:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        type: string
+      channel_id:
+        description: "Firebase Hosting channel ID"
+        required: true
+        type: string
+    secrets:
+      DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT:
+        required: true
 
 permissions: {}
 
 jobs:
-    deploy:
-        environment:
-            name: ${{ inputs.environment }}
-        permissions:
-            checks: write
-            contents: read
-            pull-requests: write
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-            - name: Download Artifacts
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-              with:
-                  name: frontend-build
-                  path: ./frontend/build/web
-            - name: Deploy
-              uses: FirebaseExtended/action-hosting-deploy@e2eda2e106cfa35cdbcf4ac9ddaf6c4756df2c8c # v0.10.0
-              with:
-                  repoToken: ${{ secrets.GITHUB_TOKEN }}
-                  firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
-                  channelId: ${{ inputs.channel_id }}
+  deploy:
+    environment:
+      name: ${{ inputs.environment }}
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Download Artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: frontend-build
+          path: ./frontend/build/web
+      - name: Deploy
+        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
+          channelId: ${{ inputs.channel_id }}

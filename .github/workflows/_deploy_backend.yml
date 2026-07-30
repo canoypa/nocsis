@@ -1,56 +1,54 @@
 name: Deploy Backend
 
 on:
-    workflow_call:
-        inputs:
-            environment:
-                description: "Deployment environment"
-                required: true
-                type: string
-            tag:
-                description: "Cloud Run revision tag (omit for production)"
-                required: false
-                type: string
-            promote:
-                description: "Promote to latest traffic after deploy"
-                required: false
-                type: boolean
-                default: false
+  workflow_call:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        type: string
+      image:
+        description: "Image built by _build_backend.yml"
+        required: true
+        type: string
+      tag:
+        description: "Cloud Run revision tag (omit for production)"
+        required: false
+        type: string
+      promote:
+        description: "Promote to latest traffic after deploy"
+        required: false
+        type: boolean
+        default: false
 
 permissions: {}
 
 jobs:
-    deploy:
-        concurrency:
-            group: deploy-backend
-            cancel-in-progress: false
-        environment:
-            name: ${{ inputs.environment }}
-        permissions:
-            contents: read
-            id-token: write
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-            - name: Setup Tools
-              uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
-            - name: Auth
-              uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
-              with:
-                  workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
-                  service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
-            - name: Set up Cloud SDK
-              uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
-            - name: Deploy Backend
-              run: |
-                  gcloud run deploy backend \
-                    --source ./backend \
-                    --project class-clock-40088 \
-                    --region asia-northeast1 \
-                    --no-traffic \
-                    ${{ inputs.tag && format('--tag {0}', inputs.tag) || '' }}
-            - name: Set Traffic
-              if: ${{ inputs.promote }}
-              run: gcloud run services update-traffic backend --to-latest --project
-                  class-clock-40088 --region asia-northeast1
+  deploy:
+    concurrency:
+      group: deploy-backend
+      cancel-in-progress: false
+    environment:
+      name: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+      - name: Deploy Backend
+        run: |
+          gcloud run deploy backend \
+            --image ${{ inputs.image }} \
+            --project class-clock-40088 \
+            --region asia-northeast1 \
+            --no-traffic \
+            ${{ inputs.tag && format('--tag {0}', inputs.tag) || '' }}
+      - name: Set Traffic
+        if: ${{ inputs.promote }}
+        run: gcloud run services update-traffic backend --to-latest --project class-clock-40088 --region asia-northeast1

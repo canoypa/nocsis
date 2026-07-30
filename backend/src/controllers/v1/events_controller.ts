@@ -14,41 +14,39 @@ import {
 import { eventSchema } from "../../resources/v1/events.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
 
-import "zod-openapi/extend";
-
 export const eventsRoutes = new Hono<AuthenticatedEnv>();
 
 const paramSchema = z
   .object({
-    groupId: z.string().openapi({ description: "グループのID" }),
+    groupId: z.string().meta({ description: "グループのID" }),
   })
-  .openapi({ description: "イベントの一覧を取得する際のパラメータ" });
+  .meta({ description: "イベントの一覧を取得する際のパラメータ" });
 
 const querySchema = z
   .object({
     from: z
       .string()
       .datetime({ offset: true })
-      .openapi({ description: "取得開始日時" }),
+      .meta({ description: "取得開始日時" }),
     to: z
       .string()
       .datetime({ offset: true })
       .optional()
-      .openapi({ description: "取得終了日時" }),
+      .meta({ description: "取得終了日時" }),
     limit: z.coerce
       .number()
       .int()
       .positive({ message: "limitは正の整数である必要があります" })
       .optional()
-      .openapi({ description: "取得件数上限" }),
+      .meta({ description: "取得件数上限" }),
   })
-  .openapi({ description: "イベントの一覧を取得する際のクエリパラメータ" });
+  .meta({ description: "イベントの一覧を取得する際のクエリパラメータ" });
 
 const eventsResponseSchema = z
   .object({
-    items: z.array(eventSchema).openapi({ description: "イベントのリスト" }),
+    items: z.array(eventSchema).meta({ description: "イベントのリスト" }),
   })
-  .openapi({ description: "イベントの一覧を取得する際のレスポンス" });
+  .meta({ description: "イベントの一覧を取得する際のレスポンス" });
 type EventsResponse = z.infer<typeof eventsResponseSchema>;
 
 eventsRoutes.get(

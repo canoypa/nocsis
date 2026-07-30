@@ -10,8 +10,6 @@ import {
 import { groupSchema } from "../../resources/v1/groups.js";
 import { userJoinedGroupsSchema } from "../../resources/v1/user_joined_groups.js";
 
-import "zod-openapi/extend";
-
 export const userRoutes = new Hono<AuthenticatedEnv>();
 
 type UserJoinedGroupsResponse = z.infer<typeof userJoinedGroupsSchema>;

@@ -1,11 +1,11 @@
-FROM node:22-slim AS base
+FROM node:24-slim AS base
 WORKDIR /app
 
 ENV NODE_ENV=production
 
 FROM base AS builder-base
 
-ENV PNPM_VERSION=10.11.0
+ENV PNPM_VERSION=11.17.0
 
 RUN npm install --global pnpm@${PNPM_VERSION}
 

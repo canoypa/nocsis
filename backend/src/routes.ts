@@ -6,8 +6,6 @@ import { openAPIRouteHandler } from "hono-openapi";
 import { db } from "./clients/drizzle.js";
 import { v1Routes } from "./controllers/v1_controller.js";
 
-import "zod-openapi/extend";
-
 export const app = new Hono({
   strict: false, // パス末尾のスラッシュ有無を区別しない
 }).basePath("/api");
