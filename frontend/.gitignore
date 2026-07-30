@@ -1,5 +1,4 @@
 # openapi
-swagger/api.json
 lib/generated/api_client/
 
 # Flutter

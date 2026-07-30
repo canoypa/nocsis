@@ -87,6 +87,15 @@ jobs:
         run: pnpm run typecheck
       - name: Lint
         run: pnpm run ci
+      # frontend のコード生成はコミット済みの api.json を入力にするため、
+      # 古いままだと backend と食い違ったクライアントが生成される。
+      - name: Check OpenAPI spec
+        run: |
+          pnpm run generate-openapi
+          git diff --exit-code -- ../frontend/swagger/api.json || {
+            echo "::error::api.json が古くなっています。backend で pnpm run generate-openapi を実行してコミットしてください。"
+            exit 1
+          }
 
   lint-frontend:
     runs-on: ubuntu-latest
@@ -107,20 +116,6 @@ jobs:
             ${{ runner.os }}-pub-cache-
       - name: Install dependencies
         run: flutter pub get --enforce-lockfile
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-        working-directory: ./backend
-      - name: Setup pnpm cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-backend-${{ hashFiles('backend/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-backend-
-      - name: Generate OpenAPI spec
-        run: pnpm install --frozen-lockfile && pnpm run generate-openapi
-        working-directory: ./backend
       - name: Setup build_runner cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:

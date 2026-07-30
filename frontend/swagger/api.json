@@ -1,0 +1,737 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Hono Documentation",
+    "description": "Development documentation",
+    "version": "0.0.0"
+  },
+  "paths": {
+    "/api/v1/groups/{id}": {
+      "get": {
+        "operationId": "getApiV1GroupsById",
+        "description": "グループを取得する",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "ID"
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patchApiV1GroupsById",
+        "description": "グループを更新する",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Group"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupPatchJson"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/groups/{groupId}/classes": {
+      "get": {
+        "operationId": "getApiV1GroupsByGroupIdClasses",
+        "description": "授業の一覧を取得する",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Class"
+                      },
+                      "description": "授業のリスト"
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "description": "授業の一覧を取得する際のレスポンス"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "groupId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "グループのID"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "description": "取得開始日時"
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "description": "取得終了日時"
+          }
+        ]
+      }
+    },
+    "/api/v1/groups/{groupId}/dayduty": {
+      "get": {
+        "operationId": "getApiV1GroupsByGroupIdDayduty",
+        "description": "日直情報を取得する",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Classmate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "groupId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "グループのID"
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2024-01-01T00:00:00+09:00"
+            },
+            "description": "日直を取得する日付（ISO形式、省略時は今日）"
+          }
+        ]
+      }
+    },
+    "/api/v1/groups/{groupId}/events": {
+      "get": {
+        "operationId": "getApiV1GroupsByGroupIdEvents",
+        "description": "イベントの一覧を取得する",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Event"
+                      },
+                      "description": "イベントのリスト"
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "description": "イベントの一覧を取得する際のレスポンス"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "groupId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "グループのID"
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": true,
+            "description": "取得開始日時"
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "取得終了日時"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0
+            },
+            "description": "取得件数上限"
+          }
+        ]
+      }
+    },
+    "/api/v1/groups/{groupId}/weather/now": {
+      "get": {
+        "operationId": "getApiV1GroupsByGroupIdWeatherNow",
+        "description": "現在の天気を取得する",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherData"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "groupId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "グループのID"
+          }
+        ]
+      }
+    },
+    "/api/v1/users/me/groups": {
+      "get": {
+        "operationId": "getApiV1UsersMeGroups",
+        "description": "自分が参加しているグループ一覧を取得する",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserJoinedGroups"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Group": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "名前"
+          },
+          "classes_calendar_id": {
+            "type": "string",
+            "description": "授業カレンダーID"
+          },
+          "events_calendar_id": {
+            "type": "string",
+            "description": "イベントカレンダーID"
+          },
+          "dayduty_start_date": {
+            "type": "string",
+            "description": "日直開始日"
+          },
+          "slack_event_channel_id": {
+            "type": "string",
+            "description": "Slackイベント通知チャンネルID"
+          },
+          "weather_point": {
+            "$ref": "#/components/schemas/WeatherPoint"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "classes_calendar_id",
+          "events_calendar_id",
+          "dayduty_start_date",
+          "slack_event_channel_id",
+          "weather_point"
+        ],
+        "description": "グループ"
+      },
+      "WeatherPoint": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "description": "緯度"
+          },
+          "lon": {
+            "type": "number",
+            "description": "経度"
+          }
+        },
+        "required": [
+          "lat",
+          "lon"
+        ],
+        "description": "天気情報を取得する地点"
+      },
+      "GroupPatchJson": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "名前"
+          },
+          "classes_calendar_id": {
+            "type": "string",
+            "description": "授業カレンダーID"
+          },
+          "events_calendar_id": {
+            "type": "string",
+            "description": "イベントカレンダーID"
+          },
+          "dayduty_start_date": {
+            "type": "string",
+            "description": "日直開始日"
+          },
+          "slack_event_channel_id": {
+            "type": "string",
+            "description": "Slackイベント通知チャンネルID"
+          },
+          "weather_point": {
+            "$ref": "#/components/schemas/WeatherPoint"
+          }
+        },
+        "description": "グループの更新に使用するJSONデータ"
+      },
+      "Class": {
+        "type": "object",
+        "properties": {
+          "startAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "開始日時"
+          },
+          "endAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "終了日時"
+          },
+          "title": {
+            "type": "string",
+            "description": "タイトル"
+          },
+          "period": {
+            "type": "integer",
+            "description": "時限"
+          }
+        },
+        "required": [
+          "startAt",
+          "endAt",
+          "title",
+          "period"
+        ],
+        "description": "授業"
+      },
+      "Classmate": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "student",
+              "teacher"
+            ],
+            "description": "役割"
+          },
+          "stuNo": {
+            "type": "integer",
+            "description": "出席番号"
+          },
+          "name": {
+            "type": "string",
+            "description": "名前"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "メールアドレス"
+          },
+          "slackUserId": {
+            "type": "string",
+            "description": "SlackユーザーID"
+          }
+        },
+        "required": [
+          "role",
+          "stuNo",
+          "name",
+          "email",
+          "slackUserId"
+        ],
+        "description": "クラスメイト"
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID"
+          },
+          "startAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ],
+            "description": "開始日時"
+          },
+          "endAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              }
+            ],
+            "description": "終了日時"
+          },
+          "title": {
+            "type": "string",
+            "description": "タイトル"
+          },
+          "description": {
+            "type": "string",
+            "description": "説明"
+          },
+          "location": {
+            "type": "string",
+            "description": "場所"
+          },
+          "isAllDay": {
+            "type": "boolean",
+            "description": "終日イベントかどうか"
+          }
+        },
+        "required": [
+          "id",
+          "startAt",
+          "endAt",
+          "title",
+          "isAllDay"
+        ],
+        "description": "イベント"
+      },
+      "WeatherData": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "type": "object",
+            "properties": {
+              "temp": {
+                "type": "number",
+                "description": "気温"
+              },
+              "name": {
+                "type": "string",
+                "enum": [
+                  "Rain",
+                  "Snow",
+                  "Atmosphere",
+                  "Clear",
+                  "Clouds",
+                  "Unknown"
+                ],
+                "description": "天候名"
+              }
+            },
+            "required": [
+              "temp",
+              "name"
+            ],
+            "description": "現在の天気情報"
+          },
+          "hourly": {
+            "type": "object",
+            "properties": {
+              "temp": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "8時間先までの気温"
+              },
+              "pop": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "8時間先までの降水確率"
+              }
+            },
+            "required": [
+              "temp",
+              "pop"
+            ],
+            "description": "時間別天気予報"
+          },
+          "threeHour": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Rain",
+                "Snow",
+                "Atmosphere",
+                "Clear",
+                "Clouds",
+                "Unknown"
+              ],
+              "description": "天候名"
+            },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "3時間先までの天気"
+          }
+        },
+        "required": [
+          "current",
+          "hourly",
+          "threeHour"
+        ],
+        "description": "天気データ"
+      },
+      "UserJoinedGroups": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Group"
+            },
+            "description": "参加しているグループのリスト"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "description": "ユーザーが参加しているグループのリスト"
+      }
+    }
+  }
+}
