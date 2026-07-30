@@ -1,4 +1,4 @@
 [tools]
-node = "22"
+node = "24"
 pnpm = "11.17.0"
 flutter = "3.44.8"

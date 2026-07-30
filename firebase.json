@@ -23,7 +23,7 @@
   // https://cloud.google.com/functions/docs/runtime-support#node.js
   "functions": {
     "source": "functions",
-    "runtime": "nodejs22"
+    "runtime": "nodejs24"
   },
   "firestore": {
     "rules": "firestore.rules",
