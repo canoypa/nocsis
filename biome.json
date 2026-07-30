@@ -3,7 +3,13 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
 
   "files": {
-    "includes": ["**", "!**/coverage/**", "!**/dist/**", "!**/frontend/**"]
+    "includes": [
+      "**",
+      "!**/coverage/**",
+      "!**/dist/**",
+      "!**/drizzle/**",
+      "!**/frontend/**"
+    ]
   },
 
   "linter": {

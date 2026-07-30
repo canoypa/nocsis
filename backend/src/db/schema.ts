@@ -1,5 +1,11 @@
 import { sql } from "drizzle-orm";
-import { bigint, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  bigint,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 
 /**
  * ユーザー。Firebase Auth の uid と email を Postgres 側に固定するアンカー。
