@@ -14,34 +14,32 @@ import {
 import { classSchema } from "../../resources/v1/classes.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
 
-import "zod-openapi/extend";
-
 export const classesRoutes = new Hono<AuthenticatedEnv>();
 
 const paramSchema = z
   .object({
-    groupId: z.string().openapi({ description: "グループのID" }),
+    groupId: z.string().meta({ description: "グループのID" }),
   })
-  .openapi({ description: "授業の一覧を取得する際のパラメータ" });
+  .meta({ description: "授業の一覧を取得する際のパラメータ" });
 
 const querySchema = z
   .object({
     from: z
       .string()
       .datetime({ offset: true })
-      .openapi({ description: "取得開始日時" }),
+      .meta({ description: "取得開始日時" }),
     to: z
       .string()
       .datetime({ offset: true })
-      .openapi({ description: "取得終了日時" }),
+      .meta({ description: "取得終了日時" }),
   })
-  .openapi({ description: "授業の一覧を取得する際のクエリパラメータ" });
+  .meta({ description: "授業の一覧を取得する際のクエリパラメータ" });
 
 const classesResponseSchema = z
   .object({
-    items: z.array(classSchema).openapi({ description: "授業のリスト" }),
+    items: z.array(classSchema).meta({ description: "授業のリスト" }),
   })
-  .openapi({ description: "授業の一覧を取得する際のレスポンス" });
+  .meta({ description: "授業の一覧を取得する際のレスポンス" });
 type ClassesResponse = z.infer<typeof classesResponseSchema>;
 
 classesRoutes.get(

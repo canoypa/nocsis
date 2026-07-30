@@ -8,22 +8,20 @@ import {
   authentication,
   getCurrentUserId,
 } from "../../middlewares/authenticate.js";
+import { groupSchema } from "../../resources/v1/groups.js";
 import { weatherDataSchema } from "../../resources/v1/weather_data.js";
 import {
   fetchWeather,
   getWeatherNameById,
 } from "../../services/open_weather_map_service.js";
 
-import "zod-openapi/extend";
-import { groupSchema } from "../../resources/v1/groups.js";
-
 export const weatherRoutes = new Hono<AuthenticatedEnv>();
 
 const paramSchema = z
   .object({
-    groupId: z.string().openapi({ description: "グループのID" }),
+    groupId: z.string().meta({ description: "グループのID" }),
   })
-  .openapi({ description: "パスパラメータ" });
+  .meta({ description: "パスパラメータ" });
 type WeatherDataResponse = z.infer<typeof weatherDataSchema>;
 
 weatherRoutes.get(
