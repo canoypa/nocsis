@@ -16,15 +16,13 @@ import {
 } from "../../resources/v1/dayduty.js";
 import { getDaydutyStuNo } from "../../services/dayduty_service.js";
 
-import "zod-openapi/extend";
-
 export const daydutRoutes = new Hono<AuthenticatedEnv>();
 
 const paramSchema = z
   .object({
-    groupId: z.string().openapi({ description: "グループのID" }),
+    groupId: z.string().meta({ description: "グループのID" }),
   })
-  .openapi({ description: "日直情報を取得する際のパラメータ" });
+  .meta({ description: "日直情報を取得する際のパラメータ" });
 type DaydutyResponse = z.infer<typeof daydutyResponseSchema>;
 
 daydutRoutes.get(
