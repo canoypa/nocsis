@@ -27,9 +27,22 @@ jobs:
       - name: Run build_runner
         working-directory: ./frontend
         run: flutter pub run build_runner build
+      - name: Write Firebase config
+        working-directory: ./frontend
+        env:
+          FIREBASE_WEB_CONFIG: ${{ vars.FIREBASE_WEB_CONFIG }}
+        run: |
+          mkdir -p dart_defines
+          printf '%s' "$FIREBASE_WEB_CONFIG" > dart_defines/build.json
+          # Flutter は空の定義ファイルを黙って受け入れるため、設定が空のまま
+          # ビルドが成功しデプロイまで通ってしまう。ここで落とす。
+          jq -e '(.FIREBASE_API_KEY // "") != ""' dart_defines/build.json > /dev/null || {
+            echo "::error::Actions variable の FIREBASE_WEB_CONFIG が未設定か不正です。"
+            exit 1
+          }
       - name: Build
         working-directory: ./frontend
-        run: flutter build web --wasm
+        run: flutter build web --wasm --dart-define-from-file=dart_defines/build.json
       - name: Upload Artifacts
         if: ${{ inputs.persist }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

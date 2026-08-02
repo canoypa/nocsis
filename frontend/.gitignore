@@ -1,6 +1,10 @@
 # openapi
 lib/generated/api_client/
 
+# firebase
+dart_defines/
+firebase.json
+
 # Flutter
 .fvm/
 lib/**/*.g.dart
