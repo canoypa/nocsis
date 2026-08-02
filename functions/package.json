@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit",
     "ci": "biome ci src",
     "format": "biome format src",
-    "test": "firebase emulators:exec 'pnpm vitest run --coverage'",
+    "test": "firebase emulators:exec --project demo-nocsis 'pnpm vitest run --coverage'",
     "test:watch": "vitest watch --coverage",
     "build": "tsup src/main.ts -d dist --format esm --clean --sourcemap",
     "build:watch": "tsup src/main.ts -d dist --format esm --clean --sourcemap --watch",
