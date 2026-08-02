@@ -34,6 +34,12 @@ jobs:
         run: |
           mkdir -p dart_defines
           printf '%s' "$FIREBASE_WEB_CONFIG" > dart_defines/build.json
+          # Flutter は空の定義ファイルを黙って受け入れるため、設定が空のまま
+          # ビルドが成功しデプロイまで通ってしまう。ここで落とす。
+          jq -e '(.FIREBASE_API_KEY // "") != ""' dart_defines/build.json > /dev/null || {
+            echo "::error::Actions variable の FIREBASE_WEB_CONFIG が未設定か不正です。"
+            exit 1
+          }
       - name: Build
         working-directory: ./frontend
         run: flutter build web --wasm --dart-define-from-file=dart_defines/build.json

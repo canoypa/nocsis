@@ -16,8 +16,8 @@
     "serve-emulator": "firebase emulators:start --project demo-nocsis --only functions",
     "shell": "pnpm run build && firebase functions:shell --project demo-nocsis",
     "start": "pnpm run shell",
-    "deploy": "firebase deploy --project $FIREBASE_PROJECT --only functions",
-    "logs": "firebase functions:log --project $FIREBASE_PROJECT"
+    "deploy": "firebase deploy --project \"${FIREBASE_PROJECT:?FIREBASE_PROJECT is not set}\" --only functions",
+    "logs": "firebase functions:log --project \"${FIREBASE_PROJECT:?FIREBASE_PROJECT is not set}\""
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^5.0.2",
