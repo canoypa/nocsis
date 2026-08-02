@@ -13,11 +13,11 @@
     "build": "tsup src/main.ts -d dist --format esm --clean --sourcemap",
     "build:watch": "tsup src/main.ts -d dist --format esm --clean --sourcemap --watch",
     "serve": "pnpm run serve-emulator",
-    "serve-emulator": "firebase emulators:start --only functions",
-    "shell": "pnpm run build && firebase functions:shell",
+    "serve-emulator": "firebase emulators:start --project demo-nocsis --only functions",
+    "shell": "pnpm run build && firebase functions:shell --project demo-nocsis",
     "start": "pnpm run shell",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "deploy": "firebase deploy --project $FIREBASE_PROJECT --only functions",
+    "logs": "firebase functions:log --project $FIREBASE_PROJECT"
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^5.0.2",
