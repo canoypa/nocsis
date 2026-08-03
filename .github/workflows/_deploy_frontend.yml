@@ -52,9 +52,15 @@ jobs:
             pnpm firebase deploy --project "$PROJECT_ID" --only hosting
             exit 0
           fi
-          pnpm firebase hosting:channel:deploy "$CHANNEL_ID" \
+          # --silent が無いと pnpm 自身の出力が stdout に混ざり、JSON として
+          # 読めなくなる。
+          pnpm --silent firebase hosting:channel:deploy "$CHANNEL_ID" \
             --project "$PROJECT_ID" --expires 7d --json > channel.json
-          url=$(jq -er '.result | to_entries[0].value.url' channel.json)
+          if ! url=$(jq -er '.result | to_entries[0].value.url' channel.json); then
+            echo "::error::プレビュー URL を取り出せませんでした。firebase の出力:"
+            cat channel.json
+            exit 1
+          fi
           echo "url=$url" >> "$GITHUB_OUTPUT"
       # action-hosting-deploy が出していたプレビュー URL のコメントを引き継ぐ。
       - name: Comment preview URL
