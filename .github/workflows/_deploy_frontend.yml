@@ -39,4 +39,7 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
+          # サービスアカウントからは対象プロジェクトが決まらない。.firebaserc を
+          # 置かない以上、ここで明示しないと "No currently active project" で落ちる。
+          projectId: ${{ vars.GCP_PROJECT_ID }}
           channelId: ${{ inputs.channel_id }}
