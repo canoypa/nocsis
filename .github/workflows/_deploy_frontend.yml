@@ -62,7 +62,6 @@ jobs:
             exit 1
           fi
           echo "url=$url" >> "$GITHUB_OUTPUT"
-      # action-hosting-deploy が出していたプレビュー URL のコメントを引き継ぐ。
       - name: Comment preview URL
         if: ${{ steps.deploy.outputs.url && github.event.pull_request.number }}
         env:
