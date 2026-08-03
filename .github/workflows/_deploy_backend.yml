@@ -47,6 +47,7 @@ jobs:
             --image ${{ inputs.image }} \
             --project ${{ vars.GCP_PROJECT_ID }} \
             --region asia-northeast1 \
+            --service-account backend-runtime@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
             --no-traffic \
             ${{ inputs.tag && format('--tag {0}', inputs.tag) || '' }}
       - name: Set Traffic
