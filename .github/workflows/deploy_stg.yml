@@ -1,0 +1,29 @@
+name: Deploy to Staging
+
+# 特定のブランチに依存しない。任意のブランチから手動で流して、本番と同じ
+# デプロイ経路を先に通す。向き先は Staging 環境の変数で決まる。
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: Deploy to Staging
+  cancel-in-progress: false
+
+jobs:
+  build_functions:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_functions.yml
+    with:
+      persist: true
+
+  deploy_functions:
+    needs: [build_functions]
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_deploy_functions.yml
+    with:
+      environment: Staging
