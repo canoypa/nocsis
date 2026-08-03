@@ -38,4 +38,4 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Delete Firebase Hosting channel
-        run: pnpm firebase hosting:channel:delete ${{ env.CHANNEL_ID }} --force
+        run: pnpm firebase hosting:channel:delete ${{ env.CHANNEL_ID }} --project ${{ vars.GCP_PROJECT_ID }} --force
