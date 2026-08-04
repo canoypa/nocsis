@@ -56,3 +56,4 @@ jobs:
     with:
       environment: Preview
       channel_id: ${{ github.event_name == 'workflow_dispatch' && inputs.channel_id || format('pr-{0}', github.event.pull_request.number) }}
+      expect_project_id: ${{ needs.build_frontend.outputs.project_id }}
