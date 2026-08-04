@@ -7,10 +7,6 @@ on:
         description: "Deployment environment"
         required: true
         type: string
-      channel_id:
-        description: "Firebase Hosting channel ID"
-        required: true
-        type: string
       expect_project_id:
         description: "Firebase project the downloaded build points at"
         required: false
@@ -25,7 +21,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -57,34 +52,7 @@ jobs:
         with:
           workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
           service_account: wlif-deploy@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-      # channel_id は workflow_dispatch の入力に由来しうるので、run に展開せず
-      # 環境変数として渡す。
       - name: Deploy
-        id: deploy
         env:
-          CHANNEL_ID: ${{ inputs.channel_id }}
           PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-        run: |
-          if [ "$CHANNEL_ID" = "live" ]; then
-            pnpm firebase deploy --project "$PROJECT_ID" --only hosting
-            exit 0
-          fi
-          # --silent が無いと pnpm 自身の出力が stdout に混ざり、JSON として
-          # 読めなくなる。
-          pnpm --silent firebase hosting:channel:deploy "$CHANNEL_ID" \
-            --project "$PROJECT_ID" --expires 7d --json > channel.json
-          if ! url=$(jq -er '.result | to_entries[0].value.url' channel.json); then
-            echo "::error::プレビュー URL を取り出せませんでした。firebase の出力:"
-            cat channel.json
-            exit 1
-          fi
-          echo "url=$url" >> "$GITHUB_OUTPUT"
-      - name: Comment preview URL
-        if: ${{ steps.deploy.outputs.url && github.event.pull_request.number }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          URL: ${{ steps.deploy.outputs.url }}
-        run: |
-          gh pr comment "$PR_NUMBER" --edit-last --create-if-none \
-            --body "Firebase Hosting のプレビュー: $URL"
+        run: pnpm firebase deploy --project "$PROJECT_ID" --only hosting
