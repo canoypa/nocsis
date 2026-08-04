@@ -23,19 +23,19 @@ jobs:
       - name: Auth
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
-          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
-          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
+          workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: wlif-deploy@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
       - name: Delete Cloud Run tag
         run: |
           gcloud run services update-traffic backend \
             --remove-tags ${{ env.CHANNEL_ID }} \
-            --project class-clock-40088 \
+            --project ${{ vars.GCP_PROJECT_ID }} \
             --region asia-northeast1
       - name: Setup Tools
-        uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
+        uses: jdx/mise-action@7e36c90d9ab29c415a2384db3006f3ec8a8cc654 # v4.2.4
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Delete Firebase Hosting channel
-        run: pnpm firebase hosting:channel:delete ${{ env.CHANNEL_ID }} --force
+        run: pnpm firebase hosting:channel:delete ${{ env.CHANNEL_ID }} --project ${{ vars.GCP_PROJECT_ID }} --force

@@ -12,6 +12,17 @@ on:
         required: false
         type: boolean
         default: false
+      # environment は宣言しない。build ジョブが environment を持つと、その OIDC
+      # トークンは attribute.environment 束縛の wlif-deploy を引けるようになり、
+      # 下のコメントの分離が崩れる。push 先は呼び出し元が渡す。
+      project_id:
+        description: "GCP project to push the image to (defaults to production)"
+        required: false
+        type: string
+      project_number:
+        description: "GCP project number for Workload Identity Federation"
+        required: false
+        type: string
     outputs:
       image:
         description: "Built image reference (empty unless persist is true)"
@@ -28,7 +39,9 @@ jobs:
     outputs:
       image: ${{ steps.push.outputs.digest }}
     env:
-      IMAGE_REPO: asia-northeast1-docker.pkg.dev/class-clock-40088/cloud-run-source-deploy/backend
+      PROJECT_ID: ${{ inputs.project_id || vars.GCP_PROJECT_ID }}
+      PROJECT_NUMBER: ${{ inputs.project_number || vars.GCP_PROJECT_NUMBER }}
+      IMAGE_REPO: asia-northeast1-docker.pkg.dev/${{ inputs.project_id || vars.GCP_PROJECT_ID }}/cloud-run-source-deploy/backend
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,12 +51,15 @@ jobs:
         # Cloud Run は amd64 イメージのみ動かせる。runner が amd64 でなくなったら、
         # 黙って動かないイメージを積むのではなくここで落とす(QEMU は用意しない)。
         run: docker build --platform linux/amd64 --tag "$IMAGE" ./backend
+      # デプロイ用の SA を使わない。このジョブがするのは image の push だけで、
+      # デプロイ権限は要らない。WIF の条件はリポジトリ単位でブランチを見ないため、
+      # ここで deploy 用 SA を引くと任意のブランチから本番デプロイ権限が取れる。
       - name: Auth
         if: ${{ inputs.persist }}
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
-          workload_identity_provider: projects/219141289630/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
-          service_account: gh-actions-deploy@class-clock-40088.iam.gserviceaccount.com
+          workload_identity_provider: projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: wlif-build@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
       - name: Set up Cloud SDK
         if: ${{ inputs.persist }}
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1

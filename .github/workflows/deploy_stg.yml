@@ -1,0 +1,95 @@
+name: Deploy to Staging
+
+# 特定のブランチに依存しない。任意のブランチから手動で流して、本番と同じ
+# デプロイ経路を先に通す。デプロイ先は Staging 環境の変数で決まる。
+#
+# build ジョブだけは environment を宣言できないため(宣言するとデプロイ権限に
+# 届く。理由は _build_backend.yml のコメント)、ビルドの向き先をリポジトリ変数
+# STG_* から渡す。デプロイ先と一致しているかは _deploy_frontend.yml の
+# Verify build target が突き合わせる。
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: Deploy to Staging
+  cancel-in-progress: false
+
+jobs:
+  # 呼び出し先は入力が空だと本番の変数にフォールバックする(Preview / Production は
+  # それで正しい)。staging でフォールバックすると本番の Artifact Registry へ
+  # push してしまうため、ここで未設定を落とす。
+  check_config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify staging variables
+        env:
+          STG_GCP_PROJECT_ID: ${{ vars.STG_GCP_PROJECT_ID }}
+          STG_GCP_PROJECT_NUMBER: ${{ vars.STG_GCP_PROJECT_NUMBER }}
+          STG_FIREBASE_WEB_CONFIG: ${{ vars.STG_FIREBASE_WEB_CONFIG }}
+        run: |
+          for name in STG_GCP_PROJECT_ID STG_GCP_PROJECT_NUMBER STG_FIREBASE_WEB_CONFIG; do
+            [ -n "${!name}" ] || {
+              echo "::error::Actions variable の $name が未設定です。"
+              exit 1
+            }
+          done
+
+  build_backend:
+    needs: [check_config]
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_build_backend.yml
+    with:
+      persist: true
+      project_id: ${{ vars.STG_GCP_PROJECT_ID }}
+      project_number: ${{ vars.STG_GCP_PROJECT_NUMBER }}
+
+  build_functions:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_functions.yml
+    with:
+      persist: true
+
+  build_frontend:
+    needs: [check_config]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_frontend.yml
+    with:
+      persist: true
+      firebase_web_config: ${{ vars.STG_FIREBASE_WEB_CONFIG }}
+
+  deploy_backend:
+    needs: [build_backend]
+    permissions:
+      id-token: write
+    uses: ./.github/workflows/_deploy_backend.yml
+    with:
+      environment: Staging
+      image: ${{ needs.build_backend.outputs.image }}
+      promote: true
+
+  deploy_functions:
+    needs: [build_functions]
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_deploy_functions.yml
+    with:
+      environment: Staging
+
+  deploy_frontend:
+    needs: [build_frontend, deploy_backend, deploy_functions]
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    uses: ./.github/workflows/_deploy_frontend.yml
+    with:
+      environment: Staging
+      channel_id: live
+      expect_project_id: ${{ needs.build_frontend.outputs.project_id }}

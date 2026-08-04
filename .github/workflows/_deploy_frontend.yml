@@ -11,9 +11,10 @@ on:
         description: "Firebase Hosting channel ID"
         required: true
         type: string
-    secrets:
-      DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT:
-        required: true
+      expect_project_id:
+        description: "Firebase project the downloaded build points at"
+        required: false
+        type: string
 
 permissions: {}
 
@@ -22,21 +23,68 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
     permissions:
-      checks: write
       contents: read
+      id-token: write
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Tools
+        uses: jdx/mise-action@7e36c90d9ab29c415a2384db3006f3ec8a8cc654 # v4.2.4
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Download Artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: frontend-build
           path: ./frontend/build/web
-      - name: Deploy
-        uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
+      # ビルドの向き先はデプロイ先と同じでなければならない。違えば、staging の
+      # Hosting に本番を向いたアプリが載る(逆も同じ)。設定はビルド側の入力、
+      # デプロイ先は environment の変数で決まるため、両者は自動では一致しない。
+      - name: Verify build target
+        if: ${{ inputs.expect_project_id }}
+        env:
+          BUILT_FOR: ${{ inputs.expect_project_id }}
+          DEPLOY_TO: ${{ vars.GCP_PROJECT_ID }}
+        run: |
+          [ "$BUILT_FOR" = "$DEPLOY_TO" ] || {
+            echo "::error::ビルドは $BUILT_FOR 向けですが、デプロイ先は $DEPLOY_TO です。"
+            exit 1
+          }
+      - name: Auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.DEPLOY_FIREBASE_HOSTING_SERVICE_ACCOUNT }}
-          channelId: ${{ inputs.channel_id }}
+          workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: wlif-deploy@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+      # channel_id は workflow_dispatch の入力に由来しうるので、run に展開せず
+      # 環境変数として渡す。
+      - name: Deploy
+        id: deploy
+        env:
+          CHANNEL_ID: ${{ inputs.channel_id }}
+          PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+        run: |
+          if [ "$CHANNEL_ID" = "live" ]; then
+            pnpm firebase deploy --project "$PROJECT_ID" --only hosting
+            exit 0
+          fi
+          # --silent が無いと pnpm 自身の出力が stdout に混ざり、JSON として
+          # 読めなくなる。
+          pnpm --silent firebase hosting:channel:deploy "$CHANNEL_ID" \
+            --project "$PROJECT_ID" --expires 7d --json > channel.json
+          if ! url=$(jq -er '.result | to_entries[0].value.url' channel.json); then
+            echo "::error::プレビュー URL を取り出せませんでした。firebase の出力:"
+            cat channel.json
+            exit 1
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Comment preview URL
+        if: ${{ steps.deploy.outputs.url && github.event.pull_request.number }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          gh pr comment "$PR_NUMBER" --edit-last --create-if-none \
+            --body "Firebase Hosting のプレビュー: $URL"

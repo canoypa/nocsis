@@ -49,11 +49,11 @@ jobs:
     needs: [build_frontend, deploy_backend]
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, '👀 Enable Preview') }}
     permissions:
-      checks: write
       contents: read
+      id-token: write
       pull-requests: write
     uses: ./.github/workflows/_deploy_frontend.yml
     with:
       environment: Preview
       channel_id: ${{ github.event_name == 'workflow_dispatch' && inputs.channel_id || format('pr-{0}', github.event.pull_request.number) }}
-    secrets: inherit
+      expect_project_id: ${{ needs.build_frontend.outputs.project_id }}

@@ -8,6 +8,14 @@ on:
         required: false
         type: boolean
         default: false
+      firebase_web_config:
+        description: "Firebase web config JSON (defaults to the production one)"
+        required: false
+        type: string
+    outputs:
+      project_id:
+        description: "Firebase project the build points at"
+        value: ${{ jobs.build.outputs.project_id }}
 
 permissions: {}
 
@@ -16,20 +24,45 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    outputs:
+      project_id: ${{ steps.config.outputs.project_id }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
+        uses: jdx/mise-action@7e36c90d9ab29c415a2384db3006f3ec8a8cc654 # v4.2.4
       - name: Install dependencies
         working-directory: ./frontend
         run: flutter pub get --enforce-lockfile
       - name: Run build_runner
         working-directory: ./frontend
         run: flutter pub run build_runner build
+      # 設定は呼び出し元から渡す。このジョブに environment を宣言すれば環境変数で
+      # 解決できるが、build ジョブが environment を持つと、その OIDC トークンは
+      # attribute.environment 束縛の wlif-deploy を引けるようになる。build に
+      # デプロイ権限を渡さないための境界なので、宣言しない。
+      - name: Write Firebase config
+        id: config
+        working-directory: ./frontend
+        env:
+          FIREBASE_WEB_CONFIG: ${{ inputs.firebase_web_config || vars.FIREBASE_WEB_CONFIG }}
+        run: |
+          mkdir -p dart_defines
+          printf '%s' "$FIREBASE_WEB_CONFIG" > dart_defines/build.json
+          # Flutter は空の定義ファイルを黙って受け入れるため、設定が空のまま
+          # ビルドが成功しデプロイまで通ってしまう。ここで落とす。
+          jq -e '(.FIREBASE_API_KEY // "") != ""' dart_defines/build.json > /dev/null || {
+            echo "::error::Firebase の web 設定が未設定か不正です。"
+            exit 1
+          }
+          # デプロイ側が「このビルドが向いている先」と自分のデプロイ先を突き合わせ
+          # られるようにする。設定の取得元(呼び出し元の入力)とデプロイ先の解決元
+          # (environment の変数)は別なので、ここが唯一の照合点になる。
+          project_id=$(jq -er '.FIREBASE_PROJECT_ID' dart_defines/build.json)
+          echo "project_id=$project_id" >> "$GITHUB_OUTPUT"
       - name: Build
         working-directory: ./frontend
-        run: flutter build web --wasm
+        run: flutter build web --wasm --dart-define-from-file=dart_defines/build.json
       - name: Upload Artifacts
         if: ${{ inputs.persist }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
