@@ -1,7 +1,12 @@
 name: Deploy to Staging
 
 # 特定のブランチに依存しない。任意のブランチから手動で流して、本番と同じ
-# デプロイ経路を先に通す。向き先は Staging 環境の変数で決まる。
+# デプロイ経路を先に通す。デプロイ先は Staging 環境の変数で決まる。
+#
+# build ジョブだけは environment を宣言できないため(宣言するとデプロイ権限に
+# 届く。理由は _build_backend.yml のコメント)、ビルドの向き先をリポジトリ変数
+# STG_* から渡す。デプロイ先と一致しているかは _deploy_frontend.yml の
+# Verify build target が突き合わせる。
 on:
   workflow_dispatch:
 
@@ -12,12 +17,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build_backend:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/_build_backend.yml
+    with:
+      persist: true
+      project_id: ${{ vars.STG_GCP_PROJECT_ID }}
+      project_number: ${{ vars.STG_GCP_PROJECT_NUMBER }}
+
   build_functions:
     permissions:
       contents: read
     uses: ./.github/workflows/_build_functions.yml
     with:
       persist: true
+
+  build_frontend:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_build_frontend.yml
+    with:
+      persist: true
+      firebase_web_config: ${{ vars.STG_FIREBASE_WEB_CONFIG }}
+
+  deploy_backend:
+    needs: [build_backend]
+    permissions:
+      id-token: write
+    uses: ./.github/workflows/_deploy_backend.yml
+    with:
+      environment: Staging
+      image: ${{ needs.build_backend.outputs.image }}
+      promote: true
 
   deploy_functions:
     needs: [build_functions]
@@ -27,3 +60,15 @@ jobs:
     uses: ./.github/workflows/_deploy_functions.yml
     with:
       environment: Staging
+
+  deploy_frontend:
+    needs: [build_frontend, deploy_backend, deploy_functions]
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    uses: ./.github/workflows/_deploy_frontend.yml
+    with:
+      environment: Staging
+      channel_id: live
+      expect_project_id: ${{ needs.build_frontend.outputs.project_id }}

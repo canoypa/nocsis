@@ -63,3 +63,4 @@ jobs:
     with:
       environment: Production
       channel_id: live
+      expect_project_id: ${{ needs.build_frontend.outputs.project_id }}

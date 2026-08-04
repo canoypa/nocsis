@@ -11,6 +11,10 @@ on:
         description: "Firebase Hosting channel ID"
         required: true
         type: string
+      expect_project_id:
+        description: "Firebase project the downloaded build points at"
+        required: false
+        type: string
 
 permissions: {}
 
@@ -35,6 +39,19 @@ jobs:
         with:
           name: frontend-build
           path: ./frontend/build/web
+      # ビルドの向き先はデプロイ先と同じでなければならない。違えば、staging の
+      # Hosting に本番を向いたアプリが載る(逆も同じ)。設定はビルド側の入力、
+      # デプロイ先は environment の変数で決まるため、両者は自動では一致しない。
+      - name: Verify build target
+        if: ${{ inputs.expect_project_id }}
+        env:
+          BUILT_FOR: ${{ inputs.expect_project_id }}
+          DEPLOY_TO: ${{ vars.GCP_PROJECT_ID }}
+        run: |
+          [ "$BUILT_FOR" = "$DEPLOY_TO" ] || {
+            echo "::error::ビルドは $BUILT_FOR 向けですが、デプロイ先は $DEPLOY_TO です。"
+            exit 1
+          }
       - name: Auth
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
