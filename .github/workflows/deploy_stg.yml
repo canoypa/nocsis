@@ -17,7 +17,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # 呼び出し先は入力が空だと本番の変数にフォールバックする(Preview / Production は
+  # それで正しい)。staging でフォールバックすると本番の Artifact Registry へ
+  # push してしまうため、ここで未設定を落とす。
+  check_config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify staging variables
+        env:
+          STG_GCP_PROJECT_ID: ${{ vars.STG_GCP_PROJECT_ID }}
+          STG_GCP_PROJECT_NUMBER: ${{ vars.STG_GCP_PROJECT_NUMBER }}
+          STG_FIREBASE_WEB_CONFIG: ${{ vars.STG_FIREBASE_WEB_CONFIG }}
+        run: |
+          for name in STG_GCP_PROJECT_ID STG_GCP_PROJECT_NUMBER STG_FIREBASE_WEB_CONFIG; do
+            [ -n "${!name}" ] || {
+              echo "::error::Actions variable の $name が未設定です。"
+              exit 1
+            }
+          done
+
   build_backend:
+    needs: [check_config]
     permissions:
       contents: read
       id-token: write
@@ -35,6 +55,7 @@ jobs:
       persist: true
 
   build_frontend:
+    needs: [check_config]
     permissions:
       contents: read
     uses: ./.github/workflows/_build_frontend.yml
