@@ -7,9 +7,14 @@ on:
 permissions:
   contents: read
 
+# workflow_call で呼ばれると github.workflow は呼び出し元の名前になる。lint と
+# test を同じ workflow から呼ぶとグループ名が衝突し、後から始まった方が相手を
+# キャンセルするため、ワークフロー固有の接頭辞を付ける。
+# キャンセルしてよいのは PR の作り直しだけ。デプロイ経路から呼ばれたものを
+# 後続の run に潰されると、ゲートが cancelled になってデプロイが止まる。
 concurrency:
-  group: ${{ github.workflow }}_${{ github.ref }}
-  cancel-in-progress: true
+  group: lint_${{ github.workflow }}_${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check-root-deps:
