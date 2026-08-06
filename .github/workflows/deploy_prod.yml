@@ -12,6 +12,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # デプロイ経路自身が持つ最終防衛線。ruleset の required status check は
+  # admin が bypass できるうえ workflow_dispatch は PR を経由しないため、
+  # 「lint/test を通ったものだけが本番に出る」はリポジトリ内から保証されない。
+  # ここで通すことで、どの経路で来ても deploy_* の手前で止まる。
+  # build_* は成果物を作るだけで外に影響しないため、待たせずに並走させる。
+  lint:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/lint.yml
+
+  test:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/test.yml
+
   build_backend:
     permissions:
       contents: read
@@ -35,7 +50,7 @@ jobs:
       persist: true
 
   deploy_backend:
-    needs: [build_backend]
+    needs: [lint, test, build_backend]
     permissions:
       id-token: write
     uses: ./.github/workflows/_deploy_backend.yml
@@ -45,7 +60,7 @@ jobs:
       promote: true
 
   deploy_functions:
-    needs: [build_functions]
+    needs: [lint, test, build_functions]
     permissions:
       contents: read
       id-token: write
@@ -54,7 +69,7 @@ jobs:
       environment: Production
 
   deploy_frontend:
-    needs: [build_frontend, deploy_backend, deploy_functions]
+    needs: [lint, test, build_frontend, deploy_backend, deploy_functions]
     permissions:
       contents: read
       id-token: write
