@@ -36,8 +36,6 @@ jobs:
             }
           done
 
-  # 本番と同じゲートを持たせる。stg は本番と同じ経路を先に通すためのものなので、
-  # ゲートの有無がずれると「stg で通ったから本番も通る」が成り立たなくなる。
   lint:
     permissions:
       contents: read

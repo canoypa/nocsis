@@ -12,17 +12,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # デプロイ経路自身が持つ最終防衛線。ruleset の required status check は
-  # admin が bypass できるうえ workflow_dispatch は PR を経由しないため、
-  # 「lint/test を通ったものだけが本番に出る」はリポジトリ内から保証されない。
-  # 保証するのはそこまでで、「レビューを通ったものだけが出る」ではない。
-  # workflow_dispatch は任意の ref を受け付ける(#1255)。
-  #
-  # build_* は待たせない。デプロイまでの時間を伸ばさないためであって、外に影響が
-  # ないからではない。build_backend は persist: true で本番の Artifact Registry
-  # へ image を push するので、ゲートが落ちた run でも image は残る(#1254)。
-  # それがデプロイされないことは、_deploy_*.yml が workflow_call 専用で、呼び出し
-  # 元がここと deploy_stg.yml だけ、という事実に依存している。
+  # ruleset の required check には任せない。admin が bypass できる。
   lint:
     permissions:
       contents: read
