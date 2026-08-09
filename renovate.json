@@ -59,7 +59,7 @@
       "groupName": "node major"
     },
     {
-      "description": "pnpm のバージョンを定義している3箇所をまとめる",
+      "description": "pnpm のバージョンを定義している5箇所をまとめる",
       "matchManagers": ["mise", "npm", "custom.regex"],
       "matchDepNames": ["pnpm"],
       "groupName": "pnpm"
