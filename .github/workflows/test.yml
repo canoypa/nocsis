@@ -7,9 +7,10 @@ on:
 permissions:
   contents: read
 
+# 接頭辞と cancel-in-progress の条件については lint.yml のコメントを参照。
 concurrency:
-  group: ${{ github.workflow }}_${{ github.ref }}
-  cancel-in-progress: true
+  group: test_${{ github.workflow }}_${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test-functions:
