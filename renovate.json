@@ -29,7 +29,7 @@
     },
     {
       "customType": "regex",
-      "description": "pub マネージャは environment.flutter を見ないため、pubspec.yaml が要求する Flutter SDK バージョンを追跡する",
+      "description": "pub マネージャが見ない pubspec.yaml の Flutter SDK 要求バージョンを追跡する",
       "managerFilePatterns": ["frontend/pubspec.yaml"],
       "matchStrings": ["(^|\\n)environment:\\n(?:.*\\n)*?  flutter:[ \\t]*\"(?<currentValue>[\\d.]+)\""],
       "depNameTemplate": "flutter",
