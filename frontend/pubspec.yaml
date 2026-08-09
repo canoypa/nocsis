@@ -4,7 +4,7 @@ name: nocsis
 
 environment:
   sdk: "^3.10.0"
-  flutter: "3.44.8"
+  flutter: "3.44.9"
 
 dependencies:
   flutter:
