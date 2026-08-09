@@ -26,6 +26,15 @@
       "depNameTemplate": "node",
       "datasourceTemplate": "node-version",
       "versioningTemplate": "node"
+    },
+    {
+      "customType": "regex",
+      "description": "pub マネージャが見ない pubspec.yaml の Flutter SDK 要求バージョンを追跡する",
+      "managerFilePatterns": ["frontend/pubspec.yaml"],
+      "matchStrings": ["(^|\\n)environment:\\n(?:.*\\n)*?  flutter:[ \\t]*\"(?<currentValue>[\\d.]+)\""],
+      "depNameTemplate": "flutter",
+      "packageNameTemplate": "flutter/flutter",
+      "datasourceTemplate": "github-tags"
     }
   ],
   "packageRules": [
@@ -50,14 +59,14 @@
       "groupName": "node major"
     },
     {
-      "description": "pnpm のバージョンを定義している3箇所をまとめる",
+      "description": "pnpm のバージョンを定義している5箇所をまとめる",
       "matchManagers": ["mise", "npm", "custom.regex"],
       "matchDepNames": ["pnpm"],
       "groupName": "pnpm"
     },
     {
-      "description": "flutter のバージョンを定義している2箇所をまとめる",
-      "matchManagers": ["mise", "pub"],
+      "description": "mise.toml と pubspec.yaml が定義する Flutter バージョンをまとめる",
+      "matchManagers": ["mise", "pub", "custom.regex"],
       "matchDepNames": ["flutter"],
       "groupName": "flutter"
     }
