@@ -12,14 +12,14 @@ importers:
         specifier: ^6.1.2
         version: 6.3.0(supports-color@7.2.0)
       '@googleapis/calendar':
-        specifier: ^15.0.0
-        version: 15.0.0(supports-color@7.2.0)
+        specifier: ^16.0.0
+        version: 16.0.0(supports-color@7.2.0)
       '@hono/node-server':
         specifier: ^2.0.1
         version: 2.1.0(hono@4.13.1)
       '@hono/standard-validator':
-        specifier: ^0.3.0
-        version: 0.3.0(@standard-schema/spec@1.1.0)(hono@4.13.1)
+        specifier: ^0.4.0
+        version: 0.4.0(@standard-schema/spec@1.1.0)(hono@4.13.1)
       '@scalar/hono-api-reference':
         specifier: ^0.11.0
         version: 0.11.13(hono@4.13.1)
@@ -31,7 +31,7 @@ importers:
         version: 4.13.1
       hono-openapi:
         specifier: ^1.3.0
-        version: 1.3.1(@hono/standard-validator@0.3.0(@standard-schema/spec@1.1.0)(hono@4.13.1))(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.4.3))(@types/json-schema@7.0.15)(hono@4.13.1)(openapi-types@12.1.3)
+        version: 1.3.1(@hono/standard-validator@0.4.0(@standard-schema/spec@1.1.0)(hono@4.13.1))(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.4.3))(@types/json-schema@7.0.15)(hono@4.13.1)(openapi-types@12.1.3)
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
@@ -581,8 +581,8 @@ packages:
     resolution: {integrity: sha512-l+IFTkd+6Y5LoAuXyYCKNAKtw/Ci+rAMqgdTB1jv4iZiLhw0rtq+0qjIRbBizXkNzEFmXiXUW0H7sZQQvk1ffA==}
     engines: {node: '>=14'}
 
-  '@googleapis/calendar@15.0.0':
-    resolution: {integrity: sha512-K5FVIhFOgAaNsfshvOEmGkT7kkowM69MzMYATGDA6Ol3ZwqIK0nZJnS9/keFVYkId6MT2elAy+omcAMUdadHww==}
+  '@googleapis/calendar@16.0.0':
+    resolution: {integrity: sha512-Z/8Jdf4hMvmMlBMhP0whZNPSixEpYv4mC5RJfrlvrnqpf/rV68MJ+8M9MmyqUt7/SQp2zRfVmEqkk+csB2Cgmg==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sqladmin@37.0.0':
@@ -604,8 +604,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/standard-validator@0.3.0':
-    resolution: {integrity: sha512-tHLKEjKXDcHImj0XTFWW4Hr0ev+1G5GxnBZrGdpg/7NLy9s9meFPTSCOkw++ZzZKom3FjrMw2e0nFQpPPvwUVQ==}
+  '@hono/standard-validator@0.4.0':
+    resolution: {integrity: sha512-MxOm1asDh9j7c1D0KiWwppSbFgAQxTRO4YEhjMrJn3lF1BIcXenPdgjSGKDRfQmZdaTaMA8slQLETgVOKyJxFw==}
     peerDependencies:
       '@standard-schema/spec': ^1.0.0
       hono: '>=4.11.2'
@@ -4488,7 +4488,7 @@ snapshots:
       - supports-color
     optional: true
 
-  '@googleapis/calendar@15.0.0(supports-color@7.2.0)':
+  '@googleapis/calendar@16.0.0(supports-color@7.2.0)':
     dependencies:
       googleapis-common: 8.0.3(supports-color@7.2.0)
     transitivePeerDependencies:
@@ -4516,7 +4516,7 @@ snapshots:
     dependencies:
       hono: 4.13.1
 
-  '@hono/standard-validator@0.3.0(@standard-schema/spec@1.1.0)(hono@4.13.1)':
+  '@hono/standard-validator@0.4.0(@standard-schema/spec@1.1.0)(hono@4.13.1)':
     dependencies:
       '@standard-schema/spec': 1.1.0
       hono: 4.13.1
@@ -6305,7 +6305,7 @@ snapshots:
       ecdsa-sig-formatter: 1.0.11
       gaxios: 7.3.0(supports-color@7.2.0)
       gcp-metadata: 8.1.4(supports-color@7.2.0)
-      google-logging-utils: 1.1.3
+      google-logging-utils: 1.2.0
       gtoken: 8.0.0(supports-color@7.2.0)
       jws: 4.0.1
     transitivePeerDependencies:
@@ -6413,14 +6413,14 @@ snapshots:
 
   highlight.js@10.7.3: {}
 
-  hono-openapi@1.3.1(@hono/standard-validator@0.3.0(@standard-schema/spec@1.1.0)(hono@4.13.1))(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.4.3))(@types/json-schema@7.0.15)(hono@4.13.1)(openapi-types@12.1.3):
+  hono-openapi@1.3.1(@hono/standard-validator@0.4.0(@standard-schema/spec@1.1.0)(hono@4.13.1))(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.4.3))(@types/json-schema@7.0.15)(hono@4.13.1)(openapi-types@12.1.3):
     dependencies:
       '@standard-community/standard-json': 0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3)
       '@standard-community/standard-openapi': 0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.4.3)
       '@types/json-schema': 7.0.15
       openapi-types: 12.1.3
     optionalDependencies:
-      '@hono/standard-validator': 0.3.0(@standard-schema/spec@1.1.0)(hono@4.13.1)
+      '@hono/standard-validator': 0.4.0(@standard-schema/spec@1.1.0)(hono@4.13.1)
       hono: 4.13.1
 
   hono@4.13.1: {}
