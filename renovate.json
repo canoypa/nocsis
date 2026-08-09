@@ -65,7 +65,7 @@
       "groupName": "pnpm"
     },
     {
-      "description": "flutter のバージョンを定義している2箇所をまとめる",
+      "description": "mise.toml と pubspec.yaml の Flutter バージョンがズレると flutter pub get がCI失敗するため同一PRでまとめる",
       "matchManagers": ["mise", "pub", "custom.regex"],
       "matchDepNames": ["flutter"],
       "groupName": "flutter"
