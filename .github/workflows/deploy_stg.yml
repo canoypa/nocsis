@@ -36,6 +36,16 @@ jobs:
             }
           done
 
+  lint:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/lint.yml
+
+  test:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/test.yml
+
   build_backend:
     needs: [check_config]
     permissions:
@@ -64,7 +74,7 @@ jobs:
       firebase_web_config: ${{ vars.STG_FIREBASE_WEB_CONFIG }}
 
   deploy_backend:
-    needs: [build_backend]
+    needs: [lint, test, build_backend]
     permissions:
       id-token: write
     uses: ./.github/workflows/_deploy_backend.yml
@@ -74,7 +84,7 @@ jobs:
       promote: true
 
   deploy_functions:
-    needs: [build_functions]
+    needs: [lint, test, build_functions]
     permissions:
       contents: read
       id-token: write
@@ -83,7 +93,7 @@ jobs:
       environment: Staging
 
   deploy_frontend:
-    needs: [build_frontend, deploy_backend, deploy_functions]
+    needs: [lint, test, build_frontend, deploy_backend, deploy_functions]
     permissions:
       contents: read
       id-token: write

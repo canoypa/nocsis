@@ -92,7 +92,13 @@ daydutRoutes.get(
       }
 
       // 出席番号取得
-      const stuNo = await getDaydutyStuNo(groupId, targetDate);
+      // @types/luxon 3.7.4 で fromISO/now().setZone() の戻り値型が
+      // DateTimeMaybeValid から DateTime に簡略化され、isValid による
+      // narrowing が効かなくなったため明示的にキャストする
+      const stuNo = await getDaydutyStuNo(
+        groupId,
+        targetDate as DateTime<true>,
+      );
 
       // Classmate 取得
       const classmateSnapshot = await firestore
