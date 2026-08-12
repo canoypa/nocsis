@@ -53,13 +53,19 @@ export const authorize = (
       throw new HTTPException(decision.reason === "no_binding" ? 404 : 403);
     }
 
-    // via はログにだけ。レスポンスには含めない
-    console.info({
-      permission,
-      subject: subject(principal),
-      resource: serialize(resource),
-      via: decision.via,
-    });
+    // via はログにだけ。レスポンスには含めない。
+    // Cloud Logging に jsonPayload として渡すため、行全体を JSON にする
+    // （severity は console のメソッドではなくこのフィールドで決まる）
+    console.log(
+      JSON.stringify({
+        severity: "INFO",
+        message: "認可した",
+        permission,
+        subject: subject(principal),
+        resource: serialize(resource),
+        via: decision.via,
+      }),
+    );
 
     c.set("principal", principal);
 
