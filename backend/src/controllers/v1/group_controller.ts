@@ -2,15 +2,16 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { z } from "zod";
-import { firestore } from "../../clients/firebase.js";
 import {
-  type AuthenticatedEnv,
-  authentication,
-  getCurrentUserId,
-} from "../../middlewares/authenticate.js";
+  type AuthorizedEnv,
+  authorize,
+  groupOf,
+} from "../../authz/middleware.js";
+import { firestore } from "../../clients/firebase.js";
+import { authentication } from "../../middlewares/authenticate.js";
 import { groupSchema } from "../../resources/v1/groups.js";
 
-export const groupRoutes = new Hono<AuthenticatedEnv>();
+export const groupRoutes = new Hono<AuthorizedEnv>();
 
 const paramSchema = z
   .object({
@@ -59,27 +60,16 @@ groupRoutes
     }),
     validator("param", paramSchema),
     authentication,
+    authorize("group.read", groupOf("id")),
     async (c) => {
       const groupId = c.req.param("id");
 
-      const uid = getCurrentUserId(c);
-
-      // Firestore 並列クエリ: グループ存在 & 参加チェック
-      const [groupSnapshot, userJoinedGroupSnapshot] = await Promise.all([
-        firestore.collection("groups").doc(groupId).get(),
-        firestore
-          .collection("user_joined_groups")
-          .where("user_id", "==", uid)
-          .where("group_id", "==", groupId)
-          .get(),
-      ]);
+      const groupSnapshot = await firestore
+        .collection("groups")
+        .doc(groupId)
+        .get();
       if (!groupSnapshot.exists) {
         throw new HTTPException(404, { message: "グループが存在しません。" });
-      }
-      if (userJoinedGroupSnapshot.empty) {
-        throw new HTTPException(403, {
-          message: "グループに参加していません。",
-        });
       }
 
       const group = groupSchema.parse({
@@ -122,30 +112,16 @@ groupRoutes
     validator("param", paramSchema),
     validator("json", patchJsonSchema),
     authentication,
+    authorize("group.update", groupOf("id")),
     async (c) => {
       const groupId = c.req.param("id");
       const data = c.req.valid("json");
 
-      const uid = getCurrentUserId(c);
-
       const groupRef = firestore.collection("groups").doc(groupId);
 
-      // Firestore 並列クエリ: グループ存在 & 参加チェック
-      const [groupSnapshot, userJoinedGroupSnapshot] = await Promise.all([
-        groupRef.get(),
-        firestore
-          .collection("user_joined_groups")
-          .where("user_id", "==", uid)
-          .where("group_id", "==", groupId)
-          .get(),
-      ]);
+      const groupSnapshot = await groupRef.get();
       if (!groupSnapshot.exists) {
         throw new HTTPException(404, { message: "グループが存在しません。" });
-      }
-      if (userJoinedGroupSnapshot.empty) {
-        throw new HTTPException(403, {
-          message: "グループに参加していません。",
-        });
       }
 
       await groupRef.update(data);
