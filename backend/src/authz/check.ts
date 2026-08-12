@@ -1,4 +1,5 @@
 import { firestore } from "../clients/firebase.js";
+import { COLLECTION } from "./binding.js";
 import { type Principal, subject } from "./principal.js";
 import { ancestors, type ResourceRef, serialize } from "./resource.js";
 import { isRoleName, type Permission, permissionsOf } from "./roles.js";
@@ -12,8 +13,6 @@ import { isRoleName, type Permission, permissionsOf } from "./roles.js";
 export type Decision =
   | { allowed: true; via: string }
   | { allowed: false; reason: "no_binding" | "insufficient_permission" };
-
-const COLLECTION = "role_bindings";
 
 /**
  * 判定点（PDP）。毎リクエスト Firestore を読む。
