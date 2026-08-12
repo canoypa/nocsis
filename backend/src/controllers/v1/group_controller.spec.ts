@@ -1,8 +1,21 @@
 import type { UserRecord } from "firebase-admin/auth";
 import { beforeEach, describe, expect, it } from "vitest";
 import { type LoginResult, login } from "../../../tests/helpers/users.js";
+import { COLLECTION, grant } from "../../authz/binding.js";
+import { user as principal } from "../../authz/principal.js";
+import { group } from "../../authz/resource.js";
+import type { RoleName } from "../../authz/roles.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
+
+const bind = (uid: string, role: RoleName, groupId: string) =>
+  grant({ principal: principal(uid), role, resource: group(groupId) });
+
+const clearBindings = async () => {
+  const snapshot = await firestore.collection(COLLECTION).get();
+
+  await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
+};
 
 describe("GroupController", () => {
   describe("GET /api/v1/groups/:id", async () => {
@@ -24,17 +37,12 @@ describe("GroupController", () => {
         weather_point: { lat: 0, lon: 0 },
       });
 
-      const userJoinedGroupsRef = await firestore
-        .collection("user_joined_groups")
-        .add({
-          user_id: "test_user_1",
-          group_id: "test_group_1",
-        });
+      await bind("test_user_1", "group_student", "test_group_1");
 
       return async () => {
         await auth.deleteUser("test_user_1");
         await groupRef.delete();
-        await userJoinedGroupsRef.delete();
+        await clearBindings();
       };
     });
 
@@ -59,8 +67,34 @@ describe("GroupController", () => {
       });
     });
 
-    describe("グループが存在しない場合", async () => {
-      it("404エラーになること", async () => {
+    // 権限が無い相手に存在を漏らさないための規則。存在するグループと存在しない
+    // グループが、レスポンスで区別できてはいけない
+    describe("権限を持たないグループを指定した場合", () => {
+      let loginResult: LoginResult;
+
+      beforeEach(async () => {
+        const outsider = await auth.createUser({
+          uid: "test_user_not_in_group_1",
+        });
+        loginResult = await login(outsider);
+
+        return async () => {
+          await auth.deleteUser(outsider.uid);
+        };
+      });
+
+      it("実在するグループでも404になること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            Accept: "application/json",
+          },
+        });
+
+        expect(response.status).toBe(404);
+      });
+
+      it("存在しないグループでも404になること", async () => {
         const response = await app.request("/api/v1/groups/test_group_2", {
           headers: {
             Authorization: `Bearer ${loginResult.idToken}`,
@@ -72,28 +106,20 @@ describe("GroupController", () => {
       });
     });
 
-    describe("ユーザーがグループに参加していない場合", () => {
-      let user: UserRecord;
-      let loginResult: LoginResult;
-
+    describe("binding はあるがグループの実体が無い場合", () => {
       beforeEach(async () => {
-        user = await auth.createUser({ uid: "test_user_not_in_group_1" });
-        loginResult = await login(user);
-
-        return async () => {
-          await auth.deleteUser(user.uid);
-        };
+        await bind("test_user_1", "group_student", "test_group_2");
       });
 
-      it("403エラーになること", async () => {
-        const response = await app.request("/api/v1/groups/test_group_1", {
+      it("404エラーになること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_2", {
           headers: {
             Authorization: `Bearer ${loginResult.idToken}`,
             Accept: "application/json",
           },
         });
 
-        expect(response.status).toBe(403);
+        expect(response.status).toBe(404);
       });
     });
 
@@ -144,17 +170,12 @@ describe("GroupController", () => {
         weather_point: { lat: 0, lon: 0 },
       });
 
-      const userJoinedGroupsRef = await firestore
-        .collection("user_joined_groups")
-        .add({
-          user_id: "test_user_1",
-          group_id: "test_group_1",
-        });
+      await bind("test_user_1", "group_admin", "test_group_1");
 
       return async () => {
         await auth.deleteUser("test_user_1");
         await groupRef.delete();
-        await userJoinedGroupsRef.delete();
+        await clearBindings();
       };
     });
 
@@ -217,7 +238,7 @@ describe("GroupController", () => {
       });
     });
 
-    describe("グループが存在しない場合", async () => {
+    describe("権限を持たないグループを指定した場合", () => {
       it("404エラーになること", async () => {
         const response = await app.request("/api/v1/groups/test_group_2", {
           method: "PATCH",
@@ -228,11 +249,28 @@ describe("GroupController", () => {
           },
           body: JSON.stringify({
             name: "Updated Test Name",
-            classes_calendar_id: "updated_classes_calendar_id",
-            events_calendar_id: "updated_events_calendar_id",
-            dayduty_start_date: "2099-12-31",
-            slack_event_channel_id: "updated_slack_event_channel_id",
-            weather_point: { lat: 99, lon: 99 },
+          }),
+        });
+
+        expect(response.status).toBe(404);
+      });
+    });
+
+    describe("binding はあるがグループの実体が無い場合", () => {
+      beforeEach(async () => {
+        await bind("test_user_1", "group_admin", "test_group_2");
+      });
+
+      it("404エラーになること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_2", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: "Updated Test Name",
           }),
         });
 
@@ -310,19 +348,51 @@ describe("GroupController", () => {
       });
     });
 
-    describe("ユーザーがグループに参加していない場合", () => {
-      let user: UserRecord;
+    describe("binding を持たないユーザーの場合", () => {
+      let outsider: UserRecord;
       let loginResult: LoginResult;
 
       beforeEach(async () => {
-        user = await auth.createUser({ uid: "test_user_not_in_group_1" });
-        loginResult = await login(user);
+        outsider = await auth.createUser({ uid: "test_user_not_in_group_1" });
+        loginResult = await login(outsider);
 
         return async () => {
-          await auth.deleteUser(user.uid);
+          await auth.deleteUser(outsider.uid);
         };
       });
 
+      // 存在を知る権利が無いので、存在しないグループと同じ応答になる
+      it("404エラーになること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ name: "Updated Test Name" }),
+        });
+
+        expect(response.status).toBe(404);
+      });
+    });
+
+    describe("読めるが更新の権限を持たないユーザーの場合", () => {
+      let student: UserRecord;
+      let loginResult: LoginResult;
+
+      beforeEach(async () => {
+        student = await auth.createUser({ uid: "test_user_student_1" });
+        loginResult = await login(student);
+
+        await bind("test_user_student_1", "group_student", "test_group_1");
+
+        return async () => {
+          await auth.deleteUser(student.uid);
+        };
+      });
+
+      // binding はあるので存在は知っている。足りないのは group.update だけ
       it("403エラーになること", async () => {
         const response = await app.request("/api/v1/groups/test_group_1", {
           method: "PATCH",
@@ -331,14 +401,7 @@ describe("GroupController", () => {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          body: JSON.stringify({
-            name: "Updated Test Name",
-            classes_calendar_id: "updated_classes_calendar_id",
-            events_calendar_id: "updated_events_calendar_id",
-            dayduty_start_date: "2099-12-31",
-            slack_event_channel_id: "updated_slack_event_channel_id",
-            weather_point: { lat: 99, lon: 99 },
-          }),
+          body: JSON.stringify({ name: "Updated Test Name" }),
         });
 
         expect(response.status).toBe(403);
