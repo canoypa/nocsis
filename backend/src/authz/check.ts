@@ -35,14 +35,22 @@ export const can = async (
     .where("resource", "in", chain)
     .get();
 
-  if (snapshot.empty) {
+  // ROLES に無いロール名は何も付与しないので、行があっても binding として数えない。
+  // 数えてしまうと、ロールを1つ廃止しただけで、その binding を持つ相手に
+  // リソースの存在が見える（404 が 403 に変わる）
+  const bindings = snapshot.docs.flatMap((doc) => {
+    const role = doc.data().role;
+
+    return isRoleName(role) ? [{ id: doc.id, role }] : [];
+  });
+
+  if (bindings.length === 0) {
     return { allowed: false, reason: "no_binding" };
   }
 
-  for (const doc of snapshot.docs) {
-    const role = doc.data().role;
-    if (isRoleName(role) && permissionsOf(role).includes(permission)) {
-      return { allowed: true, via: `${COLLECTION}/${doc.id}` };
+  for (const { id, role } of bindings) {
+    if (permissionsOf(role).includes(permission)) {
+      return { allowed: true, via: `${COLLECTION}/${id}` };
     }
   }
 

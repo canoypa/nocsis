@@ -139,8 +139,9 @@ describe("can", () => {
     });
   });
 
-  describe("ROLES に無いロール名の binding がある場合", () => {
-    it("通さないこと", async () => {
+  describe("ROLES に無いロール名の binding しか無い場合", () => {
+    // 何も付与していない行なので、リソースの存在を知る根拠にもならない
+    it("binding が無いのと同じ扱いになること", async () => {
       await addBinding({
         subject: "user:test_user_1",
         role: "group_teacher",
@@ -150,6 +151,29 @@ describe("can", () => {
       const decision = await can(
         user("test_user_1"),
         "group.read",
+        group("test_group_1"),
+      );
+
+      expect(decision).toEqual({ allowed: false, reason: "no_binding" });
+    });
+  });
+
+  describe("ROLES に無いロール名の binding が混ざっている場合", () => {
+    it("有効な binding の方で判定すること", async () => {
+      await addBinding({
+        subject: "user:test_user_1",
+        role: "group_teacher",
+        resource: "group:test_group_1",
+      });
+      await addBinding({
+        subject: "user:test_user_1",
+        role: "group_student",
+        resource: "group:test_group_1",
+      });
+
+      const decision = await can(
+        user("test_user_1"),
+        "group.update",
         group("test_group_1"),
       );
 
