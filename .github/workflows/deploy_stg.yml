@@ -97,9 +97,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-      pull-requests: write
     uses: ./.github/workflows/_deploy_frontend.yml
     with:
       environment: Staging
-      channel_id: live
       expect_project_id: ${{ needs.build_frontend.outputs.project_id }}
