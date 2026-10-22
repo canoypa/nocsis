@@ -26,7 +26,7 @@ void main() {
         eventsCalendarId: 'events-cal',
         daydutyStartDate: '2024-01-01',
         slackEventChannelId: 'C123',
-        weatherPoint: const WeatherPoint(lat: 35.0, lon: 139.0),
+        weatherPoint: const WeatherPointOutput(lat: 35.0, lon: 139.0),
       );
       when(() => mockApi.apiV1UsersMeGroupsGet()).thenAnswer(
         (_) async => chopper.Response(
