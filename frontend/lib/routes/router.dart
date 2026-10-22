@@ -22,7 +22,9 @@ import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/providers/auth.dart';
+import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/firebase.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

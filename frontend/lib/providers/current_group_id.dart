@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'current_group_id.g.dart';
 
-@riverpod
+@Riverpod(dependencies: [])
 String currentGroupId(Ref ref) {
   throw UnimplementedError(
     'currentGroupIdProvider は /groups/:groupId の配下で使用してください。',

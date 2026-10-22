@@ -1,9 +1,11 @@
 part of 'package:nocsis/routes/router.dart';
 
+@Dependencies([currentGroupId])
 const settingsShellRoute = TypedShellRoute<SettingsShellRoute>(
   routes: [settingsTopPageRoute],
 );
 
+@Dependencies([currentGroupId])
 class SettingsShellRoute extends ShellRouteData {
   const SettingsShellRoute();
 

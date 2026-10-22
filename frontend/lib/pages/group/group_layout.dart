@@ -15,12 +15,7 @@ class GroupLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
-      overrides: [
-        // 読み手はこの ProviderScope 配下のウィジェットだけだが、go_router の
-        // シェルルートを挟むので dependencies を宣言しても lint が辿れない。
-        // ignore: riverpod_lint/scoped_providers_should_specify_dependencies
-        currentGroupIdProvider.overrideWithValue(groupId),
-      ],
+      overrides: [currentGroupIdProvider.overrideWithValue(groupId)],
       child: navigator,
     );
   }

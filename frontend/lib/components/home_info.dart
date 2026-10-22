@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:nocsis/components/clock.dart';
 import 'package:nocsis/components/daydudy.dart';
 import 'package:nocsis/components/weather_info.dart';
+import 'package:nocsis/providers/current_group_id.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class HomeInfo extends StatelessWidget {
   const HomeInfo({super.key});
 

@@ -4,7 +4,9 @@ import 'package:nocsis/components/personal/class_list.dart';
 import 'package:nocsis/components/personal/event_list.dart';
 import 'package:nocsis/providers/day_schedules.dart';
 import 'package:nocsis/providers/current_group_id.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class DaySchedule extends ConsumerWidget {
   final int epochDay;
 

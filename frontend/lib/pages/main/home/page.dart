@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/day_schedule.dart';
 import 'package:nocsis/components/personal/toggle_day.dart';
+import 'package:nocsis/providers/current_group_id.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class MainView extends StatefulWidget {
   const MainView({super.key});
 

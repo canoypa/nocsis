@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/user_joined_groups.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class SelectGroupMenu extends ConsumerWidget {
   const SelectGroupMenu({super.key});
 
