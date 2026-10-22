@@ -37,7 +37,7 @@
     "@vitest/coverage-v8": "4.1.12",
     "firebase-functions-test": "^3.4.1",
     "firebase-tools": "^15.8.0",
-    "msw": "^2.12.10",
+    "msw": "^3.0.0",
     "tsup": "^8.5.1",
     "typescript": "^7.0.0",
     "vitest": "^4.1.4"
