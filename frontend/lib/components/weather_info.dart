@@ -4,7 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/weather.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class WeatherInfo extends ConsumerWidget {
   const WeatherInfo({super.key});
 

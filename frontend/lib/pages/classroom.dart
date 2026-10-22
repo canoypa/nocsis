@@ -10,7 +10,9 @@ import 'package:nocsis/routes/router.dart';
 import 'package:nocsis/screens/classroom.dart';
 import 'package:nocsis/screens/during_class.dart';
 import 'package:nocsis/themes/display.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class ClassroomPage extends ConsumerStatefulWidget {
   const ClassroomPage({super.key});
 

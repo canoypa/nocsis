@@ -1,9 +1,11 @@
 part of 'package:nocsis/routes/router.dart';
 
+@Dependencies([currentGroupId])
 const personalHomePageRoute = TypedGoRoute<PersonalHomePageRoute>(
   path: PersonalHomePageRoute.path,
 );
 
+@Dependencies([currentGroupId])
 class PersonalHomePageRoute extends GoRouteData with $PersonalHomePageRoute {
   final String groupId;
 

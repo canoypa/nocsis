@@ -6,7 +6,9 @@ import 'package:nocsis/providers/classes.dart';
 import 'package:nocsis/providers/cron.dart';
 import 'package:nocsis/providers/events.dart';
 import 'package:nocsis/providers/current_group_id.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class HomeSchedules extends ConsumerWidget {
   const HomeSchedules({super.key});
 
