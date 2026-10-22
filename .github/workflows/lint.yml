@@ -130,4 +130,4 @@ jobs:
       - name: Lint
         run: |
           dart format --output=none --set-exit-if-changed .
-          flutter analyze
+          dart analyze --fatal-infos

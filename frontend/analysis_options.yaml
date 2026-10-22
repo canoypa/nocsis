@@ -9,3 +9,6 @@ analyzer:
     - "**/*/*.g.dart"
     - build/**
     - web/**
+
+plugins:
+  riverpod_lint: ^3.1.9
