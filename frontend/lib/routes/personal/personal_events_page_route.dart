@@ -1,9 +1,11 @@
 part of 'package:nocsis/routes/router.dart';
 
+@Dependencies([currentGroupId])
 const personalEventsPageRoute = TypedGoRoute<PersonalEventsPageRoute>(
   path: PersonalEventsPageRoute.path,
 );
 
+@Dependencies([currentGroupId])
 class PersonalEventsPageRoute extends GoRouteData
     with $PersonalEventsPageRoute {
   final String groupId;

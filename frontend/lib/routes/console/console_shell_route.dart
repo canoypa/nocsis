@@ -1,5 +1,6 @@
 part of 'package:nocsis/routes/router.dart';
 
+@Dependencies([currentGroupId])
 const consoleShellRoute = TypedShellRoute<ConsoleShellRoute>(
   routes: [
     consoleTopPageRoute,
@@ -12,6 +13,7 @@ const consoleShellRoute = TypedShellRoute<ConsoleShellRoute>(
   ],
 );
 
+@Dependencies([currentGroupId])
 class ConsoleShellRoute extends ShellRouteData {
   const ConsoleShellRoute();
 

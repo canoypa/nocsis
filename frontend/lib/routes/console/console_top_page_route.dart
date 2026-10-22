@@ -1,9 +1,11 @@
 part of 'package:nocsis/routes/router.dart';
 
+@Dependencies([currentGroupId])
 const consoleTopPageRoute = TypedGoRoute<ConsoleTopPageRoute>(
   path: ConsoleTopPageRoute.path,
 );
 
+@Dependencies([currentGroupId])
 class ConsoleTopPageRoute extends GoRouteData with $ConsoleTopPageRoute {
   static const path = '/groups/:groupId/console';
 

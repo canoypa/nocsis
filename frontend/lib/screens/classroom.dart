@@ -3,7 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nocsis/components/home_info.dart';
 import 'package:nocsis/components/home_schedules.dart';
 import 'package:nocsis/components/weather_graph.dart';
+import 'package:nocsis/providers/current_group_id.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class ClassroomScreen extends StatelessWidget {
   const ClassroomScreen({super.key});
 

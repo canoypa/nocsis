@@ -1,9 +1,11 @@
 part of 'package:nocsis/routes/router.dart';
 
+@Dependencies([currentGroupId])
 const classroomPageRoute = TypedGoRoute<ClassroomPageRoute>(
   path: ClassroomPageRoute.path,
 );
 
+@Dependencies([currentGroupId])
 class ClassroomPageRoute extends GoRouteData with $ClassroomPageRoute {
   static const path = '/groups/:groupId/classroom';
 

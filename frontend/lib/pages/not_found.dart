@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class ErrorPage extends ConsumerWidget {
   const ErrorPage({super.key});
 

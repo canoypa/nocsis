@@ -6,6 +6,7 @@ import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/current_group_id.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
 // 月毎のイベントグループ
 class MonthEventGroup {
@@ -57,6 +58,7 @@ final eventsProvider = FutureProvider.family<List<MonthEventGroup>, String>((
   }
 });
 
+@Dependencies([currentGroupId])
 class EventsView extends ConsumerWidget {
   const EventsView({super.key});
 

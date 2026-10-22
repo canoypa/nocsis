@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'cron.g.dart';
 
 @riverpod
-Stream<DateTime> cron(_, String cronFormat) async* {
+Stream<DateTime> cron(Ref ref, String cronFormat) async* {
   final schedule = Cron.parse(cronFormat);
 
   while (true) {
