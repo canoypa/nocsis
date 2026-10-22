@@ -67,6 +67,13 @@
       "groupName": "node major"
     },
     {
+      "description": "mise.toml と backend/Dockerfile が定義する node のマイナー・パッチ更新をまとめる",
+      "matchManagers": ["mise", "dockerfile"],
+      "matchDepNames": ["node"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "node"
+    },
+    {
       "description": "pnpm のバージョンを定義している5箇所をまとめる",
       "matchManagers": ["mise", "npm", "custom.regex"],
       "matchDepNames": ["pnpm"],
