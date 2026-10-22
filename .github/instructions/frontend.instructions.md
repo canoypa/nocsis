@@ -16,10 +16,6 @@ paths:
 
 入力の `swagger/api.json` は backend が生成したものなので、ここを直しても次の生成で戻る。
 
-## `flutter analyze` だけでは lint が終わらない
-
-riverpod_lint の指摘は `flutter pub run custom_lint` にしか出ない。`analysis_options.yaml` の `plugins:` に custom_lint を書いてあるが、`flutter analyze` はそれを評価しないため。CI は `dart format --output=none --set-exit-if-changed .` / `flutter analyze` / `flutter pub run custom_lint` の3本を回す。
-
 ## 実行には dart_defines が要る
 
 `flutter run --dart-define-from-file=dart_defines/build.json`。このファイルは ignore 済み。`firebase_options.dart` は値を `String.fromEnvironment` で読む形に手で書き換えてあるので、`flutterfire configure` を実行すると値が直接書き戻されてこの仕組みが壊れる。
