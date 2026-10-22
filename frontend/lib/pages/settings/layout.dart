@@ -5,7 +5,9 @@ import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/components/select_group_menu.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class SettingsLayout extends ConsumerWidget {
   final Widget child;
 

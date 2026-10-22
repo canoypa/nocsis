@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 class ConsoleLayout extends ConsumerWidget {
   final Widget child;
 

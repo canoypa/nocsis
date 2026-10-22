@@ -1,9 +1,11 @@
 part of 'package:nocsis/routes/router.dart';
 
+@Dependencies([currentGroupId])
 const personalShellRoute = TypedShellRoute<PersonalShellRoute>(
   routes: [personalHomePageRoute, personalEventsPageRoute],
 );
 
+@Dependencies([currentGroupId])
 class PersonalShellRoute extends ShellRouteData {
   const PersonalShellRoute();
 

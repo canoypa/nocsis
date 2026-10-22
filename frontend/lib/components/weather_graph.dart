@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/generated/api_client/api.swagger.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/weather.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
 // 初回読み込み中のデータ
 final _initWeatherHourly = WeatherData$Hourly(
@@ -12,6 +13,7 @@ final _initWeatherHourly = WeatherData$Hourly(
   pop: List.generate(8, (index) => 0.0),
 );
 
+@Dependencies([currentGroupId])
 class WeatherGraph extends ConsumerWidget {
   const WeatherGraph({super.key});
 
