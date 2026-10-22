@@ -35,6 +35,14 @@
       "depNameTemplate": "flutter",
       "packageNameTemplate": "flutter/flutter",
       "datasourceTemplate": "github-tags"
+    },
+    {
+      "customType": "regex",
+      "description": "pub マネージャが見ない analysis_options.yaml の analyzer プラグインを追跡する",
+      "managerFilePatterns": ["frontend/analysis_options.yaml"],
+      "matchStrings": ["(^|\\n)plugins:\\n(?:  .*\\n)*?  (?<depName>[a-z0-9_]+):[ \\t]*(?<currentValue>\\^?[\\d.]+)"],
+      "datasourceTemplate": "dart",
+      "versioningTemplate": "npm"
     }
   ],
   "packageRules": [
