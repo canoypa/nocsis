@@ -12,8 +12,8 @@ importers:
         specifier: ^5.0.2
         version: 5.0.5(supports-color@8.1.1)
       '@google-cloud/secret-manager':
-        specifier: ^6.1.1
-        version: 6.3.0(supports-color@8.1.1)
+        specifier: ^7.0.0
+        version: 7.2.0(supports-color@8.1.1)
       '@googleapis/calendar':
         specifier: ^16.0.0
         version: 16.0.0(supports-color@8.1.1)
@@ -581,9 +581,9 @@ packages:
     resolution: {integrity: sha512-xXAQBVVrFviWz8L8yDKEqv1ziVw/gMSpYHt3IxSYRSY0fTyjis+xOrKJILj8dd8PAUHGnGiAIYuTprflkE9jsQ==}
     engines: {node: '>=18'}
 
-  '@google-cloud/secret-manager@6.3.0':
-    resolution: {integrity: sha512-TUuzu8CchbCd2cXd0pYJSXvDBsEVX3wpZu4iOpdLrXLbYbvCDKhdjDyOyC7vo14qQRE9J6Z0AL2hfX08H+fh3A==}
-    engines: {node: '>=18'}
+  '@google-cloud/secret-manager@7.2.0':
+    resolution: {integrity: sha512-SQ/e9mo7Pl5QpFIn3GOa8K/PhS+3HgQnlWpMZbaE1UiZBa42AFB+EqxWQZOljv0kNwemo/PWiesAh8TywU9uVw==}
+    engines: {node: '>=22'}
 
   '@google-cloud/sql@0.25.0':
     resolution: {integrity: sha512-OKAA98q2M25rQcqcFvbQniix4zTFcbeSyauj+PcPd+6ngn7eXvAUqpuCRVxbIGmA8r5OtE6Ru/oCJ1xwcUR2vA==}
@@ -5461,9 +5461,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google-cloud/secret-manager@6.3.0(supports-color@8.1.1)':
+  '@google-cloud/secret-manager@7.2.0(supports-color@8.1.1)':
     dependencies:
-      google-gax: 5.0.8(supports-color@8.1.1)
+      google-gax: 6.12.1(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -7932,7 +7932,6 @@ snapshots:
       retry-request: 9.1.0
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   google-logging-utils@0.0.2: {}
 
@@ -9250,7 +9249,6 @@ snapshots:
   proto3-json-serializer@4.1.0:
     dependencies:
       protobufjs: 7.6.6
-    optional: true
 
   protobufjs@7.6.6:
     dependencies:
@@ -9408,7 +9406,6 @@ snapshots:
   retry-request@9.1.0:
     dependencies:
       extend: 3.0.2
-    optional: true
 
   retry@0.13.1: {}
 
