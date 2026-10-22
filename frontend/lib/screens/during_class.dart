@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/during_class_progress.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
