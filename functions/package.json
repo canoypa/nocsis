@@ -3,7 +3,7 @@
   "name": "nocsis-functions",
   "type": "module",
   "main": "dist/main.js",
-  "packageManager": "pnpm@12.14.0",
+  "packageManager": "pnpm@12.16.1",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "ci": "biome ci src",
