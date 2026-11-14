@@ -51,7 +51,11 @@
       "matchManagers": ["npm", "pub", "github-actions"],
       "matchUpdateTypes": ["patch", "digest"],
       "minimumReleaseAge": "3 days",
-      "automerge": true
+      "automerge": true,
+      "prPriority": 1,
+      "prConcurrentLimit": 0,
+      "branchConcurrentLimit": 0,
+      "prHourlyLimit": 0
     },
     {
       "description": "lockfile を共有する minor 更新をディレクトリ単位でまとめる",
