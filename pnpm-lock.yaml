@@ -176,7 +176,7 @@ importers:
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^2.4.12
+        specifier: ^2.6.7
         version: 2.6.7
       firebase-tools:
         specifier: ^15.15.0
