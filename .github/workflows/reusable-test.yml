@@ -1,13 +1,12 @@
 name: Test
 
 on:
-  pull_request:
   workflow_call:
 
 permissions:
   contents: read
 
-# 接頭辞と cancel-in-progress の条件については lint.yml のコメントを参照。
+# 接頭辞と cancel-in-progress の条件については reusable-lint.yml のコメントを参照。
 concurrency:
   group: test_${{ github.workflow }}_${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}

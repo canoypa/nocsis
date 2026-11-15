@@ -10,7 +10,7 @@ paths:
 
 ## build ジョブに environment を宣言しない
 
-`_build_*.yml` が `environment` を持つと、その OIDC トークンが `attribute.environment` に束縛された `wlif-deploy` を引けるようになる。つまりビルドジョブがデプロイ権限に届く。両者を分ける境界はここにしかない。
+`reusable-build_*.yml` が `environment` を持つと、その OIDC トークンが `attribute.environment` に束縛された `wlif-deploy` を引けるようになる。つまりビルドジョブがデプロイ権限に届く。両者を分ける境界はここにしかない。
 
 その結果、ビルドの向き先は environment の変数から解決できない。呼び出し元が入力で渡し、渡された向き先とデプロイ先が一致しているかはデプロイ側の `Verify image target` / `Verify build target` が突き合わせる。
 
