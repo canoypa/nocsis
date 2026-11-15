@@ -217,7 +217,8 @@ jobs:
         run: |
           mkdir -p e2e-logs
           nohup pnpm exec firebase emulators:start --only auth,firestore --project demo-nocsis > e2e-logs/emulators.log 2>&1 &
-          (cd backend && nohup pnpm exec tsx --import ./e2e/fake_external_apis.ts src/main.ts > ../e2e-logs/backend.log 2>&1 &)
+          (cd backend && FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8888 \
+            nohup pnpm exec tsx --import ./e2e/fake_external_apis.ts src/main.ts > ../e2e-logs/backend.log 2>&1 &)
           nohup chromedriver --port=4444 > e2e-logs/chromedriver.log 2>&1 &
       - name: Setup pub cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
