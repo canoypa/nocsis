@@ -13,6 +13,31 @@ describe("fetchSecret", () => {
     };
   });
 
+  describe("SECRET_<名前> の env がある場合", () => {
+    beforeEach(() => {
+      vi.stubEnv("SECRET_test-secret", "env-value");
+
+      return () => {
+        vi.unstubAllEnvs();
+      };
+    });
+
+    it("Secret Manager を呼ばずに env の値を返すこと", async () => {
+      const result = await fetchSecret("test-secret");
+
+      expect(result).toBe("env-value");
+      expect(secretManagerClient.accessSecretVersion).not.toHaveBeenCalled();
+    });
+
+    it("本番では env を見ずに Secret Manager から取得すること", async () => {
+      vi.stubEnv("NODE_ENV", "production");
+
+      const result = await fetchSecret("test-secret");
+
+      expect(result).toBe("secret-value");
+    });
+  });
+
   it("シークレット値を取得できること", async () => {
     const result = await fetchSecret("test-secret");
 
