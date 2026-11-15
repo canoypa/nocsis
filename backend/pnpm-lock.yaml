@@ -228,7 +228,7 @@ importers:
         specifier: ^9.0.0
         version: 9.0.0(postcss@8.5.31)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)
       tsx:
-        specifier: ^4.20.6
+        specifier: ^4.23.15
         version: 4.23.15
       typescript:
         specifier: ^7.0.0
