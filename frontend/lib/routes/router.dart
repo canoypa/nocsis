@@ -19,6 +19,7 @@ import 'package:nocsis/pages/login.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
+import 'package:nocsis/pages/no_group.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/providers/auth.dart';
@@ -40,6 +41,7 @@ part 'console/console_weather_page_route.dart';
 part 'group/group_shell_route.dart';
 part 'licenses_page_route.dart';
 part 'login_page_route.dart';
+part 'no_group_page_route.dart';
 part 'personal/personal_events_page_route.dart';
 part 'personal/personal_home_page_route.dart';
 part 'personal/personal_shell_route.dart';
@@ -48,7 +50,12 @@ part 'settings/settings_shell_route.dart';
 part 'settings/settings_top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
-  routes: [groupShellRoute, licensesPageRoute, loginPageRoute],
+  routes: [
+    groupShellRoute,
+    licensesPageRoute,
+    loginPageRoute,
+    noGroupPageRoute,
+  ],
 )
 class AppShell extends ShellRouteData {
   @override
@@ -92,6 +99,10 @@ GoRouter router(Ref ref) {
     }
 
     final data = response.body!;
+    if (data.items.isEmpty) {
+      return const NoGroupPageRoute().location;
+    }
+
     final firstUserJoinedGroup = data.items.first;
 
     sharedPreferences.setString('latest_group_id', firstUserJoinedGroup.id);
@@ -109,7 +120,12 @@ GoRouter router(Ref ref) {
       return null;
     }
 
-    final continueUri = state.uri.toString() == "/" ? null : state.uri;
+    // グループ未参加の画面へ戻すと、別のアカウントでログインし直したときにグループを選び直せない。
+    final continueUri =
+        state.uri.toString() == "/" ||
+            state.matchedLocation == NoGroupPageRoute.path
+        ? null
+        : state.uri;
     return LoginPageRoute(continueUri: continueUri).location;
   }
 
