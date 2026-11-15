@@ -1,11 +1,10 @@
 name: Build
 
-# feature PR では走らせない。build はデプロイ成果物のコンパイルで、PR ごとに
-# 回すコストに見合わない。main 向けPR(リリースPR)で検知できれば目的を満たす。
+# branches を main に絞らない。Renovate は development に自動マージするので、
+# 絞るとビルドを壊す更新がリリース PR まで素通りする。
 
 on:
   pull_request:
-    branches: [main]
 
 permissions:
   contents: read
