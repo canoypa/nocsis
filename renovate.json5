@@ -61,7 +61,14 @@
       "description": "lockfile を共有する minor 更新をディレクトリ単位でまとめる",
       "matchManagers": ["npm", "pub"],
       "matchUpdateTypes": ["minor"],
-      "groupName": "minor dependencies ({{packageFileDir}})"
+      // ルートの package.json は packageFileDir が空になるので root と表示する
+      "groupName": "minor dependencies ({{#if packageFileDir}}{{packageFileDir}}{{else}}root{{/if}})"
+    },
+    {
+      "description": "互いのバージョンを要求し合う Firebase の Flutter パッケージをまとめる",
+      "matchManagers": ["pub"],
+      "matchPackageNames": ["firebase_core", "firebase_auth", "firebase_auth_mocks"],
+      "groupName": "firebase (frontend)"
     },
     {
       "description": "node のバージョンを定義している5箇所のメジャー更新をまとめる",
