@@ -84,10 +84,19 @@
       "groupName": "pnpm"
     },
     {
-      "description": "mise.toml と pubspec.yaml が定義する Flutter バージョンをまとめる",
+      "description": "Flutter のバージョンと Dart SDK の下限を揃えて更新する",
       "matchManagers": ["mise", "pub", "custom.regex"],
-      "matchDepNames": ["flutter"],
+      "matchDepNames": ["flutter", "dart"],
+      // pubspec.yaml の sdk (^x.y.z) は新しい Dart も範囲に含むため、既定では書き換えられない。
+      // bump にして、Flutter に同梱の Dart まで下限を上げる。
+      "rangeStrategy": "bump",
       "groupName": "flutter"
+    },
+    {
+      "description": "npm の依存の範囲指定を最新に追従させる",
+      "matchManagers": ["npm"],
+      // 範囲内の更新でも package.json の下限を上げる。
+      "rangeStrategy": "bump"
     }
   ]
 }
