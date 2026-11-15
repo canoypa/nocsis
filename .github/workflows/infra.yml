@@ -1,0 +1,111 @@
+name: Infra
+
+# Terraform (infra/) を PR で plan し、マージで apply する。
+# development → Staging、main → Production。
+#
+# 公開リポジトリの Actions のログと artifact は誰でも読めるため、plan / apply の
+# 本文は出さない。出すのは「どのリソースをどう変えるか」の一覧だけ。
+on:
+  pull_request:
+    paths:
+      - "infra/**"
+      - "mise.toml"
+      - ".github/workflows/infra.yml"
+  push:
+    branches: [development, main]
+    paths:
+      - "infra/**"
+      - "mise.toml"
+      - ".github/workflows/infra.yml"
+
+permissions: {}
+
+jobs:
+  # environment を宣言しない。宣言すると tf-apply を引けるようになる。
+  # plan は PR ごとに流すので、state のロックは取らない (tf-plan は state を読めるだけ)。
+  plan:
+    if: ${{ github.event_name == 'pull_request' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dir: staging
+            project_id_var: STG_GCP_PROJECT_ID
+            project_number_var: STG_GCP_PROJECT_NUMBER
+          - dir: production
+            project_id_var: GCP_PROJECT_ID
+            project_number_var: GCP_PROJECT_NUMBER
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/${{ matrix.dir }}
+    env:
+      PROJECT_ID: ${{ vars[matrix.project_id_var] }}
+      PROJECT_NUMBER: ${{ vars[matrix.project_number_var] }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Terraform
+        uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+        with:
+          install_args: terraform
+      - name: Auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: tf-plan@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+      # 最初の apply までは state が無い。gcs backend は無い state を init 時に作ろうとするが、
+      # tf-plan に書き込み権限は渡さない。その間は空の state (= 何も無い) に対して plan する。
+      - name: Use empty state until the first apply
+        run: |
+          bucket=$(sed -n 's/^ *bucket *= *"\(.*\)"/\1/p' main.tf)
+          # バケットが読めないときは落とす。空の state で plan すると全部 create に見えて紛らわしい。
+          objects=$(gcloud storage ls "gs://$bucket")
+          if ! grep -qx "gs://$bucket/default.tfstate" <<< "$objects"; then
+            printf 'terraform {\n  backend "local" {}\n}\n' > backend_override.tf
+            echo "::notice::gs://$bucket に state がまだ無いため、空の state に対して plan する"
+          fi
+      - name: Init
+        run: terraform init -input=false -lockfile=readonly
+      - name: Plan
+        run: terraform plan -input=false -lock=false -out=tfplan > /dev/null
+      - name: Summarize
+        run: ../summarize.sh tfplan "${{ matrix.dir }}" >> "$GITHUB_STEP_SUMMARY"
+
+  apply:
+    if: ${{ github.event_name == 'push' }}
+    environment:
+      name: ${{ github.ref_name == 'main' && 'Production' || 'Staging' }}
+    concurrency:
+      group: infra-apply-${{ github.ref_name }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Terraform
+        uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+        with:
+          install_args: terraform
+      - name: Auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
+          service_account: tf-apply@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+      - name: Init
+        run: terraform init -input=false -lockfile=readonly
+      - name: Plan
+        run: terraform plan -input=false -out=tfplan > /dev/null
+      - name: Summarize
+        run: ../summarize.sh tfplan "${{ github.ref_name }}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Apply
+        run: terraform apply -input=false tfplan > /dev/null

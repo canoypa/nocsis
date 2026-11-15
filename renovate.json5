@@ -7,7 +7,7 @@
     ":maintainLockFilesWeekly",
     ":configMigration"
   ],
-  "enabledManagers": ["mise", "github-actions", "dockerfile", "npm", "pub", "custom.regex"],
+  "enabledManagers": ["mise", "github-actions", "dockerfile", "npm", "pub", "terraform", "custom.regex"],
   "labels": ["dependencies"],
   "customManagers": [
     {
