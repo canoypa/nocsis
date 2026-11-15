@@ -1,16 +1,18 @@
 import { generateKeyPairSync } from "node:crypto";
-import { writeFileSync } from "node:fs";
+import { rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { HttpResponse, http } from "msw";
 import { setupServer } from "msw/node";
-import { afterAll, afterEach, beforeAll } from "vitest";
+import { afterAll, afterEach, beforeAll, vi } from "vitest";
 
 const { privateKey, publicKey } = generateKeyPairSync("rsa", {
   modulusLength: 2048,
   privateKeyEncoding: { type: "pkcs8", format: "pem" },
   publicKeyEncoding: { type: "spki", format: "pem" },
 });
+
+export const GOOGLE_OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
 export const serviceAccountPublicKey = publicKey;
 
@@ -21,10 +23,9 @@ export const serviceAccountKey = {
   private_key: privateKey,
   client_email: "test@demo-nocsis.iam.gserviceaccount.com",
   client_id: "0",
-  token_uri: "https://oauth2.googleapis.com/token",
+  token_uri: GOOGLE_OAUTH_TOKEN_URL,
 };
 
-export const GOOGLE_OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token";
 export const TEST_ACCESS_TOKEN = "test-access-token";
 
 export const SECRET_MANAGER_ACCESS_URL =
@@ -98,14 +99,15 @@ export const externalApiServer = setupServer(...defaultHandlers);
  * msw 3 は HTTP/2 の素通しで応答が返らず Firestore (gRPC) が止まるので、エミュレータを使うテストでは呼ばない
  */
 export const useExternalApiServer = () => {
+  const credentialsPath = join(
+    tmpdir(),
+    `nocsis-test-credentials-${process.pid}.json`,
+  );
+
   beforeAll(() => {
     // 開発者の gcloud ADC を拾わないよう、テスト用の鍵を ADC として読ませる
-    const credentialsPath = join(
-      tmpdir(),
-      `nocsis-test-credentials-${process.pid}.json`,
-    );
     writeFileSync(credentialsPath, JSON.stringify(serviceAccountKey));
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
+    vi.stubEnv("GOOGLE_APPLICATION_CREDENTIALS", credentialsPath);
 
     externalApiServer.listen({ onUnhandledFrame: "error" });
   });
@@ -116,5 +118,7 @@ export const useExternalApiServer = () => {
 
   afterAll(() => {
     externalApiServer.close();
+    vi.unstubAllEnvs();
+    rmSync(credentialsPath, { force: true });
   });
 };

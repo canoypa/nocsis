@@ -1,5 +1,6 @@
 import { HttpResponse, http } from "msw";
 import { describe, expect, it } from "vitest";
+import { ZodError } from "zod";
 import {
   externalApiServer,
   OPEN_WEATHER_MAP_CURRENT_URL,
@@ -114,7 +115,7 @@ describe("fetchWeather", () => {
         ),
       );
 
-      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow();
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(ZodError);
     });
   });
 });

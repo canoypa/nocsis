@@ -16,7 +16,7 @@ describe("fetchSecret", () => {
   beforeEach(() => {
     requests = [];
     const onRequest = ({ request }: { request: Request }) => {
-      if (request.url.startsWith("https://secretmanager.googleapis.com/")) {
+      if (request.url.startsWith(new URL(SECRET_MANAGER_ACCESS_URL).origin)) {
         requests.push(request);
       }
     };
@@ -69,7 +69,9 @@ describe("fetchSecret", () => {
 
   describe("シークレットが存在しない場合", () => {
     it("エラーになること", async () => {
-      await expect(fetchSecret("missing-secret")).rejects.toThrow();
+      await expect(fetchSecret("missing-secret")).rejects.toMatchObject({
+        code: 5,
+      });
     });
   });
 

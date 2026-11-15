@@ -2,16 +2,18 @@ import { createVerify } from "node:crypto";
 import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  defaultSecrets,
   externalApiServer,
   GOOGLE_OAUTH_TOKEN_URL,
   secretManagerHandler,
   serviceAccountKey,
   serviceAccountPublicKey,
+  TEST_ACCESS_TOKEN,
   useExternalApiServer,
 } from "../../tests/helpers/external_apis.js";
 
 useExternalApiServer();
+
+const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
 
 const decodeJwtPart = (part: string) =>
   JSON.parse(Buffer.from(part, "base64url").toString());
@@ -29,9 +31,13 @@ describe("getCalendarClient", () => {
     tokenRequests = [];
     externalApiServer.use(
       http.post(GOOGLE_OAUTH_TOKEN_URL, async ({ request }) => {
-        tokenRequests.push(new URLSearchParams(await request.text()));
+        const body = new URLSearchParams(await request.text());
+        const [, payload] = (body.get("assertion") ?? "").split(".");
+        if (decodeJwtPart(payload).scope === CALENDAR_SCOPE) {
+          tokenRequests.push(body);
+        }
         return HttpResponse.json({
-          access_token: "test-access-token",
+          access_token: TEST_ACCESS_TOKEN,
           expires_in: 3600,
           token_type: "Bearer",
         });
@@ -55,7 +61,7 @@ describe("getCalendarClient", () => {
     expect(decodeJwtPart(header)).toMatchObject({ alg: "RS256" });
     expect(decodeJwtPart(payload)).toMatchObject({
       iss: serviceAccountKey.client_email,
-      scope: "https://www.googleapis.com/auth/calendar.events",
+      scope: CALENDAR_SCOPE,
       aud: GOOGLE_OAUTH_TOKEN_URL,
     });
     expect(
@@ -108,7 +114,6 @@ describe("getCalendarClient", () => {
   describe("トークンの取得に失敗した場合", () => {
     it("エラーになること", async () => {
       externalApiServer.use(
-        secretManagerHandler(defaultSecrets),
         http.post(GOOGLE_OAUTH_TOKEN_URL, () =>
           HttpResponse.json(
             { error: "invalid_grant", error_description: "Invalid JWT" },
@@ -118,7 +123,7 @@ describe("getCalendarClient", () => {
       );
       const { getCalendarClient } = await importClient();
 
-      await expect(getCalendarClient()).rejects.toThrow();
+      await expect(getCalendarClient()).rejects.toThrow("invalid_grant");
     });
   });
 });
