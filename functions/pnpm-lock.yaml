@@ -207,7 +207,7 @@ importers:
         specifier: ^2.6.7
         version: 2.6.7
       '@types/luxon':
-        specifier: ^3.7.1
+        specifier: ^3.7.6
         version: 3.7.6
       '@types/node':
         specifier: ^24.19.2
