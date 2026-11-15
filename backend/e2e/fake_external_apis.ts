@@ -3,6 +3,7 @@ import { generateKeyPairSync } from "node:crypto";
 import { registerHooks } from "node:module";
 import { DateTime } from "luxon";
 import { getResponse, HttpResponse, http } from "msw";
+import { secretManagerClient } from "../src/clients/secret_manager.js";
 
 // 鍵をリポジトリに置かない。JWT の署名に本物の RSA 鍵が要るので起動のたびに作る。
 const { privateKey } = generateKeyPairSync("rsa", {
@@ -10,11 +11,27 @@ const { privateKey } = generateKeyPairSync("rsa", {
   privateKeyEncoding: { type: "pkcs8", format: "pem" },
   publicKeyEncoding: { type: "spki", format: "pem" },
 });
-process.env.SECRET_CALENDAR_ACCOUNT_KEY = JSON.stringify({
-  client_email: "e2e@example.iam.gserviceaccount.com",
-  private_key: privateKey,
-});
-process.env.SECRET_OPENWEATHERMAP_TOKEN = "e2e";
+const secrets: Record<string, string> = {
+  CALENDAR_ACCOUNT_KEY: JSON.stringify({
+    client_email: "e2e@example.iam.gserviceaccount.com",
+    private_key: privateKey,
+  }),
+  OPENWEATHERMAP_TOKEN: "e2e",
+};
+
+// Secret Manager は msw で差し替えない。クライアントが gRPC で fetch を通らない。
+// main.ts と同じモジュールのインスタンスなので、ここで差し替えれば backend に効く。
+secretManagerClient.accessSecretVersion = (async ({
+  name,
+}: {
+  name: string;
+}) => {
+  const secretName = name.split("/").at(-3) ?? "";
+  const data = secrets[secretName];
+  if (data === undefined)
+    throw new Error(`E2E に偽のシークレットがありません: ${name}`);
+  return [{ payload: { data } }];
+}) as unknown as typeof secretManagerClient.accessSecretVersion;
 
 /** e2e/seed.ts のグループが指すカレンダー ID ごとの予定名 */
 const calendarTitles: Record<string, string[]> = {
@@ -82,10 +99,19 @@ const handlers = [
 
 // msw/node の setupServer も msw の FetchInterceptor も使わない。どちらを入れても、
 // firebase-admin が gRPC で話す Firestore エミュレータへの接続が返らなくなる。
-// fetch だけを差し替えて handlers に流し、偽物の無い宛先はそのまま通す。外部宛てなら
-// 認証情報が無く失敗するので E2E で気づける。
+// fetch だけを差し替えて handlers に流す。
 const originalFetch = globalThis.fetch;
+const fakedHosts = new Set([
+  "oauth2.googleapis.com",
+  "www.googleapis.com",
+  "api.openweathermap.org",
+]);
 globalThis.fetch = async (input, init) => {
+  const url = new URL(input instanceof Request ? input.url : input);
+  // 偽物の無い宛先は Request に包まずに渡す。node-fetch 流の init (ストリームの body
+  // など) はネイティブの Request が受け付けない。
+  if (!fakedHosts.has(url.hostname)) return originalFetch(input, init);
+
   const request = new Request(input, init);
   const response = await getResponse(handlers, request.clone());
   return response ?? originalFetch(request);

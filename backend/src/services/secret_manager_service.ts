@@ -10,13 +10,6 @@ const secretCache = new Map<string, string>();
  * @returns シークレット値
  */
 export const fetchSecret = async (secretName: string): Promise<string> => {
-  // E2E で値を差し替える口を msw で作らない。Secret Manager のクライアントは gRPC で
-  // msw に載らず、エミュレータも無い。本番で env が誤って効かないよう本番では見ない。
-  if (process.env.NODE_ENV !== "production") {
-    const fromEnv = process.env[`SECRET_${secretName}`];
-    if (fromEnv !== undefined) return fromEnv;
-  }
-
   const secretPath = secretManagerClient.secretVersionPath(
     "class-clock-40088",
     secretName,
