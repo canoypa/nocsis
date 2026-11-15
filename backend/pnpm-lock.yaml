@@ -176,8 +176,8 @@ importers:
   .:
     dependencies:
       '@google-cloud/secret-manager':
-        specifier: ^7.2.0
-        version: 7.2.0(supports-color@7.2.0)
+        specifier: ^8.0.0
+        version: 8.0.0(supports-color@7.2.0)
       '@googleapis/calendar':
         specifier: ^20.1.0
         version: 20.1.0(supports-color@7.2.0)
@@ -601,8 +601,8 @@ packages:
     resolution: {integrity: sha512-xXAQBVVrFviWz8L8yDKEqv1ziVw/gMSpYHt3IxSYRSY0fTyjis+xOrKJILj8dd8PAUHGnGiAIYuTprflkE9jsQ==}
     engines: {node: '>=18'}
 
-  '@google-cloud/secret-manager@7.2.0':
-    resolution: {integrity: sha512-SQ/e9mo7Pl5QpFIn3GOa8K/PhS+3HgQnlWpMZbaE1UiZBa42AFB+EqxWQZOljv0kNwemo/PWiesAh8TywU9uVw==}
+  '@google-cloud/secret-manager@8.0.0':
+    resolution: {integrity: sha512-RUvUiFBuhsNvK8Mj9Mo116rLB3TsS+8r+LufOWiFvyF8r4A8m/l5Tx5+8PcfL4OTrHjGdCBdcERsvuDFGD/pMw==}
     engines: {node: '>=22'}
 
   '@google-cloud/sql@0.25.0':
@@ -4262,7 +4262,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google-cloud/secret-manager@7.2.0(supports-color@7.2.0)':
+  '@google-cloud/secret-manager@8.0.0(supports-color@7.2.0)':
     dependencies:
       google-gax: 6.12.1(supports-color@7.2.0)
     transitivePeerDependencies:

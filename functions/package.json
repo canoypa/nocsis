@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^5.0.5",
-    "@google-cloud/secret-manager": "^7.2.0",
+    "@google-cloud/secret-manager": "^8.0.0",
     "@googleapis/calendar": "^20.1.0",
     "@slack/web-api": "^8.3.0",
     "cron-parser": "^5.10.4",
