@@ -22,14 +22,9 @@ jobs:
 
   # main 向けの PR に絞らない。Renovate は development に自動マージするので、
   # 絞るとビルドを壊す更新がリリース PR まで素通りする。
-  build-backend:
-    permissions:
-      contents: read
-      # ここは persist しないので使わないが、reusable-build_backend.yml が宣言する権限を
-      # 渡さないと call 自体が失敗する(呼び出し先の permissions は呼び出し側が上限)。
-      id-token: write
-    uses: ./.github/workflows/reusable-build_backend.yml
-
+  #
+  # backend のイメージはここでビルドしない。test の smoke-backend が同じ Dockerfile で
+  # ビルドし、起動まで確かめる。
   build-functions:
     permissions:
       contents: read
@@ -44,7 +39,7 @@ jobs:
   # 更新が要り、忘れると Renovate の自動マージが新しいジョブを待たずに通る。
   ci-ok:
     if: ${{ always() }}
-    needs: [lint, test, build-backend, build-functions, build-frontend]
+    needs: [lint, test, build-functions, build-frontend]
     runs-on: ubuntu-latest
     permissions: {}
     steps:
