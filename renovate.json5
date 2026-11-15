@@ -122,6 +122,12 @@
       "matchManagers": ["npm"],
       // 範囲内の更新でも package.json の下限を上げる。
       "rangeStrategy": "bump"
+    },
+    {
+      "description": "lockfile は変えずに package.json の下限だけを上げる更新をディレクトリ単位でまとめる",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["bump"],
+      "groupName": "range bump ({{#if packageFileDir}}{{packageFileDir}}{{else}}root{{/if}})"
     }
   ]
 }
