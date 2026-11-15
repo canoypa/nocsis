@@ -176,7 +176,7 @@ importers:
   .:
     dependencies:
       '@google-cloud/secret-manager':
-        specifier: ^7.0.0
+        specifier: ^7.2.0
         version: 7.2.0(supports-color@7.2.0)
       '@googleapis/calendar':
         specifier: ^20.1.0
