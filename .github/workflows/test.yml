@@ -109,6 +109,48 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
+  smoke-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Java
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      - name: Setup Tools
+        uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-root-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-root-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build image
+        run: docker build --platform linux/amd64 --tag backend:smoke ./backend
+      # エミュレータの起動は待たない。firebase-admin は初回のリクエストまで接続しない。
+      # -p でポートを公開する形にしないのは、コンテナからホストの 127.0.0.1 で
+      # 待つエミュレータに届かないため。
+      - name: Start backend
+        run: |
+          docker run --detach --name backend --network host \
+            --env GCLOUD_PROJECT=demo-nocsis \
+            --env FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 \
+            --env FIRESTORE_EMULATOR_HOST=127.0.0.1:8888 \
+            backend:smoke
+      - name: Smoke test
+        run: pnpm exec firebase emulators:exec --only auth,firestore --project demo-nocsis 'bash scripts/smoke_backend.sh'
+      - name: Backend logs
+        if: ${{ !cancelled() }}
+        run: docker logs backend
+
   test-frontend:
     runs-on: ubuntu-latest
     defaults:
