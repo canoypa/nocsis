@@ -66,19 +66,19 @@ void main() {
       .uri
       .toString();
 
-  testWidgets('グループ未参加のユーザーがトップを開くとグループ未参加の画面へ遷移する', (tester) async {
+  testWidgets('グループ未参加のユーザーがトップを開くとグループ未参加の画面を出す', (tester) async {
     await pumpApp(tester, '/');
 
     expect(tester.takeException(), isNull);
-    expect(currentLocation(), '/no-groups');
+    expect(currentLocation(), '/');
     expect(find.text('参加しているグループがありません'), findsOneWidget);
   });
 
-  testWidgets('グループ未参加のユーザーがログイン画面を開くとグループ未参加の画面へ遷移する', (tester) async {
+  testWidgets('グループ未参加のユーザーがログイン画面を開くとトップのグループ未参加の画面へ遷移する', (tester) async {
     await pumpApp(tester, '/login');
 
     expect(tester.takeException(), isNull);
-    expect(currentLocation(), '/no-groups');
+    expect(currentLocation(), '/');
     expect(find.text('参加しているグループがありません'), findsOneWidget);
   });
 

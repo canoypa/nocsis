@@ -41,21 +41,16 @@ part 'console/console_weather_page_route.dart';
 part 'group/group_shell_route.dart';
 part 'licenses_page_route.dart';
 part 'login_page_route.dart';
-part 'no_group_page_route.dart';
 part 'personal/personal_events_page_route.dart';
 part 'personal/personal_home_page_route.dart';
 part 'personal/personal_shell_route.dart';
 part 'router.g.dart';
 part 'settings/settings_shell_route.dart';
 part 'settings/settings_top_page_route.dart';
+part 'top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
-  routes: [
-    groupShellRoute,
-    licensesPageRoute,
-    loginPageRoute,
-    noGroupPageRoute,
-  ],
+  routes: [groupShellRoute, licensesPageRoute, loginPageRoute, topPageRoute],
 )
 class AppShell extends ShellRouteData {
   @override
@@ -100,7 +95,7 @@ GoRouter router(Ref ref) {
 
     final data = response.body!;
     if (data.items.isEmpty) {
-      return const NoGroupPageRoute().location;
+      return null;
     }
 
     final firstUserJoinedGroup = data.items.first;
@@ -120,12 +115,7 @@ GoRouter router(Ref ref) {
       return null;
     }
 
-    // グループ未参加の画面へ戻すと、別のアカウントでログインし直したときにグループを選び直せない。
-    final continueUri =
-        state.uri.toString() == "/" ||
-            state.matchedLocation == NoGroupPageRoute.path
-        ? null
-        : state.uri;
+    final continueUri = state.uri.toString() == "/" ? null : state.uri;
     return LoginPageRoute(continueUri: continueUri).location;
   }
 

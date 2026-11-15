@@ -1,13 +1,11 @@
 part of 'package:nocsis/routes/router.dart';
 
-const noGroupPageRoute = TypedGoRoute<NoGroupPageRoute>(
-  path: NoGroupPageRoute.path,
-);
+const topPageRoute = TypedGoRoute<TopPageRoute>(path: TopPageRoute.path);
 
-class NoGroupPageRoute extends GoRouteData with $NoGroupPageRoute {
-  static const path = '/no-groups';
+class TopPageRoute extends GoRouteData with $TopPageRoute {
+  static const path = '/';
 
-  const NoGroupPageRoute();
+  const TopPageRoute();
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
