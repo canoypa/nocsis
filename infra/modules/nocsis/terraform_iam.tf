@@ -1,0 +1,20 @@
+# tf-apply 自身の権限のうち、bootstrap が付けないもの。
+# 管理対象を増やすときは、取り込み (import) より先にここで権限を足して apply しておく。
+# 取り込みは apply の plan で読みに行くため、同じ apply では間に合わない。
+locals {
+  tf_apply_member = "serviceAccount:tf-apply@${var.project_id}.iam.gserviceaccount.com"
+
+  tf_apply_roles = [
+    # Auth の設定だけを読み書きする。roles/firebaseauth.admin はユーザーまで触れるので使わない。
+    "projects/${var.project_id}/roles/authConfigDeployer",
+    "roles/firebasehosting.admin",
+  ]
+}
+
+resource "google_project_iam_member" "tf_apply" {
+  for_each = toset(local.tf_apply_roles)
+
+  project = var.project_id
+  role    = each.key
+  member  = local.tf_apply_member
+}
