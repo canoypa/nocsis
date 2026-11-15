@@ -200,7 +200,7 @@ importers:
         specifier: ^3.7.2
         version: 3.7.2
       valibot:
-        specifier: ^1.2.0
+        specifier: ^1.5.0
         version: 1.5.0(typescript@7.0.2)
     devDependencies:
       '@biomejs/biome':
