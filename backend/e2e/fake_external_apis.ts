@@ -16,7 +16,7 @@ process.env.SECRET_CALENDAR_ACCOUNT_KEY = JSON.stringify({
 });
 process.env.SECRET_OPENWEATHERMAP_TOKEN = "e2e";
 
-/** scripts/seed_e2e.sh のグループが指すカレンダー ID ごとの予定名 */
+/** e2e/seed.ts のグループが指すカレンダー ID ごとの予定名 */
 const calendarTitles: Record<string, string[]> = {
   classes: ["E2E 国語", "E2E 数学"],
   events: ["E2E 遠足"],

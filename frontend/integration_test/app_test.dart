@@ -8,7 +8,7 @@ import 'package:nocsis/firebase_options.dart';
 import 'package:nocsis/main.dart';
 import 'package:nocsis/routes/router.dart';
 
-// scripts/seed_e2e.sh がエミュレータに作るデータと、backend/e2e/fake_external_apis.ts が
+// backend/e2e/seed.ts がエミュレータに作るデータと、backend/e2e/fake_external_apis.ts が
 // 返す偽の予定。
 const _email = 'e2e@example.com';
 const _password = 'e2e-password';
@@ -43,10 +43,15 @@ void main() {
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     await initializeDateFormatting('ja_JP');
     // ログイン画面は Google のポップアップしか持たず、ブラウザ自動操作では通せない。
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: _email,
-      password: _password,
-    );
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      );
+    } on FirebaseException catch (e) {
+      // profile ビルドは例外の型名が minify され、そのまま投げると原因が読めない。
+      throw TestFailure('ログインに失敗しました: ${e.code} ${e.message}');
+    }
   });
 
   late ProviderContainer container;
