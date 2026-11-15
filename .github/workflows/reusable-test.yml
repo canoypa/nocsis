@@ -20,11 +20,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Java
-        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
-        with:
-          distribution: 'temurin'
-          java-version: '25'
       - name: Setup Tools
         uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
       - name: Get pnpm store directory
@@ -68,11 +63,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Java
-        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
-        with:
-          distribution: 'temurin'
-          java-version: '25'
       - name: Setup Tools
         uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
       - name: Get pnpm store directory
@@ -113,11 +103,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup Java
-        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
-        with:
-          distribution: 'temurin'
-          java-version: '25'
       - name: Setup Tools
         uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
       - name: Get pnpm store directory
@@ -201,3 +186,82 @@ jobs:
             echo "| lines | ${pct}% | ${THRESHOLD}% |"
           } >> "$GITHUB_STEP_SUMMARY"
           awk -v p="$pct" -v t="$THRESHOLD" 'BEGIN { printf "Line coverage: %s%% (threshold: %s%%)\n", p, t; exit (p + 0 >= t + 0) ? 0 : 1 }'
+
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      GCLOUD_PROJECT: demo-nocsis
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Tools
+        uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-e2e-${{ hashFiles('pnpm-lock.yaml', 'backend/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-e2e-
+      - name: Install dependencies (root, backend)
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --dir backend install --frozen-lockfile
+      # 待ち時間の大半は wasm のコンパイルなので、エミュレータ・backend・chromedriver は
+      # その裏で起動しておく。emulators:exec で包まないのは、包むとコンパイルが
+      # エミュレータの起動を待ってから始まるため。
+      - name: Start emulators, backend and chromedriver
+        run: |
+          mkdir -p e2e-logs
+          nohup pnpm exec firebase emulators:start --only auth,firestore --project demo-nocsis > e2e-logs/emulators.log 2>&1 &
+          (cd backend && FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8888 \
+            nohup pnpm exec tsx --import ./e2e/fake_external_apis.ts src/main.ts > ../e2e-logs/backend.log 2>&1 &)
+          nohup chromedriver --port=4444 > e2e-logs/chromedriver.log 2>&1 &
+      - name: Setup pub cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-cache-${{ hashFiles('frontend/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-cache-
+      - name: Install dependencies (frontend)
+        working-directory: ./frontend
+        run: flutter pub get --enforce-lockfile
+      - name: Setup build_runner cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: frontend/.dart_tool/build
+          key: ${{ runner.os }}-build-runner-${{ hashFiles('frontend/pubspec.lock', 'frontend/lib/**/*.dart', 'frontend/swagger/api.json', 'frontend/build.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-runner-
+      - name: Run build_runner
+        working-directory: ./frontend
+        run: flutter pub run build_runner build
+      - name: Seed emulators
+        run: |
+          timeout 60 bash -c 'until curl -sf http://127.0.0.1:8888/ > /dev/null && curl -sf http://127.0.0.1:9099/ > /dev/null; do sleep 1; done'
+          FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8888 \
+            pnpm --dir backend exec tsx e2e/seed.ts
+          timeout 60 bash -c 'until curl -s -o /dev/null http://127.0.0.1:8080/api/v1/users/me/groups; do sleep 1; done'
+      # 本番と同じ --wasm の profile ビルドで回す。debug にしないのは、本番と別の
+      # コンパイラ (DDC) で作られたアプリを検査することになるため。
+      - name: E2E
+        working-directory: ./frontend
+        run: |
+          flutter drive \
+            --driver=test_driver/integration_test.dart \
+            --target=integration_test/app_test.dart \
+            -d web-server --browser-name=chrome --headless \
+            --profile --wasm \
+            --dart-define=API_BASE_URL=http://localhost:8080 \
+            --dart-define=FIREBASE_API_KEY=dummy \
+            --dart-define=FIREBASE_APP_ID=1:000000000000:web:0000000000000000 \
+            --dart-define=FIREBASE_MESSAGING_SENDER_ID=000000000000 \
+            --dart-define=FIREBASE_PROJECT_ID=demo-nocsis \
+            --dart-define=FIREBASE_AUTH_DOMAIN=localhost
+      - name: Logs
+        if: ${{ !cancelled() }}
+        run: tail -n 100 e2e-logs/*.log
