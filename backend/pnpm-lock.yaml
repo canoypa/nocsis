@@ -194,7 +194,7 @@ importers:
         specifier: ^14.5.1
         version: 14.5.1(supports-color@7.2.0)
       hono:
-        specifier: ^4.12.25
+        specifier: ^4.13.18
         version: 4.13.18
       hono-openapi:
         specifier: ^1.5.0
