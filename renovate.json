@@ -84,9 +84,10 @@
       "groupName": "pnpm"
     },
     {
-      "description": "mise.toml と pubspec.yaml が定義する Flutter バージョンをまとめる",
+      "description": "mise.toml と pubspec.yaml が定義する Flutter バージョンと、pubspec.yaml の Dart SDK 下限をまとめる。dart は範囲内の更新でも下限を上げる (bump) ので、Flutter に同梱の Dart まで下限が追従する",
       "matchManagers": ["mise", "pub", "custom.regex"],
-      "matchDepNames": ["flutter"],
+      "matchDepNames": ["flutter", "dart"],
+      "rangeStrategy": "bump",
       "groupName": "flutter"
     }
   ]
