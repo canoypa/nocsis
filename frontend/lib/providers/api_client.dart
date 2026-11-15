@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nocsis/generated/api_client/api.swagger.dart';

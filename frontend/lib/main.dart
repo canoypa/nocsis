@@ -14,9 +14,8 @@ void main() async {
   usePathUrlStrategy();
 
   // Firebase の初期化と、初回の認証状態の取得を待つ
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  ).then((_) => FirebaseAuth.instance.authStateChanges().first);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
+      .then((_) => FirebaseAuth.instance.authStateChanges().first);
 
   // DateTime の日本語フォーマット初期化
   initializeDateFormatting("ja_JP");

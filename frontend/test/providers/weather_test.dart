@@ -28,11 +28,10 @@ void main() {
         hourly: const WeatherData$Hourly(temp: [20.0, 21.0], pop: [0.1, 0.2]),
         threeHour: const [WeatherDataThreeHour.clear],
       );
-      when(
-        () => mockApi.apiV1GroupsGroupIdWeatherNowGet(groupId: 'group-1'),
-      ).thenAnswer(
-        (_) async => chopper.Response(http.Response('', 200), weatherData),
-      );
+      when(() => mockApi.apiV1GroupsGroupIdWeatherNowGet(groupId: 'group-1'))
+          .thenAnswer(
+            (_) async => chopper.Response(http.Response('', 200), weatherData),
+          );
 
       final container = ProviderContainer(
         overrides: [apiClientProvider.overrideWith((ref) async => mockApi)],
@@ -48,12 +47,11 @@ void main() {
 
     test('APIが失敗を返した場合は例外を投げる', () async {
       // Arrange
-      when(
-        () => mockApi.apiV1GroupsGroupIdWeatherNowGet(groupId: 'group-1'),
-      ).thenAnswer(
-        (_) async =>
-            chopper.Response<WeatherData>(http.Response('', 500), null),
-      );
+      when(() => mockApi.apiV1GroupsGroupIdWeatherNowGet(groupId: 'group-1'))
+          .thenAnswer(
+            (_) async =>
+                chopper.Response<WeatherData>(http.Response('', 500), null),
+          );
 
       // Riverpod 3.x はデフォルトで失敗時にリトライするため、
       // リトライを無効化して即座に AsyncError へ落とす。

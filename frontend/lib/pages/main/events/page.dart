@@ -36,9 +36,8 @@ final eventsProvider = FutureProvider.family<List<MonthEventGroup>, String>((
 
     // 月毎にグループ化
     final monthGroups = groupBy(events, (Event event) {
-      final DateTime? startDate = DateTime.tryParse(
-        event.startAt as String,
-      )?.toLocal();
+      final DateTime? startDate = DateTime.tryParse(event.startAt as String)
+          ?.toLocal();
       return DateFormat('yyyy-MM').format(startDate!);
     });
 

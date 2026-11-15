@@ -128,9 +128,9 @@ class SettingsTopPage extends ConsumerWidget {
                                         .textTheme
                                         .bodyMedium
                                         ?.copyWith(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
                                         ),
                                   ),
                               ],
