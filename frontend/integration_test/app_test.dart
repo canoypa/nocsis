@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -34,7 +35,7 @@ Future<void> pumpUntilFound(
 }
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
     await Firebase.initializeApp(
@@ -67,7 +68,35 @@ void main() {
     );
   }
 
-  testWidgets('トップを開くと参加しているグループの今日の授業とイベントが出る', (tester) async {
+  // 失敗の中身は FlutterErrorDetails の toString では運ばない。profile ビルドではそれが空か
+  // minify された型名になり、driver 側で原因が読めない。
+  void e2eTest(String description, WidgetTesterCallback body) {
+    testWidgets(description, (tester) async {
+      try {
+        await body(tester);
+      } catch (e, s) {
+        final texts = tester
+            .widgetList<RichText>(find.byType(RichText))
+            .map((w) => w.text.toPlainText())
+            .where((t) => t.trim().isNotEmpty)
+            .toList();
+        (binding.reportData ??= {})[description] = {
+          'error': e is TestFailure ? e.message : '$e',
+          'stack': '$s',
+          'location': container
+              .read(routerProvider)
+              .routeInformationProvider
+              .value
+              .uri
+              .toString(),
+          'texts': texts,
+        };
+        rethrow;
+      }
+    });
+  }
+
+  e2eTest('トップを開くと参加しているグループの今日の授業とイベントが出る', (tester) async {
     await pumpApp(tester);
 
     await pumpUntilFound(tester, find.text(_className));
@@ -78,7 +107,7 @@ void main() {
     );
   });
 
-  testWidgets('教室画面に日直・授業・天気が出る', (tester) async {
+  e2eTest('教室画面に日直・授業・天気が出る', (tester) async {
     await pumpApp(tester);
     container.read(routerProvider).go('/groups/$_groupId/classroom');
 
