@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:
+
+permissions: {}
+
+concurrency:
+  group: ci_${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-lint.yml
+
+  test:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-test.yml
+
+  # main 向けの PR に絞らない。Renovate は development に自動マージするので、
+  # 絞るとビルドを壊す更新がリリース PR まで素通りする。
+  #
+  # backend のイメージはここでビルドしない。test の smoke-backend が同じ Dockerfile で
+  # ビルドし、起動まで確かめる。
+  build-functions:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-build_functions.yml
+
+  build-frontend:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-build_frontend.yml
+
+  # 個々のジョブを ruleset の必須チェックに並べない。ジョブを足すたびに ruleset の
+  # 更新が要り、忘れると Renovate の自動マージが新しいジョブを待たずに通る。
+  ci-ok:
+    if: ${{ always() }}
+    needs: [lint, test, build-functions, build-frontend]
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Check results
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "$RESULTS"
+          jq -e 'all(. == "success")' <<<"$RESULTS" > /dev/null

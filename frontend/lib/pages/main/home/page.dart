@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/day_schedule.dart';
 import 'package:nocsis/components/personal/toggle_day.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
@@ -14,9 +14,8 @@ class SelectGroupMenu extends ConsumerWidget {
     if (groupId == null) return;
 
     final currentGroupId = GoRouter.of(context).state.pathParameters['groupId'];
-    final newUri = GoRouter.of(
-      context,
-    ).state.uri.path.replaceFirst('/$currentGroupId', '/$groupId');
+    final newUri = GoRouter.of(context).state.uri.path
+        .replaceFirst('/$currentGroupId', '/$groupId');
 
     GoRouter.of(context).go(newUri);
   }

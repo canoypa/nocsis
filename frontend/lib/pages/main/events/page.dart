@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
@@ -36,9 +36,8 @@ final eventsProvider = FutureProvider.family<List<MonthEventGroup>, String>((
 
     // 月毎にグループ化
     final monthGroups = groupBy(events, (Event event) {
-      final DateTime? startDate = DateTime.tryParse(
-        event.startAt as String,
-      )?.toLocal();
+      final DateTime? startDate = DateTime.tryParse(event.startAt as String)
+          ?.toLocal();
       return DateFormat('yyyy-MM').format(startDate!);
     });
 

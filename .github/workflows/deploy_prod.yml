@@ -16,32 +16,32 @@ jobs:
   lint:
     permissions:
       contents: read
-    uses: ./.github/workflows/lint.yml
+    uses: ./.github/workflows/reusable-lint.yml
 
   test:
     permissions:
       contents: read
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/reusable-test.yml
 
   build_backend:
     permissions:
       contents: read
       id-token: write
-    uses: ./.github/workflows/_build_backend.yml
+    uses: ./.github/workflows/reusable-build_backend.yml
     with:
       persist: true
 
   build_functions:
     permissions:
       contents: read
-    uses: ./.github/workflows/_build_functions.yml
+    uses: ./.github/workflows/reusable-build_functions.yml
     with:
       persist: true
 
   build_frontend:
     permissions:
       contents: read
-    uses: ./.github/workflows/_build_frontend.yml
+    uses: ./.github/workflows/reusable-build_frontend.yml
     with:
       persist: true
 
@@ -49,7 +49,7 @@ jobs:
     needs: [lint, test, build_backend]
     permissions:
       id-token: write
-    uses: ./.github/workflows/_deploy_backend.yml
+    uses: ./.github/workflows/reusable-deploy_backend.yml
     with:
       environment: Production
       image: ${{ needs.build_backend.outputs.image }}
@@ -60,7 +60,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: ./.github/workflows/_deploy_functions.yml
+    uses: ./.github/workflows/reusable-deploy_functions.yml
     with:
       environment: Production
 
@@ -70,7 +70,7 @@ jobs:
       contents: read
       id-token: write
       pull-requests: write
-    uses: ./.github/workflows/_deploy_frontend.yml
+    uses: ./.github/workflows/reusable-deploy_frontend.yml
     with:
       environment: Production
       channel_id: live

@@ -51,13 +51,24 @@
       "matchManagers": ["npm", "pub", "github-actions"],
       "matchUpdateTypes": ["patch", "digest"],
       "minimumReleaseAge": "3 days",
-      "automerge": true
+      "automerge": true,
+      "prPriority": 1,
+      "prConcurrentLimit": 0,
+      "branchConcurrentLimit": 0,
+      "prHourlyLimit": 0
     },
     {
       "description": "lockfile を共有する minor 更新をディレクトリ単位でまとめる",
       "matchManagers": ["npm", "pub"],
       "matchUpdateTypes": ["minor"],
-      "groupName": "minor dependencies ({{packageFileDir}})"
+      // ルートの package.json は packageFileDir が空になるので root と表示する
+      "groupName": "minor dependencies ({{#if packageFileDir}}{{packageFileDir}}{{else}}root{{/if}})"
+    },
+    {
+      "description": "互いのバージョンを要求し合う Firebase の Flutter パッケージをまとめる",
+      "matchManagers": ["pub"],
+      "matchPackageNames": ["firebase_core", "firebase_auth", "firebase_auth_mocks"],
+      "groupName": "firebase (frontend)"
     },
     {
       "description": "node のバージョンを定義している5箇所のメジャー更新をまとめる",
@@ -80,10 +91,37 @@
       "groupName": "pnpm"
     },
     {
-      "description": "mise.toml と pubspec.yaml が定義する Flutter バージョンをまとめる",
+      "description": "Flutter のバージョンと Dart SDK の下限を揃えて更新する",
       "matchManagers": ["mise", "pub", "custom.regex"],
-      "matchDepNames": ["flutter"],
-      "groupName": "flutter"
+      "matchDepNames": ["flutter", "dart"],
+      // pubspec.yaml の sdk (^x.y.z) は新しい Dart も範囲に含むため、既定では書き換えられない。
+      // bump にして、Flutter に同梱の Dart まで下限を上げる。
+      "rangeStrategy": "bump",
+      "groupName": "flutter",
+      // グループ PR のタイトルに Flutter のバージョンを出す (mise.toml の flutter は depType が tools)
+      "group": {
+        "commitMessageTopic": "{{{groupName}}}{{#each upgrades}}{{#if (equals depType \"tools\")}} to v{{{newVersion}}}{{/if}}{{/each}}"
+      }
+    },
+    {
+      "description": "Dart SDK の下限を caret の範囲のまま上げる",
+      "matchManagers": ["pub"],
+      "matchDepNames": ["dart"],
+      // dart-version データソースの既定は semver で、^3.10.0 が 3.14.0 に置き換わってしまう
+      "versioning": "npm"
+    },
+    {
+      "description": "Dart SDK のパッチ更新は Flutter の同梱版より先に出るので追わない",
+      "matchManagers": ["pub"],
+      "matchDepNames": ["dart"],
+      "matchUpdateTypes": ["patch"],
+      "enabled": false
+    },
+    {
+      "description": "npm の依存の範囲指定を最新に追従させる",
+      "matchManagers": ["npm"],
+      // 範囲内の更新でも package.json の下限を上げる。
+      "rangeStrategy": "bump"
     }
   ]
 }

@@ -1,10 +1,10 @@
 {
-  "packageManager": "pnpm@11.28.6",
+  "packageManager": "pnpm@12.20.0",
   "scripts": {
     "emulators:start": "firebase emulators:start --project demo-nocsis --import ./emulator_data --export-on-exit ./emulator_data"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.12",
-    "firebase-tools": "^15.15.0"
+    "@biomejs/biome": "^2.6.7",
+    "firebase-tools": "^15.36.0"
   }
 }

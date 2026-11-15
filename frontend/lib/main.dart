@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -14,9 +14,8 @@ void main() async {
   usePathUrlStrategy();
 
   // Firebase の初期化と、初回の認証状態の取得を待つ
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  ).then((_) => FirebaseAuth.instance.authStateChanges().first);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
+      .then((_) => FirebaseAuth.instance.authStateChanges().first);
 
   // DateTime の日本語フォーマット初期化
   initializeDateFormatting("ja_JP");

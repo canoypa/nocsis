@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:nocsis/components/clock.dart';
 import 'package:nocsis/components/daydudy.dart';
 import 'package:nocsis/components/weather_info.dart';

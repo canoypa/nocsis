@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nocsis/generated/api_client/api.swagger.dart';
@@ -7,7 +8,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'api_client.g.dart';
 
-final String _baseUrl = kDebugMode ? 'http://localhost:8080' : Uri.base.origin;
+// E2E で kDebugMode に頼らない。デバッグビルドは本番と別のコンパイラで作られるため、
+// 本番と同じ wasm のビルドで backend を指せるよう --dart-define で上書きできるようにする。
+const _apiBaseUrlOverride = String.fromEnvironment('API_BASE_URL');
+
+final String _baseUrl = _apiBaseUrlOverride.isNotEmpty
+    ? _apiBaseUrlOverride
+    : kDebugMode
+    ? 'http://localhost:8080'
+    : Uri.base.origin;
 
 class BearerAuthInterceptor implements Interceptor {
   final String token;

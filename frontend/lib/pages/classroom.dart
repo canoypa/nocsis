@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -92,9 +92,9 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 600),
                     decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.surfaceContainerHighest,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
                       border: Border.all(
                         width: 2,
                         color: Theme.of(context).colorScheme.outline,

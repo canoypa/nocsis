@@ -4,8 +4,8 @@ name: Deploy to Staging
 # デプロイ経路を先に通す。デプロイ先は Staging 環境の変数で決まる。
 #
 # build ジョブだけは environment を宣言できないため(宣言するとデプロイ権限に
-# 届く。理由は _build_backend.yml のコメント)、ビルドの向き先をリポジトリ変数
-# STG_* から渡す。デプロイ先と一致しているかは _deploy_frontend.yml の
+# 届く。理由は reusable-build_backend.yml のコメント)、ビルドの向き先をリポジトリ変数
+# STG_* から渡す。デプロイ先と一致しているかは reusable-deploy_frontend.yml の
 # Verify build target が突き合わせる。
 on:
   workflow_dispatch:
@@ -39,19 +39,19 @@ jobs:
   lint:
     permissions:
       contents: read
-    uses: ./.github/workflows/lint.yml
+    uses: ./.github/workflows/reusable-lint.yml
 
   test:
     permissions:
       contents: read
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/reusable-test.yml
 
   build_backend:
     needs: [check_config]
     permissions:
       contents: read
       id-token: write
-    uses: ./.github/workflows/_build_backend.yml
+    uses: ./.github/workflows/reusable-build_backend.yml
     with:
       persist: true
       project_id: ${{ vars.STG_GCP_PROJECT_ID }}
@@ -60,7 +60,7 @@ jobs:
   build_functions:
     permissions:
       contents: read
-    uses: ./.github/workflows/_build_functions.yml
+    uses: ./.github/workflows/reusable-build_functions.yml
     with:
       persist: true
 
@@ -68,7 +68,7 @@ jobs:
     needs: [check_config]
     permissions:
       contents: read
-    uses: ./.github/workflows/_build_frontend.yml
+    uses: ./.github/workflows/reusable-build_frontend.yml
     with:
       persist: true
       firebase_web_config: ${{ vars.STG_FIREBASE_WEB_CONFIG }}
@@ -77,7 +77,7 @@ jobs:
     needs: [lint, test, build_backend]
     permissions:
       id-token: write
-    uses: ./.github/workflows/_deploy_backend.yml
+    uses: ./.github/workflows/reusable-deploy_backend.yml
     with:
       environment: Staging
       image: ${{ needs.build_backend.outputs.image }}
@@ -88,7 +88,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    uses: ./.github/workflows/_deploy_functions.yml
+    uses: ./.github/workflows/reusable-deploy_functions.yml
     with:
       environment: Staging
 
@@ -98,7 +98,7 @@ jobs:
       contents: read
       id-token: write
       pull-requests: write
-    uses: ./.github/workflows/_deploy_frontend.yml
+    uses: ./.github/workflows/reusable-deploy_frontend.yml
     with:
       environment: Staging
       channel_id: live
