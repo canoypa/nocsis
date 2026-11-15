@@ -14,9 +14,8 @@ class SelectGroupMenu extends ConsumerWidget {
     if (groupId == null) return;
 
     final currentGroupId = GoRouter.of(context).state.pathParameters['groupId'];
-    final newUri = GoRouter.of(
-      context,
-    ).state.uri.path.replaceFirst('/$currentGroupId', '/$groupId');
+    final newUri = GoRouter.of(context).state.uri.path
+        .replaceFirst('/$currentGroupId', '/$groupId');
 
     GoRouter.of(context).go(newUri);
   }

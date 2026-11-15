@@ -19,12 +19,10 @@ class ClassListView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: (items).map((data) {
-              final String startAt = DateFormat(
-                "HH:mm",
-              ).format(data.startAt.toLocal());
-              final String endAt = DateFormat(
-                "HH:mm",
-              ).format(data.endAt.toLocal());
+              final String startAt = DateFormat("HH:mm")
+                  .format(data.startAt.toLocal());
+              final String endAt = DateFormat("HH:mm")
+                  .format(data.endAt.toLocal());
 
               return BasicCard(
                 primary: Text(data.title),
