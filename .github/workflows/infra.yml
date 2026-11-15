@@ -57,6 +57,17 @@ jobs:
         with:
           workload_identity_provider: projects/${{ env.PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
           service_account: tf-plan@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+      # 最初の apply までは state が無い。gcs backend は無い state を init 時に作ろうとするが、
+      # tf-plan に書き込み権限は渡さない。その間は空の state (= 何も無い) に対して plan する。
+      - name: Use empty state until the first apply
+        run: |
+          bucket=$(sed -n 's/^ *bucket *= *"\(.*\)"/\1/p' main.tf)
+          # バケットが読めないときは落とす。空の state で plan すると全部 create に見えて紛らわしい。
+          objects=$(gcloud storage ls "gs://$bucket")
+          if ! grep -qx "gs://$bucket/default.tfstate" <<< "$objects"; then
+            printf 'terraform {\n  backend "local" {}\n}\n' > backend_override.tf
+            echo "::notice::gs://$bucket に state がまだ無いため、空の state に対して plan する"
+          fi
       - name: Init
         run: terraform init -input=false -lockfile=readonly
       - name: Plan
