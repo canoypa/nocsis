@@ -254,7 +254,7 @@ jobs:
             --driver=test_driver/integration_test.dart \
             --target=integration_test/app_test.dart \
             -d web-server --browser-name=chrome --headless \
-            --profile \
+            --profile --wasm \
             --dart-define=API_BASE_URL=http://localhost:8080 \
             --dart-define=FIREBASE_API_KEY=dummy \
             --dart-define=FIREBASE_APP_ID=1:000000000000:web:0000000000000000 \
