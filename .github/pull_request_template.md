@@ -10,6 +10,6 @@ Resolves #
 
 <!-- 何をするか -->
 
-## Verification
+## Verify
 
 <!-- 何を確かめたか -->
