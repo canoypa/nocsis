@@ -35,7 +35,7 @@
     "@types/luxon": "^3.7.1",
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "5.1.0",
-    "firebase-functions-test": "^3.4.1",
+    "firebase-functions-test": "^3.5.0",
     "firebase-tools": "^15.8.0",
     "msw": "^3.0.0",
     "tsup": "^9.0.0",
