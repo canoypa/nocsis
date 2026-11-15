@@ -3,8 +3,8 @@ publish_to: "none"
 name: nocsis
 
 environment:
-  sdk: "^3.10.0"
-  flutter: "3.47.7"
+  sdk: "^3.14.0"
+  flutter: "3.50.0"
 
 dependencies:
   flutter:
