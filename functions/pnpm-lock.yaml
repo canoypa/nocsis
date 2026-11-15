@@ -194,7 +194,7 @@ importers:
         specifier: ^14.5.1
         version: 14.5.1(supports-color@8.1.1)
       firebase-functions:
-        specifier: ^7.1.1
+        specifier: ^7.4.0
         version: 7.4.0(firebase-admin@14.5.1(supports-color@8.1.1))(graphql@16.14.2)(supports-color@8.1.1)
       luxon:
         specifier: ^3.7.2
