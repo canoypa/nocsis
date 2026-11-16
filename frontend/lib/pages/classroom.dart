@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/core/deployed_version.dart';
+import 'package:nocsis/core/reload_page.dart';
 import 'package:nocsis/providers/during_class_data.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
@@ -24,6 +27,22 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
   bool _isMouseMoving = false;
   Timer? _mouseTimer;
 
+  final _httpClient = http.Client();
+
+  // サイネージとして置かれ、誰も操作しないので、デプロイされた新しい版に自分で
+  // 切り替える。人が操作する画面では、入力中の state が消えるので入れない
+  late final _newVersionWatcher = NewVersionWatcher(
+    current: builtVersion,
+    fetchDeployed: () => fetchDeployedVersion(_httpClient, Uri.base),
+    reload: reloadPage,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _newVersionWatcher.start();
+  }
+
   void _onMouseMove(PointerEvent details) {
     setState(() {
       _isMouseMoving = true;
@@ -40,6 +59,8 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
   @override
   void dispose() {
     _mouseTimer?.cancel();
+    _newVersionWatcher.stop();
+    _httpClient.close();
     super.dispose();
   }
 
