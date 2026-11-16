@@ -22,4 +22,13 @@ module "nocsis" {
   auth_authorized_domains      = ["nocsis-development.firebaseapp.com", "nocsis-development.web.app"]
   auth_email_password_required = true
   auth_google_client_id        = "862064818225-50oucenghkua7qb7hqlpm6vfqp20b6h7.apps.googleusercontent.com"
+
+  # #1408 で自分の environment だけに絞る。
+  wlif_deploy_environments = ["Production", "Staging"]
+
+  extra_service_accounts = {
+    "claude-readonly" = {
+      display_name = "Claude (read-only)"
+    }
+  }
 }

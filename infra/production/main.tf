@@ -25,4 +25,14 @@ module "nocsis" {
 
   hosting_app_id         = "1:219141289630:web:6988629faf082890b1ad8f"
   hosting_custom_domains = ["nocsis.app"]
+
+  # #1408 で自分の environment だけに絞る。
+  wlif_deploy_environments = ["Production", "Staging"]
+
+  extra_service_accounts = {
+    "events-reader" = {
+      display_name = "Events Reader"
+      description  = "Google カレンダーから Class Clock のイベントを取得する"
+    }
+  }
 }
