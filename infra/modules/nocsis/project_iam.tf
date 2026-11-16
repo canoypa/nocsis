@@ -30,7 +30,7 @@ locals {
       "roles/logging.logWriter",
       "roles/storage.objectViewer",
     ]
-    # このクラウド環境の閲覧用。Firestore のドキュメントと Secret の値は読めない (#1409)。
+    # このクラウド環境の閲覧用。Firestore のドキュメントと Secret の値は読めない。
     "serviceAccount:${var.claude_readonly_email}" = [
       "projects/${var.project_id}/roles/claudeConfigReader",
       "roles/firebasehosting.viewer",

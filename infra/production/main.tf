@@ -26,7 +26,7 @@ module "nocsis" {
   hosting_app_id         = "1:219141289630:web:6988629faf082890b1ad8f"
   hosting_custom_domains = ["nocsis.app"]
 
-  # 承認や制限は environment ごとに違う。別の environment のジョブにこの環境へデプロイさせない (#1408)。
+  # 承認や制限は environment ごとに違う。別の environment のジョブにこの環境へデプロイさせない。
   wlif_deploy_environments = ["Production"]
 
   extra_service_accounts = {

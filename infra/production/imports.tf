@@ -1,4 +1,4 @@
-# 手で設定していたものを取り込む (#1406)。apply で取り込まれた後は消してよい。
+# 手で設定していたものを取り込む。apply で取り込まれた後は消してよい。
 
 import {
   to = module.nocsis.google_identity_platform_config.this
