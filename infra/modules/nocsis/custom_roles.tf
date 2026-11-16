@@ -3,13 +3,13 @@ locals {
   custom_roles = {
     authConfigDeployer = {
       title       = "Auth config deployer"
-      description = "blocking functions の登録に必要な Auth 設定の読み書きのみ。ユーザー情報には触れない。追跡: github.com/canoypa/nocsis/issues/1221"
+      description = "blocking functions の登録に必要な Auth 設定の読み書きのみ。ユーザー情報には触れない。"
       stage       = "GA"
       permissions = ["firebaseauth.configs.get", "firebaseauth.configs.update"]
     }
     runIamSetter = {
       title       = "Run IAM setter"
-      description = "Cloud Run サービスの invoker 設定に必要。firebase deploy が関数の呼び出し許可を設定する。追跡: github.com/canoypa/nocsis/issues/1221"
+      description = "Cloud Run サービスの invoker 設定に必要。firebase deploy が関数の呼び出し許可を設定する。"
       stage       = "GA"
       permissions = ["run.services.setIamPolicy"]
     }

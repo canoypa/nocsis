@@ -2,19 +2,19 @@ locals {
   service_accounts = merge({
     "wlif-build" = {
       display_name = "WLIF: GitHub Actions build"
-      description  = "GitHub Actions の build ジョブが Workload Identity Federation で借りる。Artifact Registry への push のみ。追跡: github.com/canoypa/nocsis/issues/1221"
+      description  = "GitHub Actions の build ジョブが Workload Identity Federation で借りる。Artifact Registry への push のみ。"
     }
     "wlif-deploy" = {
       display_name = "WLIF: GitHub Actions deploy"
-      description  = "GitHub Actions の deploy ジョブが Workload Identity Federation で借りる。Cloud Run / Functions / Hosting / Firestore ルール。追跡: github.com/canoypa/nocsis/issues/1221"
+      description  = "GitHub Actions の deploy ジョブが Workload Identity Federation で借りる。Cloud Run / Functions / Hosting / Firestore ルール。"
     }
     "backend-runtime" = {
       display_name = "backend runtime"
-      description  = "Cloud Run の backend が実行時に使う。Firestore とログ、OPENWEATHERMAP_TOKEN / CALENDAR_ACCOUNT_KEY のみ。追跡: github.com/canoypa/nocsis/issues/1221"
+      description  = "Cloud Run の backend が実行時に使う。Firestore とログ、OPENWEATHERMAP_TOKEN / CALENDAR_ACCOUNT_KEY のみ。"
     }
     "functions-runtime" = {
       display_name = "functions runtime"
-      description  = "Cloud Functions が実行時に使う。Firestore とログ、CALENDAR_ACCOUNT_KEY とグループごとの Slack トークンのみ。追跡: github.com/canoypa/nocsis/issues/1221"
+      description  = "Cloud Functions が実行時に使う。Firestore とログ、CALENDAR_ACCOUNT_KEY とグループごとの Slack トークンのみ。"
     }
   }, var.extra_service_accounts)
 
