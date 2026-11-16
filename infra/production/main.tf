@@ -34,6 +34,14 @@ module "nocsis" {
     "OPENWEATHERMAP_TOKEN" = ["backend-runtime"]
   }
 
+  # events-reader が Google カレンダーを読む。
+  extra_services = ["calendar-json.googleapis.com"]
+
+  # 手で設定していたもの。要るかは別に決める。
+  audit_log_configs = {
+    "storage.googleapis.com" = ["ADMIN_READ", "DATA_READ", "DATA_WRITE"]
+  }
+
   extra_service_accounts = {
     "events-reader" = {
       display_name = "Events Reader"
