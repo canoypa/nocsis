@@ -9,8 +9,11 @@ TITLE=${2:-plan}
 echo "### $TITLE"
 echo
 terraform show -json "$PLAN" | jq -r '
-  [.resource_changes[]? | select(.change.actions != ["no-op"])] as $changes
+  [.resource_changes[]?
+    | select(.change.actions != ["no-op"] or .change.importing != null)
+    | {address, actions: ((if .change.importing != null then ["import"] else [] end)
+        + (.change.actions | map(select(. != "no-op"))))}] as $changes
   | if ($changes | length) == 0 then "変更なし"
-    else ($changes[] | "- `\(.change.actions | join("/"))` \(.address)")
+    else ($changes[] | "- `\(.actions | join("/"))` \(.address)")
     end'
 echo
