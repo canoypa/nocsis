@@ -1,5 +1,5 @@
 import { HttpResponse, http } from "msw";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ZodError } from "zod";
 import {
   externalApiServer,
@@ -101,7 +101,7 @@ describe("fetchWeather", () => {
         ),
       );
 
-      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
+      await expect(fetchWeather({ lat: 2, lon: 2 })).rejects.toThrow(
         "天気データの取得に失敗しました",
       );
     });
@@ -115,7 +115,85 @@ describe("fetchWeather", () => {
         ),
       );
 
-      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(ZodError);
+      await expect(fetchWeather({ lat: 3, lon: 3 })).rejects.toThrow(ZodError);
+    });
+  });
+});
+
+describe("fetchWeather のキャッシュ", () => {
+  const countRequests = () => {
+    const count = { current: 0, forecast: 0 };
+    externalApiServer.events.on("request:start", ({ request }) => {
+      const { pathname } = new URL(request.url);
+      if (pathname.endsWith("/weather")) count.current++;
+      if (pathname.endsWith("/forecast")) count.forecast++;
+    });
+    return count;
+  };
+
+  afterEach(() => {
+    externalApiServer.events.removeAllListeners();
+    vi.useRealTimers();
+  });
+
+  it("同じ地点を10分以内にもう一度取得しても API を呼ばないこと", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const count = countRequests();
+
+    const first = await fetchWeather({ lat: 100, lon: 100 });
+    vi.advanceTimersByTime(10 * 60 * 1000 - 1);
+    const second = await fetchWeather({ lat: 100, lon: 100 });
+
+    expect(second).toEqual(first);
+    expect(count).toEqual({ current: 1, forecast: 1 });
+  });
+
+  it("10分経つと API から取り直すこと", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const count = countRequests();
+
+    await fetchWeather({ lat: 101, lon: 101 });
+    vi.advanceTimersByTime(10 * 60 * 1000);
+    await fetchWeather({ lat: 101, lon: 101 });
+
+    expect(count).toEqual({ current: 2, forecast: 2 });
+  });
+
+  it("同時に来た取得は API を1回だけ呼ぶこと", async () => {
+    const count = countRequests();
+
+    await Promise.all([
+      fetchWeather({ lat: 102, lon: 102 }),
+      fetchWeather({ lat: 102, lon: 102 }),
+    ]);
+
+    expect(count).toEqual({ current: 1, forecast: 1 });
+  });
+
+  it("地点が違えば別々に取得すること", async () => {
+    const count = countRequests();
+
+    await fetchWeather({ lat: 103, lon: 103 });
+    await fetchWeather({ lat: 103, lon: 104 });
+
+    expect(count).toEqual({ current: 2, forecast: 2 });
+  });
+
+  it("取得に失敗した結果は残さず、次の取得で API を呼び直すこと", async () => {
+    externalApiServer.use(
+      http.get(
+        OPEN_WEATHER_MAP_CURRENT_URL,
+        () => HttpResponse.json({}, { status: 500 }),
+        { once: true },
+      ),
+    );
+
+    await expect(fetchWeather({ lat: 105, lon: 105 })).rejects.toThrow(
+      "天気データの取得に失敗しました",
+    );
+    await expect(fetchWeather({ lat: 105, lon: 105 })).resolves.toEqual({
+      current: { temp: 20, weather: [{ id: 800, main: "Clear" }] },
+      hourly: [{ temp: 21, pop: 0, weather: [{ id: 800, main: "Clear" }] }],
     });
   });
 });

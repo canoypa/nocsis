@@ -34,10 +34,43 @@ const CURRENT_WEATHER_ENDPOINT =
 const FIVE_DAY_WEATHER_FORECAST_ENDPOINT =
   "https://api.openweathermap.org/data/2.5/forecast";
 
+const CACHE_TTL_MS = 10 * 60 * 1000;
+
+const cache = new Map<
+  string,
+  { expiresAt: number; data: Promise<WeatherData> }
+>();
+
+/**
+ * 天気情報を地点ごとにキャッシュして返す
+ */
+export const fetchWeather = (
+  params: FetchWeatherParams,
+): Promise<WeatherData> => {
+  const key = `${params.lat},${params.lon}`;
+  const now = Date.now();
+
+  const hit = cache.get(key);
+  if (hit && hit.expiresAt > now) return hit.data;
+
+  for (const [k, entry] of cache) {
+    if (entry.expiresAt <= now) cache.delete(k);
+  }
+
+  const data = fetchWeatherFromApi(params);
+  cache.set(key, { expiresAt: now + CACHE_TTL_MS, data });
+  // 失敗を残すと TTL の間ずっとエラーを返し続ける
+  data.catch(() => {
+    if (cache.get(key)?.data === data) cache.delete(key);
+  });
+
+  return data;
+};
+
 /**
  * OpenWeatherMap API から天気情報を取得する
  */
-export const fetchWeather = async ({
+const fetchWeatherFromApi = async ({
   lat,
   lon,
 }: FetchWeatherParams): Promise<WeatherData> => {
