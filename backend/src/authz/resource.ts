@@ -13,7 +13,7 @@ export const serialize = (ref: ResourceRef): string => `${ref.type}:${ref.id}`;
  * 祖先チェーン。自分自身を含み、祖先に対する binding も判定に効く。
  *
  * 親子はドメインのデータから引く。認可専用の親フィールドを Firestore に作らない。
- * 管理画面（#90）を作るときに ROOT が末尾に足される。
+ * 管理画面を作るときに ROOT が末尾に足される。
  *
  * 網羅していない型が増えると「返り値が undefined になり得る」でコンパイルエラーになる。
  */
