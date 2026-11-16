@@ -105,6 +105,7 @@ daydutRoutes.get(
         .collection("classmates")
         .where("group_id", "==", groupId)
         .where("stuNo", "==", stuNo)
+        .select("name")
         .get();
 
       if (classmateSnapshot.empty) {
@@ -113,13 +114,9 @@ daydutRoutes.get(
         });
       }
 
-      const classmateDoc = classmateSnapshot.docs[0];
-      const classmate = {
-        id: classmateDoc.id,
-        ...classmateDoc.data(),
-      };
-
-      const validatedResponse = daydutyResponseSchema.parse(classmate);
+      const validatedResponse = daydutyResponseSchema.parse(
+        classmateSnapshot.docs[0].data(),
+      );
 
       return c.json<DaydutyResponse>(validatedResponse, 200);
     } catch (error) {
