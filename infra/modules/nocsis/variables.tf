@@ -75,3 +75,15 @@ variable "secrets" {
     error_message = "読める SA は backend-runtime か functions-runtime。既定の SA (compute / appspot) には読ませない。"
   }
 }
+
+variable "extra_services" {
+  description = "その環境にだけ要る API"
+  type        = list(string)
+  default     = []
+}
+
+variable "audit_log_configs" {
+  description = "Data Access の監査ログ (サービス => ADMIN_READ / DATA_READ / DATA_WRITE)"
+  type        = map(list(string))
+  default     = {}
+}

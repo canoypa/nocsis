@@ -13,6 +13,8 @@ output "import_ids" {
       for k, v in local.project_iam_members : k => "${var.project_id} ${v.role} ${v.member}"
       if k != "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}"
     }
+    services            = { for s in local.services : s => "${var.project_id}/${s}" }
+    audit_log_configs   = { for s, _ in var.audit_log_configs : s => "${var.project_id} ${s}" }
     wlif_deploy_acts_as = { for k, v in local.wlif_deploy_acts_as : k => "${v} roles/iam.serviceAccountUser serviceAccount:wlif-deploy@${var.project_id}.iam.gserviceaccount.com" }
   }
 }
