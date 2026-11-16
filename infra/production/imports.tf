@@ -63,3 +63,15 @@ import {
   to       = module.nocsis.google_project_iam_member.this[each.key]
   id       = each.value
 }
+
+import {
+  for_each = module.nocsis.import_ids.secrets
+  to       = module.nocsis.google_secret_manager_secret.this[each.key]
+  id       = each.value
+}
+
+import {
+  for_each = module.nocsis.import_ids.secret_accessors
+  to       = module.nocsis.google_secret_manager_secret_iam_binding.accessor[each.key]
+  id       = each.value
+}

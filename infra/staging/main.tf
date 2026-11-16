@@ -26,6 +26,10 @@ module "nocsis" {
   # 承認や制限は environment ごとに違う。別の environment のジョブにこの環境へデプロイさせない。
   wlif_deploy_environments = ["Staging"]
 
+  secrets = {
+    "CALENDAR_ACCOUNT_KEY" = ["backend-runtime", "functions-runtime"]
+  }
+
   extra_service_accounts = {
     "claude-readonly" = {
       display_name = "Claude (read-only)"
