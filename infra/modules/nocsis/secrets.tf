@@ -4,8 +4,6 @@ locals {
   secret_accessor_members = {
     "backend-runtime"   = google_service_account.this["backend-runtime"].member
     "functions-runtime" = google_service_account.this["functions-runtime"].member
-    "compute-default"   = "serviceAccount:${local.compute_default_sa}"
-    "appengine-default" = "serviceAccount:${local.appengine_default_sa}"
   }
 }
 
