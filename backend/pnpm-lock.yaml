@@ -179,16 +179,16 @@ importers:
         specifier: ^8.0.0
         version: 8.0.0(supports-color@7.2.0)
       '@googleapis/calendar':
-        specifier: ^20.1.0
+        specifier: ^20.2.0
         version: 20.2.0(supports-color@7.2.0)
       '@hono/node-server':
-        specifier: ^2.1.7
+        specifier: ^2.1.8
         version: 2.1.8(hono@4.13.18)
       '@hono/standard-validator':
         specifier: ^0.4.1
         version: 0.4.1(@standard-schema/spec@1.1.0)(hono@4.13.18)
       '@scalar/hono-api-reference':
-        specifier: ^0.12.19
+        specifier: ^0.12.20
         version: 0.12.20(hono@4.13.18)
       firebase-admin:
         specifier: ^14.5.1

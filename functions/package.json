@@ -22,9 +22,9 @@
   "dependencies": {
     "@google-cloud/functions-framework": "^5.0.5",
     "@google-cloud/secret-manager": "^8.0.0",
-    "@googleapis/calendar": "^20.1.0",
-    "@slack/web-api": "^8.3.0",
-    "cron-parser": "^5.10.4",
+    "@googleapis/calendar": "^20.2.0",
+    "@slack/web-api": "^8.4.0",
+    "cron-parser": "^5.10.5",
     "firebase-admin": "^14.5.1",
     "firebase-functions": "^7.4.0",
     "luxon": "^3.7.2",

@@ -19,6 +19,7 @@ import 'package:nocsis/pages/login.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
+import 'package:nocsis/pages/no_group.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/providers/auth.dart';
@@ -46,9 +47,10 @@ part 'personal/personal_shell_route.dart';
 part 'router.g.dart';
 part 'settings/settings_shell_route.dart';
 part 'settings/settings_top_page_route.dart';
+part 'top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
-  routes: [groupShellRoute, licensesPageRoute, loginPageRoute],
+  routes: [groupShellRoute, licensesPageRoute, loginPageRoute, topPageRoute],
 )
 class AppShell extends ShellRouteData {
   @override
@@ -92,6 +94,10 @@ GoRouter router(Ref ref) {
     }
 
     final data = response.body!;
+    if (data.items.isEmpty) {
+      return null;
+    }
+
     final firstUserJoinedGroup = data.items.first;
 
     sharedPreferences.setString('latest_group_id', firstUserJoinedGroup.id);
