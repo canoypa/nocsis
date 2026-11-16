@@ -6,8 +6,6 @@ name: Infra
 # 公開リポジトリの Actions のログと artifact は誰でも読めるため、plan / apply の
 # 本文は出さない。出すのは「どのリソースをどう変えるか」の一覧だけ。
 on:
-  # pull_request_target / workflow_run / issue_comment に変えない。fork の PR が
-  # tf-plan の権限で plan を動かせるようになる。
   pull_request:
     paths:
       - "infra/**"
