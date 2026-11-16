@@ -15,11 +15,10 @@ locals {
     }
     secretConfigManager = {
       title       = "Secret config manager"
-      description = "Secret の入れ物と、誰が読めるかだけを管理する。値は読めない。"
+      description = "Secret の入れ物と、誰が読めるかを管理する。値を読む権限と、消す権限は含めない。"
       stage       = "GA"
       permissions = [
         "secretmanager.secrets.create",
-        "secretmanager.secrets.delete",
         "secretmanager.secrets.get",
         "secretmanager.secrets.getIamPolicy",
         "secretmanager.secrets.list",
