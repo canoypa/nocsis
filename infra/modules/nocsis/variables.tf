@@ -35,3 +35,23 @@ variable "hosting_app_id" {
   type        = string
   default     = null
 }
+
+variable "extra_service_accounts" {
+  description = "その環境にだけある SA (account_id => 表示名と説明)"
+  type = map(object({
+    display_name = string
+    description  = optional(string)
+  }))
+  default = {}
+}
+
+variable "wlif_deploy_environments" {
+  description = "wlif-deploy を引ける GitHub の environment"
+  type        = list(string)
+}
+
+variable "claude_readonly_email" {
+  description = "このクラウド環境の閲覧用 SA。Staging のプロジェクトにある"
+  type        = string
+  default     = "claude-readonly@nocsis-development.iam.gserviceaccount.com"
+}
