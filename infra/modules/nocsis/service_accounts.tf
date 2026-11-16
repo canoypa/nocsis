@@ -18,8 +18,7 @@ locals {
     }
   }, var.extra_service_accounts)
 
-  compute_default_sa   = "${data.google_project.this.number}-compute@developer.gserviceaccount.com"
-  appengine_default_sa = "${var.project_id}@appspot.gserviceaccount.com"
+  compute_default_sa = "${data.google_project.this.number}-compute@developer.gserviceaccount.com"
 }
 
 resource "google_service_account" "this" {
@@ -30,13 +29,13 @@ resource "google_service_account" "this" {
   description  = each.value.description
 }
 
-# deploy がサービスや関数をこれらの SA で動かすために要る。
+# deploy がサービスや関数をこれらの SA で動かすために要る。compute の既定 SA は関数のビルドに使われる。
+# App Engine の既定 SA で動くものは無いので、deploy に使わせない。
 locals {
   wlif_deploy_acts_as = {
     "backend-runtime"   = "projects/${var.project_id}/serviceAccounts/backend-runtime@${var.project_id}.iam.gserviceaccount.com"
     "functions-runtime" = "projects/${var.project_id}/serviceAccounts/functions-runtime@${var.project_id}.iam.gserviceaccount.com"
     "compute-default"   = "projects/${var.project_id}/serviceAccounts/${local.compute_default_sa}"
-    "appengine-default" = "projects/${var.project_id}/serviceAccounts/${local.appengine_default_sa}"
   }
 }
 
