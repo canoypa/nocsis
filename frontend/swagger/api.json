@@ -146,47 +146,19 @@
         "additionalProperties": false,
         "description": "授業"
       },
-      "Classmate": {
+      "Dayduty": {
         "type": "object",
         "properties": {
-          "role": {
-            "type": "string",
-            "enum": [
-              "student",
-              "teacher"
-            ],
-            "description": "役割"
-          },
-          "stuNo": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991,
-            "description": "出席番号"
-          },
           "name": {
             "type": "string",
             "description": "名前"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
-            "description": "メールアドレス"
-          },
-          "slackUserId": {
-            "type": "string",
-            "description": "SlackユーザーID"
           }
         },
         "required": [
-          "role",
-          "stuNo",
-          "name",
-          "email",
-          "slackUserId"
+          "name"
         ],
         "additionalProperties": false,
-        "description": "クラスメイト"
+        "description": "日直"
       },
       "Event": {
         "type": "object",
@@ -334,13 +306,32 @@
         "additionalProperties": false,
         "description": "天気データ"
       },
+      "UserJoinedGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "名前"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "description": "参加しているグループ"
+      },
       "UserJoinedGroups": {
         "type": "object",
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Group"
+              "$ref": "#/components/schemas/UserJoinedGroup"
             },
             "description": "参加しているグループのリスト"
           }
@@ -584,7 +575,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classmate"
+                  "$ref": "#/components/schemas/Dayduty"
                 }
               }
             }

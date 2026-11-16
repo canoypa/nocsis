@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
-import 'package:nocsis/generated/api_client/api.enums.swagger.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/daydudy.dart';
@@ -20,20 +19,14 @@ void main() {
 
     test('日直情報を取得できる', () async {
       // Arrange
-      final classmate = Classmate(
-        role: ClassmateRole.student,
-        stuNo: 1,
-        name: 'テスト太郎',
-        email: 'test@example.com',
-        slackUserId: 'U123',
-      );
+      const dayduty = Dayduty(name: 'テスト太郎');
       when(
         () => mockApi.apiV1GroupsGroupIdDaydutyGet(
           groupId: 'group-1',
           date: any(named: 'date'),
         ),
       ).thenAnswer(
-        (_) async => chopper.Response(http.Response('', 200), classmate),
+        (_) async => chopper.Response(http.Response('', 200), dayduty),
       );
 
       final container = ProviderContainer(
@@ -45,7 +38,7 @@ void main() {
       final result = await container.read(daydudyProvider('group-1').future);
 
       // Assert
-      expect(result, classmate);
+      expect(result, dayduty);
     });
 
     test('APIが失敗を返した場合は例外を投げる', () async {
@@ -56,7 +49,7 @@ void main() {
           date: any(named: 'date'),
         ),
       ).thenAnswer(
-        (_) async => chopper.Response<Classmate>(http.Response('', 500), null),
+        (_) async => chopper.Response<Dayduty>(http.Response('', 500), null),
       );
 
       // Riverpod 3.x はデフォルトで失敗時にリトライするため、

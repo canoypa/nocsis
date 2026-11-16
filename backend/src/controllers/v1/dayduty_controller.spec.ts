@@ -240,9 +240,7 @@ describe("Dayduty Controller", () => {
 
         expect(response.status).toBe(200);
         const json = await response.json();
-        expect(json).toHaveProperty("stuNo", 1);
-        expect(json).toHaveProperty("name", "Test Student");
-        expect(json).toHaveProperty("role", "student");
+        expect(json).toEqual({ name: "Test Student" });
       });
     });
 
@@ -260,9 +258,7 @@ describe("Dayduty Controller", () => {
 
         expect(response.status).toBe(200);
         const json = await response.json();
-        expect(json).toHaveProperty("stuNo");
-        expect(json).toHaveProperty("name");
-        expect(json).toHaveProperty("role", "student");
+        expect(json).toEqual({ name: expect.any(String) });
       });
     });
   });
