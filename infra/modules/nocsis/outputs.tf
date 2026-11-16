@@ -13,6 +13,22 @@ output "import_ids" {
       for k, v in local.project_iam_members : k => "${var.project_id} ${v.role} ${v.member}"
       if k != "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}"
     }
+    # 取り込みの時点で有効だったものだけ。後から足したものを取り込もうとすると plan が落ちる。
+    services = {
+      for s in setintersection(local.services, [
+        "artifactregistry.googleapis.com", "calendar-json.googleapis.com", "cloudbuild.googleapis.com",
+        "cloudfunctions.googleapis.com", "cloudresourcemanager.googleapis.com", "cloudscheduler.googleapis.com",
+        "eventarc.googleapis.com", "firebase.googleapis.com", "firebasehosting.googleapis.com",
+        "firebaserules.googleapis.com", "firestore.googleapis.com", "iam.googleapis.com",
+        "iamcredentials.googleapis.com", "identitytoolkit.googleapis.com", "logging.googleapis.com",
+        "pubsub.googleapis.com", "run.googleapis.com", "secretmanager.googleapis.com",
+        "securetoken.googleapis.com", "serviceusage.googleapis.com", "storage.googleapis.com",
+        "sts.googleapis.com",
+      ]) : s => "${var.project_id}/${s}"
+    }
+    audit_log_configs = {
+      for s, _ in var.audit_log_configs : s => "${var.project_id} ${s}" if s == "storage.googleapis.com"
+    }
     wlif_deploy_acts_as = { for k, v in local.wlif_deploy_acts_as : k => "${v} roles/iam.serviceAccountUser serviceAccount:wlif-deploy@${var.project_id}.iam.gserviceaccount.com" }
   }
 }

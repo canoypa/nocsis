@@ -63,3 +63,15 @@ import {
   to       = module.nocsis.google_project_iam_member.this[each.key]
   id       = each.value
 }
+
+import {
+  for_each = module.nocsis.import_ids.services
+  to       = module.nocsis.google_project_service.this[each.key]
+  id       = each.value
+}
+
+import {
+  for_each = module.nocsis.import_ids.audit_log_configs
+  to       = module.nocsis.google_project_iam_audit_config.this[each.key]
+  id       = each.value
+}
