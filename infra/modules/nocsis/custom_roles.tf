@@ -26,6 +26,31 @@ locals {
         "secretmanager.secrets.update",
       ]
     }
+    # roles/storage.admin はオブジェクトの読み書きまで含むので、バケットの設定だけを切り出した。
+    # 消す権限は含めない。
+    bucketConfigManager = {
+      title       = "Bucket config manager"
+      description = "バケットの作成と設定、誰が読み書きできるかを管理する。オブジェクトには触れない。"
+      stage       = "GA"
+      permissions = [
+        "storage.buckets.create",
+        "storage.buckets.get",
+        "storage.buckets.getIamPolicy",
+        "storage.buckets.list",
+        "storage.buckets.setIamPolicy",
+        "storage.buckets.update",
+      ]
+    }
+    bucketConfigReader = {
+      title       = "Bucket config reader"
+      description = "バケットの設定と、誰が読み書きできるかを読む。オブジェクトには触れない。"
+      stage       = "GA"
+      permissions = [
+        "storage.buckets.get",
+        "storage.buckets.getIamPolicy",
+        "storage.buckets.list",
+      ]
+    }
     # roles/viewer は Firestore のドキュメントまで読めるので、設定の読み取りだけを切り出した。
     claudeConfigReader = {
       title       = "Claude config reader"
