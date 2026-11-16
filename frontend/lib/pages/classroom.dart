@@ -35,6 +35,7 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
     current: builtVersion,
     fetchDeployed: () => fetchDeployedVersion(_httpClient, Uri.base),
     reload: reloadPage,
+    interval: const Duration(hours: 1),
     // 授業中に画面が一瞬消えないよう、休み時間まで待つ
     canReload: () =>
         ref

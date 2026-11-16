@@ -32,21 +32,22 @@ Future<String?> fetchDeployedVersion(http.Client client, Uri base) async {
   }
 }
 
-/// デプロイされている版を定期的に確かめ、自分と違えば [reload] を呼ぶ。
+/// デプロイされている版を [interval] ごとに確かめ、自分と違えば [reload] を呼ぶ。
+///
+/// いつリロードしてよいかは使う側が [canReload] で決める。だめなら次の確認に回す。
 class NewVersionWatcher {
   NewVersionWatcher({
     required this.current,
     required this.fetchDeployed,
     required this.reload,
     this.canReload = _always,
-    this.interval = const Duration(minutes: 5),
+    this.interval = const Duration(hours: 1),
   });
 
   final String current;
   final Future<String?> Function() fetchDeployed;
   final void Function() reload;
 
-  /// 今リロードしてよいか。だめなら次の確認に回す
   final bool Function() canReload;
   final Duration interval;
 

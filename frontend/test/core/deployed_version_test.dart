@@ -70,17 +70,17 @@ void main() {
           current: '1',
           fetchDeployed: () async => '2',
           reload: () => reloaded++,
-          interval: const Duration(minutes: 5),
+          interval: const Duration(hours: 1),
         )..start();
 
-        async.elapse(const Duration(minutes: 4));
+        async.elapse(const Duration(minutes: 59));
         expect(reloaded, 0);
 
         async.elapse(const Duration(minutes: 1));
         expect(reloaded, 1);
 
         // リロードした後は見張りをやめる
-        async.elapse(const Duration(minutes: 10));
+        async.elapse(const Duration(hours: 2));
         expect(reloaded, 1);
         watcher.stop();
       });
@@ -95,7 +95,7 @@ void main() {
           reload: () => reloaded++,
         )..start();
 
-        async.elapse(const Duration(minutes: 30));
+        async.elapse(const Duration(hours: 6));
         expect(reloaded, 0);
         watcher.stop();
       });
@@ -110,7 +110,7 @@ void main() {
           reload: () => reloaded++,
         )..start();
 
-        async.elapse(const Duration(minutes: 30));
+        async.elapse(const Duration(hours: 6));
         expect(reloaded, 0);
         watcher.stop();
       });
@@ -128,7 +128,7 @@ void main() {
           reload: () {},
         )..start();
 
-        async.elapse(const Duration(minutes: 30));
+        async.elapse(const Duration(hours: 6));
         expect(fetched, 0);
         watcher.stop();
       });
@@ -143,14 +143,14 @@ void main() {
           fetchDeployed: () async => '2',
           reload: () => reloaded++,
           canReload: () => !duringClass,
-          interval: const Duration(minutes: 5),
+          interval: const Duration(hours: 1),
         )..start();
 
-        async.elapse(const Duration(minutes: 10));
+        async.elapse(const Duration(hours: 2));
         expect(reloaded, 0);
 
         duringClass = false;
-        async.elapse(const Duration(minutes: 5));
+        async.elapse(const Duration(hours: 1));
         expect(reloaded, 1);
         watcher.stop();
       });
@@ -166,7 +166,7 @@ void main() {
           reload: () => reloaded++,
         )..start();
 
-        async.elapse(const Duration(minutes: 5));
+        async.elapse(const Duration(hours: 1));
         watcher.stop();
         async.elapse(const Duration(seconds: 10));
 
