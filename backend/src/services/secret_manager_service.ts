@@ -10,15 +10,20 @@ const secretCache = new Map<string, string>();
  * @returns シークレット値
  */
 export const fetchSecret = async (secretName: string): Promise<string> => {
+  // キャッシュ済みならキャッシュから取得する
+  const cachedValue = secretCache.get(secretName);
+  if (cachedValue) return cachedValue;
+
+  // 動いているプロジェクトの Secret を読む。Staging から本番の Secret を読ませない。
+  // 認証ライブラリの推測 (gcloud の設定やメタデータサーバー) には頼らない。別のプロジェクトを読みうる。
+  const projectId =
+    process.env.GOOGLE_CLOUD_PROJECT ?? process.env.GCLOUD_PROJECT;
+  assert(projectId, "GOOGLE_CLOUD_PROJECT が設定されていません");
   const secretPath = secretManagerClient.secretVersionPath(
-    "class-clock-40088",
+    projectId,
     secretName,
     "latest",
   );
-
-  // キャッシュ済みならキャッシュから取得する
-  const cachedValue = secretCache.get(secretPath);
-  if (cachedValue) return cachedValue;
 
   const [version] = await secretManagerClient.accessSecretVersion({
     name: secretPath,
@@ -28,7 +33,7 @@ export const fetchSecret = async (secretName: string): Promise<string> => {
   assert(secret, "シークレット値を取得できませんでした");
 
   // キャッシュする
-  secretCache.set(secretPath, secret);
+  secretCache.set(secretName, secret);
 
   return secret;
 };
