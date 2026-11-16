@@ -1,6 +1,8 @@
 name: Cleanup Preview
 
 on:
+  # pull_request_target / workflow_run / issue_comment に変えない。fork の PR が
+  # environment: Preview の wlif-deploy に届く。
   pull_request:
     types: [closed]
 
