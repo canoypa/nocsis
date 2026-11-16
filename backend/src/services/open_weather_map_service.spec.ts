@@ -1,5 +1,5 @@
 import { HttpResponse, http } from "msw";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ZodError } from "zod";
 import {
   externalApiServer,
@@ -9,11 +9,16 @@ import {
   useExternalApiServer,
 } from "../../tests/helpers/external_apis.js";
 import {
+  clearWeatherCache,
   fetchWeather,
   getWeatherNameById,
 } from "./open_weather_map_service.js";
 
 useExternalApiServer();
+
+beforeEach(() => {
+  clearWeatherCache();
+});
 
 describe("fetchWeather", () => {
   it("Secret Manager のトークンで現在の天気と予報を取得できること", async () => {
@@ -101,7 +106,7 @@ describe("fetchWeather", () => {
         ),
       );
 
-      await expect(fetchWeather({ lat: 2, lon: 2 })).rejects.toThrow(
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
         "天気データの取得に失敗しました",
       );
     });
@@ -115,7 +120,7 @@ describe("fetchWeather", () => {
         ),
       );
 
-      await expect(fetchWeather({ lat: 3, lon: 3 })).rejects.toThrow(ZodError);
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(ZodError);
     });
   });
 });
@@ -140,9 +145,9 @@ describe("fetchWeather のキャッシュ", () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     const count = countRequests();
 
-    const first = await fetchWeather({ lat: 100, lon: 100 });
+    const first = await fetchWeather({ lat: 1, lon: 1 });
     vi.advanceTimersByTime(10 * 60 * 1000 - 1);
-    const second = await fetchWeather({ lat: 100, lon: 100 });
+    const second = await fetchWeather({ lat: 1, lon: 1 });
 
     expect(second).toEqual(first);
     expect(count).toEqual({ current: 1, forecast: 1 });
@@ -152,9 +157,9 @@ describe("fetchWeather のキャッシュ", () => {
     vi.useFakeTimers({ toFake: ["Date"] });
     const count = countRequests();
 
-    await fetchWeather({ lat: 101, lon: 101 });
+    await fetchWeather({ lat: 1, lon: 1 });
     vi.advanceTimersByTime(10 * 60 * 1000);
-    await fetchWeather({ lat: 101, lon: 101 });
+    await fetchWeather({ lat: 1, lon: 1 });
 
     expect(count).toEqual({ current: 2, forecast: 2 });
   });
@@ -163,8 +168,8 @@ describe("fetchWeather のキャッシュ", () => {
     const count = countRequests();
 
     await Promise.all([
-      fetchWeather({ lat: 102, lon: 102 }),
-      fetchWeather({ lat: 102, lon: 102 }),
+      fetchWeather({ lat: 1, lon: 1 }),
+      fetchWeather({ lat: 1, lon: 1 }),
     ]);
 
     expect(count).toEqual({ current: 1, forecast: 1 });
@@ -173,27 +178,50 @@ describe("fetchWeather のキャッシュ", () => {
   it("地点が違えば別々に取得すること", async () => {
     const count = countRequests();
 
-    await fetchWeather({ lat: 103, lon: 103 });
-    await fetchWeather({ lat: 103, lon: 104 });
+    await fetchWeather({ lat: 1, lon: 1 });
+    await fetchWeather({ lat: 1, lon: 2 });
 
     expect(count).toEqual({ current: 2, forecast: 2 });
   });
 
-  it("取得に失敗した結果は残さず、次の取得で API を呼び直すこと", async () => {
-    externalApiServer.use(
-      http.get(
-        OPEN_WEATHER_MAP_CURRENT_URL,
-        () => HttpResponse.json({}, { status: 500 }),
-        { once: true },
-      ),
-    );
+  describe("取得に失敗した場合", () => {
+    beforeEach(() => {
+      externalApiServer.use(
+        http.get(
+          OPEN_WEATHER_MAP_CURRENT_URL,
+          () => HttpResponse.json({}, { status: 500 }),
+          { once: true },
+        ),
+      );
+    });
 
-    await expect(fetchWeather({ lat: 105, lon: 105 })).rejects.toThrow(
-      "天気データの取得に失敗しました",
-    );
-    await expect(fetchWeather({ lat: 105, lon: 105 })).resolves.toEqual({
-      current: { temp: 20, weather: [{ id: 800, main: "Clear" }] },
-      hourly: [{ temp: 21, pop: 0, weather: [{ id: 800, main: "Clear" }] }],
+    it("1分以内は API を呼ばずに同じエラーを返すこと", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+      const count = countRequests();
+
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
+        "天気データの取得に失敗しました",
+      );
+      vi.advanceTimersByTime(60 * 1000 - 1);
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
+        "天気データの取得に失敗しました",
+      );
+
+      expect(count).toEqual({ current: 1, forecast: 1 });
+    });
+
+    it("1分経つと API を呼び直すこと", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] });
+
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
+        "天気データの取得に失敗しました",
+      );
+      vi.advanceTimersByTime(60 * 1000);
+
+      await expect(fetchWeather({ lat: 1, lon: 1 })).resolves.toEqual({
+        current: { temp: 20, weather: [{ id: 800, main: "Clear" }] },
+        hourly: [{ temp: 21, pop: 0, weather: [{ id: 800, main: "Clear" }] }],
+      });
     });
   });
 });

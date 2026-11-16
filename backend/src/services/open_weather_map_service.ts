@@ -35,6 +35,8 @@ const FIVE_DAY_WEATHER_FORECAST_ENDPOINT =
   "https://api.openweathermap.org/data/2.5/forecast";
 
 const CACHE_TTL_MS = 10 * 60 * 1000;
+const FAILURE_CACHE_TTL_MS = 60 * 1000;
+const FETCH_TIMEOUT_MS = 10 * 1000;
 
 const cache = new Map<
   string,
@@ -53,18 +55,25 @@ export const fetchWeather = (
   const hit = cache.get(key);
   if (hit && hit.expiresAt > now) return hit.data;
 
-  for (const [k, entry] of cache) {
-    if (entry.expiresAt <= now) cache.delete(k);
-  }
-
   const data = fetchWeatherFromApi(params);
-  cache.set(key, { expiresAt: now + CACHE_TTL_MS, data });
-  // 失敗を残すと TTL の間ずっとエラーを返し続ける
+  const entry = { expiresAt: now + CACHE_TTL_MS, data };
+  cache.set(key, entry);
+  // 失敗を TTL いっぱい残すと復旧後も長くエラーを返し、すぐ消すと API が制限中でも呼び続ける
   data.catch(() => {
-    if (cache.get(key)?.data === data) cache.delete(key);
+    entry.expiresAt = Math.min(
+      entry.expiresAt,
+      Date.now() + FAILURE_CACHE_TTL_MS,
+    );
   });
 
   return data;
+};
+
+/**
+ * テスト用: 天気のキャッシュを空にする
+ */
+export const clearWeatherCache = (): void => {
+  cache.clear();
 };
 
 /**
@@ -90,8 +99,10 @@ const fetchWeatherFromApi = async ({
   forecastApiUrl.searchParams.set("cnt", "8");
 
   const [currentRes, forecastRes] = await Promise.all([
-    fetch(currentWeatherApiUrl),
-    fetch(forecastApiUrl),
+    fetch(currentWeatherApiUrl, {
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    }),
+    fetch(forecastApiUrl, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }),
   ]);
 
   if (!currentRes.ok || !forecastRes.ok) {
