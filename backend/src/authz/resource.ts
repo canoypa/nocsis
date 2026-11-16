@@ -1,8 +1,8 @@
-/** ロールを付与できるリソースの型 */
-export type ResourceType = "group";
-
 /** binding の付け先 */
 export type ResourceRef = { type: "group"; id: string };
+
+/** ロールを付与できるリソースの型 */
+export type ResourceType = ResourceRef["type"];
 
 export const group = (id: string): ResourceRef => ({ type: "group", id });
 

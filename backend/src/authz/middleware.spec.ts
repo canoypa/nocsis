@@ -1,6 +1,6 @@
 import type { DocumentReference } from "firebase-admin/firestore";
 import { Hono } from "hono";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { firestore } from "../clients/firebase.js";
 import {
   type AuthorizedEnv,
@@ -23,8 +23,12 @@ const addBinding = async (role: string) => {
 };
 
 afterEach(async () => {
+  vi.restoreAllMocks();
   await Promise.all(created.splice(0).map((ref) => ref.delete()));
 });
+
+const loggedEntries = (spy: { mock: { calls: unknown[][] } }) =>
+  spy.mock.calls.map(([line]) => JSON.parse(String(line)));
 
 // authentication は済んでいる前提なので、currentUserId を直接置く
 const app = new Hono<AuthorizedEnv>()
@@ -73,6 +77,44 @@ describe("authorize", () => {
       const response = await app.request("/groups/test_group_2");
 
       expect(response.status).toBe(404);
+    });
+  });
+
+  describe("ログ", () => {
+    it("拒否したときも誰が何をなぜ拒否されたかを残すこと", async () => {
+      const log = vi.spyOn(console, "log").mockImplementation(() => {});
+      await addBinding("group_student");
+
+      await app.request("/groups/test_group_1");
+
+      expect(loggedEntries(log)).toEqual([
+        {
+          severity: "NOTICE",
+          message: "認可しなかった",
+          permission: "group.update",
+          subject: "user:test_user_1",
+          resource: "group:test_group_1",
+          reason: "insufficient_permission",
+        },
+      ]);
+    });
+
+    it("許可したときはどの binding で通ったかを残すこと", async () => {
+      const log = vi.spyOn(console, "log").mockImplementation(() => {});
+      const ref = await addBinding("group_admin");
+
+      await app.request("/groups/test_group_1");
+
+      expect(loggedEntries(log)).toEqual([
+        {
+          severity: "INFO",
+          message: "認可した",
+          permission: "group.update",
+          subject: "user:test_user_1",
+          resource: "group:test_group_1",
+          via: `role_bindings/${ref.id}`,
+        },
+      ]);
     });
   });
 });

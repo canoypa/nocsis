@@ -48,11 +48,11 @@ export const can = async (
     return { allowed: false, reason: "no_binding" };
   }
 
-  for (const { id, role } of bindings) {
-    if (permissionsOf(role).includes(permission)) {
-      return { allowed: true, via: `${COLLECTION}/${id}` };
-    }
-  }
+  const granting = bindings.find(({ role }) =>
+    permissionsOf(role).includes(permission),
+  );
 
-  return { allowed: false, reason: "insufficient_permission" };
+  return granting
+    ? { allowed: true, via: `${COLLECTION}/${granting.id}` }
+    : { allowed: false, reason: "insufficient_permission" };
 };

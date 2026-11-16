@@ -48,24 +48,26 @@ export const authorize = (
 
     const decision = await can(principal, permission, resource);
 
-    if (!decision.allowed) {
-      // binding が1つも無い = そのリソースの存在を知る権利が無い → 404
-      throw new HTTPException(decision.reason === "no_binding" ? 404 : 403);
-    }
-
     // via はログにだけ。レスポンスには含めない。
     // Cloud Logging に jsonPayload として渡すため、行全体を JSON にする
     // （severity は console のメソッドではなくこのフィールドで決まる）
     console.log(
       JSON.stringify({
-        severity: "INFO",
-        message: "認可した",
+        severity: decision.allowed ? "INFO" : "NOTICE",
+        message: decision.allowed ? "認可した" : "認可しなかった",
         permission,
         subject: subject(principal),
         resource: serialize(resource),
-        via: decision.via,
+        ...(decision.allowed
+          ? { via: decision.via }
+          : { reason: decision.reason }),
       }),
     );
+
+    if (!decision.allowed) {
+      // binding が1つも無い = そのリソースの存在を知る権利が無い → 404
+      throw new HTTPException(decision.reason === "no_binding" ? 404 : 403);
+    }
 
     c.set("principal", principal);
 
