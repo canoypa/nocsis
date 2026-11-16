@@ -8,6 +8,8 @@ locals {
     # Auth の設定だけを読み書きする。roles/firebaseauth.admin はユーザーまで触れるので使わない。
     "projects/${var.project_id}/roles/authConfigDeployer",
     "roles/firebasehosting.admin",
+    # Secret の値は Terraform に置かない。roles/secretmanager.admin は値を読む権限まで含むので使わない。
+    "projects/${var.project_id}/roles/secretConfigManager",
   ]
 }
 
@@ -17,4 +19,8 @@ resource "google_project_iam_member" "tf_apply" {
   project = var.project_id
   role    = each.key
   member  = local.tf_apply_member
+
+  # ロールの名前を文字列で書いているので、作る順番だけを指定する。
+  # 参照にすると、作る前は名前が決まらず for_each に使えない。
+  depends_on = [google_project_iam_custom_role.this]
 }
