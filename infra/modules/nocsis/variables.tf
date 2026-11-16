@@ -57,15 +57,21 @@ variable "claude_readonly_email" {
 }
 
 variable "secrets" {
-  description = "Secret の名前 => 読める SA (secrets.tf の secret_accessor_members のキー)"
+  description = "Secret の名前 => 読める SA (backend-runtime / functions-runtime)"
   type        = map(list(string))
   default     = {}
 
+  # 空にすると binding が全員を外す。
   validation {
-    condition = alltrue([
-      for accessors in values(var.secrets) : length(accessors) > 0
-    ])
-    # 空にすると binding が全員を外す。
+    condition     = alltrue([for accessors in values(var.secrets) : length(accessors) > 0])
     error_message = "読める SA を 1 つ以上書く。"
+  }
+
+  # 既定の SA (compute / appspot) で動くものは無いので、読ませない。
+  validation {
+    condition = alltrue(flatten([
+      for accessors in values(var.secrets) : [for a in accessors : contains(["backend-runtime", "functions-runtime"], a)]
+    ]))
+    error_message = "読める SA は backend-runtime か functions-runtime。既定の SA (compute / appspot) には読ませない。"
   }
 }
