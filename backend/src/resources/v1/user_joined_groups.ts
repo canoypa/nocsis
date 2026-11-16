@@ -1,8 +1,6 @@
 import { z } from "zod";
+import { deprecated } from "./deprecated.js";
 import { groupSchema } from "./groups.js";
-
-const deprecated = <T extends z.ZodType>(schema: T) =>
-  schema.optional().meta({ deprecated: true });
 
 // 古い frontend が読み続けているので、外す前に一度任意にして出す
 export const userJoinedGroupSchema = groupSchema
@@ -14,8 +12,8 @@ export const userJoinedGroupSchema = groupSchema
     slack_event_channel_id: deprecated(
       groupSchema.shape.slack_event_channel_id,
     ),
-    // WeatherPoint は Group と共有の部品なので、deprecated を付けると Group 側にも付く
-    weather_point: groupSchema.shape.weather_point.optional(),
+    // 共有の WeatherPoint に deprecated を付けると Group 側にも付くので、形だけ写す
+    weather_point: deprecated(z.object(groupSchema.shape.weather_point.shape)),
   })
   .meta({
     $id: "UserJoinedGroup",

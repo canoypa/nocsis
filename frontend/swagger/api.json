@@ -154,32 +154,32 @@
             "description": "名前"
           },
           "role": {
-            "description": "役割",
             "deprecated": true,
             "type": "string",
             "enum": [
               "student",
               "teacher"
-            ]
+            ],
+            "description": "役割"
           },
           "stuNo": {
-            "description": "出席番号",
             "deprecated": true,
             "type": "integer",
             "minimum": -9007199254740991,
-            "maximum": 9007199254740991
+            "maximum": 9007199254740991,
+            "description": "出席番号"
           },
           "email": {
-            "description": "メールアドレス",
             "deprecated": true,
             "type": "string",
             "format": "email",
-            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "description": "メールアドレス"
           },
           "slackUserId": {
-            "description": "SlackユーザーID",
             "deprecated": true,
-            "type": "string"
+            "type": "string",
+            "description": "SlackユーザーID"
           }
         },
         "required": [
@@ -366,7 +366,23 @@
             "description": "Slackイベント通知チャンネルID"
           },
           "weather_point": {
-            "$ref": "#/components/schemas/WeatherPointOutput"
+            "deprecated": true,
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "description": "緯度"
+              },
+              "lon": {
+                "type": "number",
+                "description": "経度"
+              }
+            },
+            "required": [
+              "lat",
+              "lon"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [

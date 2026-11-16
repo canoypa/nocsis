@@ -65,7 +65,7 @@ body=$(curl -s -w '\n%{http_code}' -H "Authorization: Bearer ${id_token}" "$ENDP
 code=$(tail -n1 <<<"$body")
 body=$(sed '$d' <<<"$body")
 [ "$code" = "200" ] || fail "認証付きで ${code} が返りました: ${body}"
-jq -e '.items | length == 1 and .[0].id == "smoke_group" and .[0].name == "Smoke Group"' \
+jq -e '.items | length == 1 and .[0].id == "smoke_group" and .[0].weather_point.lat == 35' \
   <<<"$body" >/dev/null || fail "レスポンスが想定と違います: ${body}"
 
 echo "backend のスモークテストに成功しました"
