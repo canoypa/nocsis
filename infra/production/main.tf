@@ -37,9 +37,10 @@ module "nocsis" {
   # events-reader が Google カレンダーを読む。
   extra_services = ["calendar-json.googleapis.com"]
 
-  # 手で設定していたもの。要るかは別に決める。
+  # DATA_READ / DATA_WRITE はデプロイのたびのソースやイメージの読み書きで量が多く、
+  # 見ることがないので記録しない。
   audit_log_configs = {
-    "storage.googleapis.com" = ["ADMIN_READ", "DATA_READ", "DATA_WRITE"]
+    "storage.googleapis.com" = ["ADMIN_READ"]
   }
 
   extra_service_accounts = {
