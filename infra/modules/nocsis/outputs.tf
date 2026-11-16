@@ -16,7 +16,10 @@ output "import_ids" {
     # 取り込みの時点で有効だったものだけ。後から足したものを取り込もうとすると plan が落ちる。
     services = {
       for s in setintersection(local.services, [
-        "artifactregistry.googleapis.com", "calendar-json.googleapis.com", "cloudbuild.googleapis.com",
+        "appengine.googleapis.com", "artifactregistry.googleapis.com", "calendar-json.googleapis.com",
+        "cloudbilling.googleapis.com", "cloudbuild.googleapis.com", "containerregistry.googleapis.com",
+        "deploymentmanager.googleapis.com", "firebaseextensions.googleapis.com", "firebasestorage.googleapis.com",
+        "runtimeconfig.googleapis.com",
         "cloudfunctions.googleapis.com", "cloudresourcemanager.googleapis.com", "cloudscheduler.googleapis.com",
         "eventarc.googleapis.com", "firebase.googleapis.com", "firebasehosting.googleapis.com",
         "firebaserules.googleapis.com", "firestore.googleapis.com", "iam.googleapis.com",
@@ -26,6 +29,7 @@ output "import_ids" {
         "sts.googleapis.com",
       ]) : s => "${var.project_id}/${s}"
     }
+    retiring_services = { for s in var.retiring_services : s => "${var.project_id}/${s}" }
     audit_log_configs = {
       for s, _ in var.audit_log_configs : s => "${var.project_id} ${s}" if s == "storage.googleapis.com"
     }

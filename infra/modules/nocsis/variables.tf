@@ -82,6 +82,12 @@ variable "extra_services" {
   default     = []
 }
 
+variable "retiring_services" {
+  description = "止める API。取り込んでから一覧から外すと止まる"
+  type        = list(string)
+  default     = []
+}
+
 variable "audit_log_configs" {
   description = "Data Access の監査ログ (サービス => ADMIN_READ / DATA_READ / DATA_WRITE)"
   type        = map(list(string))
