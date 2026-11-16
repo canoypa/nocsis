@@ -16,7 +16,7 @@ Future<String?> fetchDeployedVersion(http.Client client, Uri base) async {
   );
 
   try {
-    final response = await client.get(uri);
+    final response = await client.get(uri).timeout(const Duration(seconds: 30));
     if (response.statusCode != 200) {
       return null;
     }
@@ -38,12 +38,16 @@ class NewVersionWatcher {
     required this.current,
     required this.fetchDeployed,
     required this.reload,
+    this.canReload = _always,
     this.interval = const Duration(minutes: 5),
   });
 
   final String current;
   final Future<String?> Function() fetchDeployed;
   final void Function() reload;
+
+  /// 今リロードしてよいか。だめなら次の確認に回す
+  final bool Function() canReload;
   final Duration interval;
 
   Timer? _timer;
@@ -65,9 +69,14 @@ class NewVersionWatcher {
   Future<void> check() async {
     final deployed = await fetchDeployed();
 
-    if (_timer != null && deployed != null && deployed != current) {
+    if (_timer != null &&
+        deployed != null &&
+        deployed != current &&
+        canReload()) {
       stop();
       reload();
     }
   }
 }
+
+bool _always() => true;

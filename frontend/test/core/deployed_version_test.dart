@@ -37,6 +37,22 @@ void main() {
       expect(await fetchDeployedVersion(client, base), isNull);
     });
 
+    test('version.json が無く index.html が返ってきたら null を返す', () async {
+      final client = MockClient(
+        (_) async => http.Response('<!DOCTYPE html><html></html>', 200),
+      );
+
+      expect(await fetchDeployedVersion(client, base), isNull);
+    });
+
+    test('build_number が文字列でなければ null を返す', () async {
+      final client = MockClient(
+        (_) async => http.Response('{"build_number":42}', 200),
+      );
+
+      expect(await fetchDeployedVersion(client, base), isNull);
+    });
+
     test('build_number が無ければ null を返す', () async {
       final client = MockClient(
         (_) async => http.Response('{"app_name":"nocsis"}', 200),
@@ -114,6 +130,28 @@ void main() {
 
         async.elapse(const Duration(minutes: 30));
         expect(fetched, 0);
+        watcher.stop();
+      });
+    });
+
+    test('リロードしてよくなるまで待つ', () {
+      fakeAsync((async) {
+        var reloaded = 0;
+        var duringClass = true;
+        final watcher = NewVersionWatcher(
+          current: '1',
+          fetchDeployed: () async => '2',
+          reload: () => reloaded++,
+          canReload: () => !duringClass,
+          interval: const Duration(minutes: 5),
+        )..start();
+
+        async.elapse(const Duration(minutes: 10));
+        expect(reloaded, 0);
+
+        duringClass = false;
+        async.elapse(const Duration(minutes: 5));
+        expect(reloaded, 1);
         watcher.stop();
       });
     });

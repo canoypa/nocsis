@@ -29,12 +29,18 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
 
   final _httpClient = http.Client();
 
-  // サイネージとして置かれ、誰も操作しないので、デプロイされた新しい版に自分で
-  // 切り替える。人が操作する画面では、入力中の state が消えるので入れない
+  // 他の画面に入れないのは、操作中に state が消えるため。この画面は主に
+  // サイネージとして放置されるので、人がリロードするのを待てない
   late final _newVersionWatcher = NewVersionWatcher(
     current: builtVersion,
     fetchDeployed: () => fetchDeployedVersion(_httpClient, Uri.base),
     reload: reloadPage,
+    // 授業中に画面が一瞬消えないよう、休み時間まで待つ
+    canReload: () =>
+        ref
+            .read(duringClassDataProvider(ref.read(currentGroupIdProvider)))
+            .value ==
+        null,
   );
 
   @override

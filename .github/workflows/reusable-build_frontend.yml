@@ -61,8 +61,8 @@ jobs:
           project_id=$(jq -er '.FIREBASE_PROJECT_ID' dart_defines/build.json)
           echo "project_id=$project_id" >> "$GITHUB_OUTPUT"
       # 教室画面が version.json の build_number と埋め込んだ BUILD_NUMBER を比べて
-      # 自分でリロードする。run_attempt を混ぜないのは、再実行で同じ成果物を出し直した
-      # だけで全端末がリロードしないようにするため
+      # 自分でリロードする。run_attempt を混ぜないのは、ジョブの再実行だけで全端末が
+      # リロードしないようにするため
       - name: Build
         working-directory: ./frontend
         env:
