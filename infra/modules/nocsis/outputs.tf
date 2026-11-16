@@ -2,7 +2,7 @@ output "project_number" {
   value = data.google_project.this.number
 }
 
-# 取り込み (#1406) の import ブロック用。取り込みが済んだら、各環境の imports.tf と一緒に消す。
+# 取り込みの import ブロック用。取り込みが済んだら、各環境の imports.tf と一緒に消す。
 output "import_ids" {
   value = {
     service_accounts = { for id, _ in local.service_accounts : id => "projects/${var.project_id}/serviceAccounts/${id}@${var.project_id}.iam.gserviceaccount.com" }
