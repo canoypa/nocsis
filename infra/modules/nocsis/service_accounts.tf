@@ -30,7 +30,9 @@ resource "google_service_account" "this" {
   description  = each.value.description
 }
 
-# deploy がサービスや関数をこれらの SA で動かすために要る。
+# deploy がサービスや関数をこれらの SA で動かすために要る。compute の既定 SA は関数のビルドに使われる。
+# App Engine の既定 SA で動くものは無いが、外さない。firebase-tools が関数の deploy の前に、
+# この SA への actAs を確かめて、無ければ止まる。
 locals {
   wlif_deploy_acts_as = {
     "backend-runtime"   = "projects/${var.project_id}/serviceAccounts/backend-runtime@${var.project_id}.iam.gserviceaccount.com"
