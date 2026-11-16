@@ -86,4 +86,14 @@ variable "audit_log_configs" {
   description = "Data Access の監査ログ (サービス => ADMIN_READ / DATA_READ / DATA_WRITE)"
   type        = map(list(string))
   default     = {}
+
+  validation {
+    condition = alltrue(flatten([
+      for types in values(var.audit_log_configs) : concat(
+        [length(types) > 0],
+        [for t in types : contains(["ADMIN_READ", "DATA_READ", "DATA_WRITE"], t)],
+      )
+    ]))
+    error_message = "記録する種類を ADMIN_READ / DATA_READ / DATA_WRITE から 1 つ以上書く。"
+  }
 }

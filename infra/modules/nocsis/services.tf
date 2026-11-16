@@ -1,6 +1,6 @@
 # アプリとデプロイに要る API だけを持つ。ここに無い API は止めない (member 単位と同じく、足すだけ)。
 locals {
-  services = concat([
+  services = toset(concat([
     "artifactregistry.googleapis.com",
     "cloudbuild.googleapis.com",
     "cloudfunctions.googleapis.com",
@@ -22,11 +22,11 @@ locals {
     "serviceusage.googleapis.com",
     "storage.googleapis.com",
     "sts.googleapis.com",
-  ], var.extra_services)
+  ], var.extra_services))
 }
 
 resource "google_project_service" "this" {
-  for_each = toset(local.services)
+  for_each = local.services
 
   project = var.project_id
   service = each.value
