@@ -13,6 +13,20 @@ locals {
       stage       = "GA"
       permissions = ["run.services.setIamPolicy"]
     }
+    secretConfigManager = {
+      title       = "Secret config manager"
+      description = "Secret の入れ物と、誰が読めるかだけを管理する。値は読めない。"
+      stage       = "GA"
+      permissions = [
+        "secretmanager.secrets.create",
+        "secretmanager.secrets.delete",
+        "secretmanager.secrets.get",
+        "secretmanager.secrets.getIamPolicy",
+        "secretmanager.secrets.list",
+        "secretmanager.secrets.setIamPolicy",
+        "secretmanager.secrets.update",
+      ]
+    }
     # roles/viewer は Firestore のドキュメントまで読めるので、設定の読み取りだけを切り出した。
     claudeConfigReader = {
       title       = "Claude config reader"

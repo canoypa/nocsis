@@ -6,8 +6,9 @@ output "project_number" {
 output "import_ids" {
   value = {
     service_accounts = { for id, _ in local.service_accounts : id => "projects/${var.project_id}/serviceAccounts/${id}@${var.project_id}.iam.gserviceaccount.com" }
-    custom_roles     = { for id, _ in local.custom_roles : id => "projects/${var.project_id}/roles/${id}" }
-    # この PR で新しく足す権限は、取り込むものが無いので除く。
+    # 取り込みの後に新しく作ったロールは除く。
+    custom_roles = { for id, _ in local.custom_roles : id => "projects/${var.project_id}/roles/${id}" if id != "secretConfigManager" }
+    # 取り込みの後に新しく足した権限は除く。
     project_iam = {
       for k, v in local.project_iam_members : k => "${var.project_id} ${v.role} ${v.member}"
       if k != "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}"
