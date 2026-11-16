@@ -40,7 +40,7 @@ describe("fetchSecret", () => {
 
     expect(requests).toHaveLength(1);
     expect(new URL(requests[0].url).pathname).toBe(
-      "/v1/projects/class-clock-40088/secrets/test-secret/versions/latest:access",
+      `/v1/projects/${process.env.GCLOUD_PROJECT}/secrets/test-secret/versions/latest:access`,
     );
     expect(requests[0].headers.get("authorization")).toMatch(/^Bearer \S+/);
   });

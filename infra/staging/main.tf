@@ -28,6 +28,7 @@ module "nocsis" {
 
   secrets = {
     "CALENDAR_ACCOUNT_KEY" = ["backend-runtime", "functions-runtime"]
+    "OPENWEATHERMAP_TOKEN" = ["backend-runtime"]
   }
 
   extra_service_accounts = {

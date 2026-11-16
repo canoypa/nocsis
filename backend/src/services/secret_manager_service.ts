@@ -10,8 +10,10 @@ const secretCache = new Map<string, string>();
  * @returns シークレット値
  */
 export const fetchSecret = async (secretName: string): Promise<string> => {
+  // 動いているプロジェクトの Secret を読む。Staging から本番の Secret を読ませない。
+  const projectId = await secretManagerClient.getProjectId();
   const secretPath = secretManagerClient.secretVersionPath(
-    "class-clock-40088",
+    projectId,
     secretName,
     "latest",
   );
