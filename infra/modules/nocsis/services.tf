@@ -44,14 +44,15 @@ resource "google_project_service" "this" {
 
 # 止める API。一覧から外すと destroy で止まる。
 resource "google_project_service" "retiring" {
-  for_each = toset(var.retiring_services)
+  for_each = var.retiring_services
 
   project = var.project_id
   service = each.value
 
   disable_on_destroy = true
   # bigquery と bigquerystorage のように互いに依存し合うものは、片方ずつは止められない。
-  # 依存しているものが一緒に止まるので、外す前に依存先がすべてこの一覧にあることを確かめる。
+  # その API に依存しているものも一緒に止まる。一覧に残したままだと次の apply で有効に戻るので、
+  # 依存しているものは同じ変更で一覧から外す。使う API が依存していないことも外す前に確かめる。
   disable_dependent_services = true
 
   lifecycle {

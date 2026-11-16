@@ -84,7 +84,7 @@ variable "extra_services" {
 
 variable "retiring_services" {
   description = "止める API。取り込んでから一覧から外すと止まる"
-  type        = list(string)
+  type        = set(string)
   default     = []
 }
 
