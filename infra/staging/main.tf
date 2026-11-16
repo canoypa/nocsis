@@ -18,4 +18,17 @@ module "nocsis" {
   source = "../modules/nocsis"
 
   project_id = "nocsis-development"
+
+  auth_authorized_domains      = ["nocsis-development.firebaseapp.com", "nocsis-development.web.app"]
+  auth_email_password_required = true
+  auth_google_client_id        = "862064818225-50oucenghkua7qb7hqlpm6vfqp20b6h7.apps.googleusercontent.com"
+
+  # 承認や制限は environment ごとに違う。別の environment のジョブにこの環境へデプロイさせない。
+  wlif_deploy_environments = ["Staging"]
+
+  extra_service_accounts = {
+    "claude-readonly" = {
+      display_name = "Claude (read-only)"
+    }
+  }
 }
