@@ -14,10 +14,11 @@ locals {
   ]
 
   # tf-plan も、管理するリソースの設定を読めないと plan が落ちる。
+  # バケットの IAM は bootstrap が付ける roles/iam.securityReviewer で読める。
   tf_plan_member = "serviceAccount:tf-plan@${var.project_id}.iam.gserviceaccount.com"
 
   tf_plan_roles = [
-    "projects/${var.project_id}/roles/bucketConfigReader",
+    "roles/storage.bucketViewer",
   ]
 }
 
@@ -39,6 +40,4 @@ resource "google_project_iam_member" "tf_plan" {
   project = var.project_id
   role    = each.key
   member  = local.tf_plan_member
-
-  depends_on = [google_project_iam_custom_role.this]
 }
