@@ -55,3 +55,17 @@ variable "claude_readonly_email" {
   type        = string
   default     = "claude-readonly@nocsis-development.iam.gserviceaccount.com"
 }
+
+variable "secrets" {
+  description = "Secret の名前 => 読める SA (secrets.tf の secret_accessor_members のキー)"
+  type        = map(list(string))
+  default     = {}
+
+  validation {
+    condition = alltrue([
+      for accessors in values(var.secrets) : length(accessors) > 0
+    ])
+    # 空にすると binding が全員を外す。
+    error_message = "読める SA を 1 つ以上書く。"
+  }
+}

@@ -29,6 +29,12 @@ module "nocsis" {
   # 承認や制限は environment ごとに違う。別の environment のジョブにこの環境へデプロイさせない。
   wlif_deploy_environments = ["Production"]
 
+  # compute-default と appengine-default は手で付けていたもの。外すかは別に決める。
+  secrets = {
+    "CALENDAR_ACCOUNT_KEY" = ["backend-runtime", "functions-runtime", "compute-default", "appengine-default"]
+    "OPENWEATHERMAP_TOKEN" = ["backend-runtime", "compute-default", "appengine-default"]
+  }
+
   extra_service_accounts = {
     "events-reader" = {
       display_name = "Events Reader"
