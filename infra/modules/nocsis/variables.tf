@@ -57,16 +57,15 @@ variable "claude_readonly_email" {
 }
 
 variable "secrets" {
-  description = "Secret の名前 => 読める SA (backend-runtime / functions-runtime / compute-default / appengine-default)"
+  description = "Secret の名前 => 読める SA (secrets.tf の secret_accessor_members のキー)"
   type        = map(list(string))
   default     = {}
 
   validation {
     condition = alltrue([
-      for accessors in values(var.secrets) : alltrue([
-        for a in accessors : contains(["backend-runtime", "functions-runtime", "compute-default", "appengine-default"], a)
-      ])
+      for accessors in values(var.secrets) : length(accessors) > 0
     ])
-    error_message = "読める SA は backend-runtime / functions-runtime / compute-default / appengine-default から選ぶ。"
+    # 空にすると binding が全員を外す。
+    error_message = "読める SA を 1 つ以上書く。"
   }
 }
