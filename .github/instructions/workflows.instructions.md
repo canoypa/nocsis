@@ -20,8 +20,8 @@ paths:
 
 staging は本番と同じ経路を先に通すためのものなので、両者のゲートがずれると staging の意味が無くなる。
 
-## `pull_request_target` を使わない
+## fork の PR のコードを、このリポジトリの権限で動かさない
 
-`pull_request_target` のワークフローは、fork からの PR でもこのリポジトリの権限で動き、secret と OIDC トークンを受け取れる。PR のコードを checkout すると、外の人のコードがその権限で動く。今は `pull_request` だけなので、fork の PR には secret も OIDC も渡らない。WIF の条件や `wlif-build` / `tf-plan` の束縛は、この前提の上にある。
+PR から起動するトリガーは `pull_request` だけにしている。`pull_request` なら、fork の PR のジョブには secret も OIDC トークンも渡らず、`GITHUB_TOKEN` も読み取り専用になる。Preview へのデプロイ (`deploy_preview.yml` / `cleanup_preview.yml`) が `environment: Preview` と `wlif-deploy` を引けるのも、WIF の条件や `wlif-build` / `tf-plan` の束縛も、この前提の上にある。
 
-PR にコメントを書くなど、書き込みの権限が要るときも使わない。`workflow_run` も同じ理由で、fork の PR が作った artifact や出力を信用しない。
+`pull_request_target`、`workflow_run`、`issue_comment` などはベースブランチの文脈で動き、fork の PR が起点でも secret と OIDC を受け取れる。これらを足すなら、PR のコード・artifact・出力を checkout したり実行したりしない。PR にコメントを書きたいなど、書き込み権限が欲しいだけの理由でも足さない。
