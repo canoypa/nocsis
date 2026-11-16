@@ -6,7 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'daydudy.g.dart';
 
 @riverpod
-Future<Classmate> daydudy(Ref ref, String groupId) async {
+Future<Dayduty> daydudy(Ref ref, String groupId) async {
   // 一日ごとに取得
   ref.watch(cronProvider("0 0 * * *"));
 
