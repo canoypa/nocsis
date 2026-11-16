@@ -1,5 +1,5 @@
 import { HttpResponse, http } from "msw";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   externalApiServer,
   SECRET_MANAGER_ACCESS_URL,
@@ -32,6 +32,7 @@ describe("fetchSecret", () => {
     return () => {
       externalApiServer.events.removeListener("request:start", onRequest);
       clearSecretCache();
+      vi.unstubAllEnvs();
     };
   });
 
@@ -40,7 +41,7 @@ describe("fetchSecret", () => {
 
     expect(requests).toHaveLength(1);
     expect(new URL(requests[0].url).pathname).toBe(
-      `/v1/projects/${process.env.GCLOUD_PROJECT}/secrets/test-secret/versions/latest:access`,
+      "/v1/projects/demo-nocsis/secrets/test-secret/versions/latest:access",
     );
     expect(requests[0].headers.get("authorization")).toMatch(/^Bearer \S+/);
   });
@@ -104,6 +105,36 @@ describe("fetchSecret", () => {
       );
 
       expect(requests).toHaveLength(2);
+    });
+  });
+
+  describe("GOOGLE_CLOUD_PROJECT が設定されている場合", () => {
+    it("そのプロジェクトの Secret を読むこと", async () => {
+      vi.stubEnv("GOOGLE_CLOUD_PROJECT", "other-project");
+      externalApiServer.use(
+        secretManagerHandler({ "test-secret": "other-project-value" }),
+      );
+
+      await expect(fetchSecret("test-secret")).resolves.toBe(
+        "other-project-value",
+      );
+
+      expect(new URL(requests[0].url).pathname).toBe(
+        "/v1/projects/other-project/secrets/test-secret/versions/latest:access",
+      );
+    });
+  });
+
+  describe("プロジェクトが分からない場合", () => {
+    it("Secret Manager を呼ばずにエラーになること", async () => {
+      vi.stubEnv("GOOGLE_CLOUD_PROJECT", undefined);
+      vi.stubEnv("GCLOUD_PROJECT", undefined);
+
+      await expect(fetchSecret("test-secret")).rejects.toThrow(
+        "GOOGLE_CLOUD_PROJECT が設定されていません",
+      );
+
+      expect(requests).toHaveLength(0);
     });
   });
 });
