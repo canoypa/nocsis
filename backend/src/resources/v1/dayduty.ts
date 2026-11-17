@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { deprecated } from "./deprecated.js";
 
 export const daydutyQuerySchema = z.object({
   date: z.string().datetime({ offset: true }).optional().meta({
@@ -12,16 +11,28 @@ export const daydutyQuerySchema = z.object({
 export const daydutyResponseSchema = z
   .object({
     name: z.string().meta({ description: "名前" }),
-    role: deprecated(
-      z.enum(["student", "teacher"]).meta({ description: "役割" }),
-    ),
-    stuNo: deprecated(z.number().int().meta({ description: "出席番号" })),
-    email: deprecated(
-      z.string().email().meta({ description: "メールアドレス" }),
-    ),
-    slackUserId: deprecated(
-      z.string().meta({ description: "SlackユーザーID" }),
-    ),
+    role: z
+      .enum(["student", "teacher"])
+      .meta({ description: "役割" })
+      .optional()
+      .meta({ deprecated: true }),
+    stuNo: z
+      .number()
+      .int()
+      .meta({ description: "出席番号" })
+      .optional()
+      .meta({ deprecated: true }),
+    email: z
+      .string()
+      .email()
+      .meta({ description: "メールアドレス" })
+      .optional()
+      .meta({ deprecated: true }),
+    slackUserId: z
+      .string()
+      .meta({ description: "SlackユーザーID" })
+      .optional()
+      .meta({ deprecated: true }),
   })
   .meta({
     $id: "Dayduty",
