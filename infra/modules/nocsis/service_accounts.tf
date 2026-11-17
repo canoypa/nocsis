@@ -6,7 +6,7 @@ locals {
     }
     "wlif-deploy" = {
       display_name = "WLIF: GitHub Actions deploy"
-      description  = "GitHub Actions の deploy ジョブが Workload Identity Federation で借りる。Cloud Run / Functions / Hosting / Firestore ルール、ソースマップの書き込み。"
+      description  = "GitHub Actions の deploy ジョブが Workload Identity Federation で借りる。Cloud Run / Functions / Hosting / Firestore ルール、ソースマップの読み書き (上書きと削除は除く)。"
     }
     "backend-runtime" = {
       display_name = "backend runtime"
