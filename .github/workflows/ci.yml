@@ -35,11 +35,72 @@ jobs:
       contents: read
     uses: ./.github/workflows/reusable-build_frontend.yml
 
+  # レスポンスの項目を外す・任意にするなどの変更は、開いたままの古い画面を壊す。
+  # 意図した変更（2段階で出す1段目など）だけ、ラベルを付けて再実行すれば通る。
+  # ラベルはイベントの中身ではなく実行時に読む。再実行はイベントを作り直さないため
+  api-compat:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      OASDIFF_VERSION: 1.37.0
+      OASDIFF_SHA256: eac87307d31d08c36800c58a409c247f1c5db37fbb72e2544402f22a87cbca3c
+      LABEL: skip-api-compat
+      SPEC: frontend/swagger/api.json
+    steps:
+      # base は先頭ではなく merge コミットの1つ目の親から取る。再実行では同じ merge
+      # コミットが使われるので、その間に base が進むと、他の PR の変更が混ざる
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      # main 向けのリリース PR では見ない。中身は development に入るときに見ており、
+      # 意図した変更のラベルはリリース PR まで引き継がれない
+      - name: Check if comparison is needed
+        id: needed
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$BASE_REF" != development ]; then
+            echo "::notice::$BASE_REF 向けの PR なので比べない"
+          elif git diff --quiet HEAD^1 HEAD -- "$SPEC"; then
+            echo "$SPEC に変更が無いので比べない"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install oasdiff
+        if: ${{ steps.needed.outputs.run }}
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/oasdiff.tar.gz" \
+            "https://github.com/oasdiff/oasdiff/releases/download/v${OASDIFF_VERSION}/oasdiff_${OASDIFF_VERSION}_linux_amd64.tar.gz"
+          echo "${OASDIFF_SHA256}  $RUNNER_TEMP/oasdiff.tar.gz" | sha256sum -c -
+          tar xzf "$RUNNER_TEMP/oasdiff.tar.gz" -C "$RUNNER_TEMP" oasdiff
+      - name: Check breaking changes
+        if: ${{ steps.needed.outputs.run }}
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git show "HEAD^1:$SPEC" > "$RUNNER_TEMP/base.json"
+
+          if gh pr view "$PR_NUMBER" --json labels --jq '.labels[].name' | grep -qx "$LABEL"; then
+            echo "::notice::$LABEL ラベルが付いているので、互換性を壊す変更があっても通す"
+            "$RUNNER_TEMP/oasdiff" breaking "$RUNNER_TEMP/base.json" "$SPEC"
+            exit 0
+          fi
+
+          if ! "$RUNNER_TEMP/oasdiff" breaking "$RUNNER_TEMP/base.json" "$SPEC" \
+            --fail-on ERR --format githubactions; then
+            echo "::error::開いたままの古い画面を壊す API の変更があります。%0Aレスポンスの項目を外すときは2段階で出してください。%0A1. 項目を任意（deprecated）にし、frontend が読まないようにする。backend はまだ返す%0A2. 1 が本番に出て1日ほど空けてから、backend から項目を外す%0A1 のように意図した変更なら、PR に $LABEL ラベルを付けてこのジョブを再実行してください。"
+            exit 1
+          fi
+
   # 個々のジョブを ruleset の必須チェックに並べない。ジョブを足すたびに ruleset の
   # 更新が要り、忘れると Renovate の自動マージが新しいジョブを待たずに通る。
   ci-ok:
     if: ${{ always() }}
-    needs: [lint, test, build-functions, build-frontend]
+    needs: [lint, test, build-functions, build-frontend, api-compat]
     runs-on: ubuntu-latest
     permissions: {}
     steps:
