@@ -1,6 +1,6 @@
 # GitHub Actions から GCP に入るための Workload Identity と、そこから引く SA。
-# tf-plan / tf-apply とその権限は bootstrap が持つ。Terraform が自分の権限を
-# 消して戻せなくなるのを避けるため、ここでは扱わない。
+# tf-plan / tf-apply 本体と、Terraform を動かすのに要る権限は bootstrap が持つ。Terraform が
+# 自分の権限を消して戻せなくなるのを避けるため、ここでは扱わない。後から足す権限は terraform_iam.tf。
 
 resource "google_iam_workload_identity_pool" "github" {
   workload_identity_pool_id = "github-action"
