@@ -1,16 +1,42 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:nocsis/core/error_reporter.dart';
+import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:nocsis/themes/app.dart';
 
 import 'firebase_options.dart';
 
-void main() async {
+void main() {
+  final reporter = ErrorReporter(
+    client: http.Client(),
+    endpoint: Uri.parse('$apiBaseUrl/api/v1/client-errors'),
+    commit: buildCommit,
+    currentPath: () => Uri.base.path,
+  );
+
+  // Web では PlatformDispatcher.onError が呼ばれないので、非同期のエラーはゾーンで拾う。
+  // 初期化から runApp までを同じゾーンに入れる。分けると Flutter がゾーンの食い違いを警告する。
+  runZonedGuarded(
+    () => _main(reporter),
+    (error, stack) => unawaited(reporter.report(error, stack)),
+  );
+}
+
+Future<void> _main(ErrorReporter reporter) async {
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    unawaited(reporter.report(details.exception, details.stack));
+  };
+
   usePathUrlStrategy();
 
   // Firebase の初期化と、初回の認証状態の取得を待つ
