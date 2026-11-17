@@ -32,6 +32,31 @@ module "nocsis" {
     "OPENWEATHERMAP_TOKEN" = ["backend-runtime"]
   }
 
+  # 使っていない API。取り込みが済んだら、種類ごとに一覧から外して止める。
+  retiring_services = [
+    "analyticshub.googleapis.com",
+    "bigquery.googleapis.com",
+    "bigqueryconnection.googleapis.com",
+    "bigquerydatapolicy.googleapis.com",
+    "bigquerydatatransfer.googleapis.com",
+    "bigquerymigration.googleapis.com",
+    "bigqueryreservation.googleapis.com",
+    "bigquerystorage.googleapis.com",
+    "cloudaicompanion.googleapis.com",
+    "cloudapis.googleapis.com",
+    "dataform.googleapis.com",
+    "dataplex.googleapis.com",
+    "fcm.googleapis.com",
+    "fcmregistrations.googleapis.com",
+    "firebaseappdistribution.googleapis.com",
+    "firebaseinstallations.googleapis.com",
+    "firebaseremoteconfig.googleapis.com",
+    "firebaseremoteconfigrealtime.googleapis.com",
+    "source.googleapis.com",
+    "sql-component.googleapis.com",
+    "testing.googleapis.com",
+  ]
+
   extra_service_accounts = {
     "claude-readonly" = {
       display_name = "Claude (read-only)"

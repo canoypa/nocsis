@@ -66,6 +66,12 @@ import {
 }
 
 import {
+  for_each = module.nocsis.import_ids.retiring_services
+  to       = module.nocsis.google_project_service.retiring[each.key]
+  id       = each.value
+}
+
+import {
   for_each = module.nocsis.import_ids.audit_log_configs
   to       = module.nocsis.google_project_iam_audit_config.this[each.key]
   id       = each.value
