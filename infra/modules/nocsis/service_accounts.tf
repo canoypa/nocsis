@@ -6,11 +6,11 @@ locals {
     }
     "wlif-deploy" = {
       display_name = "WLIF: GitHub Actions deploy"
-      description  = "GitHub Actions の deploy ジョブが Workload Identity Federation で借りる。Cloud Run / Functions / Hosting / Firestore ルール。"
+      description  = "GitHub Actions の deploy ジョブが Workload Identity Federation で借りる。Cloud Run / Functions / Hosting / Firestore ルール、ソースマップの書き込み。"
     }
     "backend-runtime" = {
       display_name = "backend runtime"
-      description  = "Cloud Run の backend が実行時に使う。Firestore とログ、OPENWEATHERMAP_TOKEN / CALENDAR_ACCOUNT_KEY のみ。"
+      description  = "Cloud Run の backend が実行時に使う。Firestore とログ、ソースマップの読み取り、OPENWEATHERMAP_TOKEN / CALENDAR_ACCOUNT_KEY のみ。"
     }
     "functions-runtime" = {
       display_name = "functions runtime"
