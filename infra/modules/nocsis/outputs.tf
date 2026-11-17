@@ -11,7 +11,10 @@ output "import_ids" {
     # 取り込みの後に新しく足した権限は除く。
     project_iam = {
       for k, v in local.project_iam_members : k => "${var.project_id} ${v.role} ${v.member}"
-      if k != "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}"
+      if !contains([
+        "roles/errorreporting.viewer serviceAccount:${var.claude_readonly_email}",
+        "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}",
+      ], k)
     }
     # 取り込みの時点で有効だったものだけ。後から足したものを取り込もうとすると plan が落ちる。
     services = {
