@@ -16,7 +16,14 @@
         "destination": "/index.html"
       }
     ],
-    "headers": []
+    // Flutter の成果物はファイル名にハッシュを含まないので、ブラウザに既定の
+    // 1時間キャッシュさせると、リロードしても古い版が起動する。ETag で確かめさせる
+    "headers": [
+      {
+        "source": "**",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      }
+    ]
   },
   // Cloud Run functions のランタイムにはサポート期限がある。
   // 上げる前に対応状況を確認する:
