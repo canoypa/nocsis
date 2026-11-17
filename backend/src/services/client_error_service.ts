@@ -14,6 +14,7 @@ export type DecodedFrame = {
   /** ソースマップに書かれたままのパス */
   source?: string;
   line?: number;
+  /** 1 から数える */
   column?: number;
   functionName?: string;
   githubUrl?: string;
@@ -94,12 +95,30 @@ const decodeFrame = (
     path,
     source: original.source,
     line: original.line,
-    column: original.column ?? undefined,
+    column: original.column === null ? undefined : original.column + 1,
     functionName: original.name ?? undefined,
     githubUrl: path
       ? `${REPOSITORY_URL}/blob/${commit}/${path}#L${original.line}`
       : undefined,
   };
+};
+
+const fetchSourceMapOrNull = async (
+  commit: string,
+  file: SourceMapFile,
+): Promise<TraceMap | null> => {
+  try {
+    return await fetchSourceMap(commit, file);
+  } catch (error) {
+    // 解読できなくても、エラーが起きたこと自体は残す
+    console.warn(
+      JSON.stringify({
+        severity: "WARNING",
+        message: `ソースマップを取得できなかった: ${error}`,
+      }),
+    );
+    return null;
+  }
 };
 
 /**
@@ -129,7 +148,10 @@ export const decodeStack = async (
     }
 
     if (!maps.has(position.file)) {
-      maps.set(position.file, await fetchSourceMap(commit, position.file));
+      maps.set(
+        position.file,
+        await fetchSourceMapOrNull(commit, position.file),
+      );
     }
     const map = maps.get(position.file);
 

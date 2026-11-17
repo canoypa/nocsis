@@ -1,5 +1,5 @@
 import { HttpResponse, http } from "msw";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   jsSourceMap,
   wasmSourceMap,
@@ -60,7 +60,7 @@ describe("decodeStack", () => {
         source:
           "file:///home/runner/work/nocsis/nocsis/frontend/lib/pages/home.dart",
         line: 42,
-        column: 6,
+        column: 7,
         functionName: "build",
         githubUrl: `https://github.com/canoypa/nocsis/blob/${COMMIT}/frontend/lib/pages/home.dart#L42`,
       },
@@ -70,7 +70,7 @@ describe("decodeStack", () => {
         source:
           "file:///home/runner/.pub-cache/hosted/pub.dev/go_router-18.1.1/lib/src/router.dart",
         line: 10,
-        column: 2,
+        column: 3,
         functionName: "push",
         githubUrl: undefined,
       },
@@ -124,16 +124,62 @@ describe("decodeStack", () => {
     expect(requested).toHaveLength(1);
   });
 
-  it("バケットが 404 以外のエラーを返したら例外にすること", async () => {
+  it("同時に届いても、ソースマップは一度しか取りに行かないこと", async () => {
+    const requested: string[] = [];
+    serveSourceMaps(requested);
+    const stack = "    at a (https://nocsis.app/main.dart.js:10:5)";
+
+    const results = await Promise.all([
+      decodeStack(stack, COMMIT),
+      decodeStack(stack, COMMIT),
+      decodeStack(stack, COMMIT),
+    ]);
+
+    expect(requested).toHaveLength(1);
+    expect(results.map(([frame]) => frame.line)).toEqual([26, 26, 26]);
+  });
+
+  it("見つからなかったソースマップは、5 分たつまで取りに行かないこと", async () => {
+    const requested: string[] = [];
+    serveSourceMaps(requested);
+    const other = "f".repeat(40);
+    const stack = "    at a (https://nocsis.app/main.dart.js:10:5)";
+    const now = vi.spyOn(Date, "now").mockReturnValue(0);
+
+    await decodeStack(stack, other);
+    now.mockReturnValue(5 * 60_000 - 1);
+    await decodeStack(stack, other);
+    expect(requested).toHaveLength(1);
+
+    now.mockReturnValue(5 * 60_000);
+    await decodeStack(stack, other);
+    expect(requested).toHaveLength(2);
+  });
+
+  it("取得に失敗したファイルの行だけをそのまま返し、ほかの行は戻すこと", async () => {
     externalApiServer.use(
-      http.get(CLOUD_STORAGE_OBJECT_URL, () =>
-        HttpResponse.json({}, { status: 403 }),
+      http.get(CLOUD_STORAGE_OBJECT_URL, ({ params }) =>
+        decodeURIComponent(String(params.object)).endsWith("wasm.map")
+          ? HttpResponse.json(wasmSourceMap)
+          : HttpResponse.json({}, { status: 403 }),
       ),
     );
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    await expect(
-      decodeStack("    at a (https://nocsis.app/main.dart.js:10:5)", COMMIT),
-    ).rejects.toThrow("403");
+    const frames = await decodeStack(
+      [
+        "    at a (https://nocsis.app/main.dart.js:10:5)",
+        "    at M (https://nocsis.app/main.dart.wasm:wasm-function[1]:0x100)",
+      ].join("\n"),
+      COMMIT,
+    );
+
+    expect(frames.map((frame) => frame.path)).toEqual([
+      undefined,
+      "frontend/lib/pages/home.dart",
+    ]);
+    expect(warn).toHaveBeenCalledOnce();
+    expect(String(warn.mock.calls[0][0])).toContain("403");
   });
 });
 

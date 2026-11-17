@@ -95,22 +95,7 @@ clientErrorsRoutes.post(
 
     const body = c.req.valid("json");
 
-    let frames: DecodedFrame[];
-    try {
-      frames = await decodeStack(body.stack, body.commit);
-    } catch (error) {
-      // 解読できなくても、エラーが起きたこと自体は残す
-      console.warn(
-        JSON.stringify({
-          severity: "WARNING",
-          message: `ソースマップでの解読に失敗した: ${error}`,
-        }),
-      );
-      frames = body.stack
-        .split("\n")
-        .filter((line) => line.trim() !== "")
-        .map((raw) => ({ raw: raw.trim() }));
-    }
+    const frames = await decodeStack(body.stack, body.commit);
 
     writeLog(body, frames, c.req.header("User-Agent"));
 

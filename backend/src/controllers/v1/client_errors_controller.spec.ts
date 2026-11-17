@@ -53,7 +53,7 @@ describe("POST /api/v1/client-errors", () => {
         "@type":
           "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent",
         message:
-          "SampleException: わざと起こしたエラー\n    at deepFunctionThatFails (frontend/lib/main.dart:26:14)",
+          "SampleException: わざと起こしたエラー\n    at deepFunctionThatFails (frontend/lib/main.dart:26:15)",
         serviceContext: { service: "frontend", version: COMMIT },
         context: {
           httpRequest: { url: "/groups/abc", userAgent: "test-ua" },
