@@ -1,18 +1,20 @@
 # Staging に架空のデータを入れる seed (seed_stg.yml) が借りる SA。本番には作らない。
-# deploy の SA に足さないのは、デプロイのたびに Firestore のデータとユーザーを書き換えられる権限を持たせないため。
+# wlif-deploy に権限を足さないのは、デプロイの SA にデータとユーザーを書き換える権限まで持たせないため。
+# 同じ Staging environment に束縛するので、environment をまたいだ分離にはならない。
+# service_accounts.tf の for_each に入れないのは、そちらの SA は既存の取り込み (import_ids) の対象になるため。
 locals {
   seed_enabled = var.seed_environment != null
-}
 
-# roles/firebaseauth.admin は Auth の設定まで変えられ、ユーザーも消せる。作る・読む・更新するだけに絞る。
-resource "google_project_iam_custom_role" "seed_auth_users" {
-  count = local.seed_enabled ? 1 : 0
-
-  role_id     = "authUserSeeder"
-  title       = "Auth user seeder"
-  description = "テストユーザーの作成と更新、メールからの uid の引き当てのみ。設定とユーザーの削除には触れない。"
-  stage       = "GA"
-  permissions = ["firebaseauth.users.create", "firebaseauth.users.get", "firebaseauth.users.update"]
+  # custom_roles.tf の custom_roles に混ぜる。
+  seed_custom_roles = local.seed_enabled ? {
+    # roles/firebaseauth.admin は Auth の設定まで変えられ、ユーザーも消せる。
+    authUserSeeder = {
+      title       = "Auth user seeder"
+      description = "テストユーザーの作成と更新、メールからの uid の引き当てのみ。設定とユーザーの削除には触れない。"
+      stage       = "GA"
+      permissions = ["firebaseauth.users.create", "firebaseauth.users.get", "firebaseauth.users.update"]
+    }
+  } : {}
 }
 
 resource "google_service_account" "seed" {
@@ -42,5 +44,5 @@ resource "google_project_iam_member" "seed" {
   role    = each.key
   member  = google_service_account.seed[0].member
 
-  depends_on = [google_project_iam_custom_role.seed_auth_users]
+  depends_on = [google_project_iam_custom_role.this]
 }

@@ -1,6 +1,6 @@
 # 既定のロールでは広すぎるところに使う。tfConfigReader は bootstrap が持つ。
 locals {
-  custom_roles = {
+  custom_roles = merge({
     authConfigDeployer = {
       title       = "Auth config deployer"
       description = "blocking functions の登録に必要な Auth 設定の読み書きのみ。ユーザー情報には触れない。"
@@ -48,7 +48,7 @@ locals {
       stage       = "ALPHA"
       permissions = ["datastore.databases.get", "datastore.indexes.list", "firebaseauth.configs.get"]
     }
-  }
+  }, local.seed_custom_roles)
 }
 
 resource "google_project_iam_custom_role" "this" {

@@ -14,7 +14,7 @@ import { getFirestore } from "firebase-admin/firestore";
 const STAGING_PROJECT_ID = "nocsis-development";
 
 const env = process.env;
-const projectId = env.GOOGLE_CLOUD_PROJECT ?? env.GCLOUD_PROJECT;
+const projectId = env.GOOGLE_CLOUD_PROJECT || env.GCLOUD_PROJECT;
 const emulated = Boolean(
   env.FIRESTORE_EMULATOR_HOST || env.FIREBASE_AUTH_EMULATOR_HOST,
 );
@@ -153,14 +153,23 @@ await firestore
     events_calendar_id: config.eventsCalendarId,
     dayduty_start_date: "2000-01-01",
     slack_event_channel_id: config.slackEventChannelId,
+    // Slack のトークンが無いので、毎分の日直通知が落ち続ける。
+    dayduty_notification_enabled: false,
     weather_point: { lat: 35.6812, lon: 139.7671 },
   });
 
-const classmates = [
-  { stuNo: 1, name: "テスト 太郎" },
-  { stuNo: 2, name: "テスト 花子" },
-  { stuNo: 3, name: "テスト 次郎" },
-];
+// 1人にしている。日直は日付で回るので、増やすと e2e が表示を確かめる生徒が日によって変わる。
+const classmates = [{ stuNo: 1, name: "テスト 太郎" }];
+const classmateIds = classmates.map(({ stuNo }) => `${GROUP_ID}_${stuNo}`);
+const staleClassmates = await firestore
+  .collection("classmates")
+  .where("group_id", "==", GROUP_ID)
+  .get();
+await Promise.all(
+  staleClassmates.docs
+    .filter((doc) => !classmateIds.includes(doc.id))
+    .map((doc) => doc.ref.delete()),
+);
 await Promise.all(
   classmates.map(({ stuNo, name }) =>
     firestore
