@@ -9,12 +9,12 @@ import 'package:nocsis/firebase_options.dart';
 import 'package:nocsis/main.dart';
 import 'package:nocsis/routes/router.dart';
 
-// backend/e2e/seed.ts がエミュレータに作るデータと、backend/e2e/fake_external_apis.ts が
+// backend/scripts/seed.ts がエミュレータに作るデータと、backend/e2e/fake_external_apis.ts が
 // 返す偽の予定。
-const _email = 'e2e@example.com';
+const _email = 'member@example.com';
 const _password = 'e2e-password';
-const _groupId = 'e2e_group';
-const _student = 'E2E 太郎';
+const _groupId = 'test_group';
+const _student = 'テスト 太郎';
 const _className = 'E2E 国語';
 const _eventName = 'E2E 遠足';
 

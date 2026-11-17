@@ -19,15 +19,7 @@ void main() {
 
     test('参加しているグループ一覧を取得できる', () async {
       // Arrange
-      final group = Group(
-        id: 'group-1',
-        name: 'テストグループ',
-        classesCalendarId: 'classes-cal',
-        eventsCalendarId: 'events-cal',
-        daydutyStartDate: '2024-01-01',
-        slackEventChannelId: 'C123',
-        weatherPoint: const WeatherPointOutput(lat: 35.0, lon: 139.0),
-      );
+      const group = UserJoinedGroup(id: 'group-1', name: 'テストグループ');
       when(() => mockApi.apiV1UsersMeGroupsGet()).thenAnswer(
         (_) async => chopper.Response(
           http.Response('', 200),

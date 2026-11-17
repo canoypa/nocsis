@@ -103,3 +103,9 @@ variable "audit_log_configs" {
     error_message = "記録する種類を ADMIN_READ / DATA_READ / DATA_WRITE から 1 つ以上書く。"
   }
 }
+
+variable "seed_environment" {
+  description = "seed 用の SA (wlif-seed) を引ける GitHub の environment。null なら SA を作らない"
+  type        = string
+  default     = null
+}

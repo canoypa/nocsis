@@ -187,12 +187,18 @@ importers:
       '@hono/standard-validator':
         specifier: ^0.4.1
         version: 0.4.1(@standard-schema/spec@1.1.0)(hono@4.13.18)
+      '@jridgewell/trace-mapping':
+        specifier: ^0.3.31
+        version: 0.3.31
       '@scalar/hono-api-reference':
         specifier: ^0.12.20
         version: 0.12.20(hono@4.13.18)
       firebase-admin:
         specifier: ^14.5.1
         version: 14.5.1(supports-color@7.2.0)
+      google-auth-library:
+        specifier: ^11.3.4
+        version: 11.3.4(supports-color@7.2.0)
       hono:
         specifier: ^4.13.18
         version: 4.13.18

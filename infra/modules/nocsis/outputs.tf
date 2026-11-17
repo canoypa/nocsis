@@ -11,7 +11,10 @@ output "import_ids" {
     # 取り込みの後に新しく足した権限は除く。
     project_iam = {
       for k, v in local.project_iam_members : k => "${var.project_id} ${v.role} ${v.member}"
-      if k != "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}"
+      if !contains([
+        "roles/errorreporting.viewer serviceAccount:${var.claude_readonly_email}",
+        "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}",
+      ], k)
     }
     # 無効な API を足すと取り込みで plan が落ちる。今は使う API がすべて両方の環境で有効。
     services          = { for s in local.services : s => "${var.project_id}/${s}" }

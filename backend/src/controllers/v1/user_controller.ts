@@ -7,8 +7,10 @@ import {
   authentication,
   getCurrentUserId,
 } from "../../middlewares/authenticate.js";
-import { groupSchema } from "../../resources/v1/groups.js";
-import { userJoinedGroupsSchema } from "../../resources/v1/user_joined_groups.js";
+import {
+  userJoinedGroupSchema,
+  userJoinedGroupsSchema,
+} from "../../resources/v1/user_joined_groups.js";
 
 export const userRoutes = new Hono<AuthenticatedEnv>();
 
@@ -57,7 +59,7 @@ userRoutes.use("*", authentication).get(
       .where("__name__", "in", groupIds)
       .get();
 
-    const items = z.array(groupSchema).parse(
+    const items = z.array(userJoinedGroupSchema).parse(
       groupsSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),

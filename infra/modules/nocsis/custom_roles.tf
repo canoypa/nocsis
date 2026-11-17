@@ -1,6 +1,6 @@
 # 既定のロールでは広すぎるところに使う。tfConfigReader は bootstrap が持つ。
 locals {
-  custom_roles = {
+  custom_roles = merge({
     authConfigDeployer = {
       title       = "Auth config deployer"
       description = "blocking functions の登録に必要な Auth 設定の読み書きのみ。ユーザー情報には触れない。"
@@ -26,6 +26,21 @@ locals {
         "secretmanager.secrets.update",
       ]
     }
+    # roles/storage.admin はオブジェクトの読み書きまで含むので、バケットの設定だけを切り出した。
+    # 消す権限は含めない。
+    bucketConfigManager = {
+      title       = "Bucket config manager"
+      description = "バケットの作成と設定、誰が読み書きできるかを管理する。オブジェクトを読み書きする権限と、消す権限は含めない。"
+      stage       = "GA"
+      permissions = [
+        "storage.buckets.create",
+        "storage.buckets.get",
+        "storage.buckets.getIamPolicy",
+        "storage.buckets.list",
+        "storage.buckets.setIamPolicy",
+        "storage.buckets.update",
+      ]
+    }
     # roles/viewer は Firestore のドキュメントまで読めるので、設定の読み取りだけを切り出した。
     claudeConfigReader = {
       title       = "Claude config reader"
@@ -33,7 +48,7 @@ locals {
       stage       = "ALPHA"
       permissions = ["datastore.databases.get", "datastore.indexes.list", "firebaseauth.configs.get"]
     }
-  }
+  }, local.seed_custom_roles)
 }
 
 resource "google_project_iam_custom_role" "this" {
