@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/core/deployed_version.dart';
+import 'package:nocsis/core/reload_page.dart';
 import 'package:nocsis/providers/during_class_data.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
@@ -24,6 +27,29 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
   bool _isMouseMoving = false;
   Timer? _mouseTimer;
 
+  final _httpClient = http.Client();
+
+  // 他の画面に入れないのは、操作中に state が消えるため。この画面は主に
+  // サイネージとして放置されるので、人がリロードするのを待てない
+  late final _newVersionWatcher = NewVersionWatcher(
+    current: builtVersion,
+    fetchDeployed: () => fetchDeployedVersion(_httpClient, Uri.base),
+    reload: reloadPage,
+    interval: const Duration(hours: 1),
+    // 授業中に画面が一瞬消えないよう、休み時間まで待つ
+    canReload: () =>
+        ref
+            .read(duringClassDataProvider(ref.read(currentGroupIdProvider)))
+            .value ==
+        null,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _newVersionWatcher.start();
+  }
+
   void _onMouseMove(PointerEvent details) {
     setState(() {
       _isMouseMoving = true;
@@ -40,6 +66,8 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
   @override
   void dispose() {
     _mouseTimer?.cancel();
+    _newVersionWatcher.stop();
+    _httpClient.close();
     super.dispose();
   }
 

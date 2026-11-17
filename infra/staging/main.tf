@@ -25,10 +25,25 @@ module "nocsis" {
 
   # 承認や制限は environment ごとに違う。別の environment のジョブにこの環境へデプロイさせない。
   wlif_deploy_environments = ["Staging"]
+  seed_environment         = "Staging"
 
   secrets = {
     "CALENDAR_ACCOUNT_KEY" = ["backend-runtime", "functions-runtime"]
+    "OPENWEATHERMAP_TOKEN" = ["backend-runtime"]
   }
+
+  # 使っていない API。取り込みが済んだら、種類ごとに一覧から外して止める。
+  retiring_services = [
+    "cloudaicompanion.googleapis.com",
+    "fcm.googleapis.com",
+    "fcmregistrations.googleapis.com",
+    "firebaseappdistribution.googleapis.com",
+    "firebaseinstallations.googleapis.com",
+    "firebaseremoteconfig.googleapis.com",
+    "firebaseremoteconfigrealtime.googleapis.com",
+    "source.googleapis.com",
+    "testing.googleapis.com",
+  ]
 
   extra_service_accounts = {
     "claude-readonly" = {
