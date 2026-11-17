@@ -46,7 +46,7 @@ jobs:
     env:
       OASDIFF_VERSION: 1.37.0
       OASDIFF_SHA256: eac87307d31d08c36800c58a409c247f1c5db37fbb72e2544402f22a87cbca3c
-      LABEL: breaking_api
+      LABEL: skip-api-compat
       SPEC: frontend/swagger/api.json
     steps:
       # base は先頭ではなく merge コミットの1つ目の親から取る。再実行では同じ merge
