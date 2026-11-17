@@ -9,7 +9,7 @@ const auth = new GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/devstorage.read_only"],
 });
 
-// 1 つ 1.5MB ほどある。リリースは同時に 1〜2 個しか動いていないので、少しだけ持つ。
+// 1 つ 3.5MB ほどある。リリースは同時に 1〜2 個しか動いていないので、少しだけ持つ。
 const CACHE_LIMIT = 4;
 // 取り込み中の分も持ち、同じエラーが一斉に届いても 1 回だけ取りに行く。
 const cache = new Map<string, Promise<TraceMap | null>>();

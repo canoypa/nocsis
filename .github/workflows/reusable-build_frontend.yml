@@ -83,4 +83,15 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: frontend-build
-          path: ./frontend/build/web
+          path: |
+            ./frontend/build/web
+            !./frontend/build/web/**/*.map
+      # 公開リポジトリの artifact は誰でも落とせる。ソースマップは別にして、デプロイが済む間だけ残す。
+      - name: Upload Source Maps
+        if: ${{ inputs.persist }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: frontend-source-maps
+          path: ./frontend/build/web/*.map
+          retention-days: 1
+          if-no-files-found: error

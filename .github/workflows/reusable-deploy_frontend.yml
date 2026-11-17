@@ -39,6 +39,11 @@ jobs:
         with:
           name: frontend-build
           path: ./frontend/build/web
+      - name: Download Source Maps
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: frontend-source-maps
+          path: ./frontend/source-maps
       # ビルドの向き先はデプロイ先と同じでなければならない。違えば、staging の
       # Hosting に本番を向いたアプリが載る(逆も同じ)。設定はビルド側の入力、
       # デプロイ先は environment の変数で決まるため、両者は自動では一致しない。
@@ -61,16 +66,18 @@ jobs:
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
       # Hosting より先に置く。後にすると、新しい版で起きたエラーが届いたときにまだ無く、
       # backend がしばらく「無い」と覚えてしまう。
+      # 置けなくてもデプロイは止めない。エラーの報告が解読できなくなるだけで、画面は動く。
       # github.sha はビルドと同じ実行のものなので、アプリに埋め込んだ BUILD_COMMIT と一致する。
       # deploy には上書きの権限が無いので、同じ commit をやり直したときは既にあるものを飛ばす。
       - name: Upload source maps
+        continue-on-error: true
         env:
           BUCKET: ${{ vars.GCP_PROJECT_ID }}-frontend-source-maps
           COMMIT: ${{ github.sha }}
         run: |
           gcloud storage cp --no-clobber \
-            ./frontend/build/web/main.dart.js.map \
-            ./frontend/build/web/main.dart.wasm.map \
+            ./frontend/source-maps/main.dart.js.map \
+            ./frontend/source-maps/main.dart.wasm.map \
             "gs://$BUCKET/$COMMIT/"
       # channel_id は workflow_dispatch の入力に由来しうるので、run に展開せず
       # 環境変数として渡す。
