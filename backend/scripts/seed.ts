@@ -153,7 +153,7 @@ await firestore
     events_calendar_id: config.eventsCalendarId,
     dayduty_start_date: "2000-01-01",
     slack_event_channel_id: config.slackEventChannelId,
-    // Slack のトークンが無いので、毎分の日直通知が落ち続ける。
+    // Slack のトークンが無いので、毎朝の日直通知が落ちる。
     dayduty_notification_enabled: false,
     weather_point: { lat: 35.6812, lon: 139.7671 },
   });
