@@ -31,8 +31,8 @@ resource "google_storage_bucket_iam_binding" "source_maps_creator" {
 }
 
 resource "google_storage_bucket_iam_binding" "source_maps_viewer" {
-  bucket  = google_storage_bucket.source_maps.name
-  role    = "roles/storage.objectViewer"
+  bucket = google_storage_bucket.source_maps.name
+  role   = "roles/storage.objectViewer"
   members = [
     google_service_account.this["backend-runtime"].member,
     google_service_account.this["wlif-deploy"].member,
