@@ -16,8 +16,8 @@ output "import_ids" {
         "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}",
       ], k)
     }
-    # 無効な API を足すと取り込みで plan が落ちる。今は使う API がすべて両方の環境で有効。
-    services          = { for s in local.services : s => "${var.project_id}/${s}" }
+    # 取り込みの後に足した API は除く。まだ無効な環境で取り込もうとすると plan が落ちる。
+    services          = { for s in setsubtract(local.services, ["clouderrorreporting.googleapis.com"]) : s => "${var.project_id}/${s}" }
     retiring_services = { for s in var.retiring_services : s => "${var.project_id}/${s}" }
     audit_log_configs = {
       for s, _ in var.audit_log_configs : s => "${var.project_id} ${s}" if s == "storage.googleapis.com"
