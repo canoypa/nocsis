@@ -48,7 +48,7 @@ const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const parseEmails = (value: string) =>
   value
     .split(/[\s,]+/)
-    .map((email) => email.trim().toLowerCase())
+    .map((email) => email.trim())
     .filter((email) => email.length > 0);
 
 const config = emulated
