@@ -3,9 +3,8 @@ import {
   originalPositionFor,
   type TraceMap,
 } from "@jridgewell/trace-mapping";
+import { AppConfig } from "../config/app_config.js";
 import { fetchSourceMap, type SourceMapFile } from "./source_map_service.js";
-
-const REPOSITORY_URL = "https://github.com/canoypa/nocsis";
 
 export type DecodedFrame = {
   raw: string;
@@ -98,7 +97,7 @@ const decodeFrame = (
     column: original.column === null ? undefined : original.column + 1,
     functionName: original.name ?? undefined,
     githubUrl: path
-      ? `${REPOSITORY_URL}/blob/${commit}/${path}#L${original.line}`
+      ? `${AppConfig.REPOSITORY_URL}/blob/${commit}/${path}#L${original.line}`
       : undefined,
   };
 };
