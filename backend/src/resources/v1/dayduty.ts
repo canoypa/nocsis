@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { classmateSchema } from "./classmates.js";
+import { deprecated } from "../../openapi/deprecated.js";
 
 export const daydutyQuerySchema = z.object({
   date: z.string().datetime({ offset: true }).optional().meta({
@@ -8,5 +8,22 @@ export const daydutyQuerySchema = z.object({
   }),
 });
 
-// dayduty は classmate をそのまま返す
-export const daydutyResponseSchema = classmateSchema;
+// 古い frontend が読み続けているので、外す前に一度任意にして出す
+export const daydutyResponseSchema = z
+  .object({
+    name: z.string().meta({ description: "名前" }),
+    role: deprecated(
+      z.enum(["student", "teacher"]).meta({ description: "役割" }),
+    ),
+    stuNo: deprecated(z.number().int().meta({ description: "出席番号" })),
+    email: deprecated(
+      z.string().email().meta({ description: "メールアドレス" }),
+    ),
+    slackUserId: deprecated(
+      z.string().meta({ description: "SlackユーザーID" }),
+    ),
+  })
+  .meta({
+    $id: "Dayduty",
+    description: "日直",
+  });

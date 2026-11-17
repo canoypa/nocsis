@@ -146,10 +146,15 @@
         "additionalProperties": false,
         "description": "授業"
       },
-      "Classmate": {
+      "Dayduty": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "description": "名前"
+          },
           "role": {
+            "deprecated": true,
             "type": "string",
             "enum": [
               "student",
@@ -158,35 +163,30 @@
             "description": "役割"
           },
           "stuNo": {
+            "deprecated": true,
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991,
             "description": "出席番号"
           },
-          "name": {
-            "type": "string",
-            "description": "名前"
-          },
           "email": {
+            "deprecated": true,
             "type": "string",
             "format": "email",
             "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
             "description": "メールアドレス"
           },
           "slackUserId": {
+            "deprecated": true,
             "type": "string",
             "description": "SlackユーザーID"
           }
         },
         "required": [
-          "role",
-          "stuNo",
-          "name",
-          "email",
-          "slackUserId"
+          "name"
         ],
         "additionalProperties": false,
-        "description": "クラスメイト"
+        "description": "日直"
       },
       "Event": {
         "type": "object",
@@ -334,13 +334,71 @@
         "additionalProperties": false,
         "description": "天気データ"
       },
+      "UserJoinedGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "名前"
+          },
+          "classes_calendar_id": {
+            "deprecated": true,
+            "type": "string",
+            "description": "授業カレンダーID"
+          },
+          "events_calendar_id": {
+            "deprecated": true,
+            "type": "string",
+            "description": "イベントカレンダーID"
+          },
+          "dayduty_start_date": {
+            "deprecated": true,
+            "type": "string",
+            "description": "日直開始日"
+          },
+          "slack_event_channel_id": {
+            "deprecated": true,
+            "type": "string",
+            "description": "Slackイベント通知チャンネルID"
+          },
+          "weather_point": {
+            "deprecated": true,
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "description": "緯度"
+              },
+              "lon": {
+                "type": "number",
+                "description": "経度"
+              }
+            },
+            "required": [
+              "lat",
+              "lon"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "description": "参加しているグループ"
+      },
       "UserJoinedGroups": {
         "type": "object",
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Group"
+              "$ref": "#/components/schemas/UserJoinedGroup"
             },
             "description": "参加しているグループのリスト"
           }
@@ -584,7 +642,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Classmate"
+                  "$ref": "#/components/schemas/Dayduty"
                 }
               }
             }
