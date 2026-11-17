@@ -57,6 +57,21 @@ jobs:
         with:
           workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
           service_account: wlif-deploy@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+      # Hosting より先に置く。後にすると、新しい版で起きたエラーが届いたときにまだ無く、
+      # backend がしばらく「無い」と覚えてしまう。
+      # github.sha はビルドと同じ実行のものなので、アプリに埋め込んだ BUILD_COMMIT と一致する。
+      # deploy には上書きの権限が無いので、同じ commit をやり直したときは既にあるものを飛ばす。
+      - name: Upload source maps
+        env:
+          BUCKET: ${{ vars.GCP_PROJECT_ID }}-frontend-source-maps
+          COMMIT: ${{ github.sha }}
+        run: |
+          gcloud storage cp --no-clobber \
+            ./frontend/build/web/main.dart.js.map \
+            ./frontend/build/web/main.dart.wasm.map \
+            "gs://$BUCKET/$COMMIT/"
       # channel_id は workflow_dispatch の入力に由来しうるので、run に展開せず
       # 環境変数として渡す。
       - name: Deploy

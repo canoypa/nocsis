@@ -63,16 +63,21 @@ jobs:
       # 教室画面が version.json の build_number と埋め込んだ BUILD_NUMBER を比べて
       # 自分でリロードする。run_attempt を混ぜないのは、ジョブの再実行だけで全端末が
       # リロードしないようにするため
+      #
+      # エラーの報告は BUILD_COMMIT でソースマップを引く。ソースマップは Hosting に載せず、
+      # デプロイのときに同じ github.sha のパスで非公開のバケットに置く (reusable-deploy_frontend.yml)。
       - name: Build
         working-directory: ./frontend
         env:
           BUILD_NUMBER: ${{ github.run_id }}
+          BUILD_COMMIT: ${{ github.sha }}
         run: >-
-          flutter build web --wasm
+          flutter build web --wasm --source-maps
           --dart-define-from-file=dart_defines/build.json
           --build-name=0.0.0
           --build-number="$BUILD_NUMBER"
           --dart-define=BUILD_NUMBER="$BUILD_NUMBER"
+          --dart-define=BUILD_COMMIT="$BUILD_COMMIT"
       - name: Upload Artifacts
         if: ${{ inputs.persist }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
