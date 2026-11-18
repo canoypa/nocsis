@@ -39,7 +39,13 @@ describe("grant", () => {
     expect(result).toBe("created");
 
     const doc = await bindings
-      .doc(bindingId("user:test_user_1", "roles/group.admin", "group:test_group_1"))
+      .doc(
+        bindingId(
+          "user:test_user_1",
+          "roles/group.admin",
+          "group:test_group_1",
+        ),
+      )
       .get();
 
     expect(doc.exists).toBe(true);
