@@ -1,7 +1,7 @@
 name: Migrate Firestore
 
-# backend/src/migrations の移行を名前で選んで流す (backend/scripts/migrate.ts)。
-# 流せるのは backend/src/migrations/index.ts の一覧にあるものだけ。
+# backend/scripts/migrations の移行を名前で選んで流す (backend/scripts/migrate.ts)。
+# 流せるのは backend/scripts/migrations にあるものだけ。
 # 既定は書き込まずに件数を数えるだけで、apply を付けたときだけ書き込む。
 # Production environment は main からしか引けないので、本番は main で流す。
 #
@@ -16,7 +16,7 @@ on:
         options: [Staging, Production]
         default: Staging
       name:
-        description: "移行の名前 (backend/src/migrations/index.ts のキー)"
+        description: "移行の名前 (backend/scripts/migrations のファイル名から .ts を除いたもの)"
         type: string
         required: true
       apply:
@@ -55,7 +55,7 @@ jobs:
         with:
           workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
           service_account: wlif-migrate@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-      # 入力は式で run に埋め込まず、環境変数で渡す。名前は migrate.ts が一覧と照らして弾く。
+      # 入力は式で run に埋め込まず、環境変数で渡す。名前は migrate.ts が文字を絞り、実在するファイルか確かめる。
       - name: Migrate
         env:
           PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}

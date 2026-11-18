@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { COLLECTION } from "../authz/binding.js";
-import { firestore } from "../clients/firebase.js";
-import { backfillRoleBindings } from "./backfill_role_bindings.js";
+import { COLLECTION } from "../../src/authz/binding.js";
+import { firestore } from "../../src/clients/firebase.js";
+import backfillRoleBindings from "./20261118_backfill_role_bindings.js";
 
 const bindings = firestore.collection(COLLECTION);
 const memberships = firestore.collection("user_joined_groups");

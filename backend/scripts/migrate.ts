@@ -1,11 +1,27 @@
-// src/migrations の移行を名前で選んで流す。既定は書き込まずに件数だけを数える。
+// scripts/migrations の移行を名前で選んで流す。既定は書き込まずに件数だけを数える。
+//
+// 移行は1本1ファイルで scripts/migrations に置き、Migration を default export する。
+// ファイル名は「作った日付_何をするか」(例: 20261118_backfill_role_bindings) にして、並びで順序と時期がわかるようにする。
+// 一度流せば役目を終えるので、アプリのコード (src) には置かない。
 //
 //   pnpm exec tsx scripts/migrate.ts --name <name>                                   エミュレータ、ドライラン
 //   pnpm exec tsx scripts/migrate.ts --name <name> --apply --project <id> [--yes]
 //
 // 公開リポジトリの Actions から流すので、出すのは件数だけ。
+import { existsSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { selectTarget } from "./target.js";
+
+/**
+ * Firestore のデータを書き換える移行。
+ *
+ * - 何度流しても同じ結果になるように書く
+ * - apply が false のときは書き込まず、書き込むはずの件数だけを数える
+ * - 返すのは件数だけ。公開リポジトリの Actions のログに出るので、ID やドキュメントの中身は返さない
+ */
+export type Migration = (options: {
+  apply: boolean;
+}) => Promise<Record<string, number>>;
 
 const { values } = parseArgs({
   args: process.argv.slice(2).filter((arg, i) => !(i === 0 && arg === "--")),
@@ -25,19 +41,18 @@ if (!name) {
 
 const target = await selectTarget(values);
 
-const { MIGRATIONS } = await import("../src/migrations/index.js");
-const { firestore } = await import("../src/clients/firebase.js");
-
-// in だとプロトタイプの toString なども通るので、自分の持ち物だけを見る。
-if (!Object.hasOwn(MIGRATIONS, name)) {
-  console.error(
-    `移行がありません: ${name}\n流せるもの: ${Object.keys(MIGRATIONS).join(" / ")}`,
-  );
-  await firestore.terminate();
+// 名前をパスとして組み立てるので、区切りや「..」を含められないよう文字を絞る。
+// そのうえで scripts/migrations に実在するファイルだけを読む。
+const file = new URL(`./migrations/${name}.ts`, import.meta.url);
+if (!/^[a-z0-9_]+$/.test(name) || !existsSync(file)) {
+  console.error(`移行がありません: ${name}`);
   process.exit(1);
 }
 
-const counts = await MIGRATIONS[name]({ apply });
+const { default: migration }: { default: Migration } = await import(file.href);
+const { firestore } = await import("../src/clients/firebase.js");
+
+const counts = await migration({ apply });
 
 console.info(
   [

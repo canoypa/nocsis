@@ -1,8 +1,8 @@
-import { bindingId, COLLECTION, grant } from "../authz/binding.js";
-import { subject, user } from "../authz/principal.js";
-import { group, serialize } from "../authz/resource.js";
-import { firestore } from "../clients/firebase.js";
-import type { Migration } from "./migration.js";
+import { bindingId, COLLECTION, grant } from "../../src/authz/binding.js";
+import { subject, user } from "../../src/authz/principal.js";
+import { group, serialize } from "../../src/authz/resource.js";
+import { firestore } from "../../src/clients/firebase.js";
+import type { Migration } from "../migrate.js";
 
 /** 参加しているだけの人に付けるロール。管理や表示端末の権限は別に付与する */
 export const JOINED_MEMBER_ROLE = "roles/group.viewer";
@@ -14,7 +14,7 @@ export const JOINED_MEMBER_ROLE = "roles/group.viewer";
  * 参加を消しても binding は外れないので、外すときは binding も消す。
  * user_joined_groups は消さない。読み手が移り切るまで両方を残す。
  */
-export const backfillRoleBindings: Migration = async ({ apply }) => {
+const backfillRoleBindings: Migration = async ({ apply }) => {
   const snapshot = await firestore
     .collection("user_joined_groups")
     .select("user_id", "group_id")
@@ -69,3 +69,5 @@ export const backfillRoleBindings: Migration = async ({ apply }) => {
 
   return counts;
 };
+
+export default backfillRoleBindings;
