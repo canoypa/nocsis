@@ -56,6 +56,7 @@ void main() {
       requests.single.headers['Content-Type'],
       startsWith('application/json'),
     );
+    expect(requests.single.headers['X-Client-Commit'], commit);
     expect(jsonDecode(requests.single.body), {
       'message': 'Bad state: 壊れた',
       'stack': 'at a (main.dart.wasm:wasm-function[1]:0x10)\nat b',

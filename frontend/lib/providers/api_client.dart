@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
+import 'package:nocsis/core/client_commit.dart';
 import 'package:nocsis/generated/api_client/api.swagger.dart';
 import 'package:nocsis/providers/user.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -53,6 +54,6 @@ Future<Api> apiClient(Ref ref) async {
 
   return Api.create(
     baseUrl: Uri.parse(apiBaseUrl),
-    interceptors: [interceptor],
+    interceptors: [interceptor, clientCommitInterceptor(buildCommit)],
   );
 }
