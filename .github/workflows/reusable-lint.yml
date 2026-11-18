@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.8
+        uses: jdx/mise-action@v5.2.9
       - name: Get pnpm store directory
         id: pnpm-cache
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
@@ -44,7 +44,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.8
+        uses: jdx/mise-action@v5.2.9
       - name: Get pnpm store directory
         id: pnpm-cache
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
@@ -71,7 +71,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.8
+        uses: jdx/mise-action@v5.2.9
       - name: Get pnpm store directory
         id: pnpm-cache
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
@@ -107,7 +107,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.8
+        uses: jdx/mise-action@v5.2.9
       - name: Setup pub cache
         uses: actions/cache@v6.1.0
         with:

@@ -22,7 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.8
+        uses: jdx/mise-action@v5.2.9
       # firebase deploy は関数定義の discovery で functions のコードを実行するため、
       # デプロイするだけでも functions 配下の node_modules が要る。root 側は CLI 用。
       - name: Install dependencies
