@@ -73,9 +73,10 @@ classesRoutes.get(
     security: [{ bearer: [] }],
   }),
   validator("param", paramSchema),
-  validator("query", querySchema),
   authentication,
   authorize("group.read", groupOf("groupId")),
+  // 権限の無い相手に、クエリの検証結果 (400) を先に返さない
+  validator("query", querySchema),
   async (c) => {
     const groupId = c.req.param("groupId");
     const { from: fromStr, to: toStr } = c.req.valid("query");

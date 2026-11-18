@@ -56,9 +56,10 @@ daydutRoutes.get(
     security: [{ bearer: [] }],
   }),
   validator("param", paramSchema),
-  validator("query", daydutyQuerySchema),
   authentication,
   authorize("member.read", groupOf("groupId")),
+  // 権限の無い相手に、クエリの検証結果 (400) を先に返さない
+  validator("query", daydutyQuerySchema),
   async (c) => {
     const groupId = c.req.param("groupId");
     const { date } = c.req.valid("query");
