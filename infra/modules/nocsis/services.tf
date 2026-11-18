@@ -27,6 +27,7 @@ locals {
     "secretmanager.googleapis.com",
     "securetoken.googleapis.com",
     "serviceusage.googleapis.com",
+    "source.googleapis.com",
     "storage.googleapis.com",
     "sts.googleapis.com",
   ], var.extra_services))
@@ -51,10 +52,11 @@ resource "google_project_service" "retiring" {
   service = each.value
 
   disable_on_destroy = true
-  # bigquery と bigquerystorage のように互いに依存し合うものは、片方ずつは止められない。
-  # その API に依存しているものも一緒に止まる。一覧に残したままだと次の apply で有効に戻るので、
-  # 依存しているものは同じ変更で一覧から外す。使う API が依存していないことも外す前に確かめる。
-  disable_dependent_services = true
+  # 依存しているものを一緒に止めない。依存関係は API から読めない分もあり (source を止めると
+  # cloudfunctions も止めようとした)、一緒に止めると使う API まで止まりうる。依存があれば止めるのを断られる。
+  # そのため、依存されている API は依存している側を止めた後の変更で外す。bigquery と bigquerystorage の
+  # ように互いに依存し合うものは、この設定では止められない。
+  disable_dependent_services = false
 
   lifecycle {
     precondition {
@@ -62,6 +64,12 @@ resource "google_project_service" "retiring" {
       error_message = "使う API (local.services / extra_services) は止められない。"
     }
   }
+}
+
+# Cloud Functions が依存していて止められなかった。
+moved {
+  from = google_project_service.retiring["source.googleapis.com"]
+  to   = google_project_service.this["source.googleapis.com"]
 }
 
 # Data Access の監査ログ。サービスごとに、記録する種類を全部書く。
