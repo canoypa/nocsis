@@ -1,6 +1,8 @@
 {
   "hosting": {
     "public": "./frontend/build/web",
+    // ソースマップを読むのは backend だけで、画面には要らない。デプロイのときにバケットに置く
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/*.map"],
     "trailingSlash": false,
     "rewrites": [
       {
@@ -16,7 +18,14 @@
         "destination": "/index.html"
       }
     ],
-    "headers": []
+    // Flutter の成果物はファイル名にハッシュを含まないので、ブラウザに既定の
+    // 1時間キャッシュさせると、リロードしても古い版が起動する。ETag で確かめさせる
+    "headers": [
+      {
+        "source": "**",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      }
+    ]
   },
   // Cloud Run functions のランタイムにはサポート期限がある。
   // 上げる前に対応状況を確認する:

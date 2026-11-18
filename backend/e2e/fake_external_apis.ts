@@ -33,7 +33,7 @@ secretManagerClient.accessSecretVersion = (async ({
   return [{ payload: { data } }];
 }) as unknown as typeof secretManagerClient.accessSecretVersion;
 
-/** e2e/seed.ts のグループが指すカレンダー ID ごとの予定名 */
+/** scripts/seed.ts のグループが指すカレンダー ID ごとの予定名 */
 const calendarTitles: Record<string, string[]> = {
   classes: ["E2E 国語", "E2E 数学"],
   events: ["E2E 遠足"],

@@ -39,6 +39,9 @@ export const OPEN_WEATHER_MAP_CURRENT_URL =
 export const OPEN_WEATHER_MAP_FORECAST_URL =
   "https://api.openweathermap.org/data/2.5/forecast";
 
+export const CLOUD_STORAGE_OBJECT_URL =
+  "https://storage.googleapis.com/storage/v1/b/:bucket/o/:object";
+
 export const TEST_OPENWEATHERMAP_TOKEN = "test-openweathermap-token";
 
 export const defaultSecrets: Record<string, string> = {

@@ -11,21 +11,14 @@ output "import_ids" {
     # 取り込みの後に新しく足した権限は除く。
     project_iam = {
       for k, v in local.project_iam_members : k => "${var.project_id} ${v.role} ${v.member}"
-      if k != "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}"
+      if !contains([
+        "roles/errorreporting.viewer serviceAccount:${var.claude_readonly_email}",
+        "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}",
+      ], k)
     }
-    # 取り込みの時点で有効だったものだけ。後から足したものを取り込もうとすると plan が落ちる。
-    services = {
-      for s in setintersection(local.services, [
-        "artifactregistry.googleapis.com", "calendar-json.googleapis.com", "cloudbuild.googleapis.com",
-        "cloudfunctions.googleapis.com", "cloudresourcemanager.googleapis.com", "cloudscheduler.googleapis.com",
-        "eventarc.googleapis.com", "firebase.googleapis.com", "firebasehosting.googleapis.com",
-        "firebaserules.googleapis.com", "firestore.googleapis.com", "iam.googleapis.com",
-        "iamcredentials.googleapis.com", "identitytoolkit.googleapis.com", "logging.googleapis.com",
-        "pubsub.googleapis.com", "run.googleapis.com", "secretmanager.googleapis.com",
-        "securetoken.googleapis.com", "serviceusage.googleapis.com", "storage.googleapis.com",
-        "sts.googleapis.com",
-      ]) : s => "${var.project_id}/${s}"
-    }
+    # 取り込みの後に足した API は除く。まだ無効な環境で取り込もうとすると plan が落ちる。
+    services          = { for s in setsubtract(local.services, ["clouderrorreporting.googleapis.com"]) : s => "${var.project_id}/${s}" }
+    retiring_services = { for s in var.retiring_services : s => "${var.project_id}/${s}" }
     audit_log_configs = {
       for s, _ in var.audit_log_configs : s => "${var.project_id} ${s}" if s == "storage.googleapis.com"
     }
