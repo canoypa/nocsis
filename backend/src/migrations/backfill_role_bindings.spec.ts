@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { COLLECTION } from "../authz/binding.js";
 import { firestore } from "../clients/firebase.js";
-import { backfillFromJoinedGroups } from "./backfill.js";
-import { COLLECTION } from "./binding.js";
+import { backfillRoleBindings } from "./backfill_role_bindings.js";
 
 const bindings = firestore.collection(COLLECTION);
 const memberships = firestore.collection("user_joined_groups");
@@ -26,18 +26,18 @@ const triples = async () =>
     )
     .sort();
 
-describe("backfillFromJoinedGroups", () => {
+describe("backfillRoleBindings", () => {
   it("参加1件ごとに viewer の binding を作ること", async () => {
     await memberships.add({ user_id: "u1", group_id: "g1" });
     await memberships.add({ user_id: "u1", group_id: "g2" });
     await memberships.add({ user_id: "u2", group_id: "g1" });
 
-    const result = await backfillFromJoinedGroups();
+    const result = await backfillRoleBindings({ apply: true });
 
     expect(result).toEqual({
       rows: 3,
       created: 3,
-      alreadyGranted: 0,
+      already_granted: 0,
       skipped: 0,
     });
     expect(await triples()).toEqual([
@@ -51,12 +51,12 @@ describe("backfillFromJoinedGroups", () => {
     await memberships.add({ user_id: "u1", group_id: "g1" });
     await memberships.add({ user_id: "u1", group_id: "g1" });
 
-    const result = await backfillFromJoinedGroups();
+    const result = await backfillRoleBindings({ apply: true });
 
     expect(result).toEqual({
       rows: 2,
       created: 1,
-      alreadyGranted: 1,
+      already_granted: 1,
       skipped: 0,
     });
     expect(await triples()).toEqual(["user:u1 roles/group.viewer group:g1"]);
@@ -65,13 +65,13 @@ describe("backfillFromJoinedGroups", () => {
   it("もう一度流しても増えないこと", async () => {
     await memberships.add({ user_id: "u1", group_id: "g1" });
 
-    await backfillFromJoinedGroups();
-    const result = await backfillFromJoinedGroups();
+    await backfillRoleBindings({ apply: true });
+    const result = await backfillRoleBindings({ apply: true });
 
     expect(result).toEqual({
       rows: 1,
       created: 0,
-      alreadyGranted: 1,
+      already_granted: 1,
       skipped: 0,
     });
     expect(await triples()).toHaveLength(1);
@@ -83,12 +83,12 @@ describe("backfillFromJoinedGroups", () => {
     await memberships.add({ user_id: "", group_id: "g1" });
     await memberships.add({ user_id: 1, group_id: "g1" });
 
-    const result = await backfillFromJoinedGroups();
+    const result = await backfillRoleBindings({ apply: true });
 
     expect(result).toEqual({
       rows: 4,
       created: 0,
-      alreadyGranted: 0,
+      already_granted: 0,
       skipped: 4,
     });
     expect(await triples()).toEqual([]);
@@ -97,8 +97,27 @@ describe("backfillFromJoinedGroups", () => {
   it("user_joined_groups を消さないこと", async () => {
     await memberships.add({ user_id: "u1", group_id: "g1" });
 
-    await backfillFromJoinedGroups();
+    await backfillRoleBindings({ apply: true });
 
     expect((await memberships.get()).size).toBe(1);
+  });
+
+  describe("ドライランの場合", () => {
+    it("書き込まずに、作るはずの件数とあるものの件数を数えること", async () => {
+      await memberships.add({ user_id: "u1", group_id: "g1" });
+      await backfillRoleBindings({ apply: true });
+      await memberships.add({ user_id: "u2", group_id: "g1" });
+      await memberships.add({ user_id: "u3" });
+
+      const result = await backfillRoleBindings({ apply: false });
+
+      expect(result).toEqual({
+        rows: 3,
+        created: 1,
+        already_granted: 1,
+        skipped: 1,
+      });
+      expect(await triples()).toEqual(["user:u1 roles/group.viewer group:g1"]);
+    });
   });
 });

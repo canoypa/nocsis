@@ -1,4 +1,4 @@
-# Firestore のデータを書き換えるスクリプト (role_bindings のバックフィルなど) を Actions から流すときに借りる SA。
+# Actions の「Migrate Firestore」workflow が、Firestore のデータを書き換える移行を流すときに借りる SA。
 # wlif-deploy に権限を足さないのは、デプロイの SA のロールをデプロイに要るものだけにしておき、
 # データの書き換えが監査ログで別の SA として見分けられるようにするため。
 # 同じ environment に束縛するので、デプロイのジョブもこの SA を借りられる。ジョブの間の分離にはならない。

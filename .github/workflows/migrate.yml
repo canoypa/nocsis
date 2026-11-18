@@ -1,9 +1,11 @@
-name: Backfill role_bindings
+name: Migrate Firestore
 
-# user_joined_groups の参加を role_bindings に写す (backend/scripts/backfill_role_bindings.ts)。
-# 何度流しても増えない。Production environment は main からしか引けないので、本番は main で流す。
+# backend/src/migrations の移行を名前で選んで流す (backend/scripts/migrate.ts)。
+# 流せるのは backend/src/migrations/index.ts の一覧にあるものだけ。
+# 既定は書き込まずに件数を数えるだけで、apply を付けたときだけ書き込む。
+# Production environment は main からしか引けないので、本番は main で流す。
 #
-# 公開リポジトリの Actions のログは誰でも読めるので、スクリプトは件数しか出さない。
+# 公開リポジトリの Actions のログは誰でも読めるので、移行は件数しか出さない。
 # uid を入力に取る grant はここから流さない。
 on:
   workflow_dispatch:
@@ -13,15 +15,23 @@ on:
         type: choice
         options: [Staging, Production]
         default: Staging
+      name:
+        description: "移行の名前 (backend/src/migrations/index.ts のキー)"
+        type: string
+        required: true
+      apply:
+        description: "書き込む (外すとドライラン)"
+        type: boolean
+        default: false
 
 permissions: {}
 
 concurrency:
-  group: Backfill role_bindings ${{ inputs.environment }}
+  group: Migrate Firestore ${{ inputs.environment }}
   cancel-in-progress: false
 
 jobs:
-  backfill:
+  migrate:
     environment: ${{ inputs.environment }}
     permissions:
       contents: read
@@ -45,7 +55,13 @@ jobs:
         with:
           workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
           service_account: wlif-migrate@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-      - name: Backfill
-        run: pnpm exec tsx scripts/backfill_role_bindings.ts --project "$PROJECT_ID" --yes
+      # 入力は式で run に埋め込まず、環境変数で渡す。名前は migrate.ts が一覧と照らして弾く。
+      - name: Migrate
         env:
           PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          MIGRATION_NAME: ${{ inputs.name }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          args=(--name "$MIGRATION_NAME" --project "$PROJECT_ID" --yes)
+          if [ "$APPLY" = "true" ]; then args+=(--apply); fi
+          pnpm exec tsx scripts/migrate.ts "${args[@]}"

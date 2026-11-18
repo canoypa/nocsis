@@ -1,36 +1,30 @@
+import { bindingId, COLLECTION, grant } from "../authz/binding.js";
+import { subject, user } from "../authz/principal.js";
+import { group, serialize } from "../authz/resource.js";
 import { firestore } from "../clients/firebase.js";
-import { grant } from "./binding.js";
-import { user } from "./principal.js";
-import { group } from "./resource.js";
+import type { Migration } from "./migration.js";
 
 /** 参加しているだけの人に付けるロール。管理や表示端末の権限は別に付与する */
 export const JOINED_MEMBER_ROLE = "roles/group.viewer";
-
-export type BackfillResult = {
-  /** user_joined_groups の行数 */
-  rows: number;
-  created: number;
-  alreadyGranted: number;
-  /** user_id か group_id が文字列でない行 */
-  skipped: number;
-};
 
 /**
  * user_joined_groups の参加を、すべて JOINED_MEMBER_ROLE の binding にする。
  *
  * 付与は3つ組で決まるので、何度流しても増えない。同じ参加が複数行あっても1つにまとまる。
+ * 参加を消しても binding は外れないので、外すときは binding も消す。
  * user_joined_groups は消さない。読み手が移り切るまで両方を残す。
  */
-export const backfillFromJoinedGroups = async (): Promise<BackfillResult> => {
+export const backfillRoleBindings: Migration = async ({ apply }) => {
   const snapshot = await firestore
     .collection("user_joined_groups")
     .select("user_id", "group_id")
     .get();
 
-  const result: BackfillResult = {
+  const counts = {
     rows: snapshot.size,
     created: 0,
-    alreadyGranted: 0,
+    already_granted: 0,
+    // user_id か group_id が文字列でない行
     skipped: 0,
   };
 
@@ -44,22 +38,34 @@ export const backfillFromJoinedGroups = async (): Promise<BackfillResult> => {
       typeof groupId !== "string" ||
       groupId === ""
     ) {
-      result.skipped++;
+      counts.skipped++;
       continue;
     }
 
-    const granted = await grant({
+    const params = {
       principal: user(uid),
       role: JOINED_MEMBER_ROLE,
       resource: group(groupId),
-    });
+    } as const;
 
-    if (granted === "created") {
-      result.created++;
-    } else {
-      result.alreadyGranted++;
+    if (apply) {
+      const granted = await grant(params);
+      counts[granted]++;
+      continue;
     }
+
+    const existing = await firestore
+      .collection(COLLECTION)
+      .doc(
+        bindingId(
+          subject(params.principal),
+          params.role,
+          serialize(params.resource),
+        ),
+      )
+      .get();
+    counts[existing.exists ? "already_granted" : "created"]++;
   }
 
-  return result;
+  return counts;
 };
