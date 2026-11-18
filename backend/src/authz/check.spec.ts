@@ -39,7 +39,7 @@ describe("can", () => {
     it("no_binding で拒否すること", async () => {
       await addBinding({
         subject: "user:test_user_1",
-        role: "group_admin",
+        role: "roles/group.admin",
         resource: "group:test_group_2",
       });
 
@@ -57,7 +57,7 @@ describe("can", () => {
     it("no_binding で拒否すること", async () => {
       await addBinding({
         subject: "user:test_user_2",
-        role: "group_admin",
+        role: "roles/group.admin",
         resource: "group:test_group_1",
       });
 
@@ -75,7 +75,7 @@ describe("can", () => {
     it("どの binding で通ったかを添えて許可すること", async () => {
       const ref = await addBinding({
         subject: "user:test_user_1",
-        role: "group_admin",
+        role: "roles/group.admin",
         resource: "group:test_group_1",
       });
 
@@ -96,7 +96,7 @@ describe("can", () => {
     it("insufficient_permission で拒否すること", async () => {
       await addBinding({
         subject: "user:test_user_1",
-        role: "group_student",
+        role: "roles/group.viewer",
         resource: "group:test_group_1",
       });
 
@@ -117,12 +117,12 @@ describe("can", () => {
     it("いずれかが permission を含めば許可すること", async () => {
       await addBinding({
         subject: "user:test_user_1",
-        role: "group_student",
+        role: "roles/group.viewer",
         resource: "group:test_group_1",
       });
       const adminRef = await addBinding({
         subject: "user:test_user_1",
-        role: "group_admin",
+        role: "roles/group.admin",
         resource: "group:test_group_1",
       });
 
@@ -144,7 +144,7 @@ describe("can", () => {
     it("binding が無いのと同じ扱いになること", async () => {
       await addBinding({
         subject: "user:test_user_1",
-        role: "group_teacher",
+        role: "roles/group.teacher",
         resource: "group:test_group_1",
       });
 
@@ -162,12 +162,12 @@ describe("can", () => {
     it("有効な binding の方で判定すること", async () => {
       await addBinding({
         subject: "user:test_user_1",
-        role: "group_teacher",
+        role: "roles/group.teacher",
         resource: "group:test_group_1",
       });
       await addBinding({
         subject: "user:test_user_1",
-        role: "group_student",
+        role: "roles/group.viewer",
         resource: "group:test_group_1",
       });
 

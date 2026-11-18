@@ -22,11 +22,11 @@ describe("roles", () => {
 
   describe("isRoleName", () => {
     it("定義済みのロール名を受け入れること", () => {
-      expect(isRoleName("group_admin")).toBe(true);
+      expect(isRoleName("roles/group.admin")).toBe(true);
     });
 
     it("定義に無い名前を受け入れないこと", () => {
-      expect(isRoleName("group_teacher")).toBe(false);
+      expect(isRoleName("roles/group.teacher")).toBe(false);
     });
 
     it("Object のプロパティ名を受け入れないこと", () => {
@@ -40,7 +40,7 @@ describe("roles", () => {
 
   describe("permissionsOf", () => {
     it("ロールの permission を返すこと", () => {
-      expect(permissionsOf("group_student")).toEqual(["group.read"]);
+      expect(permissionsOf("roles/group.viewer")).toEqual(["group.read"]);
     });
   });
 });

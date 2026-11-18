@@ -22,18 +22,21 @@ export type Permission = (typeof PERMISSIONS)[number];
  * ロールは permission の束。判定するコードは role を見ず permission だけを見る。
  *
  * ロール定義は DB ではなくコードに置く（型・テスト・レビュー・デプロイ履歴が効く）。
+ * 名前は GCP にならい `roles/` を付け、permission と見分けられるようにする。人に付けるロールは
+ * 「何ができるか」で、端末専用のロールは用途で名付ける。
+ *
  * `scope` は単数 — 付与できるリソース型を1つに固定し、付け先違いを型エラーにする。
  */
 export const ROLES = {
-  group_student: {
+  "roles/group.viewer": {
     scope: "group",
     permissions: ["group.read"],
   },
-  group_display: {
+  "roles/group.display": {
     scope: "group",
     permissions: ["group.read", "member.read"],
   },
-  group_admin: {
+  "roles/group.admin": {
     scope: "group",
     permissions: [
       "group.read",

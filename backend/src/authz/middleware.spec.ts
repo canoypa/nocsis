@@ -51,7 +51,7 @@ describe("authorize", () => {
 
   describe("binding はあるが permission が足りない場合", () => {
     it("403になること", async () => {
-      await addBinding("group_student");
+      await addBinding("roles/group.viewer");
 
       const response = await app.request("/groups/test_group_1");
 
@@ -61,7 +61,7 @@ describe("authorize", () => {
 
   describe("permission を持つ場合", () => {
     it("ハンドラに進み principal が置かれていること", async () => {
-      await addBinding("group_admin");
+      await addBinding("roles/group.admin");
 
       const response = await app.request("/groups/test_group_1");
 
@@ -72,7 +72,7 @@ describe("authorize", () => {
 
   describe("権限を持つグループと持たないグループがある場合", () => {
     it("持たない側は404になること", async () => {
-      await addBinding("group_admin");
+      await addBinding("roles/group.admin");
 
       const response = await app.request("/groups/test_group_2");
 
@@ -83,7 +83,7 @@ describe("authorize", () => {
   describe("ログ", () => {
     it("拒否したときも誰が何をなぜ拒否されたかを残すこと", async () => {
       const log = vi.spyOn(console, "log").mockImplementation(() => {});
-      await addBinding("group_student");
+      await addBinding("roles/group.viewer");
 
       await app.request("/groups/test_group_1");
 
@@ -101,7 +101,7 @@ describe("authorize", () => {
 
     it("許可したときはどの binding で通ったかを残すこと", async () => {
       const log = vi.spyOn(console, "log").mockImplementation(() => {});
-      const ref = await addBinding("group_admin");
+      const ref = await addBinding("roles/group.admin");
 
       await app.request("/groups/test_group_1");
 
