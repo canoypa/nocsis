@@ -1,6 +1,7 @@
 # フロントエンドのソースマップを置く。backend がエラーのスタックトレースを解読するのに読む。
 # 名前は backend の AppConfig.SOURCE_MAP_BUCKET_SUFFIX と揃える。
-# ソースマップはシンボル名とパスが読めるので、公開しない。
+# Hosting は最新の版しか持たないので、古い版のソースマップは別に取っておく。
+# 読むのは backend だけなので、公開はしない。
 resource "google_storage_bucket" "source_maps" {
   name     = "${var.project_id}-frontend-source-maps"
   location = var.region
