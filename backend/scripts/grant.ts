@@ -2,7 +2,7 @@
 //
 //   pnpm run grant -- --subject user:<uid> --role <role> --resource group:<id> [--project <id>] [--yes]
 //
-// --project を省くとエミュレータに書く。
+// --project を省くとエミュレータに書く。uid とグループ ID をそのまま出すので、公開ログの残る Actions からは流さない。
 import { parseArgs } from "node:util";
 import { isRoleName, ROLES } from "../src/authz/roles.js";
 import { selectTarget } from "./target.js";
@@ -59,6 +59,13 @@ const { grant } = await import("../src/authz/binding.js");
 const { user } = await import("../src/authz/principal.js");
 const { group } = await import("../src/authz/resource.js");
 const { firestore } = await import("../src/clients/firebase.js");
+
+// 打ち間違えた ID に付与して「付与しました」と出ると、本来のグループに付いていないことに気づけない。
+const groupSnapshot = await firestore.collection("groups").doc(groupId).get();
+if (!groupSnapshot.exists) {
+  await firestore.terminate();
+  fail(`${target} にグループがありません: ${resource}`);
+}
 
 const result = await grant({
   principal: user(uid),

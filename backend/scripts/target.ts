@@ -1,7 +1,7 @@
-// 本番やStaging に書くスクリプトの、書き込み先の決め方をそろえる。
+// 本番や Staging に書くスクリプトの、書き込み先の決め方をそろえる。
 //
 // 既定はエミュレータ。実プロジェクトには --project を明示したときだけ書き、
-// 端末からなら同じ ID をもう一度打たせる。端末でない (Actions など) ときは --yes を要る。
+// 端末からなら同じ ID をもう一度打たせる。端末でない (Actions など) ときは --yes が要る。
 import assert from "node:assert";
 import { createInterface } from "node:readline/promises";
 
@@ -24,6 +24,11 @@ export const selectTarget = async (options: {
   assert(
     !process.env.FIRESTORE_EMULATOR_HOST,
     "--project を付けるときは FIRESTORE_EMULATOR_HOST を外す",
+  );
+  // initializeApp() は GOOGLE_CLOUD_PROJECT より FIREBASE_CONFIG を先に見るので、確かめた ID と書き先がずれる。
+  assert(
+    !process.env.FIREBASE_CONFIG,
+    "--project を付けるときは FIREBASE_CONFIG を外す",
   );
   process.env.GOOGLE_CLOUD_PROJECT = project;
 

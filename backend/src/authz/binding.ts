@@ -55,6 +55,11 @@ export const grant = async <R extends ResourceRef>(params: {
   const subjectKey = subject(principal);
   const resourceKey = serialize(resource);
 
+  // 区切りを含む ID を通すと、別の3つ組が同じ doc ID になり得る
+  if (subjectKey.includes("|") || resourceKey.includes("|")) {
+    throw new Error("subject と resource に | は使えません");
+  }
+
   const ref = firestore
     .collection(COLLECTION)
     .doc(bindingId(subjectKey, role, resourceKey));

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { firestore } from "../clients/firebase.js";
 import { bindingId, COLLECTION, grant } from "./binding.js";
 import { user } from "./principal.js";
@@ -6,11 +6,15 @@ import { group } from "./resource.js";
 
 const bindings = firestore.collection(COLLECTION);
 
-afterEach(async () => {
+const clear = async () => {
   const snapshot = await bindings.get();
 
   await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
-});
+};
+
+// 件数を数えるテストがあるので、前に残った binding も消す
+beforeEach(clear);
+afterEach(clear);
 
 describe("bindingId", () => {
   it("3つ組が同じなら同じ ID になること", () => {
@@ -98,5 +102,24 @@ describe("grant", () => {
 
       expect((await bindings.get()).empty).toBe(true);
     });
+  });
+
+  it("ID に区切りの | を含むと書き込まずに失敗すること", async () => {
+    await expect(
+      grant({
+        principal: user("u1|roles/group.viewer|group:a"),
+        role: "roles/group.viewer",
+        resource: group("b"),
+      }),
+    ).rejects.toThrow();
+    await expect(
+      grant({
+        principal: user("u1"),
+        role: "roles/group.viewer",
+        resource: group("a|roles/group.viewer|group:b"),
+      }),
+    ).rejects.toThrow();
+
+    expect((await bindings.get()).empty).toBe(true);
   });
 });

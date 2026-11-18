@@ -1,4 +1,5 @@
-// user_joined_groups の参加を role_bindings に写す。何度流しても同じ状態になる。
+// user_joined_groups の参加を role_bindings に写す。何度流しても増えない。
+// 参加を消しても binding は残るので、外すときは binding も消す。
 //
 //   pnpm run backfill-role-bindings                          エミュレータ
 //   pnpm run backfill-role-bindings -- --project <id> [--yes]
