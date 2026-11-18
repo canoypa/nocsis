@@ -34,7 +34,7 @@ jobs:
             --project ${{ vars.GCP_PROJECT_ID }} \
             --region asia-northeast1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.8
+        uses: jdx/mise-action@v5.2.9
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Delete Firebase Hosting channel

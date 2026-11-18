@@ -32,7 +32,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.8
+        uses: jdx/mise-action@v5.2.9
         with:
           install_args: node pnpm
       - name: Install dependencies
