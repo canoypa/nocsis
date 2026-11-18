@@ -1,9 +1,12 @@
 import type { UserRecord } from "firebase-admin/auth";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { clearBindings, grantGroup } from "../../../tests/helpers/bindings.js";
 import type { LoginResult } from "../../../tests/helpers/users.js";
 import { login } from "../../../tests/helpers/users.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
+
+afterEach(clearBindings);
 
 describe("UserController", () => {
   describe("GET /api/v1/users/me/groups", () => {
@@ -38,35 +41,12 @@ describe("UserController", () => {
           weather_point: { lat: 35.0, lon: 139.0 },
         });
 
-      await firestore
-        .collection("user_joined_groups")
-        .doc("test_user_joined_group_1")
-        .set({
-          user_id: user.uid,
-          group_id: "test_group_1",
-          group_name: "Test Group 1",
-        });
-
-      await firestore
-        .collection("user_joined_groups")
-        .doc("test_user_joined_group_2")
-        .set({
-          user_id: user.uid,
-          group_id: "test_group_2",
-          group_name: "Test Group 2",
-        });
+      await grantGroup(user.uid, "test_group_1");
+      await grantGroup(user.uid, "test_group_2", "roles/group.viewer");
     });
 
     afterEach(async () => {
       await auth.deleteUser(user.uid);
-      await firestore
-        .collection("user_joined_groups")
-        .doc("test_user_joined_group_1")
-        .delete();
-      await firestore
-        .collection("user_joined_groups")
-        .doc("test_user_joined_group_2")
-        .delete();
       await firestore.collection("groups").doc("test_group_1").delete();
       await firestore.collection("groups").doc("test_group_2").delete();
     });
@@ -88,6 +68,38 @@ describe("UserController", () => {
           { id: "test_group_2", name: "Test Group 2" },
         ]),
       });
+      expect(body.items).toHaveLength(2);
+    });
+
+    it("同じグループに複数のロールがあっても、1つだけ返す", async () => {
+      await grantGroup(user.uid, "test_group_1", "roles/group.viewer");
+
+      const res = await app.request("/api/v1/users/me/groups", {
+        headers: {
+          Authorization: `Bearer ${loginResult.idToken}`,
+          Accept: "application/json",
+        },
+      });
+      const body = await res.json();
+
+      expect(body.items).toHaveLength(2);
+    });
+
+    it("定義に無いロールの付与は数えない", async () => {
+      await firestore.collection("role_bindings").add({
+        subject: `user:${user.uid}`,
+        role: "roles/group.unknown",
+        resource: "group:test_group_3",
+      });
+
+      const res = await app.request("/api/v1/users/me/groups", {
+        headers: {
+          Authorization: `Bearer ${loginResult.idToken}`,
+          Accept: "application/json",
+        },
+      });
+      const body = await res.json();
+
       expect(body.items).toHaveLength(2);
     });
 

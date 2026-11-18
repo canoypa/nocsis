@@ -1,16 +1,11 @@
 import type { UserRecord } from "firebase-admin/auth";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { clearBindings, grantGroup } from "../../../tests/helpers/bindings.js";
 import { type LoginResult, login } from "../../../tests/helpers/users.js";
-import { grant } from "../../authz/binding.js";
-import { user as principal } from "../../authz/principal.js";
-import { group } from "../../authz/resource.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
 
-const deleteBindings = async () => {
-  const snapshot = await firestore.collection("role_bindings").get();
-  await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
-};
+afterEach(clearBindings);
 
 describe("GroupController", () => {
   describe("GET /api/v1/groups/:id", async () => {
@@ -32,16 +27,11 @@ describe("GroupController", () => {
         weather_point: { lat: 0, lon: 0 },
       });
 
-      await grant({
-        principal: principal("test_user_1"),
-        role: "roles/group.viewer",
-        resource: group("test_group_1"),
-      });
+      await grantGroup("test_user_1", "test_group_1", "roles/group.viewer");
 
       return async () => {
         await auth.deleteUser("test_user_1");
         await groupRef.delete();
-        await deleteBindings();
       };
     });
 
@@ -68,11 +58,7 @@ describe("GroupController", () => {
 
     describe("binding が残ったまま、グループが消えている場合", () => {
       beforeEach(async () => {
-        await grant({
-          principal: principal("test_user_1"),
-          role: "roles/group.viewer",
-          resource: group("deleted_group"),
-        });
+        await grantGroup("test_user_1", "deleted_group", "roles/group.viewer");
       });
 
       it("404エラーになること", async () => {
@@ -172,16 +158,11 @@ describe("GroupController", () => {
         weather_point: { lat: 0, lon: 0 },
       });
 
-      await grant({
-        principal: principal("test_user_1"),
-        role: "roles/group.admin",
-        resource: group("test_group_1"),
-      });
+      await grantGroup("test_user_1", "test_group_1", "roles/group.admin");
 
       return async () => {
         await auth.deleteUser("test_user_1");
         await groupRef.delete();
-        await deleteBindings();
       };
     });
 
@@ -379,11 +360,7 @@ describe("GroupController", () => {
       beforeEach(async () => {
         viewer = await auth.createUser({ uid: "test_viewer_1" });
         viewerLogin = await login(viewer);
-        await grant({
-          principal: principal(viewer.uid),
-          role: "roles/group.viewer",
-          resource: group("test_group_1"),
-        });
+        await grantGroup(viewer.uid, "test_group_1", "roles/group.viewer");
 
         return async () => {
           await auth.deleteUser(viewer.uid);

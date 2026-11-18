@@ -77,11 +77,7 @@ const auth = getAuth(app);
 const firestore = getFirestore(app);
 
 // src の Firestore クライアントは既定のアプリを使い回す。上で作ったアプリを使わせるため、作った後に読む。
-const {
-  bindingId,
-  COLLECTION: BINDINGS,
-  grant,
-} = await import("../src/authz/binding.js");
+const { COLLECTION: BINDINGS, grant } = await import("../src/authz/binding.js");
 const { subject, user } = await import("../src/authz/principal.js");
 const { group, serialize } = await import("../src/authz/resource.js");
 
@@ -136,12 +132,13 @@ const setMembership = async (uid: string, joined: boolean) => {
 
   if (!joined) {
     await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
-    await firestore
+    // 未参加の画面を確かめるので、ロールを問わずこのグループへの付与を全部外す
+    const bindings = await firestore
       .collection(BINDINGS)
-      .doc(
-        bindingId(subject(user(uid)), MEMBER_ROLE, serialize(group(GROUP_ID))),
-      )
-      .delete();
+      .where("subject", "==", subject(user(uid)))
+      .where("resource", "==", serialize(group(GROUP_ID)))
+      .get();
+    await Promise.all(bindings.docs.map((doc) => doc.ref.delete()));
     return;
   }
   if (snapshot.empty) {

@@ -1,10 +1,13 @@
 import type { UserRecord } from "firebase-admin/auth";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { clearBindings, grantGroup } from "../../../tests/helpers/bindings.js";
 import type { LoginResult } from "../../../tests/helpers/users.js";
 import { login } from "../../../tests/helpers/users.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
 import * as openWeatherMapServiceModule from "../../services/open_weather_map_service.js";
+
+afterEach(clearBindings);
 
 vi.mock("../../services/secret_manager_service.js", () => ({
   fetchSecret: vi.fn().mockResolvedValue("mock-secret"),
@@ -29,10 +32,7 @@ describe("WeatherController", () => {
         weather_point: { lat: 35.0, lon: 139.0 },
       });
 
-      await firestore.collection("user_joined_groups").add({
-        user_id: user.uid,
-        group_id: "test_group_1",
-      });
+      await grantGroup(user.uid, "test_group_1");
 
       return async () => {
         await auth.deleteUser(user.uid);
@@ -85,7 +85,7 @@ describe("WeatherController", () => {
       });
     });
 
-    it("should return 403 if not joined group", async () => {
+    it("should return 404 without revealing the group if not joined", async () => {
       // 他のユーザーでアクセス
       const other = await auth.createUser({ uid: "user2" });
       const loginOther = await login(other);
@@ -93,7 +93,7 @@ describe("WeatherController", () => {
         headers: { Authorization: `Bearer ${loginOther.idToken}` },
       });
       await auth.deleteUser(other.uid);
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(404);
     });
 
     it("should return 404 if group not found", async () => {

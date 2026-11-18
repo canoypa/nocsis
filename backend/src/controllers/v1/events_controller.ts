@@ -4,17 +4,18 @@ import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { DateTime } from "luxon";
 import { z } from "zod";
+import {
+  type AuthorizedEnv,
+  authorize,
+  groupOf,
+} from "../../authz/middleware.js";
 import { firestore } from "../../clients/firebase.js";
 import { AppConfig } from "../../config/app_config.js";
-import {
-  type AuthenticatedEnv,
-  authentication,
-  getCurrentUserId,
-} from "../../middlewares/authenticate.js";
+import { authentication } from "../../middlewares/authenticate.js";
 import { eventSchema } from "../../resources/v1/events.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
 
-export const eventsRoutes = new Hono<AuthenticatedEnv>();
+export const eventsRoutes = new Hono<AuthorizedEnv>();
 
 const paramSchema = z
   .object({
@@ -81,6 +82,7 @@ eventsRoutes.get(
   validator("param", paramSchema),
   validator("query", querySchema),
   authentication,
+  authorize("group.read", groupOf("groupId")),
   async (c) => {
     const groupId = c.req.param("groupId");
     const { from: fromStr, to: toStr, limit } = c.req.valid("query");
@@ -96,22 +98,13 @@ eventsRoutes.get(
       });
     }
 
-    const uid = getCurrentUserId(c);
-
-    // Firestore 並列クエリ: グループ存在 & 参加チェック
-    const [groupSnapshot, userJoinedGroupSnapshot] = await Promise.all([
-      firestore.collection("groups").doc(groupId).get(),
-      firestore
-        .collection("user_joined_groups")
-        .where("user_id", "==", uid)
-        .where("group_id", "==", groupId)
-        .get(),
-    ]);
+    // binding が残ったまま、グループが消えていることがある
+    const groupSnapshot = await firestore
+      .collection("groups")
+      .doc(groupId)
+      .get();
     if (!groupSnapshot.exists) {
       throw new HTTPException(404, { message: "グループが存在しません。" });
-    }
-    if (userJoinedGroupSnapshot.empty) {
-      throw new HTTPException(403, { message: "グループに参加していません。" });
     }
 
     const group = groupSnapshot.data();

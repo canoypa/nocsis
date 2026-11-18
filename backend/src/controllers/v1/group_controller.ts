@@ -111,9 +111,10 @@ groupRoutes
       security: [{ bearer: [] }],
     }),
     validator("param", paramSchema),
-    validator("json", patchJsonSchema),
     authentication,
     authorize("group.update", groupOf("id")),
+    // 権限の無い相手に、本文の検証結果 (400) を先に返さない
+    validator("json", patchJsonSchema),
     async (c) => {
       const groupId = c.req.param("id");
       const data = c.req.valid("json");

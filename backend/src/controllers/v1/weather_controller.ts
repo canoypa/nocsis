@@ -2,12 +2,13 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { z } from "zod";
-import { firestore } from "../../clients/firebase.js";
 import {
-  type AuthenticatedEnv,
-  authentication,
-  getCurrentUserId,
-} from "../../middlewares/authenticate.js";
+  type AuthorizedEnv,
+  authorize,
+  groupOf,
+} from "../../authz/middleware.js";
+import { firestore } from "../../clients/firebase.js";
+import { authentication } from "../../middlewares/authenticate.js";
 import { groupSchema } from "../../resources/v1/groups.js";
 import { weatherDataSchema } from "../../resources/v1/weather_data.js";
 import {
@@ -15,7 +16,7 @@ import {
   getWeatherNameById,
 } from "../../services/open_weather_map_service.js";
 
-export const weatherRoutes = new Hono<AuthenticatedEnv>();
+export const weatherRoutes = new Hono<AuthorizedEnv>();
 
 const paramSchema = z
   .object({
@@ -45,24 +46,17 @@ weatherRoutes.get(
   }),
   validator("param", paramSchema),
   authentication,
+  authorize("group.read", groupOf("groupId")),
   async (c) => {
     const groupId = c.req.param("groupId");
-    const uid = getCurrentUserId(c);
 
-    // Firestore 並列クエリ: グループ存在 & 参加チェック
-    const [groupSnapshot, userJoinedGroupSnapshot] = await Promise.all([
-      firestore.collection("groups").doc(groupId).get(),
-      firestore
-        .collection("user_joined_groups")
-        .where("user_id", "==", uid)
-        .where("group_id", "==", groupId)
-        .get(),
-    ]);
+    // binding が残ったまま、グループが消えていることがある
+    const groupSnapshot = await firestore
+      .collection("groups")
+      .doc(groupId)
+      .get();
     if (!groupSnapshot.exists) {
       throw new HTTPException(404, { message: "グループが存在しません。" });
-    }
-    if (userJoinedGroupSnapshot.empty) {
-      throw new HTTPException(403, { message: "グループに参加していません。" });
     }
 
     const parseGroup = groupSchema.safeParse({

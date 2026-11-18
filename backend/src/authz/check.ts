@@ -55,3 +55,37 @@ export const can = async (
     ? { allowed: true, via: `${COLLECTION}/${granting.id}` }
     : { allowed: false, reason: "insufficient_permission" };
 };
+
+/**
+ * permission を持っている、ある型のリソースの ID 一覧。「自分のグループ一覧」のように、
+ * 判定する相手が先に決まっていないときに使う。
+ *
+ * 祖先への付与はまだ無い（ancestors が自分だけを返す）ので、直接の binding だけを見る。
+ * 祖先に付与できるようになったら、ここも祖先から辿る。
+ */
+export const resourceIdsWith = async (
+  principal: Principal,
+  permission: Permission,
+  type: ResourceRef["type"],
+): Promise<string[]> => {
+  const snapshot = await firestore
+    .collection(COLLECTION)
+    .where("subject", "==", subject(principal))
+    .select("role", "resource")
+    .get();
+
+  const prefix = `${type}:`;
+  const ids = snapshot.docs.flatMap((doc) => {
+    const { role, resource } = doc.data();
+
+    return isRoleName(role) &&
+      permissionsOf(role).includes(permission) &&
+      typeof resource === "string" &&
+      resource.startsWith(prefix)
+      ? [resource.slice(prefix.length)]
+      : [];
+  });
+
+  // 同じリソースに複数のロールがあると重なる
+  return [...new Set(ids)];
+};

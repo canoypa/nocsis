@@ -1,10 +1,13 @@
 import type { UserRecord } from "firebase-admin/auth";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { clearBindings, grantGroup } from "../../../tests/helpers/bindings.js";
 import type { LoginResult } from "../../../tests/helpers/users.js";
 import { login } from "../../../tests/helpers/users.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
+
+afterEach(clearBindings);
 
 vi.mock("../../services/google_calendar_service.js", () => ({
   fetchGoogleCalendarEvents: vi.fn(),
@@ -34,28 +37,12 @@ describe("Events Controller", () => {
         weather_point: { lat: 0, lon: 0 },
       });
 
-    await firestore.collection("user_joined_groups").add({
-      user_id: user.uid,
-      group_id: "test_group_1",
-      created_at: new Date(),
-    });
+    await grantGroup(user.uid, "test_group_1");
   });
 
   afterEach(async () => {
     await auth.deleteUser(user.uid);
     await firestore.collection("groups").doc("test_group_1").delete();
-
-    const userJoinedGroupsSnapshot = await firestore
-      .collection("user_joined_groups")
-      .where("user_id", "==", user.uid)
-      .where("group_id", "==", "test_group_1")
-      .get();
-
-    const batch = firestore.batch();
-    for (const doc of userJoinedGroupsSnapshot.docs) {
-      batch.delete(doc.ref);
-    }
-    await batch.commit();
   });
 
   describe("GET /:groupId/events", () => {
@@ -84,7 +71,7 @@ describe("Events Controller", () => {
       expect(response.status).toBe(404);
     });
 
-    it("グループに参加していない場合は403が返されること", async () => {
+    it("グループに参加していない場合は、グループがあることを明かさず404が返されること", async () => {
       const unauthorizedUser = await auth.createUser({ uid: "test_user_2" });
       const unauthorizedLoginResult = await login(unauthorizedUser);
 
@@ -98,7 +85,7 @@ describe("Events Controller", () => {
         },
       );
 
-      expect(response.status).toBe(403);
+      expect(response.status).toBe(404);
 
       await auth.deleteUser(unauthorizedUser.uid);
     });
@@ -116,11 +103,7 @@ describe("Events Controller", () => {
           weather_point: { lat: 0, lon: 0 },
         });
 
-      await firestore.collection("user_joined_groups").add({
-        user_id: user.uid,
-        group_id: "test_group_2",
-        created_at: new Date(),
-      });
+      await grantGroup(user.uid, "test_group_2");
 
       const response = await app.request(
         "/api/v1/groups/test_group_2/events?from=2024-01-01T00:00:00%2B09:00&limit=10",
@@ -135,17 +118,6 @@ describe("Events Controller", () => {
       expect(response.status).toBe(500);
 
       await firestore.collection("groups").doc("test_group_2").delete();
-      const userJoinedGroupsSnapshot = await firestore
-        .collection("user_joined_groups")
-        .where("user_id", "==", user.uid)
-        .where("group_id", "==", "test_group_2")
-        .get();
-
-      const batch = firestore.batch();
-      for (const doc of userJoinedGroupsSnapshot.docs) {
-        batch.delete(doc.ref);
-      }
-      await batch.commit();
     });
 
     it("不正な日付フォーマットの場合は400が返されること", async () => {
