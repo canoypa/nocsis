@@ -46,6 +46,6 @@ jobs:
           workload_identity_provider: projects/${{ vars.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis
           service_account: wlif-migrate@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
       - name: Backfill
-        run: pnpm run backfill-role-bindings -- --project "$PROJECT_ID" --yes
+        run: pnpm exec tsx scripts/backfill_role_bindings.ts --project "$PROJECT_ID" --yes
         env:
           PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}

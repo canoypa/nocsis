@@ -1,8 +1,9 @@
 // user_joined_groups の参加を role_bindings に写す。何度流しても増えない。
 // 参加を消しても binding は残るので、外すときは binding も消す。
 //
-//   pnpm run backfill-role-bindings                          エミュレータ
-//   pnpm run backfill-role-bindings -- --project <id> [--yes]
+// 流すのは数回だけなので npm script にしない。backend で:
+//   pnpm exec tsx scripts/backfill_role_bindings.ts                          エミュレータ
+//   pnpm exec tsx scripts/backfill_role_bindings.ts --project <id> [--yes]
 //
 // 公開リポジトリの Actions から流すこともあるので、uid やグループ ID は出さず件数だけを出す。
 import { parseArgs } from "node:util";
