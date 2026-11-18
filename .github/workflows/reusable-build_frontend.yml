@@ -86,7 +86,8 @@ jobs:
           path: |
             ./frontend/build/web
             !./frontend/build/web/**/*.map
-      # 公開リポジトリの artifact は誰でも落とせる。ソースマップは別にして、デプロイが済む間だけ残す。
+      # 公開リポジトリの artifact は誰でも落とせる。上の frontend-build からは .map を除き、
+      # .map だけをこの artifact に入れる。デプロイで使い終わればよいので、保持期間は最短の 1 日にする。
       - name: Upload Source Maps
         if: ${{ inputs.persist }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
