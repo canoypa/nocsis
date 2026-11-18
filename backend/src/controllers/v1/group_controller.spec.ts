@@ -1,8 +1,16 @@
 import type { UserRecord } from "firebase-admin/auth";
 import { beforeEach, describe, expect, it } from "vitest";
 import { type LoginResult, login } from "../../../tests/helpers/users.js";
+import { grant } from "../../authz/binding.js";
+import { user as principal } from "../../authz/principal.js";
+import { group } from "../../authz/resource.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
+
+const deleteBindings = async () => {
+  const snapshot = await firestore.collection("role_bindings").get();
+  await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
+};
 
 describe("GroupController", () => {
   describe("GET /api/v1/groups/:id", async () => {
@@ -24,17 +32,16 @@ describe("GroupController", () => {
         weather_point: { lat: 0, lon: 0 },
       });
 
-      const userJoinedGroupsRef = await firestore
-        .collection("user_joined_groups")
-        .add({
-          user_id: "test_user_1",
-          group_id: "test_group_1",
-        });
+      await grant({
+        principal: principal("test_user_1"),
+        role: "roles/group.viewer",
+        resource: group("test_group_1"),
+      });
 
       return async () => {
         await auth.deleteUser("test_user_1");
         await groupRef.delete();
-        await userJoinedGroupsRef.delete();
+        await deleteBindings();
       };
     });
 
@@ -56,6 +63,27 @@ describe("GroupController", () => {
         dayduty_start_date: "2000-01-01",
         slack_event_channel_id: "slack_event_channel_id",
         weather_point: { lat: 0, lon: 0 },
+      });
+    });
+
+    describe("binding が残ったまま、グループが消えている場合", () => {
+      beforeEach(async () => {
+        await grant({
+          principal: principal("test_user_1"),
+          role: "roles/group.viewer",
+          resource: group("deleted_group"),
+        });
+      });
+
+      it("404エラーになること", async () => {
+        const response = await app.request("/api/v1/groups/deleted_group", {
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            Accept: "application/json",
+          },
+        });
+
+        expect(response.status).toBe(404);
       });
     });
 
@@ -85,7 +113,7 @@ describe("GroupController", () => {
         };
       });
 
-      it("403エラーになること", async () => {
+      it("グループがあることを明かさず、404エラーになること", async () => {
         const response = await app.request("/api/v1/groups/test_group_1", {
           headers: {
             Authorization: `Bearer ${loginResult.idToken}`,
@@ -93,7 +121,7 @@ describe("GroupController", () => {
           },
         });
 
-        expect(response.status).toBe(403);
+        expect(response.status).toBe(404);
       });
     });
 
@@ -144,17 +172,16 @@ describe("GroupController", () => {
         weather_point: { lat: 0, lon: 0 },
       });
 
-      const userJoinedGroupsRef = await firestore
-        .collection("user_joined_groups")
-        .add({
-          user_id: "test_user_1",
-          group_id: "test_group_1",
-        });
+      await grant({
+        principal: principal("test_user_1"),
+        role: "roles/group.admin",
+        resource: group("test_group_1"),
+      });
 
       return async () => {
         await auth.deleteUser("test_user_1");
         await groupRef.delete();
-        await userJoinedGroupsRef.delete();
+        await deleteBindings();
       };
     });
 
@@ -323,7 +350,7 @@ describe("GroupController", () => {
         };
       });
 
-      it("403エラーになること", async () => {
+      it("グループがあることを明かさず、404エラーになること", async () => {
         const response = await app.request("/api/v1/groups/test_group_1", {
           method: "PATCH",
           headers: {
@@ -341,7 +368,46 @@ describe("GroupController", () => {
           }),
         });
 
+        expect(response.status).toBe(404);
+      });
+    });
+
+    describe("更新の権限が無いロールの場合", () => {
+      let viewer: UserRecord;
+      let viewerLogin: LoginResult;
+
+      beforeEach(async () => {
+        viewer = await auth.createUser({ uid: "test_viewer_1" });
+        viewerLogin = await login(viewer);
+        await grant({
+          principal: principal(viewer.uid),
+          role: "roles/group.viewer",
+          resource: group("test_group_1"),
+        });
+
+        return async () => {
+          await auth.deleteUser(viewer.uid);
+        };
+      });
+
+      it("403エラーになり、更新されないこと", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${viewerLogin.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ name: "Updated Test Name" }),
+        });
+
         expect(response.status).toBe(403);
+
+        const snapshot = await firestore
+          .collection("groups")
+          .doc("test_group_1")
+          .get();
+        expect(snapshot.get("name")).toBe("Test Group");
       });
     });
 
