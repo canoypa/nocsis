@@ -38,28 +38,18 @@ module "nocsis" {
   # firebasestorage は Staging では無効でも困っていないが、本番では firebase deploy が呼んでいるので止めない。
   extra_services = ["calendar-json.googleapis.com", "firebasestorage.googleapis.com"]
 
-  # 使っていない API。取り込みが済んだら、種類ごとに一覧から外して止める。
+  # 使っていない API。止める順序は services.tf のコメントを読む。
   retiring_services = [
-    "actions.googleapis.com",
-    "appenginereporting.googleapis.com",
     "bigquery.googleapis.com",
     "bigquerystorage.googleapis.com",
-    "cloudapis.googleapis.com",
     "fcm.googleapis.com",
     "fcmregistrations.googleapis.com",
-    "firebaseappcheck.googleapis.com",
-    "firebaseappdistribution.googleapis.com",
-    "firebasedataconnect.googleapis.com",
-    "firebasedynamiclinks.googleapis.com",
-    "firebaseinappmessaging.googleapis.com",
     "firebaseinstallations.googleapis.com",
     "firebaseml.googleapis.com",
     "firebaseremoteconfig.googleapis.com",
     "firebaseremoteconfigrealtime.googleapis.com",
     "googlecloudmessaging.googleapis.com",
     "mlkit.googleapis.com",
-    "mobilecrashreporting.googleapis.com",
-    "policyanalyzer.googleapis.com",
     "sql-component.googleapis.com",
     "sqladmin.googleapis.com",
     "testing.googleapis.com",
