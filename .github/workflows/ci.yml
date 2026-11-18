@@ -52,7 +52,7 @@ jobs:
       # base は先頭ではなく merge コミットの1つ目の親から取る。再実行では同じ merge
       # コミットが使われるので、その間に base が進むと、他の PR の変更が混ざる
       - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 2
       # main 向けのリリース PR では見ない。中身は development に入るときに見ており、
@@ -96,11 +96,28 @@ jobs:
             exit 1
           fi
 
+  actions-lock:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_ACTIONS_LOCK_VERSION: v0.4.1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install gh-actions-lock
+        run: gh extension install github/gh-actions-lock --pin "$GH_ACTIONS_LOCK_VERSION"
+      - name: Verify lockfile
+        run: gh actions-lock --verify
+
   # 個々のジョブを ruleset の必須チェックに並べない。ジョブを足すたびに ruleset の
   # 更新が要り、忘れると Renovate の自動マージが新しいジョブを待たずに通る。
   ci-ok:
     if: ${{ always() }}
-    needs: [lint, test, build-functions, build-frontend, api-compat]
+    needs: [lint, test, build-functions, build-frontend, api-compat, actions-lock]
     runs-on: ubuntu-latest
     permissions: {}
     steps:
