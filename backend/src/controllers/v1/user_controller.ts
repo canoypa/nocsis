@@ -53,10 +53,10 @@ userRoutes.use("*", authentication).get(
       return c.json<UserJoinedGroupsResponse>({ items: [] });
     }
 
-    // グループの詳細情報を取得
     const groupsSnapshot = await firestore
       .collection("groups")
       .where("__name__", "in", groupIds)
+      .select("name")
       .get();
 
     const items = z.array(userJoinedGroupSchema).parse(

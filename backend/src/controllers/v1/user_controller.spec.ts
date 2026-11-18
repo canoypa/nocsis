@@ -84,24 +84,8 @@ describe("UserController", () => {
       expect(res.status).toBe(200);
       expect(body).toEqual({
         items: expect.arrayContaining([
-          {
-            id: "test_group_1",
-            name: "Test Group 1",
-            classes_calendar_id: "",
-            events_calendar_id: "",
-            dayduty_start_date: "",
-            slack_event_channel_id: "",
-            weather_point: { lat: 35.0, lon: 139.0 },
-          },
-          {
-            id: "test_group_2",
-            name: "Test Group 2",
-            classes_calendar_id: "",
-            events_calendar_id: "",
-            dayduty_start_date: "",
-            slack_event_channel_id: "",
-            weather_point: { lat: 35.0, lon: 139.0 },
-          },
+          { id: "test_group_1", name: "Test Group 1" },
+          { id: "test_group_2", name: "Test Group 2" },
         ]),
       });
       expect(body.items).toHaveLength(2);
