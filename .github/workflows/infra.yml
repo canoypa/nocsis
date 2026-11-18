@@ -1,7 +1,7 @@
 name: Infra
 
 # Terraform (infra/) を PR で plan し、マージで apply する。
-# development → Staging、main → Production。
+# develop → Staging、main → Production。
 #
 # 公開リポジトリの Actions のログと artifact は誰でも読めるため、plan / apply の
 # 本文は出さない。出すのは「どのリソースをどう変えるか」の一覧だけ。
@@ -12,7 +12,7 @@ on:
       - "mise.toml"
       - ".github/workflows/infra.yml"
   push:
-    branches: [development, main]
+    branches: [develop, main]
     paths:
       - "infra/**"
       - "mise.toml"

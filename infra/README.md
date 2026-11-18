@@ -11,7 +11,7 @@ Staging (`nocsis-development`) と本番 (`class-clock-40088`) の GCP / Firebas
 ## 反映の流れ
 
 - PR を出すと、`infra.yml` が両環境の `plan` を流す。結果は Actions の Summary に、変えるリソースの一覧だけが出る。
-- `development` にマージすると Staging に、`main` にマージすると本番に `apply` される。本番は Production environment の承認を通る。
+- `develop` にマージすると Staging に、`main` にマージすると本番に `apply` される。本番は Production environment の承認を通る。
 
 公開リポジトリの Actions のログと artifact は誰でも読めるため、plan / apply の本文は出さない。
 

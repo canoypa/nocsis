@@ -20,7 +20,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/reusable-test.yml
 
-  # main 向けの PR に絞らない。Renovate は development に自動マージするので、
+  # main 向けの PR に絞らない。Renovate は develop に自動マージするので、
   # 絞るとビルドを壊す更新がリリース PR まで素通りする。
   #
   # backend のイメージはここでビルドしない。test の smoke-backend が同じ Dockerfile で
@@ -55,14 +55,15 @@ jobs:
         uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 2
-      # main 向けのリリース PR では見ない。中身は development に入るときに見ており、
+      # main 向けのリリース PR では見ない。中身は develop に入るときに見ており、
       # 意図した変更のラベルはリリース PR まで引き継がれない
       - name: Check if comparison is needed
         id: needed
         env:
           BASE_REF: ${{ github.base_ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          if [ "$BASE_REF" != development ]; then
+          if [ "$BASE_REF" != "$DEFAULT_BRANCH" ]; then
             echo "::notice::$BASE_REF 向けの PR なので比べない"
           elif git diff --quiet HEAD^1 HEAD -- "$SPEC"; then
             echo "$SPEC に変更が無いので比べない"

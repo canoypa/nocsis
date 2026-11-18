@@ -17,4 +17,4 @@
 
 **backend / functions のテストは Firestore エミュレータに繋がる。** 各プロジェクトの `pnpm run test` は `firebase emulators:exec` 経由なので単体で完結する。1ファイルだけ回すときは、ルートで `pnpm run emulators:start` を起動したまま `pnpm vitest run <file>` する。
 
-**`development → main` のリリース PR は push で自動生成される。** 手で作らない。`main` への push が本番デプロイを起こす。
+**`develop → main` のリリース PR は push で自動生成される。** 手で作らない。`main` への push が本番デプロイを起こす。
