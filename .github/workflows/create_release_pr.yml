@@ -2,7 +2,7 @@ name: Create Release Pull Request
 
 on:
   push:
-    branches: [development]
+    branches: [develop]
 
 permissions: {}
 
@@ -21,9 +21,9 @@ jobs:
         run: |
           pr_title=$(echo "Release $(TZ=Asia/Tokyo date +'%Y-%m-%d')")
 
-          release_pr_number=$(gh pr list -B main -H development --json "number" -q ".[0].number")
+          release_pr_number=$(gh pr list -B main -H develop --json "number" -q ".[0].number")
           if [ -z "$release_pr_number" ]; then
-            release_pr_number=$(gh pr create -H development -B main -t "$pr_title" -b "wip" --label "🚀 リリース" | sed -n 's/.*\///p')
+            release_pr_number=$(gh pr create -H develop -B main -t "$pr_title" -b "wip" --label "🚀 リリース" | sed -n 's/.*\///p')
           fi
 
           GRAPHQL_QUERY="$(cat <<'EOF'
@@ -49,7 +49,7 @@ jobs:
           EOF
           )"
           prs=$(gh api graphql -F query="$GRAPHQL_QUERY" -F owner="${{ github.repository_owner }}" -F repo="${{ github.event.repository.name }}" -F prNumber="$release_pr_number" \
-                | jq '[.data.repository.pullRequest.commits.nodes[].commit.associatedPullRequests.nodes[] | select(.baseRefName == "development")] | unique_by(.number)')
+                | jq '[.data.repository.pullRequest.commits.nodes[].commit.associatedPullRequests.nodes[] | select(.baseRefName == "develop")] | unique_by(.number)')
 
           body=$(echo "$prs" | jq -r '.[] | "- #\(.number) @\(.author.login)"')
 
