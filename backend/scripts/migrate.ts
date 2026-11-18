@@ -10,8 +10,8 @@
 // 公開リポジトリの Actions から流すので、出すのは件数だけ。
 import { existsSync } from "node:fs";
 import { parseArgs } from "node:util";
-import type { Migration } from "./migration.js";
-import { selectTarget } from "./target.js";
+import type { Migration } from "./lib/migration.js";
+import { selectTarget } from "./lib/target.js";
 
 const { values } = parseArgs({
   args: process.argv.slice(2).filter((arg, i) => !(i === 0 && arg === "--")),

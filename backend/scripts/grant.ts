@@ -5,7 +5,7 @@
 // --project を省くとエミュレータに書く。uid とグループ ID をそのまま出すので、公開ログの残る Actions からは流さない。
 import { parseArgs } from "node:util";
 import { isRoleName, ROLES } from "../src/authz/roles.js";
-import { selectTarget } from "./target.js";
+import { selectTarget } from "./lib/target.js";
 
 const USAGE = `使い方:
   pnpm run grant -- --subject user:<uid> --role <role> --resource group:<id> [--project <id>] [--yes]

@@ -2,7 +2,7 @@ import { grant } from "../../src/authz/binding.js";
 import { user } from "../../src/authz/principal.js";
 import { group } from "../../src/authz/resource.js";
 import { firestore } from "../../src/clients/firebase.js";
-import type { Migration } from "../migration.js";
+import type { Migration } from "../lib/migration.js";
 
 /** 参加しているだけの人に付けるロール。管理や表示端末の権限は別に付与する */
 export const JOINED_MEMBER_ROLE = "roles/group.viewer";
