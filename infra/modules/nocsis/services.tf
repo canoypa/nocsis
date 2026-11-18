@@ -25,9 +25,9 @@ locals {
     "run.googleapis.com",
     "runtimeconfig.googleapis.com",
     "secretmanager.googleapis.com",
-    "source.googleapis.com",
     "securetoken.googleapis.com",
     "serviceusage.googleapis.com",
+    "source.googleapis.com",
     "storage.googleapis.com",
     "sts.googleapis.com",
   ], var.extra_services))
@@ -54,6 +54,8 @@ resource "google_project_service" "retiring" {
   disable_on_destroy = true
   # 依存しているものを一緒に止めない。依存関係は API から読めない分もあり (source を止めると
   # cloudfunctions も止めようとした)、一緒に止めると使う API まで止まりうる。依存があれば止めるのを断られる。
+  # そのため、依存されている API は依存している側を止めた後の変更で外す。bigquery と bigquerystorage の
+  # ように互いに依存し合うものは、この設定では止められない。
   disable_dependent_services = false
 
   lifecycle {
