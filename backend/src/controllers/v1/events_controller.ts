@@ -4,14 +4,14 @@ import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { DateTime } from "luxon";
 import { z } from "zod";
+import { firestore } from "../../clients/firebase.js";
+import { AppConfig } from "../../config/app_config.js";
+import { authentication } from "../../middlewares/authenticate.js";
 import {
   type AuthorizedEnv,
   authorize,
   groupOf,
-} from "../../authz/middleware.js";
-import { firestore } from "../../clients/firebase.js";
-import { AppConfig } from "../../config/app_config.js";
-import { authentication } from "../../middlewares/authenticate.js";
+} from "../../middlewares/authorize.js";
 import { eventSchema } from "../../resources/v1/events.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
 

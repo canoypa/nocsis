@@ -81,7 +81,7 @@ const { COLLECTION: BINDINGS, grant } = await import("../src/authz/binding.js");
 const { subject, user } = await import("../src/authz/principal.js");
 const { group, serialize } = await import("../src/authz/resource.js");
 
-// 本物のアカウントは今みな管理者なので、テストのユーザーもそろえる。
+// 所属ありのユーザーで、編集を含むすべての画面を確かめられるようにする。
 const MEMBER_ROLE = "roles/group.admin";
 
 const GROUP_ID = "test_group";

@@ -4,7 +4,7 @@ import { isRoleName, PERMISSIONS, permissionsOf, ROLES } from "./roles.js";
 describe("roles", () => {
   describe("ROLES", () => {
     // 「binding があるのに read できない」ロールが存在すると、404 と 403 の判定
-    // （authz/middleware.ts）が「binding の有無」だけでは正しくなくなる
+    // （middlewares/authorize.ts）が「binding の有無」だけでは正しくなくなる
     it("すべてのロールがそのスコープの read 権限を含むこと", () => {
       for (const role of Object.values(ROLES)) {
         expect(role.permissions).toContain(`${role.scope}.read`);

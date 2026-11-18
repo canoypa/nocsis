@@ -14,7 +14,7 @@ paths:
 
 ## 認証の後に、認可のミドルウェアを置く
 
-`middlewares/authenticate.ts` は Firebase ID トークンを検証して `currentUserId` を context に置くところで終わる。認可はその後ろに置く `authorize(permission, groupOf("..."))`（`src/authz/`）が `role_bindings` を見て決める。コントローラで参加を確かめ直さない。
+`middlewares/authenticate.ts` は Firebase ID トークンを検証して `currentUserId` を context に置くところで終わる。認可はその後ろに置く `authorize(permission, groupOf("..."))`（`middlewares/authorize.ts`）が `role_bindings` を見て決める。コントローラで参加を確かめ直さない。
 
 権限が1つも無い相手には、リソースがあっても 404 を返す（403 との違いで存在が分かるため）。binding が残ったままグループが消えていることがあるので、グループの存在はコントローラで確かめる。
 

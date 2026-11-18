@@ -2,13 +2,13 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
 import { z } from "zod";
+import { firestore } from "../../clients/firebase.js";
+import { authentication } from "../../middlewares/authenticate.js";
 import {
   type AuthorizedEnv,
   authorize,
   groupOf,
-} from "../../authz/middleware.js";
-import { firestore } from "../../clients/firebase.js";
-import { authentication } from "../../middlewares/authenticate.js";
+} from "../../middlewares/authorize.js";
 import { groupSchema } from "../../resources/v1/groups.js";
 
 export const groupRoutes = new Hono<AuthorizedEnv>();
