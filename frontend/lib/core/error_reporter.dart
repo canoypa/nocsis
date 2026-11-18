@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:nocsis/core/client_commit.dart';
 import 'package:nocsis/generated/api_client/api.swagger.dart';
-
-/// ビルドした commit。`flutter run` など、CI 以外のビルドでは空。
-const buildCommit = String.fromEnvironment('BUILD_COMMIT');
 
 const _isWasm = bool.fromEnvironment('dart.tool.dart2wasm');
 
@@ -31,7 +29,11 @@ class ErrorReporter {
     this.maxReports = 20,
     this.duplicateWindow = const Duration(minutes: 1),
     DateTime Function()? now,
-  }) : _api = Api.create(baseUrl: baseUrl, httpClient: client),
+  }) : _api = Api.create(
+         baseUrl: baseUrl,
+         httpClient: client,
+         interceptors: [clientCommitInterceptor(commit)],
+       ),
        _now = now ?? DateTime.now;
 
   // 認証の interceptor は付けない。ログイン前や認証まわりで起きたエラーも送るため

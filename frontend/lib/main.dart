@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:nocsis/core/client_commit.dart';
 import 'package:nocsis/core/error_reporter.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/routes/router.dart';
