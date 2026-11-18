@@ -60,7 +60,6 @@ module "nocsis" {
     "mlkit.googleapis.com",
     "mobilecrashreporting.googleapis.com",
     "policyanalyzer.googleapis.com",
-    "source.googleapis.com",
     "sql-component.googleapis.com",
     "sqladmin.googleapis.com",
     "testing.googleapis.com",
