@@ -1,8 +1,8 @@
-import { bindingId, COLLECTION, grant } from "../../src/authz/binding.js";
-import { subject, user } from "../../src/authz/principal.js";
-import { group, serialize } from "../../src/authz/resource.js";
+import { grant } from "../../src/authz/binding.js";
+import { user } from "../../src/authz/principal.js";
+import { group } from "../../src/authz/resource.js";
 import { firestore } from "../../src/clients/firebase.js";
-import type { Migration } from "../migrate.js";
+import type { Migration } from "../migration.js";
 
 /** 参加しているだけの人に付けるロール。管理や表示端末の権限は別に付与する */
 export const JOINED_MEMBER_ROLE = "roles/group.viewer";
@@ -28,6 +28,8 @@ const backfillRoleBindings: Migration = async ({ apply }) => {
     skipped: 0,
   };
 
+  const seen = new Set<string>();
+
   for (const doc of snapshot.docs) {
     const uid = doc.get("user_id");
     const groupId = doc.get("group_id");
@@ -42,29 +44,23 @@ const backfillRoleBindings: Migration = async ({ apply }) => {
       continue;
     }
 
-    const params = {
-      principal: user(uid),
-      role: JOINED_MEMBER_ROLE,
-      resource: group(groupId),
-    } as const;
-
-    if (apply) {
-      const granted = await grant(params);
-      counts[granted]++;
+    // ドライランは書き込まないので、同じ参加の2行目も「作る」と数えてしまう。数えた参加を覚えておく。
+    const key = JSON.stringify([uid, groupId]);
+    if (!apply && seen.has(key)) {
+      counts.already_granted++;
       continue;
     }
+    seen.add(key);
 
-    const existing = await firestore
-      .collection(COLLECTION)
-      .doc(
-        bindingId(
-          subject(params.principal),
-          params.role,
-          serialize(params.resource),
-        ),
-      )
-      .get();
-    counts[existing.exists ? "already_granted" : "created"]++;
+    const granted = await grant(
+      {
+        principal: user(uid),
+        role: JOINED_MEMBER_ROLE,
+        resource: group(groupId),
+      },
+      { dryRun: !apply },
+    );
+    counts[granted]++;
   }
 
   return counts;

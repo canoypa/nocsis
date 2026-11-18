@@ -10,18 +10,8 @@
 // 公開リポジトリの Actions から流すので、出すのは件数だけ。
 import { existsSync } from "node:fs";
 import { parseArgs } from "node:util";
+import type { Migration } from "./migration.js";
 import { selectTarget } from "./target.js";
-
-/**
- * Firestore のデータを書き換える移行。
- *
- * - 何度流しても同じ結果になるように書く
- * - apply が false のときは書き込まず、書き込むはずの件数だけを数える
- * - 返すのは件数だけ。公開リポジトリの Actions のログに出るので、ID やドキュメントの中身は返さない
- */
-export type Migration = (options: {
-  apply: boolean;
-}) => Promise<Record<string, number>>;
 
 const { values } = parseArgs({
   args: process.argv.slice(2).filter((arg, i) => !(i === 0 && arg === "--")),
@@ -39,8 +29,6 @@ if (!name) {
   process.exit(1);
 }
 
-const target = await selectTarget(values);
-
 // 名前をパスとして組み立てるので、区切りや「..」を含められないよう文字を絞る。
 // そのうえで scripts/migrations に実在するファイルだけを読む。
 const file = new URL(`./migrations/${name}.ts`, import.meta.url);
@@ -49,7 +37,14 @@ if (!/^[a-z0-9_]+$/.test(name) || !existsSync(file)) {
   process.exit(1);
 }
 
-const { default: migration }: { default: Migration } = await import(file.href);
+// 確認のプロンプトより先に名前を確かめ、打ち間違いで本番の ID を打たせない。
+const target = await selectTarget(values);
+
+const { default: migration }: { default?: Migration } = await import(file.href);
+if (typeof migration !== "function") {
+  console.error(`${name} は Migration を default export していません`);
+  process.exit(1);
+}
 const { firestore } = await import("../src/clients/firebase.js");
 
 const counts = await migration({ apply });

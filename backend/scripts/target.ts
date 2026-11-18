@@ -42,7 +42,7 @@ export const selectTarget = async (options: {
       output: process.stdout,
     });
     const answer = await rl.question(
-      `プロジェクト ${project} に書き込みます。確認のため ID をもう一度入力してください: `,
+      `プロジェクト ${project} を対象にします。確認のため ID をもう一度入力してください: `,
     );
     rl.close();
     assert(answer.trim() === project, "ID が一致しないので中止しました");

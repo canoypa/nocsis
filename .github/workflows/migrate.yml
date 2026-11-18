@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "書き込む環境"
+        description: "流す環境"
         type: choice
         options: [Staging, Production]
         default: Staging

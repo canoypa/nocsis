@@ -37,11 +37,17 @@ export type RoleForResource<T extends ResourceType> = {
  * 「誰が付けたか」は持たない。binding が表すのは今の状態で、付与という行為は
  * 別の事実（寿命も更新のされ方も違う）。行為の記録は Cloud Audit Logs にある。
  */
-export const grant = async <R extends ResourceRef>(params: {
-  principal: Principal;
-  role: RoleForResource<R["type"]>;
-  resource: R;
-}): Promise<GrantResult> => {
+export const grant = async <R extends ResourceRef>(
+  params: {
+    principal: Principal;
+    role: RoleForResource<R["type"]>;
+    resource: R;
+  },
+  options: {
+    /** 書き込まずに、付与したら何になるかだけを返す。確かめる中身は書き込むときと同じ */
+    dryRun?: boolean;
+  } = {},
+): Promise<GrantResult> => {
   const { principal, role, resource } = params;
 
   // 型でも弾いているが、CLI のように実行時に組み立てる経路があるので確かめる
@@ -62,6 +68,10 @@ export const grant = async <R extends ResourceRef>(params: {
   const ref = firestore
     .collection(COLLECTION)
     .doc(bindingId(subjectKey, role, resourceKey));
+
+  if (options.dryRun) {
+    return (await ref.get()).exists ? "already_granted" : "created";
+  }
 
   try {
     await ref.create({

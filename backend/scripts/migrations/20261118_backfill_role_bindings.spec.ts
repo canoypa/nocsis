@@ -119,5 +119,26 @@ describe("backfillRoleBindings", () => {
       });
       expect(await triples()).toEqual(["user:u1 roles/group.viewer group:g1"]);
     });
+
+    it("同じ参加が複数行あっても、作るのは1件と数えること", async () => {
+      await memberships.add({ user_id: "u1", group_id: "g1" });
+      await memberships.add({ user_id: "u1", group_id: "g1" });
+
+      const result = await backfillRoleBindings({ apply: false });
+
+      expect(result).toEqual({
+        rows: 2,
+        created: 1,
+        already_granted: 1,
+        skipped: 0,
+      });
+      expect(await triples()).toEqual([]);
+    });
+
+    it("書き込むと失敗する行では、ドライランでも失敗すること", async () => {
+      await memberships.add({ user_id: "u1|x", group_id: "g1" });
+
+      await expect(backfillRoleBindings({ apply: false })).rejects.toThrow();
+    });
   });
 });
