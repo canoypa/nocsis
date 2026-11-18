@@ -54,15 +54,23 @@ resource "google_project_service" "retiring" {
   disable_on_destroy = true
   # 依存しているものを一緒に止めない。依存関係は API から読めない分もあり (source を止めると
   # cloudfunctions も止めようとした)、一緒に止めると使う API まで止まりうる。依存があれば止めるのを断られる。
-  # そのため、依存されている API は依存している側を止めた後の変更で外す。bigquery と bigquerystorage の
-  # ように互いに依存し合うものは、この設定では止められない。
-  disable_dependent_services = false
+  # そのため、依存されている API は依存している側を止めた後の変更で外す。
+  # bigquery と bigquerystorage のように互いに依存し合うものだけ、retiring_with_dependents で一緒に止める。
+  # destroy は state に残った値で動くので、一覧から外す前の apply で先に入れておく。
+  disable_dependent_services = contains(var.retiring_with_dependents, each.value)
 
   lifecycle {
     precondition {
       condition     = !contains(local.services, each.value)
       error_message = "使う API (local.services / extra_services) は止められない。"
     }
+  }
+}
+
+check "retiring_with_dependents" {
+  assert {
+    condition     = length(setsubtract(var.retiring_with_dependents, var.retiring_services)) == 0
+    error_message = "retiring_with_dependents は retiring_services に入っているものだけ書く。"
   }
 }
 

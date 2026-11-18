@@ -88,6 +88,12 @@ variable "retiring_services" {
   default     = []
 }
 
+variable "retiring_with_dependents" {
+  description = "止めるときに、依存している API も一緒に止めるもの。互いに依存し合う組だけに使う"
+  type        = set(string)
+  default     = []
+}
+
 variable "audit_log_configs" {
   description = "Data Access の監査ログ (サービス => ADMIN_READ / DATA_READ / DATA_WRITE)"
   type        = map(list(string))
