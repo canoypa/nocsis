@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { firestore } from "../clients/firebase.js";
+import { isAlreadyExists } from "../clients/firestore_errors.js";
 import { type Principal, subject } from "./principal.js";
 import { type ResourceRef, type ResourceType, serialize } from "./resource.js";
 import { ROLES, type RoleName } from "./roles.js";
@@ -24,8 +25,6 @@ export const bindingId = (
     .digest("hex");
 
 export type GrantResult = "created" | "already_granted";
-
-const ALREADY_EXISTS = 6;
 
 /** そのリソース型に付与できるロール。scope が合わない組み合わせは型で弾く */
 export type RoleForResource<T extends ResourceType> = {
@@ -74,12 +73,7 @@ export const grant = async <R extends ResourceRef>(params: {
 
     return "created";
   } catch (err) {
-    if (
-      typeof err === "object" &&
-      err !== null &&
-      "code" in err &&
-      err.code === ALREADY_EXISTS
-    ) {
+    if (isAlreadyExists(err)) {
       return "already_granted";
     }
 
