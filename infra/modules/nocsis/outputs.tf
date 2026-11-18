@@ -11,7 +11,16 @@ output "import_ids" {
     # 取り込みの後に新しく足した権限は除く。
     project_iam = {
       for k, v in local.project_iam_members : k => "${var.project_id} ${v.role} ${v.member}"
-      if k != "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}"
+      if !contains([
+        "roles/errorreporting.viewer serviceAccount:${var.claude_readonly_email}",
+        "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}",
+      ], k)
+    }
+    # 取り込みの後に足した API は除く。まだ無効な環境で取り込もうとすると plan が落ちる。
+    services          = { for s in setsubtract(local.services, ["clouderrorreporting.googleapis.com"]) : s => "${var.project_id}/${s}" }
+    retiring_services = { for s in var.retiring_services : s => "${var.project_id}/${s}" }
+    audit_log_configs = {
+      for s, _ in var.audit_log_configs : s => "${var.project_id} ${s}" if s == "storage.googleapis.com"
     }
     wlif_deploy_acts_as = { for k, v in local.wlif_deploy_acts_as : k => "${v} roles/iam.serviceAccountUser serviceAccount:wlif-deploy@${var.project_id}.iam.gserviceaccount.com" }
   }

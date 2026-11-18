@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { classesRoutes } from "./v1/classes_controller.js";
+import { clientErrorsRoutes } from "./v1/client_errors_controller.js";
 import { daydutRoutes } from "./v1/dayduty_controller.js";
 import { eventsRoutes } from "./v1/events_controller.js";
 import { groupRoutes } from "./v1/group_controller.js";
@@ -14,5 +15,6 @@ v1Routes.route("/groups", daydutRoutes);
 v1Routes.route("/groups", eventsRoutes);
 v1Routes.route("/groups", weatherRoutes);
 v1Routes.route("/users", userRoutes);
+v1Routes.route("/client-errors", clientErrorsRoutes);
 
 export { v1Routes };

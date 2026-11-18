@@ -33,6 +33,7 @@ locals {
     # このクラウド環境の閲覧用。Firestore のドキュメントと Secret の値は読めない。
     "serviceAccount:${var.claude_readonly_email}" = [
       "projects/${var.project_id}/roles/claudeConfigReader",
+      "roles/errorreporting.viewer",
       "roles/firebasehosting.viewer",
       "roles/iam.securityReviewer",
       "roles/iam.workloadIdentityPoolViewer",

@@ -6,11 +6,11 @@ locals {
     }
     "wlif-deploy" = {
       display_name = "WLIF: GitHub Actions deploy"
-      description  = "GitHub Actions の deploy ジョブが Workload Identity Federation で借りる。Cloud Run / Functions / Hosting / Firestore ルール。"
+      description  = "GitHub Actions の deploy ジョブが Workload Identity Federation で借りる。Cloud Run / Functions / Hosting / Firestore ルール、ソースマップの読み書き (上書きと削除は除く)。"
     }
     "backend-runtime" = {
       display_name = "backend runtime"
-      description  = "Cloud Run の backend が実行時に使う。Firestore とログ、OPENWEATHERMAP_TOKEN / CALENDAR_ACCOUNT_KEY のみ。"
+      description  = "Cloud Run の backend が実行時に使う。Firestore とログ、ソースマップの読み取り、OPENWEATHERMAP_TOKEN / CALENDAR_ACCOUNT_KEY のみ。"
     }
     "functions-runtime" = {
       display_name = "functions runtime"
@@ -30,7 +30,9 @@ resource "google_service_account" "this" {
   description  = each.value.description
 }
 
-# deploy がサービスや関数をこれらの SA で動かすために要る。
+# deploy がサービスや関数をこれらの SA で動かすために要る。compute の既定 SA は関数のビルドに使われる。
+# App Engine の既定 SA で動くものは無いが、外さない。firebase-tools が関数の deploy の前に、
+# この SA への actAs を確かめて、無ければ止まる。
 locals {
   wlif_deploy_acts_as = {
     "backend-runtime"   = "projects/${var.project_id}/serviceAccounts/backend-runtime@${var.project_id}.iam.gserviceaccount.com"

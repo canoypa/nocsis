@@ -12,7 +12,8 @@ part 'api_client.g.dart';
 // 本番と同じ wasm のビルドで backend を指せるよう --dart-define で上書きできるようにする。
 const _apiBaseUrlOverride = String.fromEnvironment('API_BASE_URL');
 
-final String _baseUrl = _apiBaseUrlOverride.isNotEmpty
+/// backend の URL。エラーの報告など、認証の要らない送り先でも使う
+final String apiBaseUrl = _apiBaseUrlOverride.isNotEmpty
     ? _apiBaseUrlOverride
     : kDebugMode
     ? 'http://localhost:8080'
@@ -50,5 +51,8 @@ Future<BearerAuthInterceptor> firebaseAuthInterceptor(Ref ref) async {
 Future<Api> apiClient(Ref ref) async {
   final interceptor = await ref.watch(firebaseAuthInterceptorProvider.future);
 
-  return Api.create(baseUrl: Uri.parse(_baseUrl), interceptors: [interceptor]);
+  return Api.create(
+    baseUrl: Uri.parse(apiBaseUrl),
+    interceptors: [interceptor],
+  );
 }
