@@ -28,7 +28,6 @@ module "nocsis" {
 
   # 承認や制限は environment ごとに違う。別の environment のジョブにこの環境へデプロイさせない。
   wlif_deploy_environments = ["Production"]
-  migrate_environment      = "Production"
 
   secrets = {
     "CALENDAR_ACCOUNT_KEY" = ["backend-runtime", "functions-runtime"]

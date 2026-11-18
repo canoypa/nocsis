@@ -18,7 +18,7 @@ paths:
 
 ## テストは `.spec.ts`
 
-対象は `src/**/*.spec.ts` と `scripts/**/*.spec.ts`。functions は `.test.ts` なので、綴りを引きずらない。同じ Firestore を共有するため `fileParallelism: false` が要る。
+対象は `src/**/*.spec.ts`。functions は `.test.ts` なので、綴りを引きずらない。同じ Firestore を共有するため `fileParallelism: false` が要る。
 
 ## レスポンスの項目は2段階で外す
 
