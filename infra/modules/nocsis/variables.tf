@@ -109,3 +109,9 @@ variable "seed_environment" {
   type        = string
   default     = null
 }
+
+variable "migrate_environment" {
+  description = "データ移行用の SA (wlif-migrate) を引ける GitHub の environment。null なら SA を作らない"
+  type        = string
+  default     = null
+}
