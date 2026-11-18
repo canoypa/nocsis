@@ -76,6 +76,14 @@ const app = initializeApp({ projectId });
 const auth = getAuth(app);
 const firestore = getFirestore(app);
 
+// src の Firestore クライアントは既定のアプリを使い回す。上で作ったアプリを使わせるため、作った後に読む。
+const { COLLECTION: BINDINGS, grant } = await import("../src/authz/binding.js");
+const { subject, user } = await import("../src/authz/principal.js");
+const { group, serialize } = await import("../src/authz/resource.js");
+
+// 所属ありのユーザーで、編集を含むすべての画面を確かめられるようにする。
+const MEMBER_ROLE = "roles/group.admin";
+
 const GROUP_ID = "test_group";
 
 const testUsers = [
@@ -124,6 +132,13 @@ const setMembership = async (uid: string, joined: boolean) => {
 
   if (!joined) {
     await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
+    // 未参加の画面を確かめるので、ロールを問わずこのグループへの付与を全部外す
+    const bindings = await firestore
+      .collection(BINDINGS)
+      .where("subject", "==", subject(user(uid)))
+      .where("resource", "==", serialize(group(GROUP_ID)))
+      .get();
+    await Promise.all(bindings.docs.map((doc) => doc.ref.delete()));
     return;
   }
   if (snapshot.empty) {
@@ -131,6 +146,11 @@ const setMembership = async (uid: string, joined: boolean) => {
       .doc(`${GROUP_ID}_${uid}`)
       .set({ user_id: uid, group_id: GROUP_ID });
   }
+  await grant({
+    principal: user(uid),
+    role: MEMBER_ROLE,
+    resource: group(GROUP_ID),
+  });
 };
 
 // エラーの文言にメールアドレスが入りうるので、コードだけを返す。
