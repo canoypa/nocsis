@@ -55,8 +55,8 @@ module "nocsis" {
     "testing.googleapis.com",
   ]
 
-  # 互いに依存し合っていて、片方ずつは止められない。
-  retiring_with_dependents = ["bigquery.googleapis.com", "bigquerystorage.googleapis.com"]
+  # bigquerystorage と互いに依存し合っていて、片方ずつは止められない。
+  retiring_with_dependents = ["bigquery.googleapis.com"]
 
   # 手で設定していたもの。要るかは別に決める。
   audit_log_configs = {

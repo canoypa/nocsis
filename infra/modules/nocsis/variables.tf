@@ -89,9 +89,14 @@ variable "retiring_services" {
 }
 
 variable "retiring_with_dependents" {
-  description = "止めるときに、依存している API も一緒に止めるもの。互いに依存し合う組だけに使う"
+  description = "止めるときに、依存している API も一緒に止めるもの。互いに依存し合う組の片方だけに使う"
   type        = set(string)
   default     = []
+
+  validation {
+    condition     = length(setsubtract(var.retiring_with_dependents, var.retiring_services)) == 0
+    error_message = "retiring_with_dependents は retiring_services に入っているものだけ書く。"
+  }
 }
 
 variable "audit_log_configs" {
