@@ -1,6 +1,8 @@
 {
   "hosting": {
     "public": "./frontend/build/web",
+    // ソースマップを読むのは backend だけで、画面には要らない。デプロイのときにバケットに置く
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/*.map"],
     "trailingSlash": false,
     "rewrites": [
       {
