@@ -1,7 +1,7 @@
 {
   "hosting": {
     "public": "./frontend/build/web",
-    // ソースマップはシンボル名やパスが読めるので公開しない。デプロイのときに非公開のバケットに置く
+    // ソースマップを読むのは backend だけで、画面には要らない。デプロイのときにバケットに置く
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "**/*.map"],
     "trailingSlash": false,
     "rewrites": [
