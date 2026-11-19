@@ -48,9 +48,8 @@ jobs:
           }
           EOF
           )"
-          # TODO: 改名後の最初のリリースが済んだら development を外す。改名前にマージされた PR の baseRefName は development のまま
           prs=$(gh api graphql -F query="$GRAPHQL_QUERY" -F owner="${{ github.repository_owner }}" -F repo="${{ github.event.repository.name }}" -F prNumber="$release_pr_number" \
-                | jq '[.data.repository.pullRequest.commits.nodes[].commit.associatedPullRequests.nodes[] | select(.baseRefName | IN("develop", "development"))] | unique_by(.number)')
+                | jq '[.data.repository.pullRequest.commits.nodes[].commit.associatedPullRequests.nodes[] | select(.baseRefName == "develop")] | unique_by(.number)')
 
           body=$(echo "$prs" | jq -r '.[] | "- #\(.number) @\(.author.login)"')
 
