@@ -29,8 +29,11 @@ const post = (body: unknown) =>
     body: JSON.stringify(body),
   });
 
-const loggedEntries = (spy: { mock: { calls: unknown[][] } }) =>
-  spy.mock.calls.map((call) => JSON.parse(String(call[0])));
+// リクエストごとのログも同じ console.log に出るので、エラーの報告だけを見る
+const reportedErrors = (spy: { mock: { calls: unknown[][] } }) =>
+  spy.mock.calls
+    .map((call) => JSON.parse(String(call[0])))
+    .filter((entry) => entry.severity === "ERROR");
 
 beforeEach(() => {
   clearSourceMapCache();
@@ -47,7 +50,7 @@ describe("POST /api/v1/client-errors", () => {
     const res = await post(validBody);
 
     expect(res.status).toBe(204);
-    expect(loggedEntries(log)).toEqual([
+    expect(reportedErrors(log)).toEqual([
       {
         severity: "ERROR",
         "@type":
@@ -83,7 +86,7 @@ describe("POST /api/v1/client-errors", () => {
 
     expect(res.status).toBe(204);
     expect(warn).toHaveBeenCalledOnce();
-    const [entry] = loggedEntries(log);
+    const [entry] = reportedErrors(log);
     expect(entry.message).toBe(
       "SampleException: わざと起こしたエラー\n    at Object.a0v (https://nocsis.app/main.dart.js:10:5)",
     );
@@ -104,7 +107,7 @@ describe("POST /api/v1/client-errors", () => {
     const res = await post(body);
 
     expect(res.status).toBe(400);
-    expect(log).not.toHaveBeenCalled();
+    expect(reportedErrors(log)).toEqual([]);
   });
 
   it("32KB を超える本文は 413 を返すこと", async () => {

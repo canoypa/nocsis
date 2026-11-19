@@ -20,7 +20,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/reusable-test.yml
 
-  # main 向けの PR に絞らない。Renovate は development に自動マージするので、
+  # main 向けの PR に絞らない。Renovate は develop に自動マージするので、
   # 絞るとビルドを壊す更新がリリース PR まで素通りする。
   #
   # backend のイメージはここでビルドしない。test の smoke-backend が同じ Dockerfile で
@@ -52,17 +52,18 @@ jobs:
       # base は先頭ではなく merge コミットの1つ目の親から取る。再実行では同じ merge
       # コミットが使われるので、その間に base が進むと、他の PR の変更が混ざる
       - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 2
-      # main 向けのリリース PR では見ない。中身は development に入るときに見ており、
+      # main 向けのリリース PR では見ない。中身は develop に入るときに見ており、
       # 意図した変更のラベルはリリース PR まで引き継がれない
       - name: Check if comparison is needed
         id: needed
         env:
           BASE_REF: ${{ github.base_ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          if [ "$BASE_REF" != development ]; then
+          if [ "$BASE_REF" != "$DEFAULT_BRANCH" ]; then
             echo "::notice::$BASE_REF 向けの PR なので比べない"
           elif git diff --quiet HEAD^1 HEAD -- "$SPEC"; then
             echo "$SPEC に変更が無いので比べない"
@@ -96,11 +97,28 @@ jobs:
             exit 1
           fi
 
+  actions-lock:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_ACTIONS_LOCK_VERSION: v0.4.1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install gh-actions-lock
+        run: gh extension install github/gh-actions-lock --pin "$GH_ACTIONS_LOCK_VERSION"
+      - name: Verify lockfile
+        run: gh actions-lock --verify
+
   # 個々のジョブを ruleset の必須チェックに並べない。ジョブを足すたびに ruleset の
   # 更新が要り、忘れると Renovate の自動マージが新しいジョブを待たずに通る。
   ci-ok:
     if: ${{ always() }}
-    needs: [lint, test, build-functions, build-frontend, api-compat]
+    needs: [lint, test, build-functions, build-frontend, api-compat, actions-lock]
     runs-on: ubuntu-latest
     permissions: {}
     steps:

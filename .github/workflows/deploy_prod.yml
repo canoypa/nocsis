@@ -12,18 +12,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # environment の Deployment branches でも止まるが、そこに届く前にビルドが本番の
+  # Artifact Registry へ push してしまう。
+  check_branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify branch
+        run: |
+          if [ "$GITHUB_REF" != refs/heads/main ]; then
+            echo "::error::本番デプロイは main からだけ流せる ($GITHUB_REF)"
+            exit 1
+          fi
+
   # ruleset の required check には任せない。admin が bypass できる。
   lint:
+    needs: check_branch
     permissions:
       contents: read
     uses: ./.github/workflows/reusable-lint.yml
 
   test:
+    needs: check_branch
     permissions:
       contents: read
     uses: ./.github/workflows/reusable-test.yml
 
   build_backend:
+    needs: check_branch
     permissions:
       contents: read
       id-token: write
@@ -32,6 +47,7 @@ jobs:
       persist: true
 
   build_functions:
+    needs: check_branch
     permissions:
       contents: read
     uses: ./.github/workflows/reusable-build_functions.yml
@@ -39,6 +55,7 @@ jobs:
       persist: true
 
   build_frontend:
+    needs: check_branch
     permissions:
       contents: read
     uses: ./.github/workflows/reusable-build_frontend.yml

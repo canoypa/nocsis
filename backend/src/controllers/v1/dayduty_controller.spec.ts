@@ -1,9 +1,12 @@
 import type { UserRecord } from "firebase-admin/auth";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { clearBindings, grantGroup } from "../../../tests/helpers/bindings.js";
 import type { LoginResult } from "../../../tests/helpers/users.js";
 import { login } from "../../../tests/helpers/users.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
+
+afterEach(clearBindings);
 
 describe("Dayduty Controller", () => {
   let user: UserRecord;
@@ -25,11 +28,7 @@ describe("Dayduty Controller", () => {
         weather_point: { lat: 0, lon: 0 },
       });
 
-    await firestore.collection("user_joined_groups").add({
-      user_id: user.uid,
-      group_id: "test_group_1",
-      created_at: new Date(),
-    });
+    await grantGroup(user.uid, "test_group_1");
 
     await firestore.collection("classmates").add({
       group_id: "test_group_1",
@@ -44,21 +43,12 @@ describe("Dayduty Controller", () => {
       await auth.deleteUser(user.uid);
       await firestore.collection("groups").doc("test_group_1").delete();
 
-      const userJoinedGroupsSnapshot = await firestore
-        .collection("user_joined_groups")
-        .where("user_id", "==", user.uid)
-        .where("group_id", "==", "test_group_1")
-        .get();
-
       const classmatesSnapshot = await firestore
         .collection("classmates")
         .where("group_id", "==", "test_group_1")
         .get();
 
       const batch = firestore.batch();
-      for (const doc of userJoinedGroupsSnapshot.docs) {
-        batch.delete(doc.ref);
-      }
       for (const doc of classmatesSnapshot.docs) {
         batch.delete(doc.ref);
       }
@@ -95,7 +85,7 @@ describe("Dayduty Controller", () => {
     });
 
     describe("グループに参加していない場合", () => {
-      it("403が返されること", async () => {
+      it("グループがあることを明かさず、404が返されること", async () => {
         const unauthorizedUser = await auth.createUser({
           uid: `test_user_2_${Date.now()}`,
         });
@@ -111,9 +101,33 @@ describe("Dayduty Controller", () => {
           },
         );
 
-        expect(response.status).toBe(403);
+        expect(response.status).toBe(404);
 
         await auth.deleteUser(unauthorizedUser.uid);
+      });
+    });
+
+    describe("メンバーを見る権限が無いロールの場合", () => {
+      it("403が返されること", async () => {
+        const viewer = await auth.createUser({
+          uid: `test_viewer_${Date.now()}`,
+        });
+        const viewerLogin = await login(viewer);
+        await grantGroup(viewer.uid, "test_group_1", "roles/group.viewer");
+
+        const response = await app.request(
+          "/api/v1/groups/test_group_1/dayduty",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${viewerLogin.idToken}`,
+            },
+          },
+        );
+
+        expect(response.status).toBe(403);
+
+        await auth.deleteUser(viewer.uid);
       });
     });
 
@@ -130,11 +144,7 @@ describe("Dayduty Controller", () => {
             weather_point: { lat: 0, lon: 0 },
           });
 
-        await firestore.collection("user_joined_groups").add({
-          user_id: user.uid,
-          group_id: "test_group_2",
-          created_at: new Date(),
-        });
+        await grantGroup(user.uid, "test_group_2");
 
         const response = await app.request(
           "/api/v1/groups/test_group_2/dayduty",
@@ -149,17 +159,6 @@ describe("Dayduty Controller", () => {
         expect(response.status).toBe(500);
 
         await firestore.collection("groups").doc("test_group_2").delete();
-        const userJoinedGroupsSnapshot = await firestore
-          .collection("user_joined_groups")
-          .where("user_id", "==", user.uid)
-          .where("group_id", "==", "test_group_2")
-          .get();
-
-        const batch = firestore.batch();
-        for (const doc of userJoinedGroupsSnapshot.docs) {
-          batch.delete(doc.ref);
-        }
-        await batch.commit();
       });
     });
 
@@ -177,11 +176,7 @@ describe("Dayduty Controller", () => {
             weather_point: { lat: 0, lon: 0 },
           });
 
-        await firestore.collection("user_joined_groups").add({
-          user_id: user.uid,
-          group_id: "test_group_3",
-          created_at: new Date(),
-        });
+        await grantGroup(user.uid, "test_group_3");
 
         const response = await app.request(
           "/api/v1/groups/test_group_3/dayduty",
@@ -196,17 +191,6 @@ describe("Dayduty Controller", () => {
         expect(response.status).toBe(500);
 
         await firestore.collection("groups").doc("test_group_3").delete();
-        const userJoinedGroupsSnapshot = await firestore
-          .collection("user_joined_groups")
-          .where("user_id", "==", user.uid)
-          .where("group_id", "==", "test_group_3")
-          .get();
-
-        const batch = firestore.batch();
-        for (const doc of userJoinedGroupsSnapshot.docs) {
-          batch.delete(doc.ref);
-        }
-        await batch.commit();
       });
     });
 
@@ -240,9 +224,7 @@ describe("Dayduty Controller", () => {
 
         expect(response.status).toBe(200);
         const json = await response.json();
-        expect(json).toHaveProperty("stuNo", 1);
-        expect(json).toHaveProperty("name", "Test Student");
-        expect(json).toHaveProperty("role", "student");
+        expect(json).toEqual({ name: "Test Student" });
       });
     });
 
@@ -260,9 +242,7 @@ describe("Dayduty Controller", () => {
 
         expect(response.status).toBe(200);
         const json = await response.json();
-        expect(json).toHaveProperty("stuNo");
-        expect(json).toHaveProperty("name");
-        expect(json).toHaveProperty("role", "student");
+        expect(json).toEqual({ name: expect.any(String) });
       });
     });
   });

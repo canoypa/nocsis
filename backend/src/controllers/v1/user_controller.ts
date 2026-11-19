@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { describeRoute, resolver } from "hono-openapi";
 import { z } from "zod";
+import { resourceIdsWith } from "../../authz/check.js";
+import { user } from "../../authz/principal.js";
 import { firestore } from "../../clients/firebase.js";
 import {
   type AuthenticatedEnv,
@@ -39,24 +41,16 @@ userRoutes.use("*", authentication).get(
   async (c) => {
     const uid = getCurrentUserId(c);
 
-    const userJoinedGroupsSnapshot = await firestore
-      .collection("user_joined_groups")
-      .where("user_id", "==", uid)
-      .get();
-
-    // 参加しているグループIDを取得
-    const groupIds = userJoinedGroupsSnapshot.docs.map(
-      (doc) => doc.data().group_id,
-    );
+    const groupIds = await resourceIdsWith(user(uid), "group.read", "group");
 
     if (groupIds.length === 0) {
       return c.json<UserJoinedGroupsResponse>({ items: [] });
     }
 
-    // グループの詳細情報を取得
     const groupsSnapshot = await firestore
       .collection("groups")
       .where("__name__", "in", groupIds)
+      .select("name")
       .get();
 
     const items = z.array(userJoinedGroupSchema).parse(

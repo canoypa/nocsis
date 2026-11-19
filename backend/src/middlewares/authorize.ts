@@ -2,11 +2,11 @@ import assert from "node:assert";
 import type { Context, MiddlewareHandler } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import type { AuthenticatedEnv } from "../middlewares/authenticate.js";
-import { can } from "./check.js";
-import { type Principal, subject, user } from "./principal.js";
-import { group, type ResourceRef, serialize } from "./resource.js";
-import type { Permission } from "./roles.js";
+import { can } from "../authz/check.js";
+import { type Principal, subject, user } from "../authz/principal.js";
+import { group, type ResourceRef, serialize } from "../authz/resource.js";
+import type { Permission } from "../authz/roles.js";
+import type { AuthenticatedEnv } from "./authenticate.js";
 
 export type AuthorizedEnv = {
   Variables: AuthenticatedEnv["Variables"] & {

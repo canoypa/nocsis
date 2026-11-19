@@ -7,7 +7,7 @@ import {
   authorize,
   getPrincipal,
   groupOf,
-} from "./middleware.js";
+} from "./authorize.js";
 
 const created: DocumentReference[] = [];
 

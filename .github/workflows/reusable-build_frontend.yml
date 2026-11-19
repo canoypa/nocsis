@@ -28,9 +28,9 @@ jobs:
       project_id: ${{ steps.config.outputs.project_id }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        uses: jdx/mise-action@v5.2.9
       - name: Install dependencies
         working-directory: ./frontend
         run: flutter pub get --enforce-lockfile
@@ -80,7 +80,7 @@ jobs:
           --dart-define=BUILD_COMMIT="$BUILD_COMMIT"
       - name: Upload Artifacts
         if: ${{ inputs.persist }}
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: frontend-build
           path: |
@@ -90,7 +90,7 @@ jobs:
       # 上の frontend-build からは .map を除き、.map だけをこの artifact に入れて、保持期間を最短の 1 日にする。
       - name: Upload Source Maps
         if: ${{ inputs.persist }}
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: frontend-source-maps
           path: ./frontend/build/web/*.map

@@ -32,7 +32,7 @@ signup=$(curl -sf -X POST -H 'Content-Type: application/json' \
 id_token=$(jq -er '.idToken' <<<"$signup")
 uid=$(jq -er '.localId' <<<"$signup")
 
-echo "Firestore エミュレータにグループと所属を書き込む"
+echo "Firestore エミュレータにグループと付与を書き込む"
 # 本物の ID トークンを使わないのは、firestore.rules がクライアントを全面拒否するため。
 # Bearer owner はエミュレータ専用の管理者扱いでルールを迂回する。
 firestore_create() {
@@ -53,10 +53,13 @@ firestore_create 'groups?documentId=smoke_group' '{
     }}}
   }
 }'
-firestore_create 'user_joined_groups' "{
+# 参加は role_bindings の付与で表す。doc ID は backend が決めるハッシュだが、読む側は
+# subject で引くので、ここでは自動の ID で足りる。
+firestore_create 'role_bindings' "{
   \"fields\": {
-    \"user_id\": {\"stringValue\": \"${uid}\"},
-    \"group_id\": {\"stringValue\": \"smoke_group\"}
+    \"subject\": {\"stringValue\": \"user:${uid}\"},
+    \"role\": {\"stringValue\": \"roles/group.viewer\"},
+    \"resource\": {\"stringValue\": \"group:smoke_group\"}
   }
 }"
 
@@ -65,7 +68,7 @@ body=$(curl -s -w '\n%{http_code}' -H "Authorization: Bearer ${id_token}" "$ENDP
 code=$(tail -n1 <<<"$body")
 body=$(sed '$d' <<<"$body")
 [ "$code" = "200" ] || fail "認証付きで ${code} が返りました: ${body}"
-jq -e '.items | length == 1 and .[0].id == "smoke_group" and .[0].weather_point.lat == 35' \
+jq -e '.items | length == 1 and .[0].id == "smoke_group" and .[0].name == "Smoke Group"' \
   <<<"$body" >/dev/null || fail "レスポンスが想定と違います: ${body}"
 
 echo "backend のスモークテストに成功しました"

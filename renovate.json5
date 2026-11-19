@@ -20,6 +20,14 @@
     },
     {
       "customType": "regex",
+      "description": "github-actions マネージャが見ない gh-actions-lock 拡張のバージョンを追跡する",
+      "managerFilePatterns": [".github/workflows/ci.yml"],
+      "matchStrings": ["GH_ACTIONS_LOCK_VERSION:\\s*(?<currentValue>v\\S+)"],
+      "depNameTemplate": "github/gh-actions-lock",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
       "description": "どのマネージャも見ない firebase.json の functions ランタイムを追跡する",
       "managerFilePatterns": ["firebase.json"],
       "matchStrings": ["\"runtime\"\\s*:\\s*\"nodejs(?<currentValue>\\d+)\""],
@@ -47,7 +55,7 @@
   ],
   "packageRules": [
     {
-      "description": "パッチ・SHAダイジェスト更新の自動マージ",
+      "description": "パッチ更新の自動マージ",
       "matchManagers": ["npm", "pub", "github-actions"],
       "matchUpdateTypes": ["patch", "digest"],
       "minimumReleaseAge": "3 days",

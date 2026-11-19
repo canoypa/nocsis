@@ -1,9 +1,12 @@
 import type { UserRecord } from "firebase-admin/auth";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { clearBindings, grantGroup } from "../../../tests/helpers/bindings.js";
 import { type LoginResult, login } from "../../../tests/helpers/users.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
+
+afterEach(clearBindings);
 
 vi.mock("../../services/google_calendar_service.js", () => ({
   fetchGoogleCalendarEvents: vi.fn(),
@@ -32,17 +35,11 @@ describe("ClassesController", () => {
         weather_point: { lat: 0, lon: 0 },
       });
 
-      const userJoinedGroupsRef = await firestore
-        .collection("user_joined_groups")
-        .add({
-          user_id: "test_user_1",
-          group_id: "test_group_1",
-        });
+      await grantGroup("test_user_1", "test_group_1");
 
       return async () => {
         await auth.deleteUser("test_user_1");
         await groupRef.delete();
-        await userJoinedGroupsRef.delete();
       };
     });
 
@@ -204,7 +201,7 @@ describe("ClassesController", () => {
         };
       });
 
-      it("403エラーになること", async () => {
+      it("グループがあることを明かさず、404エラーになること", async () => {
         const response = await app.request(
           "/api/v1/groups/test_group_1/classes?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z",
           {
@@ -215,7 +212,7 @@ describe("ClassesController", () => {
           },
         );
 
-        expect(response.status).toBe(403);
+        expect(response.status).toBe(404);
       });
     });
 
@@ -297,16 +294,10 @@ describe("ClassesController", () => {
           weather_point: { lat: 0, lon: 0 },
         });
 
-        const userJoinedGroupsRef = await firestore
-          .collection("user_joined_groups")
-          .add({
-            user_id: "test_user_1",
-            group_id: "test_group_without_calendar",
-          });
+        await grantGroup("test_user_1", "test_group_without_calendar");
 
         return async () => {
           await groupRef.delete();
-          await userJoinedGroupsRef.delete();
         };
       });
 
