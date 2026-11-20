@@ -142,7 +142,9 @@ const setMembership = async (uid: string, joined: boolean) => {
 // エラーの文言にメールアドレスが入りうるので、コードだけを返す。
 const findUidByEmail = async (email: string) => {
   try {
-    return (await auth.getUserByEmail(email)).uid;
+    const user = await auth.getUserByEmail(email);
+    // 誰でもサインアップできるので、確かめていないアドレスは他人が先に登録したものかもしれない
+    return user.emailVerified ? user.uid : undefined;
   } catch (error) {
     const code = errorCode(error);
     if (code === "auth/user-not-found") return undefined;
