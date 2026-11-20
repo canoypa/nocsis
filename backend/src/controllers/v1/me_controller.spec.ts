@@ -81,6 +81,19 @@ describe("MeController", () => {
       );
     });
 
+    it("グループを ID の順に返す", async () => {
+      await grantGroup(user.uid, "test_group_2");
+      await grantGroup(user.uid, "test_group_1");
+
+      const body = await (await getMe()).json();
+
+      expect(
+        body.memberships.map(
+          (membership: { group: { id: string } }) => membership.group.id,
+        ),
+      ).toEqual(["test_group_1", "test_group_2"]);
+    });
+
     it("同じグループに複数のロールがあれば、権限の和を1件で返す", async () => {
       await grantGroup(user.uid, "test_group_1", "roles/group.viewer");
       await grantGroup(user.uid, "test_group_1", "roles/group.display");

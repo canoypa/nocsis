@@ -45,10 +45,11 @@ meRoutes.use("*", authentication).get(
     }
 
     // `in` は 30 件までなので、件数に上限の無い getAll で読む
+    // 並びは binding を読んだ順で決まらないよう ID 順にする。先頭が既定のグループになる
     const snapshots = await firestore.getAll(
-      ...[...granted.keys()].map((id) =>
-        firestore.collection("groups").doc(id),
-      ),
+      ...[...granted.keys()]
+        .sort()
+        .map((id) => firestore.collection("groups").doc(id)),
       { fieldMask: ["name"] },
     );
 
