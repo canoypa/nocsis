@@ -36,5 +36,12 @@ module "nocsis" {
     "claude-readonly" = {
       display_name = "Claude (read-only)"
     }
+    "events-reader" = {
+      display_name = "Google Calendar reader"
+      description  = "鍵を CALENDAR_ACCOUNT_KEY に入れ、共有されたカレンダーを読む。プロジェクトのロールは持たない。"
+    }
   }
+
+  # events-reader が Google カレンダーを読む。
+  extra_services = ["calendar-json.googleapis.com"]
 }

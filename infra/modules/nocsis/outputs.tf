@@ -5,7 +5,11 @@ output "project_number" {
 # 取り込みの import ブロック用。取り込みが済んだら、各環境の imports.tf と一緒に消す。
 output "import_ids" {
   value = {
-    service_accounts = { for id, _ in local.service_accounts : id => "projects/${var.project_id}/serviceAccounts/${id}@${var.project_id}.iam.gserviceaccount.com" }
+    # 取り込みの後に足した SA は除く。まだ無い SA を取り込もうとすると plan が落ちる。
+    service_accounts = {
+      for id, _ in local.service_accounts : id => "projects/${var.project_id}/serviceAccounts/${id}@${var.project_id}.iam.gserviceaccount.com"
+      if id != "events-reader"
+    }
     # 取り込みの時点で GCP にあったロールだけ。
     custom_roles = { for id in ["authConfigDeployer", "runIamSetter", "claudeConfigReader"] : id => "projects/${var.project_id}/roles/${id}" }
     # 取り込みの後に新しく足した権限は除く。
@@ -17,7 +21,7 @@ output "import_ids" {
       ], k)
     }
     # 取り込みの後に足した API は除く。まだ無効な環境で取り込もうとすると plan が落ちる。
-    services          = { for s in setsubtract(local.services, ["clouderrorreporting.googleapis.com"]) : s => "${var.project_id}/${s}" }
+    services          = { for s in setsubtract(local.services, ["clouderrorreporting.googleapis.com", "calendar-json.googleapis.com"]) : s => "${var.project_id}/${s}" }
     retiring_services = { for s in var.retiring_services : s => "${var.project_id}/${s}" }
     audit_log_configs = {
       for s, _ in var.audit_log_configs : s => "${var.project_id} ${s}" if s == "storage.googleapis.com"
