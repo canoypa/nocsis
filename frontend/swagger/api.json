@@ -306,6 +306,78 @@
         "additionalProperties": false,
         "description": "天気データ"
       },
+      "MembershipGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "名前"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "description": "グループ"
+      },
+      "Permission": {
+        "type": "string",
+        "enum": [
+          "group.read",
+          "group.update",
+          "member.read",
+          "member.create",
+          "member.update",
+          "member.delete",
+          "access.read",
+          "access.create",
+          "access.delete"
+        ],
+        "description": "`<オブジェクト型>.<動作>` の形の権限"
+      },
+      "Membership": {
+        "type": "object",
+        "properties": {
+          "group": {
+            "$ref": "#/components/schemas/MembershipGroup"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "description": "このグループに対して持っている権限"
+          }
+        },
+        "required": [
+          "group",
+          "permissions"
+        ],
+        "additionalProperties": false,
+        "description": "グループと、そのグループに対して持っている権限"
+      },
+      "Me": {
+        "type": "object",
+        "properties": {
+          "memberships": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Membership"
+            },
+            "description": "権限を1つでも持っているグループ。画面の出し分けに使う。判定はサーバが毎回やり直す"
+          }
+        },
+        "required": [
+          "memberships"
+        ],
+        "additionalProperties": false,
+        "description": "ログインしているユーザー"
+      },
       "UserJoinedGroup": {
         "type": "object",
         "properties": {
@@ -805,6 +877,35 @@
             },
             "required": true,
             "description": "グループのID"
+          }
+        ]
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "operationId": "getApiV1Me",
+        "description": "ログインしているユーザーの、グループごとの権限を取得する",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
           }
         ]
       }
