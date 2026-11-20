@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginForm extends StatefulWidget {
@@ -15,7 +16,9 @@ class LoginForm extends StatefulWidget {
   final String title;
   final String description;
   final VoidCallback onGoogleLogin;
-  final void Function(String email, String password) onPasswordLogin;
+
+  /// ログインできたら true を返す。true のときだけパスワードマネージャーに保存を促す。
+  final Future<bool> Function(String email, String password) onPasswordLogin;
 
   const LoginForm({
     super.key,
@@ -71,9 +74,24 @@ class _LoginFormState extends State<LoginForm> {
     return null;
   }
 
-  void _onEmailAndPasswordFormSubmitted(String email, String password) {
-    if (_formKey.currentState!.validate()) {
-      widget.onPasswordLogin(email, password);
+  @override
+  void dispose() {
+    _passwordFocusNode.dispose();
+    emailFieldController.dispose();
+    passwordFieldController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onEmailAndPasswordFormSubmitted(
+    String email,
+    String password,
+  ) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (await widget.onPasswordLogin(email, password)) {
+      TextInput.finishAutofillContext();
     }
   }
 
@@ -164,46 +182,51 @@ class _LoginFormState extends State<LoginForm> {
         const SizedBox(height: 24),
         Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: 16,
-            children: [
-              TextFormField(
-                controller: emailFieldController,
-                autofillHints: const [AutofillHints.email],
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'メールアドレス',
-                ),
-                validator: _validateEmailField,
-                onFieldSubmitted: (value) {
-                  FocusScope.of(context).requestFocus(_passwordFocusNode);
-                },
-              ),
-              TextFormField(
-                controller: passwordFieldController,
-                autofillHints: const [AutofillHints.password],
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                focusNode: _passwordFocusNode,
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
-                  labelText: 'パスワード',
-                  suffixIcon: IconButton(
-                    onPressed: _togglePasswordVisibility,
-                    icon: Icon(_passwordVisibilityIcon()),
+          child: AutofillGroup(
+            // 既定の commit だと、失敗した入力や Google でのログインでも保存を促してしまう
+            onDisposeAction: AutofillContextAction.cancel,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 16,
+              children: [
+                TextFormField(
+                  controller: emailFieldController,
+                  autofillHints: const [AutofillHints.username],
+                  keyboardType: TextInputType.emailAddress,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'メールアドレス',
                   ),
+                  validator: _validateEmailField,
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_passwordFocusNode);
+                  },
                 ),
-                obscureText: invisiblePassword,
-                validator: _validatePasswordField,
-                onFieldSubmitted: (value) {
-                  _onEmailAndPasswordFormSubmitted(
-                    emailFieldController.text,
-                    passwordFieldController.text,
-                  );
-                },
-              ),
-            ],
+                TextFormField(
+                  controller: passwordFieldController,
+                  autofillHints: const [AutofillHints.password],
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  focusNode: _passwordFocusNode,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: 'パスワード',
+                    suffixIcon: IconButton(
+                      onPressed: _togglePasswordVisibility,
+                      icon: Icon(_passwordVisibilityIcon()),
+                    ),
+                  ),
+                  obscureText: invisiblePassword,
+                  validator: _validatePasswordField,
+                  onFieldSubmitted: (value) {
+                    _onEmailAndPasswordFormSubmitted(
+                      emailFieldController.text,
+                      passwordFieldController.text,
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 24),
