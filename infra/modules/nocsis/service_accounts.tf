@@ -12,6 +12,10 @@ locals {
       display_name = "backend runtime"
       description  = "Cloud Run の backend が実行時に使う。Firestore とログ、ソースマップの読み取り、OPENWEATHERMAP_TOKEN / CALENDAR_ACCOUNT_KEY のみ。"
     }
+    "events-reader" = {
+      display_name = "Events Reader"
+      description  = "Google カレンダーから Class Clock のイベントを取得する"
+    }
     "functions-runtime" = {
       display_name = "functions runtime"
       description  = "Cloud Functions が実行時に使う。Firestore とログ、CALENDAR_ACCOUNT_KEY とグループごとの Slack トークンのみ。"
@@ -48,4 +52,14 @@ resource "google_service_account_iam_member" "wlif_deploy_acts_as" {
   service_account_id = each.value
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${google_service_account.this["wlif-deploy"].email}"
+}
+
+# backend と functions は鍵を持たず、events-reader になりすましてカレンダーを読む。カレンダーは events-reader に共有する。
+resource "google_service_account_iam_binding" "events_reader_token_creator" {
+  service_account_id = google_service_account.this["events-reader"].name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  members = [
+    google_service_account.this["backend-runtime"].member,
+    google_service_account.this["functions-runtime"].member,
+  ]
 }

@@ -25,9 +25,8 @@ import {
   id = "projects/nocsis-development/locations/global/workloadIdentityPools/github-action/providers/deploy-nocsis"
 }
 
-# events-reader と Calendar API は Terraform で新しく作るので取り込まない。まだ無いものを取り込もうとすると plan が落ちる。
 import {
-  for_each = { for k, v in module.nocsis.import_ids.service_accounts : k => v if k != "events-reader" }
+  for_each = module.nocsis.import_ids.service_accounts
   to       = module.nocsis.google_service_account.this[each.key]
   id       = each.value
 }
@@ -61,7 +60,7 @@ import {
 }
 
 import {
-  for_each = { for k, v in module.nocsis.import_ids.services : k => v if k != "calendar-json.googleapis.com" }
+  for_each = module.nocsis.import_ids.services
   to       = module.nocsis.google_project_service.this[each.key]
   id       = each.value
 }

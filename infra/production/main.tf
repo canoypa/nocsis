@@ -34,9 +34,8 @@ module "nocsis" {
     "OPENWEATHERMAP_TOKEN" = ["backend-runtime"]
   }
 
-  # events-reader が Google カレンダーを読む。
   # firebasestorage は Staging では無効でも困っていないが、本番では firebase deploy が呼んでいるので止めない。
-  extra_services = ["calendar-json.googleapis.com", "firebasestorage.googleapis.com"]
+  extra_services = ["firebasestorage.googleapis.com"]
 
   # 使っていない API。止める順序は services.tf のコメントを読む。
   retiring_services = [
@@ -58,12 +57,5 @@ module "nocsis" {
   # 手で設定していたもの。要るかは別に決める。
   audit_log_configs = {
     "storage.googleapis.com" = ["ADMIN_READ", "DATA_READ", "DATA_WRITE"]
-  }
-
-  extra_service_accounts = {
-    "events-reader" = {
-      display_name = "Events Reader"
-      description  = "Google カレンダーから Class Clock のイベントを取得する"
-    }
   }
 }

@@ -1,32 +1,25 @@
-import {
-  auth,
-  type calendar_v3 as CalendarV3,
-  calendar,
-} from "@googleapis/calendar";
+import { type calendar_v3 as CalendarV3, calendar } from "@googleapis/calendar";
+import { GoogleAuth, Impersonated } from "google-auth-library";
 
 let instance: CalendarV3.Calendar;
 
 /**
- * サービスアカウントの認証処理
+ * カレンダーが共有されている events-reader になりすます
  */
 const authorize = async () => {
-  const keyEnv = process.env.CALENDAR_ACCOUNT_KEY;
+  const projectId =
+    process.env.GCLOUD_PROJECT ?? process.env.GOOGLE_CLOUD_PROJECT;
+  if (!projectId) throw new Error("GCLOUD_PROJECT is not set");
 
-  if (!keyEnv) {
-    throw new Error("Can not read CALENDAR_ACCOUNT_KEY");
-  }
+  const sourceClient = await new GoogleAuth({
+    scopes: ["https://www.googleapis.com/auth/cloud-platform"],
+  }).getClient();
 
-  const key = JSON.parse(keyEnv);
-
-  const jwtClient = new auth.JWT({
-    email: key.client_email,
-    key: key.private_key,
-    scopes: ["https://www.googleapis.com/auth/calendar.events"],
+  return new Impersonated({
+    sourceClient,
+    targetPrincipal: `events-reader@${projectId}.iam.gserviceaccount.com`,
+    targetScopes: ["https://www.googleapis.com/auth/calendar.events.readonly"],
   });
-
-  await jwtClient.authorize();
-
-  return jwtClient;
 };
 
 /**

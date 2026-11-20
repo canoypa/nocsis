@@ -1,117 +1,114 @@
-import { createVerify } from "node:crypto";
 import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  CALENDAR_EVENTS_URL,
   externalApiServer,
   GOOGLE_OAUTH_TOKEN_URL,
-  secretManagerHandler,
-  serviceAccountKey,
-  serviceAccountPublicKey,
-  TEST_ACCESS_TOKEN,
+  IAM_GENERATE_ACCESS_TOKEN_URL,
   useExternalApiServer,
 } from "../../tests/helpers/external_apis.js";
 
 useExternalApiServer();
 
-const CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
-
-const decodeJwtPart = (part: string) =>
-  JSON.parse(Buffer.from(part, "base64url").toString());
-
-// インスタンスとシークレットのキャッシュをテストごとに捨てる
+// インスタンスのキャッシュをテストごとに捨てる
 const importClient = async () => {
   vi.resetModules();
   return await import("./google_calendar_client.js");
 };
 
+const listEvents = async () => {
+  const { getCalendarClient } = await importClient();
+  const calendar = await getCalendarClient();
+  await calendar.events.list({ calendarId: "events" });
+  return calendar;
+};
+
 describe("getCalendarClient", () => {
-  let tokenRequests: URLSearchParams[];
+  let impersonations: { serviceAccount: string; body: unknown }[];
+  let calendarAuthorizations: (string | null)[];
 
   beforeEach(() => {
-    tokenRequests = [];
+    vi.stubEnv("GOOGLE_CLOUD_PROJECT", "test-project");
+    impersonations = [];
+    calendarAuthorizations = [];
     externalApiServer.use(
-      http.post(GOOGLE_OAUTH_TOKEN_URL, async ({ request }) => {
-        const body = new URLSearchParams(await request.text());
-        const [, payload] = (body.get("assertion") ?? "").split(".");
-        if (decodeJwtPart(payload).scope === CALENDAR_SCOPE) {
-          tokenRequests.push(body);
-        }
-        return HttpResponse.json({
-          access_token: TEST_ACCESS_TOKEN,
-          expires_in: 3600,
-          token_type: "Bearer",
+      http.post(IAM_GENERATE_ACCESS_TOKEN_URL, async ({ params, request }) => {
+        impersonations.push({
+          serviceAccount: String(params.serviceAccount),
+          body: await request.json(),
         });
+        return HttpResponse.json({
+          accessToken: "impersonated-token",
+          expireTime: new Date(Date.now() + 3600_000).toISOString(),
+        });
+      }),
+      http.get(CALENDAR_EVENTS_URL, ({ request }) => {
+        calendarAuthorizations.push(request.headers.get("authorization"));
+        return HttpResponse.json({ items: [] });
       }),
     );
   });
 
-  it("サービスアカウントの鍵で署名した JWT でアクセストークンを取得すること", async () => {
-    const { getCalendarClient } = await importClient();
+  it("動いているプロジェクトの events-reader になりすまし、カレンダーを読む権限だけのトークンで呼ぶこと", async () => {
+    await listEvents();
 
-    await getCalendarClient();
-
-    expect(tokenRequests).toHaveLength(1);
-    const body = tokenRequests[0];
-    expect(body.get("grant_type")).toBe(
-      "urn:ietf:params:oauth:grant-type:jwt-bearer",
-    );
-
-    const assertion = body.get("assertion") ?? "";
-    const [header, payload, signature] = assertion.split(".");
-    expect(decodeJwtPart(header)).toMatchObject({ alg: "RS256" });
-    expect(decodeJwtPart(payload)).toMatchObject({
-      iss: serviceAccountKey.client_email,
-      scope: CALENDAR_SCOPE,
-      aud: GOOGLE_OAUTH_TOKEN_URL,
-    });
-    expect(
-      createVerify("RSA-SHA256")
-        .update(`${header}.${payload}`)
-        .verify(serviceAccountPublicKey, signature, "base64url"),
-    ).toBe(true);
+    expect(impersonations).toEqual([
+      {
+        serviceAccount:
+          "events-reader@test-project.iam.gserviceaccount.com:generateAccessToken",
+        body: expect.objectContaining({
+          scope: ["https://www.googleapis.com/auth/calendar.events.readonly"],
+        }),
+      },
+    ]);
+    expect(calendarAuthorizations).toEqual(["Bearer impersonated-token"]);
   });
 
-  it("2回目以降は同じインスタンスを返し、再認証しないこと", async () => {
+  it("2回目以降は同じインスタンスを返すこと", async () => {
     const { getCalendarClient } = await importClient();
 
     const first = await getCalendarClient();
     const second = await getCalendarClient();
 
     expect(second).toBe(first);
-    expect(tokenRequests).toHaveLength(1);
   });
 
-  describe("鍵が JSON でない場合", () => {
+  describe("GOOGLE_CLOUD_PROJECT も GCLOUD_PROJECT も無い場合", () => {
     it("エラーになること", async () => {
-      externalApiServer.use(
-        secretManagerHandler({ CALENDAR_ACCOUNT_KEY: "not-json" }),
-      );
+      vi.stubEnv("GOOGLE_CLOUD_PROJECT", undefined);
+      vi.stubEnv("GCLOUD_PROJECT", undefined);
       const { getCalendarClient } = await importClient();
 
       await expect(getCalendarClient()).rejects.toThrow(
-        "Failed to parse CALENDAR_ACCOUNT_KEY as JSON",
+        "GOOGLE_CLOUD_PROJECT が設定されていません",
       );
     });
   });
 
-  describe("鍵に client_email か private_key が無い場合", () => {
-    it("エラーになること", async () => {
+  describe("なりすましを断られた場合", () => {
+    it("カレンダーを呼ばずにエラーになること", async () => {
       externalApiServer.use(
-        secretManagerHandler({
-          CALENDAR_ACCOUNT_KEY: JSON.stringify({
-            client_email: serviceAccountKey.client_email,
-          }),
-        }),
+        http.post(IAM_GENERATE_ACCESS_TOKEN_URL, () =>
+          HttpResponse.json(
+            {
+              error: {
+                code: 403,
+                message:
+                  "Permission 'iam.serviceAccounts.getAccessToken' denied",
+                status: "PERMISSION_DENIED",
+              },
+            },
+            { status: 403 },
+          ),
+        ),
       );
-      const { getCalendarClient } = await importClient();
 
-      await expect(getCalendarClient()).rejects.toThrow(
-        "Invalid service account key: missing client_email or private_key",
-      );
+      await expect(listEvents()).rejects.toThrow("getAccessToken");
+      expect(calendarAuthorizations).toEqual([]);
     });
   });
 
-  describe("トークンの取得に失敗した場合", () => {
+  describe("元のトークンの取得に失敗した場合", () => {
     it("エラーになること", async () => {
       externalApiServer.use(
         http.post(GOOGLE_OAUTH_TOKEN_URL, () =>
@@ -121,9 +118,8 @@ describe("getCalendarClient", () => {
           ),
         ),
       );
-      const { getCalendarClient } = await importClient();
 
-      await expect(getCalendarClient()).rejects.toThrow("invalid_grant");
+      await expect(listEvents()).rejects.toThrow("invalid_grant");
     });
   });
 });

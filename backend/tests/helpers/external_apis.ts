@@ -28,6 +28,9 @@ export const serviceAccountKey = {
 
 export const TEST_ACCESS_TOKEN = "test-access-token";
 
+export const IAM_GENERATE_ACCESS_TOKEN_URL =
+  "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/:serviceAccount";
+
 export const SECRET_MANAGER_ACCESS_URL =
   "https://secretmanager.googleapis.com/v1/projects/:project/secrets/:secret/versions/:version";
 
@@ -73,10 +76,6 @@ export const openMeteoForecast = ({
   },
 });
 
-export const defaultSecrets: Record<string, string> = {
-  CALENDAR_ACCOUNT_KEY: JSON.stringify(serviceAccountKey),
-};
-
 /**
  * Secret Manager の accessSecretVersion (REST) に応答するハンドラ
  */
@@ -105,7 +104,13 @@ const defaultHandlers = [
       token_type: "Bearer",
     }),
   ),
-  secretManagerHandler(defaultSecrets),
+  http.post(IAM_GENERATE_ACCESS_TOKEN_URL, () =>
+    HttpResponse.json({
+      accessToken: TEST_ACCESS_TOKEN,
+      expireTime: new Date(Date.now() + 3600_000).toISOString(),
+    }),
+  ),
+  secretManagerHandler({}),
   http.get(CALENDAR_EVENTS_URL, () => HttpResponse.json({ items: [] })),
   http.get(OPEN_METEO_FORECAST_URL, () =>
     HttpResponse.json(openMeteoForecast()),
