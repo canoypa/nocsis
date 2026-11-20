@@ -112,57 +112,60 @@ class _LoginFormState extends State<LoginForm> {
           ),
           Form(
             key: _formKey,
-            child: Column(
-              spacing: 24,
-              children: [
-                TextFormField(
-                  controller: emailFieldController,
-                  autofillHints: const [AutofillHints.email],
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'メールアドレス',
-                  ),
-                  validator: _validateEmailField,
-                  onFieldSubmitted: (value) {
-                    FocusScope.of(context).requestFocus(_passwordFocusNode);
-                  },
-                ),
-                TextFormField(
-                  controller: passwordFieldController,
-                  autofillHints: const [AutofillHints.password],
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  focusNode: _passwordFocusNode,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'パスワード',
-                    suffixIcon: IconButton(
-                      onPressed: _togglePasswordVisibility,
-                      icon: Icon(_passwordVisibilityIcon()),
+            child: AutofillGroup(
+              child: Column(
+                spacing: 24,
+                children: [
+                  TextFormField(
+                    controller: emailFieldController,
+                    autofillHints: const [AutofillHints.username],
+                    keyboardType: TextInputType.emailAddress,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'メールアドレス',
                     ),
+                    validator: _validateEmailField,
+                    onFieldSubmitted: (value) {
+                      FocusScope.of(context).requestFocus(_passwordFocusNode);
+                    },
                   ),
-                  obscureText: invisiblePassword,
-                  validator: _validatePasswordField,
-                  onFieldSubmitted: (value) {
-                    _onEmailAndPasswordFormSubmitted(
-                      emailFieldController.text,
-                      passwordFieldController.text,
-                    );
-                  },
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () {
+                  TextFormField(
+                    controller: passwordFieldController,
+                    autofillHints: const [AutofillHints.password],
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    focusNode: _passwordFocusNode,
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      labelText: 'パスワード',
+                      suffixIcon: IconButton(
+                        onPressed: _togglePasswordVisibility,
+                        icon: Icon(_passwordVisibilityIcon()),
+                      ),
+                    ),
+                    obscureText: invisiblePassword,
+                    validator: _validatePasswordField,
+                    onFieldSubmitted: (value) {
                       _onEmailAndPasswordFormSubmitted(
                         emailFieldController.text,
                         passwordFieldController.text,
                       );
                     },
-                    child: const Text('ログイン'),
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () {
+                        _onEmailAndPasswordFormSubmitted(
+                          emailFieldController.text,
+                          passwordFieldController.text,
+                        );
+                      },
+                      child: const Text('ログイン'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
