@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/current_group_id.dart';
-import 'package:nocsis/providers/user_joined_groups.dart';
+import 'package:nocsis/providers/me.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
 @Dependencies([currentGroupId])
@@ -22,20 +22,20 @@ class SelectGroupMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userJoinedGroups = ref
-        .watch(userJoinedGroupsProvider)
-        .maybeWhen(
-          data: (data) => data,
-          orElse: () => UserJoinedGroups(items: []),
-        );
+    final uid = ref.watch(currentUidProvider);
+    final memberships = uid == null
+        ? <Membership>[]
+        : ref.watch(meProvider(uid)).value?.memberships ?? [];
 
     final groupId = ref.watch(currentGroupIdProvider);
 
     return DropdownButton(
-      items: userJoinedGroups.items
+      items: memberships
           .map(
-            (group) =>
-                DropdownMenuItem(value: group.id, child: Text(group.name)),
+            (membership) => DropdownMenuItem(
+              value: membership.group.id,
+              child: Text(membership.group.name),
+            ),
           )
           .toList(),
       value: groupId,

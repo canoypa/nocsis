@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:animations/animations.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/providers/api_client.dart';
+import 'package:nocsis/core/route_access.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
@@ -20,11 +21,13 @@ import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/no_group.dart';
+import 'package:nocsis/pages/not_found.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/providers/auth.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/firebase.dart';
+import 'package:nocsis/providers/me.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,6 +62,11 @@ class AppShell extends ShellRouteData {
   }
 }
 
+/// redirect から投げると、go_router が URL をそのままにエラー画面を出す
+class _PageNotFound implements Exception {
+  const _PageNotFound();
+}
+
 class _RouterRefresher extends ChangeNotifier {
   void refresh() {
     notifyListeners();
@@ -69,6 +77,16 @@ class _RouterRefresher extends ChangeNotifier {
 GoRouter router(Ref ref) {
   final refresher = _RouterRefresher();
   ref.listen(authProvider, (_, _) => refresher.refresh());
+
+  // 読む画面が無いと meProvider は取得中に破棄され得るので、読み終わるまで購読しておく
+  Future<Me> readMe(String uid) async {
+    final subscription = ref.listen(meProvider(uid), (_, _) {});
+    try {
+      return await ref.read(meProvider(uid).future);
+    } finally {
+      subscription.close();
+    }
+  }
 
   Future<String?> redirectFromTopPage(Uri uri) async {
     if (uri.path != '/') {
@@ -84,34 +102,30 @@ GoRouter router(Ref ref) {
           : "/groups/$groupId${uri.path}";
     }
 
-    final client = await ref.read(apiClientProvider.future);
-    final response = await client.apiV1UsersMeGroupsGet();
-
-    if (!response.isSuccessful || response.body == null) {
-      throw Exception(
-        'User joined groups fetch failed: ${response.statusCode}',
-      );
-    }
-
-    final data = response.body!;
-    if (data.items.isEmpty) {
+    final uid = ref.read(firebaseAuthProvider).currentUser?.uid;
+    if (uid == null) {
       return null;
     }
 
-    final firstUserJoinedGroup = data.items.first;
+    final me = await readMe(uid);
+    if (me.memberships.isEmpty) {
+      return null;
+    }
 
-    sharedPreferences.setString('latest_group_id', firstUserJoinedGroup.id);
+    final firstGroupId = me.memberships.first.group.id;
+
+    sharedPreferences.setString('latest_group_id', firstGroupId);
 
     return uri.path == '/'
-        ? "/groups/${firstUserJoinedGroup.id}"
-        : "/groups/${firstUserJoinedGroup.id}${uri.path}";
+        ? "/groups/$firstGroupId"
+        : "/groups/$firstGroupId${uri.path}";
   }
 
   String? redirectNotLoggedInUser(GoRouterState state) {
     final currentUser = ref.read(firebaseAuthProvider).currentUser;
     final isLoggedIn = currentUser != null;
 
-    if (isLoggedIn || state.matchedLocation == LoginPageRoute().location) {
+    if (isLoggedIn || isPublic(state.fullPath ?? '')) {
       return null;
     }
 
@@ -138,13 +152,63 @@ GoRouter router(Ref ref) {
     return await redirectFromTopPage(continueUri) ?? continueUri.toString();
   }
 
+  /// [routeAccess] の宣言を満たさないルートは、URL を変えずにその場で 404 を出す
+  Future<String?> redirectByAccess(GoRouterState state) async {
+    final path = state.fullPath;
+    // どのルートにも当たらない URL は go_router のエラー画面が出す
+    if (path == null) {
+      return null;
+    }
+
+    if (declarationsFor(path).isEmpty) {
+      throw const _PageNotFound();
+    }
+
+    final uid = ref.read(firebaseAuthProvider).currentUser?.uid;
+    final groupId = state.pathParameters['groupId'];
+    if (!needsGroupPermissions(path) || uid == null || groupId == null) {
+      return null;
+    }
+
+    try {
+      var granted = permissionsIn(await readMe(uid), groupId);
+
+      if (!canOpen(path, granted)) {
+        // 後からグループに追加された直後かもしれないので、一度だけ取り直す
+        ref.invalidate(meProvider(uid));
+        granted = permissionsIn(await readMe(uid), groupId);
+      }
+
+      if (canOpen(path, granted)) {
+        return null;
+      }
+    } catch (_) {
+      // 取れないときは通す。止めても守れるもの（画面の API はサーバが判定する）は無く、
+      // 止めると教室の画面が通信の回復を待てない。次の遷移で取り直す
+      ref.invalidate(meProvider(uid));
+      return null;
+    }
+
+    // 開けないグループを覚えていると、トップからまたそこへ飛ばされ続ける
+    final sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.getString('latest_group_id') == groupId) {
+      await sharedPreferences.remove('latest_group_id');
+    }
+
+    // 権限が無いことと、グループの存在を区別しない
+    throw const _PageNotFound();
+  }
+
   return GoRouter(
     routes: $appRoutes,
     refreshListenable: refresher,
+    // redirect で投げた例外もここに来る。どれも開けるページが無いという意味なので 404 に寄せる
+    errorBuilder: (context, state) => const ErrorPage(),
     redirect: (context, state) async {
       return redirectNotLoggedInUser(state) ??
           await redirectLoggedInUser(state) ??
-          await redirectFromTopPage(state.uri);
+          await redirectFromTopPage(state.uri) ??
+          await redirectByAccess(state);
     },
   );
 }
