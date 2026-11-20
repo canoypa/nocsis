@@ -108,4 +108,14 @@ void main() {
 
     expect(find.text('404: Page not found'), findsOneWidget);
   });
+
+  testWidgets('member.read を持たない相手が Classroom の URL を開くと 404 を出す', (
+    tester,
+  ) async {
+    givenPermissions([Permission.groupRead]);
+
+    await pumpApp(tester, '/groups/g1/classroom');
+
+    expect(find.text('404: Page not found'), findsOneWidget);
+  });
 }

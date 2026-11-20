@@ -17,7 +17,7 @@ class ClassroomPageRoute extends GoRouteData with $ClassroomPageRoute {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: const ClassroomPage(),
+      child: const PermissionGate(route: '/classroom', child: ClassroomPage()),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,

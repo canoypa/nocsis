@@ -7,8 +7,9 @@ const _manageMembers = {
   Permission.memberDelete,
 };
 
-/// 管理コンソールの各画面が行う操作。画面は、このうち1つでも持っていれば開ける
-const consolePagePermissions = <String, Set<Permission>>{
+/// 画面が行う操作。画面は、このうち1つでも持っていれば開ける。
+/// キーは `/groups/:groupId` より後ろのパス
+const pagePermissions = <String, Set<Permission>>{
   '/console': {..._updateGroup, ..._manageMembers},
   '/console/group': _updateGroup,
   '/console/member': _manageMembers,
@@ -16,7 +17,9 @@ const consolePagePermissions = <String, Set<Permission>>{
   '/console/day_duty': _updateGroup,
   '/console/weather': _updateGroup,
   '/console/slack': _updateGroup,
+  // 日直（メンバーの一覧）を出すのは教室の画面だけ
+  '/classroom': {Permission.memberRead},
 };
 
-bool canOpenConsolePage(String route, Set<Permission> granted) =>
-    consolePagePermissions[route]?.any(granted.contains) ?? false;
+bool canOpenPage(String route, Set<Permission> granted) =>
+    pagePermissions[route]?.any(granted.contains) ?? false;

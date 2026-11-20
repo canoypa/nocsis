@@ -2,7 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/personal/user_avatar.dart';
-import 'package:nocsis/pages/console/permissions.dart';
+import 'package:nocsis/generated/api_client/api.enums.swagger.dart';
+import 'package:nocsis/core/page_permissions.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/routes/router.dart';
@@ -16,10 +17,10 @@ class AccountMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
     final permissions = ref.watch(groupPermissionsProvider(groupId));
-    final canOpenConsole =
-        !permissions.isLoading &&
-        !permissions.hasError &&
-        canOpenConsolePage('/console', permissions.requireValue);
+    // 再取得中や失敗時の value は前の値（前のアカウントのこともある）なので使わない
+    final granted = permissions.isLoading || permissions.hasError
+        ? const <Permission>{}
+        : permissions.requireValue;
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -45,16 +46,19 @@ class AccountMenu extends ConsumerWidget {
             FirebaseAuth.instance.signOut();
           },
         ),
-        const Divider(),
-        if (canOpenConsole)
+        if (canOpenPage('/console', granted) ||
+            canOpenPage('/classroom', granted))
+          const Divider(),
+        if (canOpenPage('/console', granted))
           ListTile(
             title: const Text("管理コンソール"),
             onTap: () => ConsoleTopPageRoute(groupId).go(context),
           ),
-        ListTile(
-          title: const Text("Classroom を起動"),
-          onTap: () => ClassroomPageRoute(groupId).go(context),
-        ),
+        if (canOpenPage('/classroom', granted))
+          ListTile(
+            title: const Text("Classroom を起動"),
+            onTap: () => ClassroomPageRoute(groupId).go(context),
+          ),
         const Divider(),
         ListTile(
           title: const Text("ライセンス"),
