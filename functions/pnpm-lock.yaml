@@ -196,9 +196,6 @@ importers:
       firebase-functions:
         specifier: ^7.4.0
         version: 7.4.0(firebase-admin@14.5.1(supports-color@8.1.1))(supports-color@8.1.1)
-      google-auth-library:
-        specifier: ^11.3.4
-        version: 11.3.4(supports-color@8.1.1)
       luxon:
         specifier: ^3.7.2
         version: 3.7.2

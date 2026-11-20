@@ -2,8 +2,8 @@
 locals {
   services = toset(concat([
     "appengine.googleapis.com",
-    "calendar-json.googleapis.com",
     "artifactregistry.googleapis.com",
+    "calendar-json.googleapis.com",
     "cloudbilling.googleapis.com",
     "cloudbuild.googleapis.com",
     "clouderrorreporting.googleapis.com",

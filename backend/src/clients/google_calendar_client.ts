@@ -1,29 +1,40 @@
-import assert from "node:assert";
-import { type calendar_v3 as CalendarV3, calendar } from "@googleapis/calendar";
-import { GoogleAuth, Impersonated } from "google-auth-library";
-
-const CALENDAR_SCOPE =
-  "https://www.googleapis.com/auth/calendar.events.readonly";
+import {
+  auth,
+  type calendar_v3 as CalendarV3,
+  calendar,
+} from "@googleapis/calendar";
+import { fetchSecret } from "../services/secret_manager_service.js";
 
 let instance: CalendarV3.Calendar | null = null;
 
 /**
- * カレンダーが共有されている events-reader になりすます
+ * サービスアカウントの認証処理
  */
 const authorize = async () => {
-  const projectId =
-    process.env.GOOGLE_CLOUD_PROJECT ?? process.env.GCLOUD_PROJECT;
-  assert(projectId, "GOOGLE_CLOUD_PROJECT が設定されていません");
+  const keyJson = await fetchSecret("CALENDAR_ACCOUNT_KEY");
 
-  const sourceClient = await new GoogleAuth({
-    scopes: ["https://www.googleapis.com/auth/cloud-platform"],
-  }).getClient();
+  let key: { client_email?: string; private_key?: string };
+  try {
+    key = JSON.parse(keyJson);
+  } catch (_error) {
+    throw new Error("Failed to parse CALENDAR_ACCOUNT_KEY as JSON");
+  }
 
-  return new Impersonated({
-    sourceClient,
-    targetPrincipal: `events-reader@${projectId}.iam.gserviceaccount.com`,
-    targetScopes: [CALENDAR_SCOPE],
+  if (!key.client_email || !key.private_key) {
+    throw new Error(
+      "Invalid service account key: missing client_email or private_key",
+    );
+  }
+
+  const jwtClient = new auth.JWT({
+    email: key.client_email,
+    key: key.private_key,
+    scopes: ["https://www.googleapis.com/auth/calendar.events"],
   });
+
+  await jwtClient.authorize();
+
+  return jwtClient;
 };
 
 /**
