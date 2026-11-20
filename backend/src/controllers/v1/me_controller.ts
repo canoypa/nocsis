@@ -9,6 +9,7 @@ import {
   authentication,
   getCurrentUserId,
 } from "../../middlewares/authenticate.js";
+import { skipAuthorization } from "../../middlewares/authorize.js";
 import { meSchema } from "../../resources/v1/me.js";
 
 export const meRoutes = new Hono<AuthenticatedEnv>();
@@ -35,6 +36,7 @@ meRoutes.use("*", authentication).get(
     },
     security: [{ bearer: [] }],
   }),
+  skipAuthorization("自分の binding から導くので、判定するリソースが無い"),
   async (c) => {
     const uid = getCurrentUserId(c);
 

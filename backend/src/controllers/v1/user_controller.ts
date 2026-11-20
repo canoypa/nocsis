@@ -9,6 +9,7 @@ import {
   authentication,
   getCurrentUserId,
 } from "../../middlewares/authenticate.js";
+import { skipAuthorization } from "../../middlewares/authorize.js";
 import {
   userJoinedGroupSchema,
   userJoinedGroupsSchema,
@@ -38,6 +39,7 @@ userRoutes.use("*", authentication).get(
     },
     security: [{ bearer: [] }],
   }),
+  skipAuthorization("自分の binding から導くので、判定するリソースが無い"),
   async (c) => {
     const uid = getCurrentUserId(c);
 
