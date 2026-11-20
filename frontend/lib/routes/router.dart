@@ -53,12 +53,7 @@ part 'settings/settings_top_page_route.dart';
 part 'top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
-  routes: [
-    groupShellRoute,
-    licensesPageRoute,
-    loginPageRoute,
-    topPageRoute,
-  ],
+  routes: [groupShellRoute, licensesPageRoute, loginPageRoute, topPageRoute],
 )
 class AppShell extends ShellRouteData {
   @override
