@@ -191,7 +191,7 @@ importers:
         specifier: ^0.3.31
         version: 0.3.31
       '@scalar/hono-api-reference':
-        specifier: ^0.12.21
+        specifier: ^0.12.22
         version: 0.12.22(hono@4.13.19)
       firebase-admin:
         specifier: ^14.5.1

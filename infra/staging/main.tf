@@ -36,5 +36,12 @@ module "nocsis" {
     "claude-readonly" = {
       display_name = "Claude (read-only)"
     }
+    "events-reader" = {
+      display_name = "Events Reader"
+      description  = "Google カレンダーから Class Clock のイベントを取得する"
+    }
   }
+
+  # events-reader が Google カレンダーを読む。
+  extra_services = ["calendar-json.googleapis.com"]
 }
