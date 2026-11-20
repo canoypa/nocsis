@@ -266,6 +266,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
         setState(() {
           reAuthenticated = true;
         });
+        return true;
       },
     );
   }
@@ -401,6 +402,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
         setState(() {
           reAuthenticated = true;
         });
+        return true;
       },
     );
   }

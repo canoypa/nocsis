@@ -6,7 +6,7 @@ import 'package:nocsis/components/login_form.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  void _passwordLogin(
+  Future<bool> _passwordLogin(
     BuildContext context,
     String email,
     String password,
@@ -16,6 +16,7 @@ class LoginPage extends StatelessWidget {
         email: email,
         password: password,
       );
+      return true;
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -29,6 +30,7 @@ class LoginPage extends StatelessWidget {
           ),
         );
       }
+      return false;
     }
   }
 

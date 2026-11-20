@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginForm extends StatefulWidget {
@@ -8,7 +9,9 @@ class LoginForm extends StatefulWidget {
   final String title;
   final String description;
   final VoidCallback onGoogleLogin;
-  final void Function(String email, String password) onPasswordLogin;
+
+  /// ログインできたら true を返す。true のときだけパスワードマネージャーに保存を促す。
+  final Future<bool> Function(String email, String password) onPasswordLogin;
 
   const LoginForm({
     super.key,
@@ -61,9 +64,24 @@ class _LoginFormState extends State<LoginForm> {
     return null;
   }
 
-  void _onEmailAndPasswordFormSubmitted(String email, String password) {
-    if (_formKey.currentState!.validate()) {
-      widget.onPasswordLogin(email, password);
+  @override
+  void dispose() {
+    _passwordFocusNode.dispose();
+    emailFieldController.dispose();
+    passwordFieldController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onEmailAndPasswordFormSubmitted(
+    String email,
+    String password,
+  ) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (await widget.onPasswordLogin(email, password)) {
+      TextInput.finishAutofillContext();
     }
   }
 
@@ -113,6 +131,8 @@ class _LoginFormState extends State<LoginForm> {
           Form(
             key: _formKey,
             child: AutofillGroup(
+              // 既定の commit だと、失敗した入力や Google でのログインでも保存を促してしまう
+              onDisposeAction: AutofillContextAction.cancel,
               child: Column(
                 spacing: 24,
                 children: [
