@@ -46,7 +46,8 @@ void main() {
         // モックユーザーのアバターは外部の画像で、テストでは読み込めずに失敗する。
         // アバターを読み込み中のままにして画像を取りに行かせない
         authProvider.overrideWith((ref) => const Stream.empty()),
-        meProvider.overrideWith((ref) async => me),
+        currentUidProvider.overrideWithValue('u1'),
+        meProvider('u1').overrideWith((ref) async => me),
         apiClientProvider.overrideWith((ref) async => mockApi),
       ],
     );

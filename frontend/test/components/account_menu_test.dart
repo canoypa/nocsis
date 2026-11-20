@@ -13,7 +13,11 @@ void main() {
       ProviderScope(
         overrides: [
           currentGroupIdProvider.overrideWithValue('g1'),
-          groupPermissionsProvider('g1').overrideWith((ref) async => granted),
+          currentUidProvider.overrideWithValue('u1'),
+          groupPermissionsProvider(
+            'u1',
+            'g1',
+          ).overrideWith((ref) async => granted),
           authProvider.overrideWith((ref) => const Stream.empty()),
         ],
         child: const MaterialApp(home: Scaffold(body: AccountMenu())),

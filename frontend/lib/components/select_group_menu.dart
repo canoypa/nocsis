@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/me.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
@@ -21,7 +22,10 @@ class SelectGroupMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final memberships = ref.watch(meProvider).value?.memberships ?? [];
+    final uid = ref.watch(currentUidProvider);
+    final memberships = uid == null
+        ? <Membership>[]
+        : ref.watch(meProvider(uid)).value?.memberships ?? [];
 
     final groupId = ref.watch(currentGroupIdProvider);
 

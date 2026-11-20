@@ -19,18 +19,31 @@ class PermissionGate extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
-    final permissions = ref.watch(groupPermissionsProvider(groupId));
+    final uid = ref.watch(currentUidProvider);
+    if (uid == null) {
+      return const _Loading();
+    }
 
-    // 再取得中や失敗時の value は前の値（前のアカウントのこともある）なので使わない
-    if (permissions.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    // 値はこの uid のものだけなので、取り直し中や取り直しの失敗時も前の値で判定してよい。
+    // 一度も取れていない間は、失敗していても 404 にせず取り直しを待つ（教室の画面を固めない）
+    final permissions = ref.watch(groupPermissionsProvider(uid, groupId));
+    if (!permissions.hasValue) {
+      return const _Loading();
     }
 
     // 権限が無いことと、グループの存在を区別しない
-    if (permissions.hasError || !canOpenPage(route, permissions.requireValue)) {
+    if (!canOpenPage(route, permissions.requireValue)) {
       return const ErrorPage();
     }
 
     return child;
   }
+}
+
+class _Loading extends StatelessWidget {
+  const _Loading();
+
+  @override
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: CircularProgressIndicator()));
 }

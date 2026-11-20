@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/personal/user_avatar.dart';
-import 'package:nocsis/generated/api_client/api.enums.swagger.dart';
 import 'package:nocsis/core/page_permissions.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/me.dart';
@@ -16,11 +15,7 @@ class AccountMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
-    final permissions = ref.watch(groupPermissionsProvider(groupId));
-    // 再取得中や失敗時の value は前の値（前のアカウントのこともある）なので使わない
-    final granted = permissions.isLoading || permissions.hasError
-        ? const <Permission>{}
-        : permissions.requireValue;
+    final granted = watchGrantedPermissions(ref, groupId);
 
     return MenuAnchor(
       builder: (context, controller, child) {

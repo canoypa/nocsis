@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nocsis/core/page_permissions.dart';
 import 'package:nocsis/providers/current_group_id.dart';
+import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
@@ -11,6 +13,7 @@ class ConsoleTopPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
+    final granted = watchGrantedPermissions(ref, groupId);
 
     return Align(
       alignment: Alignment.topLeft,
@@ -23,10 +26,11 @@ class ConsoleTopPage extends ConsumerWidget {
             const SizedBox(height: 24),
             Text('かなり開発中です', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 48),
-            OutlinedButton(
-              child: const Text('Classroom を起動する'),
-              onPressed: () => ClassroomPageRoute(groupId).go(context),
-            ),
+            if (canOpenPage('/classroom', granted))
+              OutlinedButton(
+                child: const Text('Classroom を起動する'),
+                onPressed: () => ClassroomPageRoute(groupId).go(context),
+              ),
           ],
         ),
       ),
