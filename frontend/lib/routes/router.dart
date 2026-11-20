@@ -152,8 +152,7 @@ GoRouter router(Ref ref) {
     return await redirectFromTopPage(continueUri) ?? continueUri.toString();
   }
 
-  /// [routeAccess] の宣言を満たさないルートは、URL を変えずにその場で 404 を出す。表示の出し分けだけで、
-  /// 操作の可否はサーバが毎回判定する
+  /// [routeAccess] の宣言を満たさないルートは、URL を変えずにその場で 404 を出す
   Future<String?> redirectByAccess(GoRouterState state) async {
     final path = state.fullPath;
     // どのルートにも当たらない URL は go_router のエラー画面が出す

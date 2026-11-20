@@ -1,7 +1,7 @@
 import 'package:nocsis/generated/api_client/api.enums.swagger.dart';
 
 /// ルートが誰に開けるか。宣言はパスの階層で受け継ぐ。子は親の宣言に条件を足す
-/// ことしかできず、親より緩めることはできない（祖先の宣言をすべて満たす必要がある）
+/// ことしかできず、親より緩めることはできない
 sealed class RouteAccess {
   const RouteAccess();
 }
@@ -16,8 +16,7 @@ class SignedInAccess extends RouteAccess {
   const SignedInAccess();
 }
 
-/// URL のグループに対して、このうち1つでも持っていれば開ける。
-/// 画面が行う操作を並べる（「console だから」ではなく「その画面がやることが write だから」）
+/// URL のグループに対して、このうち1つでも持っていれば開ける。画面が行う操作を並べる
 class GroupAccess extends RouteAccess {
   final Set<Permission> anyOf;
 
@@ -35,7 +34,6 @@ const _manageMembers = {
 const routeAccess = <String, RouteAccess>{
   '/login': PublicAccess(),
   '/': SignedInAccess(),
-  // ライセンスの表示は誰にでも見せてよい
   '/licenses': PublicAccess(),
   '/groups/:groupId': GroupAccess({Permission.groupRead}),
   '/groups/:groupId/console': GroupAccess({..._updateGroup, ..._manageMembers}),
