@@ -43,8 +43,6 @@ const required = (name: string): string => {
   return value;
 };
 
-const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
 const parseEmails = (value: string) =>
   value
     .split(/[\s,]+/)
@@ -65,7 +63,7 @@ const config = emulated
       classesCalendarId: required("SEED_CLASSES_CALENDAR_ID"),
       eventsCalendarId: required("SEED_EVENTS_CALENDAR_ID"),
       slackEventChannelId: "",
-      // パスワードがあると、Staging のログインが Cano さんのアカウントだけに閉じなくなる。
+      // パスワードがあると、誰でもテスト用のアカウントでログインして、グループの中を見られる。
       memberPassword: undefined,
       allowedEmails: parseEmails(required("SEED_ALLOWED_EMAILS")),
     };
@@ -200,18 +198,11 @@ for (const user of testUsers) {
 }
 
 let allowedUsersFound = 0;
-if (config.allowedEmails.length > 0) {
-  // blocking function は ^...$ でアンカーされたパターンしか受け付けない。
-  await firestore.doc("environment/allowed_emails").set({
-    values: config.allowedEmails.map((email) => `^${escapeRegExp(email)}$`),
-  });
-
-  for (const email of config.allowedEmails) {
-    const uid = await findUidByEmail(email);
-    if (!uid) continue;
-    allowedUsersFound++;
-    await setMembership(uid, joinAllowedUsers);
-  }
+for (const email of config.allowedEmails) {
+  const uid = await findUidByEmail(email);
+  if (!uid) continue;
+  allowedUsersFound++;
+  await setMembership(uid, joinAllowedUsers);
 }
 
 console.log(
