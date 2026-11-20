@@ -262,14 +262,14 @@
                 "items": {
                   "type": "number"
                 },
-                "description": "8時間先までの気温"
+                "description": "3時間ごと、24時間先までの気温"
               },
               "pop": {
                 "type": "array",
                 "items": {
                   "type": "number"
                 },
-                "description": "8時間先までの降水確率"
+                "description": "3時間ごと、24時間先までの降水確率"
               }
             },
             "required": [
@@ -295,7 +295,7 @@
               ],
               "description": "天候名"
             },
-            "description": "3時間先までの天気"
+            "description": "6・9・12時間先の天気"
           }
         },
         "required": [
