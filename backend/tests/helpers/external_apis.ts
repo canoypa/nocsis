@@ -51,12 +51,25 @@ export const openMeteoForecast = ({
   pop?: number | null;
   weatherCode?: number;
 } = {}) => ({
-  current: { time: 0, temperature_2m: temp, weather_code: weatherCode },
+  current: {
+    time: 0,
+    temperature_2m: temp as number | null,
+    weather_code: weatherCode as number | null,
+  },
   hourly: {
     time: Array.from({ length: 25 }, (_, i) => i * 3600),
-    temperature_2m: Array.from({ length: 25 }, () => temp),
-    precipitation_probability: Array.from({ length: 25 }, () => pop),
-    weather_code: Array.from({ length: 25 }, () => weatherCode),
+    temperature_2m: Array.from<unknown, number | null>(
+      { length: 25 },
+      () => temp,
+    ),
+    precipitation_probability: Array.from<unknown, number | null>(
+      { length: 25 },
+      () => pop,
+    ),
+    weather_code: Array.from<unknown, number | null>(
+      { length: 25 },
+      () => weatherCode,
+    ),
   },
 });
 

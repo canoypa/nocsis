@@ -11,16 +11,16 @@ interface FetchWeatherParams {
   lon: number;
 }
 
+// 使わない時刻の欠けで予報全体を落とさないよう、値ごとに null を許して使う所で確かめる
 const ForecastResponseSchema = z.object({
   current: z.object({
-    temperature_2m: z.number(),
-    weather_code: z.number(),
+    temperature_2m: z.number().nullable(),
+    weather_code: z.number().nullable(),
   }),
   hourly: z.object({
-    temperature_2m: z.array(z.number()),
-    // 降水確率だけ欠けた時刻があっても、予報全体は落とさない
+    temperature_2m: z.array(z.number().nullable()),
     precipitation_probability: z.array(z.number().nullable()),
-    weather_code: z.array(z.number()),
+    weather_code: z.array(z.number().nullable()),
   }),
 });
 
@@ -106,20 +106,20 @@ const fetchWeatherFromApi = async ({
     const index = FORECAST_STEP_HOURS * (i + 1);
     const temp = data.hourly.temperature_2m[index];
     const weatherCode = data.hourly.weather_code[index];
-    if (temp === undefined || weatherCode === undefined) {
+    if (temp == null || weatherCode == null) {
       throw new Error("天気データの予報が足りません");
     }
+    // 降水確率だけが欠けたときは、グラフを出せるよう 0 とみなす
     const pop = data.hourly.precipitation_probability[index] ?? 0;
     return { temp, pop: pop / 100, weatherCode };
   });
 
-  return {
-    current: {
-      temp: data.current.temperature_2m,
-      weatherCode: data.current.weather_code,
-    },
-    hourly,
-  };
+  const { temperature_2m: temp, weather_code: weatherCode } = data.current;
+  if (temp === null || weatherCode === null) {
+    throw new Error("天気データの現在の値がありません");
+  }
+
+  return { current: { temp, weatherCode }, hourly };
 };
 
 /**

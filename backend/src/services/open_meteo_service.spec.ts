@@ -74,6 +74,52 @@ describe("fetchWeather", () => {
     });
   });
 
+  describe("使わない時刻の気温が null の場合", () => {
+    it("取得できること", async () => {
+      const forecast = openMeteoForecast();
+      forecast.hourly.temperature_2m[1] = null;
+      externalApiServer.use(
+        http.get(OPEN_METEO_FORECAST_URL, () => HttpResponse.json(forecast)),
+      );
+
+      await expect(fetchWeather({ lat: 1, lon: 1 })).resolves.toMatchObject({
+        current: { temp: 20 },
+      });
+    });
+  });
+
+  describe("使う時刻の天気コードが null の場合", () => {
+    it("エラーになること", async () => {
+      const forecast = openMeteoForecast();
+      forecast.hourly.weather_code[3] = null;
+      externalApiServer.use(
+        http.get(OPEN_METEO_FORECAST_URL, () => HttpResponse.json(forecast)),
+      );
+
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
+        "天気データの予報が足りません",
+      );
+    });
+  });
+
+  describe("現在の気温が null の場合", () => {
+    it("エラーになること", async () => {
+      const forecast = openMeteoForecast();
+      externalApiServer.use(
+        http.get(OPEN_METEO_FORECAST_URL, () =>
+          HttpResponse.json({
+            ...forecast,
+            current: { ...forecast.current, temperature_2m: null },
+          }),
+        ),
+      );
+
+      await expect(fetchWeather({ lat: 1, lon: 1 })).rejects.toThrow(
+        "天気データの現在の値がありません",
+      );
+    });
+  });
+
   describe("API が 500 を返す場合", () => {
     it("エラーになること", async () => {
       externalApiServer.use(
