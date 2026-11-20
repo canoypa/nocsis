@@ -54,19 +54,19 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact =
+        MediaQuery.sizeOf(context).width < LoginForm.mediumBreakpoint;
+
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(48),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              LoginForm(
-                onGoogleLogin: () => _googleLogin(context),
-                onPasswordLogin: (email, password) =>
-                    _passwordLogin(context, email, password),
-              ),
-            ],
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(compact ? 16 : 24),
+            child: LoginForm(
+              onGoogleLogin: () => _googleLogin(context),
+              onPasswordLogin: (email, password) =>
+                  _passwordLogin(context, email, password),
+            ),
           ),
         ),
       ),
