@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       join_allowed_users:
-        description: "許可したアカウントをテストグループに所属させる (外すと未参加の画面を確かめられる)"
+        description: "SEED_ALLOWED_EMAILS のアカウントをテストグループに所属させる (外すと未参加の画面を確かめられる)"
         type: boolean
         default: true
 
