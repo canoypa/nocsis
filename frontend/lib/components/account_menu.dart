@@ -2,7 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/personal/user_avatar.dart';
+import 'package:nocsis/pages/console/permissions.dart';
 import 'package:nocsis/providers/current_group_id.dart';
+import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
@@ -13,6 +15,10 @@ class AccountMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
+    final canOpenConsole = canOpenConsolePage(
+      '/console',
+      ref.watch(groupPermissionsProvider(groupId)).value ?? {},
+    );
 
     return MenuAnchor(
       builder: (context, controller, child) {
@@ -38,17 +44,16 @@ class AccountMenu extends ConsumerWidget {
             FirebaseAuth.instance.signOut();
           },
         ),
-        if (true /* isAdmin */ ) ...[
-          const Divider(),
+        const Divider(),
+        if (canOpenConsole)
           ListTile(
             title: const Text("管理コンソール"),
             onTap: () => ConsoleTopPageRoute(groupId).go(context),
           ),
-          ListTile(
-            title: const Text("Classroom を起動"),
-            onTap: () => ClassroomPageRoute(groupId).go(context),
-          ),
-        ],
+        ListTile(
+          title: const Text("Classroom を起動"),
+          onTap: () => ClassroomPageRoute(groupId).go(context),
+        ),
         const Divider(),
         ListTile(
           title: const Text("ライセンス"),

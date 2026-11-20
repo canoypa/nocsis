@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:animations/animations.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/providers/api_client.dart';
+import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
@@ -84,27 +84,18 @@ GoRouter router(Ref ref) {
           : "/groups/$groupId${uri.path}";
     }
 
-    final client = await ref.read(apiClientProvider.future);
-    final response = await client.apiV1UsersMeGroupsGet();
-
-    if (!response.isSuccessful || response.body == null) {
-      throw Exception(
-        'User joined groups fetch failed: ${response.statusCode}',
-      );
-    }
-
-    final data = response.body!;
-    if (data.items.isEmpty) {
+    final me = await ref.read(meProvider.future);
+    if (me.memberships.isEmpty) {
       return null;
     }
 
-    final firstUserJoinedGroup = data.items.first;
+    final firstGroupId = me.memberships.first.group.id;
 
-    sharedPreferences.setString('latest_group_id', firstUserJoinedGroup.id);
+    sharedPreferences.setString('latest_group_id', firstGroupId);
 
     return uri.path == '/'
-        ? "/groups/${firstUserJoinedGroup.id}"
-        : "/groups/${firstUserJoinedGroup.id}${uri.path}";
+        ? "/groups/$firstGroupId"
+        : "/groups/$firstGroupId${uri.path}";
   }
 
   String? redirectNotLoggedInUser(GoRouterState state) {

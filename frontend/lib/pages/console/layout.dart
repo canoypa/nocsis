@@ -2,7 +2,10 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/custom_icons.dart';
+import 'package:nocsis/pages/console/permissions.dart';
+import 'package:nocsis/pages/not_found.dart';
 import 'package:nocsis/providers/current_group_id.dart';
+import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
@@ -22,22 +25,32 @@ class ConsoleLayout extends ConsumerWidget {
     '/console/slack': 6,
   };
 
-  int _getNavigationIndex(BuildContext context) {
+  String _currentRoute(BuildContext context) {
     final location = GoRouterState.of(context).fullPath!;
-    final routeKey = _routeToIndex.keys.firstWhere(
+    return _routeToIndex.keys.firstWhere(
       (key) => location.replaceFirst('/groups/:groupId', '') == key,
       orElse: () => '/console',
     );
-    return _routeToIndex[routeKey]!;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
+    final route = _currentRoute(context);
+    final permissions = ref.watch(groupPermissionsProvider(groupId));
+
+    if (permissions.isLoading && !permissions.hasValue) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    // 取得に失敗したときも開かない。権限が無いことと、グループの存在を区別しない
+    if (!canOpenConsolePage(route, permissions.value ?? {})) {
+      return const ErrorPage();
+    }
 
     return DrawerLayout(
       title: const Text('管理コンソール'),
-      navigationIndex: _getNavigationIndex(context),
+      navigationIndex: _routeToIndex[route]!,
       onDestinationSelected: (value) {
         final route = _routeToIndex.entries
             .firstWhere((entry) => entry.value == value)
