@@ -33,7 +33,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.6.8",
     "@types/luxon": "^3.7.6",
-    "@types/node": "^24.19.2",
+    "@types/node": "^26.6.6",
     "@vitest/coverage-v8": "5.1.0",
     "firebase-functions-test": "^3.5.0",
     "firebase-tools": "^15.36.0",
