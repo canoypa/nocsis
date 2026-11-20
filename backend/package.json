@@ -21,7 +21,7 @@
     "@scalar/hono-api-reference": "^0.12.21",
     "firebase-admin": "^14.5.1",
     "google-auth-library": "^11.3.4",
-    "hono": "^4.13.18",
+    "hono": "^4.13.19",
     "hono-openapi": "^1.5.0",
     "luxon": "^3.7.2",
     "zod": "^4.6.7"
