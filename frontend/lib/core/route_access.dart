@@ -35,8 +35,8 @@ const _manageMembers = {
 const routeAccess = <String, RouteAccess>{
   '/login': PublicAccess(),
   '/': SignedInAccess(),
-  '/licenses': SignedInAccess(),
-  '/not-found': SignedInAccess(),
+  // ライセンスの表示は誰にでも見せてよい
+  '/licenses': PublicAccess(),
   '/groups/:groupId': GroupAccess({Permission.groupRead}),
   '/groups/:groupId/console': GroupAccess({..._updateGroup, ..._manageMembers}),
   '/groups/:groupId/console/group': GroupAccess(_updateGroup),

@@ -44,7 +44,6 @@ part 'console/console_weather_page_route.dart';
 part 'group/group_shell_route.dart';
 part 'licenses_page_route.dart';
 part 'login_page_route.dart';
-part 'not_found_page_route.dart';
 part 'personal/personal_events_page_route.dart';
 part 'personal/personal_home_page_route.dart';
 part 'personal/personal_shell_route.dart';
@@ -58,7 +57,6 @@ part 'top_page_route.dart';
     groupShellRoute,
     licensesPageRoute,
     loginPageRoute,
-    notFoundPageRoute,
     topPageRoute,
   ],
 )
@@ -67,6 +65,11 @@ class AppShell extends ShellRouteData {
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
     return navigator;
   }
+}
+
+/// redirect から投げると、go_router が URL をそのままにエラー画面を出す
+class _PageNotFound implements Exception {
+  const _PageNotFound();
 }
 
 class _RouterRefresher extends ChangeNotifier {
@@ -154,7 +157,7 @@ GoRouter router(Ref ref) {
     return await redirectFromTopPage(continueUri) ?? continueUri.toString();
   }
 
-  /// [routeAccess] の宣言を満たさないルートを 404 に回す。表示の出し分けだけで、
+  /// [routeAccess] の宣言を満たさないルートは、URL を変えずにその場で 404 を出す。表示の出し分けだけで、
   /// 操作の可否はサーバが毎回判定する
   Future<String?> redirectByAccess(GoRouterState state) async {
     final path = state.fullPath;
@@ -164,7 +167,7 @@ GoRouter router(Ref ref) {
     }
 
     if (declarationsFor(path).isEmpty) {
-      return const NotFoundPageRoute().location;
+      throw const _PageNotFound();
     }
 
     final uid = ref.read(firebaseAuthProvider).currentUser?.uid;
@@ -199,12 +202,14 @@ GoRouter router(Ref ref) {
     }
 
     // 権限が無いことと、グループの存在を区別しない
-    return const NotFoundPageRoute().location;
+    throw const _PageNotFound();
   }
 
   return GoRouter(
     routes: $appRoutes,
     refreshListenable: refresher,
+    // redirect で投げた例外もここに来る。どれも開けるページが無いという意味なので 404 に寄せる
+    errorBuilder: (context, state) => const ErrorPage(),
     redirect: (context, state) async {
       return redirectNotLoggedInUser(state) ??
           await redirectLoggedInUser(state) ??

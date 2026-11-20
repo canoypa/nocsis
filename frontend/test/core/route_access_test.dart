@@ -61,6 +61,7 @@ void main() {
     expect(isPublic(LoginPageRoute.path), isTrue);
     expect(isPublic(TopPageRoute.path), isFalse);
     expect(isPublic('/groups/:groupId'), isFalse);
+    expect(isPublic('/licenses'), isTrue);
   });
 
   group('ロールごとに開けるグループの画面', () {

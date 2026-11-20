@@ -126,12 +126,22 @@ void main() {
       .uri
       .toString();
 
-  testWidgets('開けない画面は 404 のページへ回す', (tester) async {
+  testWidgets('開けない画面は URL を変えずにその場で 404 を出す', (tester) async {
     givenPermissions([Permission.groupRead]);
 
     await pumpApp(tester, '/groups/g1/console');
 
-    expect(currentLocation(), '/not-found');
+    expect(find.text('404: Page not found'), findsOneWidget);
+    expect(currentLocation(), '/groups/g1/console');
+  });
+
+  testWidgets('どのルートにも当たらない URL も、その場で 404 を出す', (tester) async {
+    givenPermissions([Permission.groupRead]);
+
+    await pumpApp(tester, '/no-such-page');
+
+    expect(find.text('404: Page not found'), findsOneWidget);
+    expect(currentLocation(), '/no-such-page');
   });
 
   testWidgets('開けないグループを覚えていたら忘れる（トップからまた飛ばされないように）', (tester) async {
