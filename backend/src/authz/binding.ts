@@ -12,7 +12,7 @@ export const COLLECTION = "role_bindings";
  * binding は「誰に・どのロールを・どのリソースに」の3つ組。
  *
  * doc ID を3つ組の決定的ハッシュにして、同じ付与が2行入らないようにする
- * （自動 ID の user_joined_groups は同じ参加が複数行入り得た）。
+ * （自動 ID だと、同じ付与が複数行入り得る）。
  * 同じ理由で、付与は何度実行しても増えない。
  */
 export const bindingId = (

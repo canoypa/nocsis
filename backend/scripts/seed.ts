@@ -124,14 +124,7 @@ const upsertUser = async ({
 };
 
 const setMembership = async (uid: string, joined: boolean) => {
-  const memberships = firestore.collection("user_joined_groups");
-  const snapshot = await memberships
-    .where("user_id", "==", uid)
-    .where("group_id", "==", GROUP_ID)
-    .get();
-
   if (!joined) {
-    await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
     // 未参加の画面を確かめるので、ロールを問わずこのグループへの付与を全部外す
     const bindings = await firestore
       .collection(BINDINGS)
@@ -140,11 +133,6 @@ const setMembership = async (uid: string, joined: boolean) => {
       .get();
     await Promise.all(bindings.docs.map((doc) => doc.ref.delete()));
     return;
-  }
-  if (snapshot.empty) {
-    await memberships
-      .doc(`${GROUP_ID}_${uid}`)
-      .set({ user_id: uid, group_id: GROUP_ID });
   }
   await grant({
     principal: user(uid),
