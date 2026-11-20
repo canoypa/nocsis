@@ -103,7 +103,7 @@ jobs:
       contents: read
     env:
       GH_TOKEN: ${{ github.token }}
-      GH_ACTIONS_LOCK_VERSION: v0.4.1
+      GH_ACTIONS_LOCK_VERSION: v0.5.1
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
