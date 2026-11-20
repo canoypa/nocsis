@@ -34,19 +34,34 @@ export const SECRET_MANAGER_ACCESS_URL =
 export const CALENDAR_EVENTS_URL =
   "https://www.googleapis.com/calendar/v3/calendars/:calendarId/events";
 
-export const OPEN_WEATHER_MAP_CURRENT_URL =
-  "https://api.openweathermap.org/data/2.5/weather";
-export const OPEN_WEATHER_MAP_FORECAST_URL =
-  "https://api.openweathermap.org/data/2.5/forecast";
+export const OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
 
 export const CLOUD_STORAGE_OBJECT_URL =
   "https://storage.googleapis.com/storage/v1/b/:bucket/o/:object";
 
-export const TEST_OPENWEATHERMAP_TOKEN = "test-openweathermap-token";
+/**
+ * Open-Meteo の Forecast API の応答を作る。hourly は今の時刻から 25 時間分
+ */
+export const openMeteoForecast = ({
+  temp = 20,
+  pop = 0,
+  weatherCode = 0,
+}: {
+  temp?: number;
+  pop?: number | null;
+  weatherCode?: number;
+} = {}) => ({
+  current: { time: 0, temperature_2m: temp, weather_code: weatherCode },
+  hourly: {
+    time: Array.from({ length: 25 }, (_, i) => i * 3600),
+    temperature_2m: Array.from({ length: 25 }, () => temp),
+    precipitation_probability: Array.from({ length: 25 }, () => pop),
+    weather_code: Array.from({ length: 25 }, () => weatherCode),
+  },
+});
 
 export const defaultSecrets: Record<string, string> = {
   CALENDAR_ACCOUNT_KEY: JSON.stringify(serviceAccountKey),
-  OPENWEATHERMAP_TOKEN: TEST_OPENWEATHERMAP_TOKEN,
 };
 
 /**
@@ -79,18 +94,8 @@ const defaultHandlers = [
   ),
   secretManagerHandler(defaultSecrets),
   http.get(CALENDAR_EVENTS_URL, () => HttpResponse.json({ items: [] })),
-  http.get(OPEN_WEATHER_MAP_CURRENT_URL, () =>
-    HttpResponse.json({
-      weather: [{ id: 800, main: "Clear" }],
-      main: { temp: 20 },
-    }),
-  ),
-  http.get(OPEN_WEATHER_MAP_FORECAST_URL, () =>
-    HttpResponse.json({
-      list: [
-        { main: { temp: 21 }, pop: 0, weather: [{ id: 800, main: "Clear" }] },
-      ],
-    }),
+  http.get(OPEN_METEO_FORECAST_URL, () =>
+    HttpResponse.json(openMeteoForecast()),
   ),
 ];
 
