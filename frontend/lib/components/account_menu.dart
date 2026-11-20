@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/personal/user_avatar.dart';
-import 'package:nocsis/core/page_permissions.dart';
+import 'package:nocsis/core/route_access.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/routes/router.dart';
@@ -41,15 +41,15 @@ class AccountMenu extends ConsumerWidget {
             FirebaseAuth.instance.signOut();
           },
         ),
-        if (canOpenPage('/console', granted) ||
-            canOpenPage('/classroom', granted))
+        if (canOpen(ConsoleTopPageRoute.path, granted) ||
+            canOpen(ClassroomPageRoute.path, granted))
           const Divider(),
-        if (canOpenPage('/console', granted))
+        if (canOpen(ConsoleTopPageRoute.path, granted))
           ListTile(
             title: const Text("管理コンソール"),
             onTap: () => ConsoleTopPageRoute(groupId).go(context),
           ),
-        if (canOpenPage('/classroom', granted))
+        if (canOpen(ClassroomPageRoute.path, granted))
           ListTile(
             title: const Text("Classroom を起動"),
             onTap: () => ClassroomPageRoute(groupId).go(context),

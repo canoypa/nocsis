@@ -2,7 +2,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/custom_icons.dart';
-import 'package:nocsis/components/permission_gate.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
@@ -23,69 +22,66 @@ class ConsoleLayout extends ConsumerWidget {
     '/console/slack': 6,
   };
 
-  String _currentRoute(BuildContext context) {
+  int _getNavigationIndex(BuildContext context) {
     final location = GoRouterState.of(context).fullPath!;
-    return _routeToIndex.keys.firstWhere(
+    final routeKey = _routeToIndex.keys.firstWhere(
       (key) => location.replaceFirst('/groups/:groupId', '') == key,
       orElse: () => '/console',
     );
+    return _routeToIndex[routeKey]!;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
-    final route = _currentRoute(context);
 
-    return PermissionGate(
-      route: route,
-      child: DrawerLayout(
-        title: const Text('管理コンソール'),
-        navigationIndex: _routeToIndex[route]!,
-        onDestinationSelected: (value) {
-          final route = _routeToIndex.entries
-              .firstWhere((entry) => entry.value == value)
-              .key;
-          GoRouter.of(context).go("/groups/$groupId$route");
-        },
-        navigationItems: const [
-          NavigationDrawerDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: Text('ホーム'),
-          ),
-          NavigationDrawerDestination(
-            icon: Icon(Icons.workspaces_outlined),
-            selectedIcon: Icon(Icons.workspaces),
-            label: Text('グループ'),
-          ),
-          NavigationDrawerDestination(
-            icon: Icon(Icons.group_outlined),
-            selectedIcon: Icon(Icons.group),
-            label: Text('メンバー'),
-          ),
-          NavigationDrawerDestination(
-            icon: Icon(Icons.calendar_today_outlined),
-            selectedIcon: Icon(Icons.calendar_today),
-            label: Text('カレンダー'),
-          ),
-          NavigationDrawerDestination(
-            icon: Icon(Icons.person_pin_outlined),
-            selectedIcon: Icon(Icons.person_pin_rounded),
-            label: Text('日直'),
-          ),
-          NavigationDrawerDestination(
-            icon: Icon(Icons.wb_sunny_outlined),
-            selectedIcon: Icon(Icons.wb_sunny),
-            label: Text('気象データ連携'),
-          ),
-          NavigationDrawerDestination(
-            icon: Icon(CustomIcons.slack_outlined),
-            selectedIcon: Icon(CustomIcons.slack),
-            label: Text('Slack 連携'),
-          ),
-        ],
-        child: child,
-      ),
+    return DrawerLayout(
+      title: const Text('管理コンソール'),
+      navigationIndex: _getNavigationIndex(context),
+      onDestinationSelected: (value) {
+        final route = _routeToIndex.entries
+            .firstWhere((entry) => entry.value == value)
+            .key;
+        GoRouter.of(context).go("/groups/$groupId$route");
+      },
+      navigationItems: const [
+        NavigationDrawerDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home),
+          label: Text('ホーム'),
+        ),
+        NavigationDrawerDestination(
+          icon: Icon(Icons.workspaces_outlined),
+          selectedIcon: Icon(Icons.workspaces),
+          label: Text('グループ'),
+        ),
+        NavigationDrawerDestination(
+          icon: Icon(Icons.group_outlined),
+          selectedIcon: Icon(Icons.group),
+          label: Text('メンバー'),
+        ),
+        NavigationDrawerDestination(
+          icon: Icon(Icons.calendar_today_outlined),
+          selectedIcon: Icon(Icons.calendar_today),
+          label: Text('カレンダー'),
+        ),
+        NavigationDrawerDestination(
+          icon: Icon(Icons.person_pin_outlined),
+          selectedIcon: Icon(Icons.person_pin_rounded),
+          label: Text('日直'),
+        ),
+        NavigationDrawerDestination(
+          icon: Icon(Icons.wb_sunny_outlined),
+          selectedIcon: Icon(Icons.wb_sunny),
+          label: Text('気象データ連携'),
+        ),
+        NavigationDrawerDestination(
+          icon: Icon(CustomIcons.slack_outlined),
+          selectedIcon: Icon(CustomIcons.slack),
+          label: Text('Slack 連携'),
+        ),
+      ],
+      child: child,
     );
   }
 }

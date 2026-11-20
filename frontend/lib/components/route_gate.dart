@@ -1,26 +1,34 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:nocsis/core/page_permissions.dart';
+import 'package:nocsis/core/route_access.dart';
 import 'package:nocsis/pages/not_found.dart';
-import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/me.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
-/// 権限が無ければ child の代わりに 404 の画面を出す。表示の出し分けだけで、
+/// [routeAccess] の宣言を満たさなければ child の代わりに 404 の画面を出す。
+/// ログインの要否は router の redirect が見る。表示の出し分けだけで、
 /// 操作の可否はサーバが毎回判定する
-@Dependencies([currentGroupId])
-class PermissionGate extends ConsumerWidget {
-  /// `/groups/:groupId` より後ろのパス。[pagePermissions] のキー
-  final String route;
+class RouteGate extends ConsumerWidget {
+  /// go_router のルートのパス（`:groupId` を含む形）
+  final String path;
+  final String? groupId;
   final Widget child;
 
-  const PermissionGate({super.key, required this.route, required this.child});
+  const RouteGate({
+    super.key,
+    required this.path,
+    required this.groupId,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final groupId = ref.watch(currentGroupIdProvider);
+    if (!needsGroupPermissions(path)) {
+      return canOpen(path, const {}) ? child : const ErrorPage();
+    }
+
+    final groupId = this.groupId;
     final uid = ref.watch(currentUidProvider);
-    if (uid == null) {
+    if (groupId == null || uid == null) {
       return const _Loading();
     }
 
@@ -32,11 +40,7 @@ class PermissionGate extends ConsumerWidget {
     }
 
     // 権限が無いことと、グループの存在を区別しない
-    if (!canOpenPage(route, permissions.requireValue)) {
-      return const ErrorPage();
-    }
-
-    return child;
+    return canOpen(path, permissions.requireValue) ? child : const ErrorPage();
   }
 }
 

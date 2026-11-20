@@ -4,7 +4,8 @@ import 'package:animations/animations.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/providers/api_client.dart';
-import 'package:nocsis/components/permission_gate.dart';
+import 'package:nocsis/components/route_gate.dart';
+import 'package:nocsis/core/route_access.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
@@ -56,7 +57,11 @@ part 'top_page_route.dart';
 class AppShell extends ShellRouteData {
   @override
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
-    return navigator;
+    return RouteGate(
+      path: state.fullPath ?? '',
+      groupId: state.pathParameters['groupId'],
+      child: navigator,
+    );
   }
 }
 
@@ -111,7 +116,7 @@ GoRouter router(Ref ref) {
     final currentUser = ref.read(firebaseAuthProvider).currentUser;
     final isLoggedIn = currentUser != null;
 
-    if (isLoggedIn || state.matchedLocation == LoginPageRoute().location) {
+    if (isLoggedIn || isPublic(state.fullPath ?? '')) {
       return null;
     }
 
