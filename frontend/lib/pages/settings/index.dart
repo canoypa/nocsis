@@ -246,27 +246,29 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
   }
 
   Widget _loginForm(User currentUser) {
-    return LoginForm(
-      title: "メールアドレスを変更する",
-      description: '始めに、現在のアカウントで再認証が必要です。',
-      onGoogleLogin: () async {
-        await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
+    return _ReauthenticationCard(
+      child: LoginForm(
+        title: "メールアドレスを変更する",
+        description: '始めに、現在のアカウントで再認証が必要です。',
+        onGoogleLogin: () async {
+          await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
 
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
-      onPasswordLogin: (email, password) async {
-        final credential = EmailAuthProvider.credential(
-          email: email,
-          password: password,
-        );
-        await currentUser.reauthenticateWithCredential(credential);
+          setState(() {
+            reAuthenticated = true;
+          });
+        },
+        onPasswordLogin: (email, password) async {
+          final credential = EmailAuthProvider.credential(
+            email: email,
+            password: password,
+          );
+          await currentUser.reauthenticateWithCredential(credential);
 
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
+          setState(() {
+            reAuthenticated = true;
+          });
+        },
+      ),
     );
   }
 
@@ -381,27 +383,29 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
   }
 
   Widget _loginForm(User currentUser) {
-    return LoginForm(
-      title: "パスワードを設定する",
-      description: '始めに、現在のアカウントで再認証が必要です。',
-      onGoogleLogin: () async {
-        await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
+    return _ReauthenticationCard(
+      child: LoginForm(
+        title: "パスワードを設定する",
+        description: '始めに、現在のアカウントで再認証が必要です。',
+        onGoogleLogin: () async {
+          await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
 
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
-      onPasswordLogin: (email, password) async {
-        final credential = EmailAuthProvider.credential(
-          email: email,
-          password: password,
-        );
-        await currentUser.reauthenticateWithCredential(credential);
+          setState(() {
+            reAuthenticated = true;
+          });
+        },
+        onPasswordLogin: (email, password) async {
+          final credential = EmailAuthProvider.credential(
+            email: email,
+            password: password,
+          );
+          await currentUser.reauthenticateWithCredential(credential);
 
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
+          setState(() {
+            reAuthenticated = true;
+          });
+        },
+      ),
     );
   }
 
@@ -478,6 +482,29 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 再認証の LoginForm にダイアログの面を付ける。
+/// 狭い画面ではキーボードで高さが足りなくなるのでスクロールできるようにする。
+class _ReauthenticationCard extends StatelessWidget {
+  final Widget child;
+
+  const _ReauthenticationCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      ),
+      constraints: const BoxConstraints(maxWidth: 1200),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: child,
       ),
     );
   }

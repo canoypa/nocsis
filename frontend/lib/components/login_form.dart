@@ -251,7 +251,7 @@ class _LoginFormState extends State<LoginForm> {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: LoginForm.paneMaxWidth),
-        child: child,
+        child: SizedBox(width: double.infinity, child: child),
       ),
     );
   }
