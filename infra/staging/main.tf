@@ -37,8 +37,8 @@ module "nocsis" {
       display_name = "Claude (read-only)"
     }
     "events-reader" = {
-      display_name = "Google Calendar reader"
-      description  = "鍵を CALENDAR_ACCOUNT_KEY に入れ、共有されたカレンダーを読む。プロジェクトのロールは持たない。"
+      display_name = "Events Reader"
+      description  = "Google カレンダーから Class Clock のイベントを取得する"
     }
   }
 
