@@ -1,4 +1,5 @@
 import 'package:chopper/chopper.dart' as chopper;
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -20,7 +21,7 @@ void main() {
     container = ProviderContainer(
       overrides: [
         apiClientProvider.overrideWith((ref) async => mockApi),
-        authProvider.overrideWith((ref) => const Stream.empty()),
+        authProvider.overrideWith((ref) => Stream.value(MockUser(uid: 'u1'))),
       ],
       // Riverpod 3.x は失敗時にリトライするので、即座に AsyncError へ落とす
       retry: (_, _) => null,
@@ -28,6 +29,27 @@ void main() {
   });
 
   tearDown(() => container.dispose());
+
+  // 認証状態の最初の値が来るまでは uid が無く、空を返す
+  Future<void> waitForAuth(ProviderContainer container) async {
+    container.listen(authProvider, (_, _) {});
+    await container.read(authProvider.future);
+  }
+
+  test('ログインしていなければ API を呼ばずに空を返す', () async {
+    final signedOut = ProviderContainer(
+      overrides: [
+        apiClientProvider.overrideWith((ref) async => mockApi),
+        authProvider.overrideWith((ref) => Stream.value(null)),
+      ],
+    );
+    addTearDown(signedOut.dispose);
+
+    await waitForAuth(signedOut);
+
+    expect(await signedOut.read(meProvider.future), const Me(memberships: []));
+    verifyNever(() => mockApi.apiV1MeGet());
+  });
 
   group('groupPermissionsProvider', () {
     test('そのグループの権限だけを返す', () async {
@@ -49,6 +71,8 @@ void main() {
         ),
       );
 
+      await waitForAuth(container);
+
       expect(await container.read(groupPermissionsProvider('g2').future), {
         Permission.groupRead,
       });
@@ -62,6 +86,8 @@ void main() {
       when(() => mockApi.apiV1MeGet()).thenAnswer(
         (_) async => chopper.Response<Me>(http.Response('', 500), null),
       );
+
+      await waitForAuth(container);
 
       await expectLater(
         container.read(groupPermissionsProvider('g1').future),

@@ -39,12 +39,14 @@ class ConsoleLayout extends ConsumerWidget {
     final route = _currentRoute(context);
     final permissions = ref.watch(groupPermissionsProvider(groupId));
 
-    if (permissions.isLoading && !permissions.hasValue) {
+    // 再取得中や失敗時の value は前の値（前のアカウントのこともある）なので使わない
+    if (permissions.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // 取得に失敗したときも開かない。権限が無いことと、グループの存在を区別しない
-    if (!canOpenConsolePage(route, permissions.value ?? {})) {
+    // 権限が無いことと、グループの存在を区別しない
+    if (permissions.hasError ||
+        !canOpenConsolePage(route, permissions.requireValue)) {
       return const ErrorPage();
     }
 

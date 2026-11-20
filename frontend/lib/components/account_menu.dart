@@ -15,10 +15,11 @@ class AccountMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
-    final canOpenConsole = canOpenConsolePage(
-      '/console',
-      ref.watch(groupPermissionsProvider(groupId)).value ?? {},
-    );
+    final permissions = ref.watch(groupPermissionsProvider(groupId));
+    final canOpenConsole =
+        !permissions.isLoading &&
+        !permissions.hasError &&
+        canOpenConsolePage('/console', permissions.requireValue);
 
     return MenuAnchor(
       builder: (context, controller, child) {

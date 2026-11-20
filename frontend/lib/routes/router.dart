@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:animations/animations.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/providers/me.dart';
+import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
@@ -84,7 +84,15 @@ GoRouter router(Ref ref) {
           : "/groups/$groupId${uri.path}";
     }
 
-    final me = await ref.read(meProvider.future);
+    // meProvider は読む画面が無いと取得中に破棄され得るので、ここでは API を直接呼ぶ
+    final client = await ref.read(apiClientProvider.future);
+    final response = await client.apiV1MeGet();
+
+    if (!response.isSuccessful || response.body == null) {
+      throw Exception('Me fetch failed: ${response.statusCode}');
+    }
+
+    final me = response.body!;
     if (me.memberships.isEmpty) {
       return null;
     }

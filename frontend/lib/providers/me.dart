@@ -9,7 +9,10 @@ part 'me.g.dart';
 @riverpod
 Future<Me> me(Ref ref) async {
   // 別のアカウントでログインし直したら、前のアカウントの権限を使わない
-  ref.watch(authProvider);
+  final uid = ref.watch(authProvider).value?.uid;
+  if (uid == null) {
+    return const Me(memberships: []);
+  }
 
   final client = await ref.read(apiClientProvider.future);
   final response = await client.apiV1MeGet();

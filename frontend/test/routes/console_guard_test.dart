@@ -10,6 +10,7 @@ import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/auth.dart';
 import 'package:nocsis/providers/firebase.dart';
+import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,20 +20,19 @@ void main() {
   late MockApi mockApi;
   late ProviderContainer container;
 
+  late Me me;
+
   void givenPermissions(List<Permission> permissions) {
-    when(() => mockApi.apiV1MeGet()).thenAnswer(
-      (_) async => chopper.Response(
-        http.Response('', 200),
-        Me(
-          memberships: [
-            Membership(
-              group: const MembershipGroup(id: 'g1', name: 'グループ'),
-              permissions: permissions,
-            ),
-          ],
+    me = Me(
+      memberships: [
+        Membership(
+          group: const MembershipGroup(id: 'g1', name: 'グループ'),
+          permissions: permissions,
         ),
-      ),
+      ],
     );
+    when(() => mockApi.apiV1MeGet())
+        .thenAnswer((_) async => chopper.Response(http.Response('', 200), me));
   }
 
   setUp(() {
@@ -46,6 +46,7 @@ void main() {
         // モックユーザーのアバターは外部の画像で、テストでは読み込めずに失敗する。
         // アバターを読み込み中のままにして画像を取りに行かせない
         authProvider.overrideWith((ref) => const Stream.empty()),
+        meProvider.overrideWith((ref) async => me),
         apiClientProvider.overrideWith((ref) async => mockApi),
       ],
     );
