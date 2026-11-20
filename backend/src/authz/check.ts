@@ -7,6 +7,7 @@ import {
   PERMISSIONS,
   type Permission,
   permissionsOf,
+  ROLES,
 } from "./roles.js";
 
 /**
@@ -86,13 +87,19 @@ export const permissionsByResource = async (
 
     if (
       !isRoleName(role) ||
+      ROLES[role].scope !== type ||
       typeof resource !== "string" ||
       !resource.startsWith(prefix)
     ) {
       continue;
     }
 
+    // 壊れた行1つで、呼び出し側の doc(id) が全体ごと例外にならないようにする
     const id = resource.slice(prefix.length);
+    if (id === "" || id.includes("/")) {
+      continue;
+    }
+
     const permissions = granted.get(id) ?? new Set();
     for (const permission of permissionsOf(role)) {
       permissions.add(permission);

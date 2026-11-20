@@ -52,11 +52,13 @@ meRoutes.use("*", authentication).get(
       { fieldMask: ["name"] },
     );
 
-    // 消えたグループへの binding は返さない
+    // 消えたグループと名前の壊れたグループは返さない。1件のために全体を 500 にしない
     const memberships = snapshots.flatMap((snapshot) => {
       const permissions = granted.get(snapshot.id);
 
-      return snapshot.exists && permissions
+      return snapshot.exists &&
+        typeof snapshot.get("name") === "string" &&
+        permissions
         ? [
             {
               group: { id: snapshot.id, name: snapshot.get("name") },

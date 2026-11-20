@@ -127,6 +127,23 @@ describe("MeController", () => {
       ]);
     });
 
+    it("名前の無いグループは返さず、ほかのグループは返す", async () => {
+      await firestore.collection("groups").doc("nameless_group").set({});
+      await grantGroup(user.uid, "test_group_1");
+      await grantGroup(user.uid, "nameless_group");
+
+      const res = await getMe();
+      const body = await res.json();
+      await firestore.collection("groups").doc("nameless_group").delete();
+
+      expect(res.status).toBe(200);
+      expect(body.memberships).toEqual([
+        expect.objectContaining({
+          group: { id: "test_group_1", name: "Test Group 1" },
+        }),
+      ]);
+    });
+
     it("他のユーザーへの付与は返さない", async () => {
       await grantGroup("test_user_2", "test_group_1");
 
