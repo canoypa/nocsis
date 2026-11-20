@@ -9,57 +9,88 @@ import {
 import { app } from "./routes.js";
 
 /**
- * ルートごとに、認可の宣言を持つハンドラを数える。
+ * 認可の宣言が無い、または効かない位置にあるルートを返す。
  *
  * Hono はハンドラ1つごとに routes へ1行足すので、method と path でまとめる。
- * `use()` のミドルウェアは method が ALL の行になり、ルートではないので除く。
+ * 宣言は1つだけで、最後のハンドラ（レスポンスを返す）より前に無いと効かない。
+ * `use()` のミドルウェアは method が ALL で path が `*` で終わる行になり、ルートではないので除く。
+ * `all()` のルートは `*` で終わらない限り検査する。
  */
-const declarationsByRoute = (target: Hono) => {
+const undeclaredRoutes = (target: Hono) => {
   const routes = new Map<string, unknown[]>();
 
   for (const { method, path, handler } of target.routes) {
-    if (method === "ALL") continue;
+    if (method === "ALL" && path.endsWith("*")) continue;
 
     const key = `${method} ${path}`;
-    const declarations = routes.get(key) ?? [];
-    const declaration = declarationOf(handler);
-    if (declaration) declarations.push(declaration);
-    routes.set(key, declarations);
+    routes.set(key, [...(routes.get(key) ?? []), handler]);
   }
 
-  return routes;
+  return [...routes].flatMap(([route, handlers]) => {
+    const declared = handlers.flatMap((handler, index) =>
+      declarationOf(handler) ? [index] : [],
+    );
+
+    return declared.length === 1 && declared[0] < handlers.length - 1
+      ? []
+      : [route];
+  });
 };
 
 describe("認可の宣言", () => {
   it("すべてのルートが、permission か認可しない理由のどちらか1つを宣言している", () => {
-    const routes = declarationsByRoute(app);
-
     // 列挙が空なら検査が素通りする
-    expect(routes.size).toBeGreaterThan(0);
+    expect(app.routes.length).toBeGreaterThan(0);
 
-    const undeclared = [...routes]
-      .filter(([, declarations]) => declarations.length !== 1)
-      .map(([route, declarations]) => ({ route, declarations }));
-
-    expect(undeclared).toEqual([]);
+    expect(undeclaredRoutes(app)).toEqual([]);
   });
 
   describe("検査そのもの", () => {
-    it("宣言の無いルートを見つける", () => {
-      const target = new Hono()
-        .get("/declared", authorize("group.read", groupOf("id")), (c) =>
-          c.body(null),
-        )
-        .get("/skipped", skipAuthorization("テスト"), (c) => c.body(null))
-        .post("/forgotten", (c) => c.body(null));
+    const ok = () => new Response(null);
 
-      expect(declarationsByRoute(target)).toEqual(
-        new Map([
-          ["GET /declared", [{ kind: "permission", permission: "group.read" }]],
-          ["GET /skipped", [{ kind: "skip", reason: "テスト" }]],
-          ["POST /forgotten", []],
-        ]),
+    it("宣言のあるルートは通す", () => {
+      const target = new Hono()
+        .use("*", async (_c, next) => next())
+        .get("/declared", authorize("group.read", groupOf("id")), ok)
+        .get("/skipped", skipAuthorization("テスト"), ok);
+
+      expect(undeclaredRoutes(target)).toEqual([]);
+    });
+
+    it("宣言の無いルートを見つける", () => {
+      const target = new Hono().post("/forgotten", ok).all("/any", ok);
+
+      expect(undeclaredRoutes(target)).toEqual(["POST /forgotten", "ALL /any"]);
+    });
+
+    it("宣言がレスポンスを返すハンドラより後ろにあるルートを見つける", () => {
+      const target = new Hono().get(
+        "/late",
+        ok,
+        authorize("group.read", groupOf("id")),
       );
+
+      expect(undeclaredRoutes(target)).toEqual(["GET /late"]);
+    });
+
+    it("宣言が2つあるルートを見つける", () => {
+      const target = new Hono().get(
+        "/twice",
+        skipAuthorization("テスト"),
+        authorize("group.read", groupOf("id")),
+        ok,
+      );
+
+      expect(undeclaredRoutes(target)).toEqual(["GET /twice"]);
+    });
+
+    it("onError のあるサブアプリでも宣言を読める", () => {
+      const sub = new Hono()
+        .get("/declared", authorize("group.read", groupOf("id")), ok)
+        .onError((_error, c) => c.body(null, 500));
+      const target = new Hono().route("/sub", sub);
+
+      expect(undeclaredRoutes(target)).toEqual([]);
     });
   });
 });

@@ -2,6 +2,7 @@ import assert from "node:assert";
 import type { Context, MiddlewareHandler } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
+import { COMPOSED_HANDLER } from "hono/utils/constants";
 import { can } from "../authz/check.js";
 import { type Principal, subject, user } from "../authz/principal.js";
 import { group, type ResourceRef, serialize } from "../authz/resource.js";
@@ -41,8 +42,16 @@ const declarations = new WeakMap<object, AuthorizationDeclaration>();
 
 export const declarationOf = (
   handler: unknown,
-): AuthorizationDeclaration | undefined =>
-  typeof handler === "function" ? declarations.get(handler) : undefined;
+): AuthorizationDeclaration | undefined => {
+  if (typeof handler !== "function") return undefined;
+
+  // サブアプリに onError があると、route() はハンドラを包み、元を COMPOSED_HANDLER に置く
+  const original: unknown = Reflect.get(handler, COMPOSED_HANDLER) ?? handler;
+
+  return typeof original === "function"
+    ? declarations.get(original)
+    : undefined;
+};
 
 /**
  * リソースへの認可を行わないことの宣言。何もしない。
