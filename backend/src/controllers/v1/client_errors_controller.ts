@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { describeRoute, validator } from "hono-openapi";
 import type { z } from "zod";
+import { skipAuthorization } from "../../middlewares/authorize.js";
 import { clientErrorSchema } from "../../resources/v1/client_errors.js";
 import {
   type DecodedFrame,
@@ -88,6 +89,9 @@ clientErrorsRoutes.post(
       429: { description: "Too Many Requests" },
     },
   }),
+  skipAuthorization(
+    "ログイン前の画面のエラーも受けるので、認証せず、主体もいない。ログに書くだけ",
+  ),
   bodyLimit({ maxSize: 32 * 1024 }),
   validator("json", clientErrorSchema),
   async (c) => {
