@@ -36,6 +36,7 @@ const routeAccess = <String, RouteAccess>{
   '/login': PublicAccess(),
   '/': SignedInAccess(),
   '/licenses': SignedInAccess(),
+  '/not-found': SignedInAccess(),
   '/groups/:groupId': GroupAccess({Permission.groupRead}),
   '/groups/:groupId/console': GroupAccess({..._updateGroup, ..._manageMembers}),
   '/groups/:groupId/console/group': GroupAccess(_updateGroup),

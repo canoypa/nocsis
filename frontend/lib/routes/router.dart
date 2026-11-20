@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:animations/animations.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nocsis/providers/api_client.dart';
-import 'package:nocsis/components/route_gate.dart';
 import 'package:nocsis/core/route_access.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
@@ -22,11 +21,13 @@ import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
 import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/no_group.dart';
+import 'package:nocsis/pages/not_found.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/providers/auth.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/firebase.dart';
+import 'package:nocsis/providers/me.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,6 +44,7 @@ part 'console/console_weather_page_route.dart';
 part 'group/group_shell_route.dart';
 part 'licenses_page_route.dart';
 part 'login_page_route.dart';
+part 'not_found_page_route.dart';
 part 'personal/personal_events_page_route.dart';
 part 'personal/personal_home_page_route.dart';
 part 'personal/personal_shell_route.dart';
@@ -52,16 +54,18 @@ part 'settings/settings_top_page_route.dart';
 part 'top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
-  routes: [groupShellRoute, licensesPageRoute, loginPageRoute, topPageRoute],
+  routes: [
+    groupShellRoute,
+    licensesPageRoute,
+    loginPageRoute,
+    notFoundPageRoute,
+    topPageRoute,
+  ],
 )
 class AppShell extends ShellRouteData {
   @override
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
-    return RouteGate(
-      path: state.fullPath ?? '',
-      groupId: state.pathParameters['groupId'],
-      child: navigator,
-    );
+    return navigator;
   }
 }
 
@@ -75,6 +79,16 @@ class _RouterRefresher extends ChangeNotifier {
 GoRouter router(Ref ref) {
   final refresher = _RouterRefresher();
   ref.listen(authProvider, (_, _) => refresher.refresh());
+
+  // 読む画面が無いと meProvider は取得中に破棄され得るので、読み終わるまで購読しておく
+  Future<Me> readMe(String uid) async {
+    final subscription = ref.listen(meProvider(uid), (_, _) {});
+    try {
+      return await ref.read(meProvider(uid).future);
+    } finally {
+      subscription.close();
+    }
+  }
 
   Future<String?> redirectFromTopPage(Uri uri) async {
     if (uri.path != '/') {
@@ -90,15 +104,12 @@ GoRouter router(Ref ref) {
           : "/groups/$groupId${uri.path}";
     }
 
-    // meProvider は読む画面が無いと取得中に破棄され得るので、ここでは API を直接呼ぶ
-    final client = await ref.read(apiClientProvider.future);
-    final response = await client.apiV1MeGet();
-
-    if (!response.isSuccessful || response.body == null) {
-      throw Exception('Me fetch failed: ${response.statusCode}');
+    final uid = ref.read(firebaseAuthProvider).currentUser?.uid;
+    if (uid == null) {
+      return null;
     }
 
-    final me = response.body!;
+    final me = await readMe(uid);
     if (me.memberships.isEmpty) {
       return null;
     }
@@ -143,13 +154,62 @@ GoRouter router(Ref ref) {
     return await redirectFromTopPage(continueUri) ?? continueUri.toString();
   }
 
+  /// [routeAccess] の宣言を満たさないルートを 404 に回す。表示の出し分けだけで、
+  /// 操作の可否はサーバが毎回判定する
+  Future<String?> redirectByAccess(GoRouterState state) async {
+    final path = state.fullPath;
+    // どのルートにも当たらない URL は go_router のエラー画面が出す
+    if (path == null) {
+      return null;
+    }
+
+    if (declarationsFor(path).isEmpty) {
+      return const NotFoundPageRoute().location;
+    }
+
+    final uid = ref.read(firebaseAuthProvider).currentUser?.uid;
+    final groupId = state.pathParameters['groupId'];
+    if (!needsGroupPermissions(path) || uid == null || groupId == null) {
+      return null;
+    }
+
+    try {
+      var granted = permissionsIn(await readMe(uid), groupId);
+
+      if (!canOpen(path, granted)) {
+        // 後からグループに追加された直後かもしれないので、一度だけ取り直す
+        ref.invalidate(meProvider(uid));
+        granted = permissionsIn(await readMe(uid), groupId);
+      }
+
+      if (canOpen(path, granted)) {
+        return null;
+      }
+    } catch (_) {
+      // 取れないときは通す。止めても守れるもの（画面の API はサーバが判定する）は無く、
+      // 止めると教室の画面が通信の回復を待てない。次の遷移で取り直す
+      ref.invalidate(meProvider(uid));
+      return null;
+    }
+
+    // 開けないグループを覚えていると、トップからまたそこへ飛ばされ続ける
+    final sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.getString('latest_group_id') == groupId) {
+      await sharedPreferences.remove('latest_group_id');
+    }
+
+    // 権限が無いことと、グループの存在を区別しない
+    return const NotFoundPageRoute().location;
+  }
+
   return GoRouter(
     routes: $appRoutes,
     refreshListenable: refresher,
     redirect: (context, state) async {
       return redirectNotLoggedInUser(state) ??
           await redirectLoggedInUser(state) ??
-          await redirectFromTopPage(state.uri);
+          await redirectFromTopPage(state.uri) ??
+          await redirectByAccess(state);
     },
   );
 }

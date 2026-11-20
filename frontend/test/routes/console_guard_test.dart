@@ -10,7 +10,6 @@ import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/auth.dart';
 import 'package:nocsis/providers/firebase.dart';
-import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -46,10 +45,10 @@ void main() {
         // モックユーザーのアバターは外部の画像で、テストでは読み込めずに失敗する。
         // アバターを読み込み中のままにして画像を取りに行かせない
         authProvider.overrideWith((ref) => const Stream.empty()),
-        currentUidProvider.overrideWithValue('u1'),
-        meProvider('u1').overrideWith((ref) async => me),
         apiClientProvider.overrideWith((ref) async => mockApi),
       ],
+      // 失敗時のリトライのタイマーがテストの後に残らないようにする
+      retry: (_, _) => null,
     );
   });
 
@@ -118,5 +117,66 @@ void main() {
     await pumpApp(tester, '/groups/g1/classroom');
 
     expect(find.text('404: Page not found'), findsOneWidget);
+  });
+
+  String currentLocation() => container
+      .read(routerProvider)
+      .routeInformationProvider
+      .value
+      .uri
+      .toString();
+
+  testWidgets('開けない画面は 404 のページへ回す', (tester) async {
+    givenPermissions([Permission.groupRead]);
+
+    await pumpApp(tester, '/groups/g1/console');
+
+    expect(currentLocation(), '/not-found');
+  });
+
+  testWidgets('開けないグループを覚えていたら忘れる（トップからまた飛ばされないように）', (tester) async {
+    SharedPreferences.setMockInitialValues({'latest_group_id': 'g2'});
+    givenPermissions(Permission.values.toList());
+
+    await pumpApp(tester, '/groups/g2/console');
+
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('latest_group_id'), isNull);
+  });
+
+  testWidgets('開けないときは一度だけ取り直す（後から追加された直後のため）', (tester) async {
+    givenPermissions([Permission.groupRead]);
+    var calls = 0;
+    when(() => mockApi.apiV1MeGet()).thenAnswer((_) async {
+      calls++;
+      return chopper.Response(
+        http.Response('', 200),
+        Me(
+          memberships: [
+            Membership(
+              group: const MembershipGroup(id: 'g1', name: 'グループ'),
+              permissions: calls == 1
+                  ? [Permission.groupRead]
+                  : Permission.values.toList(),
+            ),
+          ],
+        ),
+      );
+    });
+
+    await pumpApp(tester, '/groups/g1/console');
+
+    expect(calls, 2);
+    expect(currentLocation(), '/groups/g1/console');
+  });
+
+  testWidgets('権限が取れないときは通す（判定はサーバがする）', (tester) async {
+    when(() => mockApi.apiV1MeGet()).thenAnswer(
+      (_) async => chopper.Response<Me>(http.Response('', 500), null),
+    );
+
+    await pumpApp(tester, '/groups/g1/console');
+
+    expect(currentLocation(), '/groups/g1/console');
   });
 }
