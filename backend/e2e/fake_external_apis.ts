@@ -16,7 +16,6 @@ const secrets: Record<string, string> = {
     client_email: "e2e@example.iam.gserviceaccount.com",
     private_key: privateKey,
   }),
-  OPENWEATHERMAP_TOKEN: "e2e",
 };
 
 // Secret Manager は msw で差し替えない。クライアントが gRPC で fetch を通らない。
@@ -38,8 +37,6 @@ const calendarTitles: Record<string, string[]> = {
   classes: ["E2E 国語", "E2E 数学"],
   events: ["E2E 遠足"],
 };
-
-const weather = { id: 800, main: "Clear" };
 
 // 期間内の毎日に予定を置く。日付を固定しないのは、画面が「今日」を基準に表示するため。
 const calendarEvents = (calendarId: string, url: URL) => {
@@ -83,16 +80,14 @@ const handlers = [
         calendarEvents(String(params.calendarId), new URL(request.url)),
       ),
   ),
-  http.get("https://api.openweathermap.org/data/2.5/weather", () =>
-    HttpResponse.json({ weather: [weather], main: { temp: 20 } }),
-  ),
-  http.get("https://api.openweathermap.org/data/2.5/forecast", () =>
+  http.get("https://api.open-meteo.com/v1/forecast", () =>
     HttpResponse.json({
-      list: Array.from({ length: 8 }, () => ({
-        main: { temp: 20 },
-        pop: 0,
-        weather: [weather],
-      })),
+      current: { temperature_2m: 20, weather_code: 0 },
+      hourly: {
+        temperature_2m: Array.from({ length: 25 }, () => 20),
+        precipitation_probability: Array.from({ length: 25 }, () => 0),
+        weather_code: Array.from({ length: 25 }, () => 0),
+      },
     }),
   ),
 ];
@@ -104,7 +99,7 @@ const originalFetch = globalThis.fetch;
 const fakedHosts = new Set([
   "oauth2.googleapis.com",
   "www.googleapis.com",
-  "api.openweathermap.org",
+  "api.open-meteo.com",
 ]);
 globalThis.fetch = async (input, init) => {
   const url = new URL(input instanceof Request ? input.url : input);
