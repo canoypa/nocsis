@@ -2,11 +2,8 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:nocsis/core/route_access.dart';
 import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/providers/current_group_id.dart';
-import 'package:nocsis/providers/me.dart';
-import 'package:nocsis/routes/router.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 
@@ -39,7 +36,6 @@ class ConsoleLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
-    final granted = watchGrantedPermissions(ref, groupId);
 
     return DrawerLayout(
       title: const Text('管理コンソール'),
@@ -50,7 +46,7 @@ class ConsoleLayout extends ConsumerWidget {
             .key;
         GoRouter.of(context).go("/groups/$groupId$route");
       },
-      navigationItems: [
+      navigationItems: const [
         NavigationDrawerDestination(
           icon: Icon(Icons.home_outlined),
           selectedIcon: Icon(Icons.home),
@@ -86,13 +82,11 @@ class ConsoleLayout extends ConsumerWidget {
           selectedIcon: Icon(CustomIcons.slack),
           label: Text('Slack 連携'),
         ),
-        // 最後に置く。出し分けても、ほかの項目の番号がずれない
-        if (canOpen(ConsoleDisplaysPageRoute.path, granted))
-          const NavigationDrawerDestination(
-            icon: Icon(Symbols.tv),
-            selectedIcon: Icon(Symbols.tv, fill: 1),
-            label: Text('教室ディスプレイ'),
-          ),
+        NavigationDrawerDestination(
+          icon: Icon(Symbols.tv),
+          selectedIcon: Icon(Symbols.tv, fill: 1),
+          label: Text('教室ディスプレイ'),
+        ),
       ],
       child: child,
     );
