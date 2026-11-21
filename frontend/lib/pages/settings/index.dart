@@ -232,6 +232,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
     try {
       await currentUser.verifyBeforeUpdateEmail(emailController.text);
     } on FirebaseAuthException catch (error) {
+      if (!mounted) rethrow;
       final requiresRecentLogin = error.code == 'requires-recent-login';
       setState(() {
         reauthenticating = requiresRecentLogin;
@@ -242,6 +243,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
       return;
     }
 
+    if (!mounted) return;
     widget.onSubmit();
   }
 
@@ -360,6 +362,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
     try {
       await currentUser.updatePassword(passwordController.text);
     } on FirebaseAuthException catch (error) {
+      if (!mounted) rethrow;
       switch (error.code) {
         case 'requires-recent-login':
           setState(() {
@@ -374,12 +377,22 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
         default:
           setState(() {
             reauthenticating = false;
+            hasError = true;
           });
           rethrow;
       }
       return;
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          reauthenticating = false;
+          hasError = true;
+        });
+      }
+      rethrow;
     }
 
+    if (!mounted) return;
     setState(() {
       hasError = false;
     });
