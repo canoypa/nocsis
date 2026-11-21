@@ -32,3 +32,15 @@ export const meSchema = z
     $id: "Me",
     description: "ログインしているユーザー",
   });
+
+export const googleAccountPutJsonSchema = z
+  .object({
+    accessToken: z.string().min(1).meta({
+      description:
+        "連携する Google アカウントで、このアプリに発行されたアクセストークン",
+    }),
+  })
+  .meta({
+    $id: "GoogleAccountPutJson",
+    description: "連携する Google アカウントの差し替えに使う JSON データ",
+  });

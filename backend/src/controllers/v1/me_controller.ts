@@ -1,5 +1,6 @@
 import { Hono } from "hono";
-import { describeRoute, resolver } from "hono-openapi";
+import { HTTPException } from "hono/http-exception";
+import { describeRoute, resolver, validator } from "hono-openapi";
 import type { z } from "zod";
 import { permissionsByResource } from "../../authz/check.js";
 import { user } from "../../authz/principal.js";
@@ -10,13 +11,19 @@ import {
   getCurrentUserId,
 } from "../../middlewares/authenticate.js";
 import { skipAuthorization } from "../../middlewares/authorize.js";
-import { meSchema } from "../../resources/v1/me.js";
+import { googleAccountPutJsonSchema, meSchema } from "../../resources/v1/me.js";
+import {
+  replaceGoogleAccount,
+  verifyGoogleAccessToken,
+} from "../../services/google_account_service.js";
 
 export const meRoutes = new Hono<AuthenticatedEnv>();
 
 type MeResponse = z.infer<typeof meSchema>;
 
-meRoutes.use("*", authentication).get(
+meRoutes.use("*", authentication);
+
+meRoutes.get(
   "/",
   describeRoute({
     description: "ログインしているユーザーの、グループごとの権限を取得する",
@@ -72,5 +79,52 @@ meRoutes.use("*", authentication).get(
     });
 
     return c.json<MeResponse>(meSchema.parse({ memberships }));
+  },
+);
+
+meRoutes.put(
+  "/google-account",
+  describeRoute({
+    description:
+      "連携する Google アカウントを差し替える。まだ連携していなければ連携する",
+    responses: {
+      204: { description: "差し替えた" },
+      400: { description: "アクセストークンが無効か、このアプリ向けではない" },
+      401: { description: "Unauthorized" },
+      403: { description: "匿名アカウント" },
+      409: {
+        description: "その Google アカウントは別のユーザーと連携している",
+      },
+      500: { description: "Internal Server Error" },
+    },
+    security: [{ bearer: [] }],
+  }),
+  skipAuthorization("自分のアカウントだけを変える"),
+  validator("json", googleAccountPutJsonSchema),
+  async (c) => {
+    if (c.get("signInProvider") === "anonymous") {
+      throw new HTTPException(403, {
+        message: "匿名アカウントには連携できません。",
+      });
+    }
+
+    const account = await verifyGoogleAccessToken(
+      c.req.valid("json").accessToken,
+    );
+    if (!account) {
+      throw new HTTPException(400, {
+        message: "Google アカウントを確認できませんでした。",
+      });
+    }
+
+    const result = await replaceGoogleAccount(getCurrentUserId(c), account);
+    if (!result.ok) {
+      throw new HTTPException(409, {
+        message:
+          "この Google アカウントはすでに別のユーザーと連携されています。",
+      });
+    }
+
+    return c.body(null, 204);
   },
 );

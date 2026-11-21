@@ -493,6 +493,20 @@
         "additionalProperties": false,
         "description": "ログインしているユーザー"
       },
+      "GoogleAccountPutJson": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1,
+            "description": "連携する Google アカウントで、このアプリに発行されたアクセストークン"
+          }
+        },
+        "required": [
+          "accessToken"
+        ],
+        "description": "連携する Google アカウントの差し替えに使う JSON データ"
+      },
       "UserJoinedGroup": {
         "type": "object",
         "properties": {
@@ -1331,6 +1345,47 @@
             "bearer": []
           }
         ]
+      }
+    },
+    "/api/v1/me/google-account": {
+      "put": {
+        "operationId": "putApiV1MeGoogleAccount",
+        "description": "連携する Google アカウントを差し替える。まだ連携していなければ連携する",
+        "responses": {
+          "204": {
+            "description": "差し替えた"
+          },
+          "400": {
+            "description": "アクセストークンが無効か、このアプリ向けではない"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "匿名アカウント"
+          },
+          "409": {
+            "description": "その Google アカウントは別のユーザーと連携している"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleAccountPutJson"
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/users/me/groups": {
