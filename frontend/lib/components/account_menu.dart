@@ -51,7 +51,7 @@ class AccountMenu extends ConsumerWidget {
           ),
         if (canOpen(ClassroomPageRoute.path, granted))
           ListTile(
-            title: const Text("Classroom を起動"),
+            title: const Text("教室ディスプレイを表示"),
             onTap: () => ClassroomPageRoute(groupId).go(context),
           ),
         const Divider(),

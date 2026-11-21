@@ -135,7 +135,7 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
                       shrinkWrap: true,
                       children: [
                         ListTile(
-                          title: const Text('Classroom を終了する'),
+                          title: const Text('教室ディスプレイを終了'),
                           onTap: () {
                             if (GoRouter.of(context).canPop()) {
                               GoRouter.of(context).pop();
