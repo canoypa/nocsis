@@ -12,6 +12,35 @@ const firestore = () => getFirestore(firebaseApp);
 
 const NOW = DateTime.fromISO("2026-11-21T03:00:00+09:00");
 
+const EMULATOR = `http://${process.env.FIREBASE_AUTH_EMULATOR_HOST}/identitytoolkit.googleapis.com/v1`;
+const PROJECT_ID = process.env.GCLOUD_PROJECT ?? "demo-nocsis";
+
+/** 匿名でサインインし（トークンの更新時刻が今になる）、サインインの時刻だけを古くする */
+const signInLongAgoButRefreshedNow = async (): Promise<string> => {
+  const { localId } = (await (
+    await fetch(`${EMULATOR}/accounts:signUp?key=fake`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    })
+  ).json()) as { localId: string };
+
+  await fetch(`${EMULATOR}/projects/${PROJECT_ID}/accounts:update`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer owner",
+    },
+    body: JSON.stringify({
+      localId,
+      createdAt: "1000000000000",
+      lastLoginAt: "1000000000000",
+    }),
+  });
+
+  return localId;
+};
+
 const exists = async (uid: string) =>
   auth()
     .getUser(uid)
@@ -67,6 +96,15 @@ describe("cleanupAnonymousUsers", () => {
     expect(await exists("stale_display")).toBe(false);
     expect(await exists("active_display")).toBe(true);
     expect(await exists("stale_person")).toBe(true);
+  });
+
+  it("サインインが古くても、トークンを更新し続けている端末は消さないこと", async () => {
+    const uid = await signInLongAgoButRefreshedNow();
+
+    await cleanupAnonymousUsers(DateTime.now());
+
+    expect(await exists(uid)).toBe(true);
+    await auth().deleteUser(uid);
   });
 
   it("消したアカウントの付与を外し、教室ディスプレイを解除済みにすること", async () => {
