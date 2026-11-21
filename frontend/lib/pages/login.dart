@@ -61,9 +61,12 @@ class LoginPage extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
+        child: Align(
+          alignment: compact ? Alignment.topCenter : Alignment.center,
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(compact ? 16 : 24),
+            padding: compact
+                ? const EdgeInsets.fromLTRB(16, 48, 16, 24)
+                : const EdgeInsets.all(24),
             child: LoginForm(
               onGoogleLogin: () => _googleLogin(context),
               onPasswordLogin: (email, password) =>
