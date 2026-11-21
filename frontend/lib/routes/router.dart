@@ -15,6 +15,8 @@ import 'package:nocsis/pages/console/layout.dart';
 import 'package:nocsis/pages/console/members.dart';
 import 'package:nocsis/pages/console/slack.dart';
 import 'package:nocsis/pages/console/weather.dart';
+import 'package:nocsis/pages/display/pairing.dart';
+import 'package:nocsis/pages/display/register.dart';
 import 'package:nocsis/pages/group/group_layout.dart';
 import 'package:nocsis/pages/licenses.dart';
 import 'package:nocsis/pages/login.dart';
@@ -43,6 +45,7 @@ part 'console/console_shell_route.dart';
 part 'console/console_slack_page_route.dart';
 part 'console/console_top_page_route.dart';
 part 'console/console_weather_page_route.dart';
+part 'display_page_route.dart';
 part 'group/group_shell_route.dart';
 part 'licenses_page_route.dart';
 part 'login_page_route.dart';
@@ -55,7 +58,13 @@ part 'settings/settings_top_page_route.dart';
 part 'top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
-  routes: [groupShellRoute, licensesPageRoute, loginPageRoute, topPageRoute],
+  routes: [
+    displayPageRoute,
+    groupShellRoute,
+    licensesPageRoute,
+    loginPageRoute,
+    topPageRoute,
+  ],
 )
 class AppShell extends ShellRouteData {
   @override
@@ -111,7 +120,10 @@ GoRouter router(Ref ref) {
 
     final me = await readMe(uid);
     if (me.memberships.isEmpty) {
-      return null;
+      // 登録が解除された端末は、また登録を待つ画面に戻す
+      final isAnonymous =
+          ref.read(firebaseAuthProvider).currentUser?.isAnonymous ?? false;
+      return isAnonymous ? DisplayPageRoute.path : null;
     }
 
     final firstGroupId = me.memberships.first.group.id;

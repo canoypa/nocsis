@@ -35,6 +35,9 @@ const routeAccess = <String, RouteAccess>{
   '/login': PublicAccess(),
   '/': SignedInAccess(),
   '/licenses': PublicAccess(),
+  // 端末はこの画面で匿名サインインする
+  '/display': PublicAccess(),
+  '/display/register': SignedInAccess(),
   '/groups/:groupId': GroupAccess({Permission.groupRead}),
   '/groups/:groupId/console': GroupAccess({..._updateGroup, ..._manageMembers}),
   '/groups/:groupId/console/group': GroupAccess(_updateGroup),

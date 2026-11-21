@@ -36,6 +36,7 @@ dependencies:
   http: ^1.6.0
   web: ^1.1.2
   material_symbols_icons: ^4.2960.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:
