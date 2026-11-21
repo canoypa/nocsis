@@ -119,6 +119,7 @@ describe("教室ディスプレイ", () => {
         id: device.uid,
         name: "1年1組 黒板横",
         created_at: expect.any(String),
+        removed_at: null,
       });
 
       const principal = user(device.uid);
@@ -199,8 +200,49 @@ describe("教室ディスプレイ", () => {
             id: device.uid,
             name: "1年1組 黒板横",
             created_at: expect.any(String),
+            removed_at: null,
           },
         ],
+      });
+    });
+
+    describe("使われなくなって登録が解除された端末", () => {
+      const removedAt = new Date("2026-11-01T00:00:00.000Z");
+
+      beforeEach(async () => {
+        await firestore
+          .doc(`groups/${GROUP_ID}/displays/${device.uid}`)
+          .update({ removed_at: Timestamp.fromDate(removedAt) });
+      });
+
+      it("解除された日時つきで一覧に出ること", async () => {
+        const response = await request(
+          `/api/v1/groups/${GROUP_ID}/displays`,
+          adminLogin.idToken,
+        );
+
+        expect(await response.json()).toMatchObject({
+          items: [{ id: device.uid, removed_at: removedAt.toISOString() }],
+        });
+      });
+
+      it("外すと一覧から消えること", async () => {
+        await auth.deleteUser(device.uid);
+
+        const response = await request(
+          `/api/v1/groups/${GROUP_ID}/displays/${device.uid}`,
+          adminLogin.idToken,
+          { method: "DELETE" },
+        );
+
+        expect(response.status).toBe(204);
+        expect(
+          (
+            await firestore
+              .doc(`groups/${GROUP_ID}/displays/${device.uid}`)
+              .get()
+          ).exists,
+        ).toBe(false);
       });
     });
 

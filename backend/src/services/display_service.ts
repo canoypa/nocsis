@@ -23,12 +23,20 @@ const FAILURE_WINDOW_MS = 10 * 60 * 1000;
 const displays = (groupId: string) =>
   firestore.collection("groups").doc(groupId).collection("displays");
 
-export type Display = { id: string; name: string; created_at: string };
+export type Display = {
+  id: string;
+  name: string;
+  created_at: string;
+  removed_at: string | null;
+};
 
 const toDisplay = (doc: FirebaseFirestore.DocumentSnapshot): Display => ({
   id: doc.id,
   name: doc.get("name"),
   created_at: (doc.get("created_at") as Timestamp).toDate().toISOString(),
+  removed_at:
+    (doc.get("removed_at") as Timestamp | undefined)?.toDate().toISOString() ??
+    null,
 });
 
 /**

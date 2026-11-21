@@ -22,6 +22,10 @@ export const displaySchema = z
     id: z.string().meta({ description: "ID" }),
     name: z.string().meta({ description: "名前" }),
     created_at: z.iso.datetime().meta({ description: "登録した日時" }),
+    removed_at: z.iso.datetime().nullable().meta({
+      description:
+        "使われなくなり、登録が解除された日時。解除されていなければ null",
+    }),
   })
   .meta({
     $id: "Display",
