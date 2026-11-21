@@ -10,6 +10,7 @@ const consoleShellRoute = TypedShellRoute<ConsoleShellRoute>(
     consoleDayDutyPageRoute,
     consoleWeatherPageRoute,
     consoleSlackPageRoute,
+    consoleDisplaysPageRoute,
   ],
 );
 

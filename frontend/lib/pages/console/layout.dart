@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
@@ -20,6 +21,7 @@ class ConsoleLayout extends ConsumerWidget {
     '/console/day_duty': 4,
     '/console/weather': 5,
     '/console/slack': 6,
+    '/console/displays': 7,
   };
 
   int _getNavigationIndex(BuildContext context) {
@@ -79,6 +81,11 @@ class ConsoleLayout extends ConsumerWidget {
           icon: Icon(CustomIcons.slack_outlined),
           selectedIcon: Icon(CustomIcons.slack),
           label: Text('Slack 連携'),
+        ),
+        NavigationDrawerDestination(
+          icon: Icon(Symbols.tv),
+          selectedIcon: Icon(Symbols.tv, fill: 1),
+          label: Text('教室ディスプレイ'),
         ),
       ],
       child: child,

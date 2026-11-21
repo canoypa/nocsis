@@ -43,6 +43,10 @@ const routeAccess = <String, RouteAccess>{
   '/groups/:groupId/console/day_duty': GroupAccess(_updateGroup),
   '/groups/:groupId/console/weather': GroupAccess(_updateGroup),
   '/groups/:groupId/console/slack': GroupAccess(_updateGroup),
+  '/groups/:groupId/console/displays': GroupAccess({
+    Permission.accessCreate,
+    Permission.accessDelete,
+  }),
   // 日直（メンバーの一覧）を出すのは教室の画面だけ
   '/groups/:groupId/classroom': GroupAccess({Permission.memberRead}),
 };
