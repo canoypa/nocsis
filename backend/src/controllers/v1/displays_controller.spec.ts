@@ -145,7 +145,7 @@ describe("教室ディスプレイ", () => {
       ).toBe(false);
     });
 
-    it("access.create の無い相手には、コードを使わせないこと", async () => {
+    it("role_binding.create の無い相手には、コードを使わせないこと", async () => {
       const { code } = await issue();
       await clearBindings();
       await grantGroup(admin.uid, GROUP_ID, "roles/group.viewer");
@@ -286,7 +286,7 @@ describe("教室ディスプレイ", () => {
       expect((await register(code)).status).toBe(404);
     });
 
-    it("access.read だけでは外せないこと", async () => {
+    it("閲覧だけの相手は外せないこと", async () => {
       await clearBindings();
       await grantGroup(admin.uid, GROUP_ID, "roles/group.viewer");
 
