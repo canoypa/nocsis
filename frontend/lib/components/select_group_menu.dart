@@ -8,10 +8,14 @@ import 'package:riverpod_annotation/experimental/scope.dart';
 
 @Dependencies([currentGroupId])
 class SelectGroupMenu extends ConsumerWidget {
-  const SelectGroupMenu({super.key});
+  final bool isExpanded;
+  final VoidCallback? onSelected;
+
+  const SelectGroupMenu({super.key, this.isExpanded = false, this.onSelected});
 
   void _onChangedDropdown(String? groupId, BuildContext context) {
     if (groupId == null) return;
+    onSelected?.call();
 
     final currentGroupId = GoRouter.of(context).state.pathParameters['groupId'];
     final newUri = GoRouter.of(context).state.uri.path
@@ -34,12 +38,16 @@ class SelectGroupMenu extends ConsumerWidget {
           .map(
             (membership) => DropdownMenuItem(
               value: membership.group.id,
-              child: Text(membership.group.name),
+              child: Text(
+                membership.group.name,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           )
           .toList(),
       value: groupId,
       onChanged: (value) => _onChangedDropdown(value, context),
+      isExpanded: isExpanded,
       underline: SizedBox(),
     );
   }
