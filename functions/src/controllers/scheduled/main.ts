@@ -15,6 +15,10 @@ const main = async (event: ScheduledEvent) => {
       "0 7 * * *",
       () => import("../../services/notify_events/index.js"),
     )(timestamp),
+    crontab(
+      "0 3 * * *",
+      () => import("../../services/cleanup_anonymous_users/index.js"),
+    )(timestamp),
   ]);
 };
 export default main;
