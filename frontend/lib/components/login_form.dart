@@ -158,14 +158,21 @@ class _LoginFormState extends State<LoginForm> {
 
   Widget _actions() {
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        FilledButton.tonal(
+        // G ロゴは色付きの背景に置けないので、tonal ではなく surface の塗りにする
+        OutlinedButton(
           onPressed: widget.onGoogleLogin,
-          style: _buttonStyle(textTheme),
+          style: _buttonStyle(textTheme).merge(
+            OutlinedButton.styleFrom(
+              backgroundColor: colorScheme.surface,
+              foregroundColor: colorScheme.onSurface,
+            ),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -175,7 +182,7 @@ class _LoginFormState extends State<LoginForm> {
                 width: 20,
                 excludeFromSemantics: true,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               const Text("Google で続行"),
             ],
           ),
