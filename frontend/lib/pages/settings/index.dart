@@ -218,7 +218,34 @@ class ChangeEmailDialog extends ConsumerStatefulWidget {
 }
 
 class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
-  bool reAuthenticated = false;
+  bool reauthenticating = false;
+
+  final TextEditingController emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _changeEmail(User currentUser) async {
+    try {
+      await currentUser.verifyBeforeUpdateEmail(emailController.text);
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) rethrow;
+      final requiresRecentLogin = error.code == 'requires-recent-login';
+      setState(() {
+        reauthenticating = requiresRecentLogin;
+      });
+      if (!requiresRecentLogin) {
+        rethrow;
+      }
+      return;
+    }
+
+    if (!mounted) return;
+    widget.onSubmit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,51 +255,16 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
       return const SizedBox.shrink();
     }
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: PageTransitionSwitcher(
-        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-          return SharedAxisTransition(
-            animation: primaryAnimation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.horizontal,
-            fillColor: Colors.transparent,
-            child: child,
-          );
-        },
-        child: !reAuthenticated ? _loginForm(user) : _changeEmailForm(user),
-      ),
-    );
-  }
-
-  Widget _loginForm(User currentUser) {
-    return LoginForm(
-      title: "メールアドレスを変更する",
-      description: '始めに、現在のアカウントで再認証が必要です。',
-      onGoogleLogin: () async {
-        await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
-
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
-      onPasswordLogin: (email, password) async {
-        final credential = EmailAuthProvider.credential(
-          email: email,
-          password: password,
-        );
-        await currentUser.reauthenticateWithCredential(credential);
-
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
+    return _ReauthenticationDialog(
+      title: 'メールアドレスを変更する',
+      currentUser: user,
+      reauthenticating: reauthenticating,
+      onReauthenticated: () => _changeEmail(user),
+      form: _changeEmailForm(user),
     );
   }
 
   Widget _changeEmailForm(User currentUser) {
-    final TextEditingController emailController = TextEditingController();
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
@@ -312,11 +304,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: () async {
-                await currentUser.verifyBeforeUpdateEmail(emailController.text);
-
-                widget.onSubmit();
-              },
+              onPressed: () => _changeEmail(currentUser),
               child: const Text('確認する'),
             ),
           ),
@@ -336,7 +324,7 @@ class ChangePasswordDialog extends ConsumerStatefulWidget {
 }
 
 class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
-  bool reAuthenticated = false;
+  bool reauthenticating = false;
 
   final TextEditingController passwordController = TextEditingController();
   bool invisiblePassword = true;
@@ -344,28 +332,9 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
   String errorMessage = '';
 
   @override
-  Widget build(BuildContext context) {
-    final user = ref.watch(currentUserProvider);
-
-    if (user == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: PageTransitionSwitcher(
-        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-          return SharedAxisTransition(
-            animation: primaryAnimation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.horizontal,
-            fillColor: Colors.transparent,
-            child: child,
-          );
-        },
-        child: !reAuthenticated ? _loginForm(user) : _changeEmailForm(user),
-      ),
-    );
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
   }
 
   void _changePasswordVisibilityCallback() {
@@ -380,32 +349,75 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
         : Icons.visibility_outlined;
   }
 
-  Widget _loginForm(User currentUser) {
-    return LoginForm(
-      title: "パスワードを設定する",
-      description: '始めに、現在のアカウントで再認証が必要です。',
-      onGoogleLogin: () async {
-        await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
+  Future<void> _changePassword(User currentUser) async {
+    if (passwordController.text.isEmpty) {
+      setState(() {
+        reauthenticating = false;
+        hasError = true;
+        errorMessage = 'パスワードを入力してください。';
+      });
+      return;
+    }
 
+    try {
+      await currentUser.updatePassword(passwordController.text);
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) rethrow;
+      switch (error.code) {
+        case 'requires-recent-login':
+          setState(() {
+            reauthenticating = true;
+          });
+        case 'weak-password':
+          setState(() {
+            reauthenticating = false;
+            hasError = true;
+            errorMessage = 'パスワードが弱すぎます。';
+          });
+        default:
+          setState(() {
+            reauthenticating = false;
+            hasError = true;
+          });
+          rethrow;
+      }
+      return;
+    } catch (_) {
+      if (mounted) {
         setState(() {
-          reAuthenticated = true;
+          reauthenticating = false;
+          hasError = true;
         });
-      },
-      onPasswordLogin: (email, password) async {
-        final credential = EmailAuthProvider.credential(
-          email: email,
-          password: password,
-        );
-        await currentUser.reauthenticateWithCredential(credential);
+      }
+      rethrow;
+    }
 
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
+    if (!mounted) return;
+    setState(() {
+      hasError = false;
+    });
+
+    widget.onSubmit();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = ref.watch(currentUserProvider);
+
+    if (user == null) {
+      return const SizedBox.shrink();
+    }
+
+    return _ReauthenticationDialog(
+      title: 'パスワードを設定する',
+      currentUser: user,
+      reauthenticating: reauthenticating,
+      onReauthenticated: () => _changePassword(user),
+      form: _changePasswordForm(user),
     );
   }
 
-  Widget _changeEmailForm(User currentUser) {
+  Widget _changePasswordForm(User currentUser) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
@@ -427,6 +439,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
           TextField(
             autofocus: true,
             controller: passwordController,
+            autofillHints: const [AutofillHints.newPassword],
             decoration: InputDecoration(
               labelText: '新しいパスワード',
               border: const OutlineInputBorder(),
@@ -442,42 +455,92 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: () async {
-                try {
-                  if (passwordController.text.isEmpty) {
-                    setState(() {
-                      hasError = true;
-                      errorMessage = 'パスワードを入力してください。';
-                    });
-                    return;
-                  }
-
-                  await currentUser.updatePassword(passwordController.text);
-
-                  setState(() {
-                    hasError = false;
-                  });
-
-                  widget.onSubmit();
-                } catch (error) {
-                  setState(() {
-                    hasError = true;
-                  });
-
-                  if (error is FirebaseAuthException &&
-                      error.code == 'weak-password') {
-                    setState(() {
-                      errorMessage = 'パスワードが弱すぎます。';
-                    });
-                  } else {
-                    rethrow;
-                  }
-                }
-              },
+              onPressed: () => _changePassword(currentUser),
               child: const Text('設定する'),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 変更が再認証を求められたときだけ、変更のフォームを再認証の LoginForm に切り替える。
+class _ReauthenticationDialog extends StatelessWidget {
+  final String title;
+  final User currentUser;
+  final bool reauthenticating;
+  final Future<void> Function() onReauthenticated;
+  final Widget form;
+
+  const _ReauthenticationDialog({
+    required this.title,
+    required this.currentUser,
+    required this.reauthenticating,
+    required this.onReauthenticated,
+    required this.form,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: PageTransitionSwitcher(
+        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+          return SharedAxisTransition(
+            animation: primaryAnimation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.horizontal,
+            fillColor: Colors.transparent,
+            child: child,
+          );
+        },
+        child: reauthenticating ? _loginForm() : form,
+      ),
+    );
+  }
+
+  Widget _loginForm() {
+    return _ReauthenticationCard(
+      child: LoginForm(
+        title: title,
+        description: '続けるには、もう一度ログインしてください。',
+        onGoogleLogin: () async {
+          await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
+          await onReauthenticated();
+        },
+        onPasswordLogin: (email, password) async {
+          final credential = EmailAuthProvider.credential(
+            email: email,
+            password: password,
+          );
+          await currentUser.reauthenticateWithCredential(credential);
+          await onReauthenticated();
+          return true;
+        },
+      ),
+    );
+  }
+}
+
+/// 再認証の LoginForm にダイアログの面を付ける。
+/// 狭い画面ではキーボードで高さが足りなくなるのでスクロールできるようにする。
+class _ReauthenticationCard extends StatelessWidget {
+  final Widget child;
+
+  const _ReauthenticationCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      ),
+      constraints: const BoxConstraints(maxWidth: 1200),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: child,
       ),
     );
   }

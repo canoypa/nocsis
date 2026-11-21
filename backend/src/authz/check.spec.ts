@@ -1,7 +1,7 @@
 import type { DocumentReference } from "firebase-admin/firestore";
 import { afterEach, describe, expect, it } from "vitest";
 import { firestore } from "../clients/firebase.js";
-import { can } from "./check.js";
+import { can, permissionsByResource, resourceIdsWith } from "./check.js";
 import { user } from "./principal.js";
 import { group } from "./resource.js";
 
@@ -182,5 +182,84 @@ describe("can", () => {
         reason: "insufficient_permission",
       });
     });
+  });
+});
+
+describe("permissionsByResource", () => {
+  it("リソースごとに、ロールの permission の和を PERMISSIONS の順で返すこと", async () => {
+    await addBinding({
+      subject: "user:test_user_1",
+      role: "roles/group.display",
+      resource: "group:test_group_1",
+    });
+    await addBinding({
+      subject: "user:test_user_1",
+      role: "roles/group.viewer",
+      resource: "group:test_group_1",
+    });
+    await addBinding({
+      subject: "user:test_user_1",
+      role: "roles/group.viewer",
+      resource: "group:test_group_2",
+    });
+
+    const granted = await permissionsByResource(user("test_user_1"), "group");
+
+    expect(granted).toEqual(
+      new Map([
+        ["test_group_1", ["group.read", "member.read"]],
+        ["test_group_2", ["group.read"]],
+      ]),
+    );
+  });
+
+  it("定義に無いロール、別の主体、壊れた resource の行は数えないこと", async () => {
+    await addBinding({
+      subject: "user:test_user_1",
+      role: "roles/group.teacher",
+      resource: "group:test_group_1",
+    });
+    await addBinding({
+      subject: "user:test_user_2",
+      role: "roles/group.admin",
+      resource: "group:test_group_1",
+    });
+    await addBinding({
+      subject: "user:test_user_1",
+      role: "roles/group.admin",
+      resource: "group:",
+    });
+    await addBinding({
+      subject: "user:test_user_1",
+      role: "roles/group.admin",
+      resource: "group:a/b",
+    });
+
+    const granted = await permissionsByResource(user("test_user_1"), "group");
+
+    expect(granted).toEqual(new Map());
+  });
+});
+
+describe("resourceIdsWith", () => {
+  it("permission を含むリソースの ID だけを返すこと", async () => {
+    await addBinding({
+      subject: "user:test_user_1",
+      role: "roles/group.admin",
+      resource: "group:test_group_1",
+    });
+    await addBinding({
+      subject: "user:test_user_1",
+      role: "roles/group.viewer",
+      resource: "group:test_group_2",
+    });
+
+    const ids = await resourceIdsWith(
+      user("test_user_1"),
+      "group.update",
+      "group",
+    );
+
+    expect(ids).toEqual(["test_group_1"]);
   });
 });

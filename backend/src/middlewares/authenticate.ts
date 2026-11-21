@@ -6,15 +6,17 @@ import { auth } from "../clients/firebase.js";
 export type AuthenticatedEnv = {
   Variables: {
     currentUserId: string;
+    signInProvider: string;
   };
 };
 
 export const authentication = bearerAuth({
   verifyToken: async (token, c: Context<AuthenticatedEnv>) => {
     try {
-      const { uid } = await auth.verifyIdToken(token);
+      const { uid, firebase } = await auth.verifyIdToken(token);
 
       c.set("currentUserId", uid);
+      c.set("signInProvider", firebase.sign_in_provider);
     } catch (err) {
       if (
         process.env.NODE_ENV === "development" ||

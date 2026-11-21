@@ -21,11 +21,9 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     mockApi = MockApi();
-    when(() => mockApi.apiV1UsersMeGroupsGet()).thenAnswer(
-      (_) async => chopper.Response(
-        http.Response('', 200),
-        const UserJoinedGroups(items: []),
-      ),
+    when(() => mockApi.apiV1MeGet()).thenAnswer(
+      (_) async =>
+          chopper.Response(http.Response('', 200), const Me(memberships: [])),
     );
     auth = MockFirebaseAuth(signedIn: true);
     container = ProviderContainer(

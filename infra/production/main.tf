@@ -40,7 +40,7 @@ module "nocsis" {
 
   # 使っていない API。止める順序は services.tf のコメントを読む。
   retiring_services = [
-    "bigquery.googleapis.com",
+    # bigquery と一緒に止まる。次のリリースで外す。残したまま apply すると bigquery ごと有効に戻る。
     "bigquerystorage.googleapis.com",
     "fcm.googleapis.com",
     "fcmregistrations.googleapis.com",
@@ -54,9 +54,6 @@ module "nocsis" {
     "sqladmin.googleapis.com",
     "testing.googleapis.com",
   ]
-
-  # bigquerystorage と互いに依存し合っていて、片方ずつは止められない。
-  retiring_with_dependents = ["bigquery.googleapis.com"]
 
   # 手で設定していたもの。要るかは別に決める。
   audit_log_configs = {

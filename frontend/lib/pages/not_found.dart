@@ -1,17 +1,11 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
-import 'package:riverpod_annotation/experimental/scope.dart';
 
-@Dependencies([currentGroupId])
-class ErrorPage extends ConsumerWidget {
+class ErrorPage extends StatelessWidget {
   const ErrorPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final groupId = ref.watch(currentGroupIdProvider);
-
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
@@ -21,7 +15,7 @@ class ErrorPage extends ConsumerWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               child: const Text("Home"),
-              onPressed: () => PersonalHomePageRoute(groupId).go(context),
+              onPressed: () => const TopPageRoute().go(context),
             ),
           ],
         ),

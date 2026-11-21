@@ -43,8 +43,6 @@ const required = (name: string): string => {
   return value;
 };
 
-const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
 const parseEmails = (value: string) =>
   value
     .split(/[\s,]+/)
@@ -65,7 +63,7 @@ const config = emulated
       classesCalendarId: required("SEED_CLASSES_CALENDAR_ID"),
       eventsCalendarId: required("SEED_EVENTS_CALENDAR_ID"),
       slackEventChannelId: "",
-      // パスワードがあると、Staging のログインが Cano さんのアカウントだけに閉じなくなる。
+      // パスワードがあると、誰でもテスト用のアカウントでログインして、グループの中を見られる。
       memberPassword: undefined,
       allowedEmails: parseEmails(required("SEED_ALLOWED_EMAILS")),
     };
@@ -124,14 +122,7 @@ const upsertUser = async ({
 };
 
 const setMembership = async (uid: string, joined: boolean) => {
-  const memberships = firestore.collection("user_joined_groups");
-  const snapshot = await memberships
-    .where("user_id", "==", uid)
-    .where("group_id", "==", GROUP_ID)
-    .get();
-
   if (!joined) {
-    await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
     // 未参加の画面を確かめるので、ロールを問わずこのグループへの付与を全部外す
     const bindings = await firestore
       .collection(BINDINGS)
@@ -140,11 +131,6 @@ const setMembership = async (uid: string, joined: boolean) => {
       .get();
     await Promise.all(bindings.docs.map((doc) => doc.ref.delete()));
     return;
-  }
-  if (snapshot.empty) {
-    await memberships
-      .doc(`${GROUP_ID}_${uid}`)
-      .set({ user_id: uid, group_id: GROUP_ID });
   }
   await grant({
     principal: user(uid),
@@ -156,7 +142,9 @@ const setMembership = async (uid: string, joined: boolean) => {
 // エラーの文言にメールアドレスが入りうるので、コードだけを返す。
 const findUidByEmail = async (email: string) => {
   try {
-    return (await auth.getUserByEmail(email)).uid;
+    const user = await auth.getUserByEmail(email);
+    // 誰でもサインアップできるので、確かめていないアドレスは他人が先に登録したものかもしれない
+    return user.emailVerified ? user.uid : undefined;
   } catch (error) {
     const code = errorCode(error);
     if (code === "auth/user-not-found") return undefined;
@@ -212,18 +200,11 @@ for (const user of testUsers) {
 }
 
 let allowedUsersFound = 0;
-if (config.allowedEmails.length > 0) {
-  // blocking function は ^...$ でアンカーされたパターンしか受け付けない。
-  await firestore.doc("environment/allowed_emails").set({
-    values: config.allowedEmails.map((email) => `^${escapeRegExp(email)}$`),
-  });
-
-  for (const email of config.allowedEmails) {
-    const uid = await findUidByEmail(email);
-    if (!uid) continue;
-    allowedUsersFound++;
-    await setMembership(uid, joinAllowedUsers);
-  }
+for (const email of config.allowedEmails) {
+  const uid = await findUidByEmail(email);
+  if (!uid) continue;
+  allowedUsersFound++;
+  await setMembership(uid, joinAllowedUsers);
 }
 
 console.log(
