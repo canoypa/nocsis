@@ -116,6 +116,6 @@ void main() {
         body: const DisplayCreateJson(code: '123456', name: '2年3組 前方'),
       ),
     ).called(1);
-    expect(find.text('コードが見つからないか、期限が切れています。'), findsOneWidget);
+    expect(find.text('コードが違うか、期限が切れています。ディスプレイのコードを確かめてください。'), findsOneWidget);
   });
 }
