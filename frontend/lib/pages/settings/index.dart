@@ -601,18 +601,35 @@ class _ReauthenticationDialog extends StatelessWidget {
             child: child,
           );
         },
-        child: reauthenticating ? _loginForm() : form,
+        child: reauthenticating ? _loginForm(context) : form,
       ),
     );
   }
 
-  Widget _loginForm() {
+  Widget _loginForm(BuildContext context) {
     return _ReauthenticationCard(
       child: LoginForm(
         title: title,
         description: '続けるには、もう一度ログインしてください。',
         onGoogleLogin: () async {
-          await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
+          final googleEmail = currentUser.providerData
+              .firstWhereOrNull(
+                (e) => e.providerId == GoogleAuthProvider.PROVIDER_ID,
+              )
+              ?.email;
+          final provider = GoogleAuthProvider();
+          if (googleEmail != null) {
+            provider.setCustomParameters({'login_hint': googleEmail});
+          }
+          try {
+            await currentUser.reauthenticateWithPopup(provider);
+          } on FirebaseAuthException catch (e) {
+            if (e.code != 'user-mismatch' || !context.mounted) rethrow;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('今ログインしている Google アカウントを選んでください。')),
+            );
+            return;
+          }
           await onReauthenticated();
         },
         onPasswordLogin: (email, password) async {
