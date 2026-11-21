@@ -1,5 +1,4 @@
 import 'package:animations/animations.dart';
-import 'package:chopper/chopper.dart' show Response;
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
@@ -9,7 +8,59 @@ import 'package:nocsis/core/google_account_token.dart';
 import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
+import 'package:nocsis/providers/firebase.dart';
 import 'package:nocsis/providers/user.dart';
+
+/// backend が再認証を求めるまでの時間。backend より少し短くして、選んだあとに弾かれにくくする
+const _recentLogin = Duration(minutes: 4);
+
+/// 最後にログイン (再認証を含む) した時刻
+final _authTimeProvider = StreamProvider.autoDispose<DateTime?>(
+  (ref) => ref
+      .watch(firebaseAuthProvider)
+      .idTokenChanges()
+      .asyncMap((user) async => (await user?.getIdTokenResult())?.authTime),
+);
+
+enum _ReplaceResult { replaced, cancelled, requiresRecentLogin }
+
+/// Google のアカウント選択を開き、選んだアカウントに連携を差し替える
+Future<_ReplaceResult> _replaceGoogleAccount(
+  BuildContext context,
+  WidgetRef ref,
+) async {
+  final user = ref.read(authenticatedUserProvider);
+  final messenger = ScaffoldMessenger.of(context);
+  final clientFuture = ref.read(apiClientProvider.future);
+
+  final accessToken = await pickGoogleAccountToken();
+  if (accessToken == null) return _ReplaceResult.cancelled;
+
+  final client = await clientFuture;
+  final response = await client.apiV1MeGoogleAccountPut(
+    body: GoogleAccountPutJson(accessToken: accessToken),
+  );
+
+  if (response.statusCode == 403 &&
+      response.bodyString.contains('requires-recent-login')) {
+    return _ReplaceResult.requiresRecentLogin;
+  }
+  if (response.statusCode == 409) {
+    messenger.showSnackBar(
+      const SnackBar(content: Text('この Google アカウントはすでに別のユーザーと連携されています。')),
+    );
+    return _ReplaceResult.cancelled;
+  }
+  if (!response.isSuccessful) {
+    throw Exception('Google account replace failed: ${response.statusCode}');
+  }
+
+  await user.reload();
+  if (context.mounted) {
+    ref.invalidate(currentUserProvider);
+  }
+  return _ReplaceResult.replaced;
+}
 
 final _googleAccountPickerLoadedProvider = FutureProvider.autoDispose(
   (ref) => loadGoogleAccountPicker(),
@@ -18,56 +69,26 @@ final _googleAccountPickerLoadedProvider = FutureProvider.autoDispose(
 class SettingsTopPage extends ConsumerWidget {
   const SettingsTopPage({super.key});
 
-  Future<void> _replaceGoogleAccount(
+  Future<void> _onReplaceGoogleAccountPressed(
     BuildContext context,
     WidgetRef ref,
   ) async {
-    final user = ref.read(authenticatedUserProvider);
-    final messenger = ScaffoldMessenger.of(context);
-    final clientFuture = ref.read(apiClientProvider.future);
+    final authTime = ref.read(_authTimeProvider).value;
+    final recentlyLoggedIn =
+        authTime != null && DateTime.now().difference(authTime) < _recentLogin;
 
-    final accessToken = await pickGoogleAccountToken();
-    if (accessToken == null) return;
-
-    final client = await clientFuture;
-    Future<Response<dynamic>> replace() => client.apiV1MeGoogleAccountPut(
-      body: GoogleAccountPutJson(accessToken: accessToken),
-    );
-
-    var response = await replace();
-
-    if (response.statusCode == 403 &&
-        response.bodyString.contains('requires-recent-login')) {
-      if (!context.mounted) return;
-      final reauthenticated = await showDialog<bool>(
-        context: context,
-        builder: (dialogContext) => _ReauthenticationDialog(
-          title: '別アカウントと連携する',
-          currentUser: user,
-          reauthenticating: true,
-          onReauthenticated: () async => Navigator.of(dialogContext).pop(true),
-          form: const SizedBox.shrink(),
-        ),
-      );
-      if (reauthenticated != true) return;
-
-      response = await replace();
-    }
-
-    if (response.statusCode == 409) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('この Google アカウントはすでに別のユーザーと連携されています。')),
-      );
+    // ポップアップは押した直後にしか開けないので、アカウント選択より前に await しない
+    if (recentlyLoggedIn &&
+        await _replaceGoogleAccount(context, ref) !=
+            _ReplaceResult.requiresRecentLogin) {
       return;
     }
-    if (!response.isSuccessful) {
-      throw Exception('Google account replace failed: ${response.statusCode}');
-    }
+    if (!context.mounted) return;
 
-    await user.reload();
-    if (context.mounted) {
-      ref.invalidate(currentUserProvider);
-    }
+    await showDialog<void>(
+      context: context,
+      builder: (_) => const _ReplaceGoogleAccountDialog(),
+    );
   }
 
   @override
@@ -79,6 +100,7 @@ class SettingsTopPage extends ConsumerWidget {
         ?.email;
 
     final pickerLoaded = ref.watch(_googleAccountPickerLoadedProvider).hasValue;
+    ref.watch(_authTimeProvider);
 
     return Align(
       alignment: Alignment.topLeft,
@@ -197,7 +219,8 @@ class SettingsTopPage extends ConsumerWidget {
                         ),
                         TextButton(
                           onPressed: pickerLoaded
-                              ? () => _replaceGoogleAccount(context, ref)
+                              ? () =>
+                                    _onReplaceGoogleAccountPressed(context, ref)
                               : null,
                           child: const Text("別アカウントと連携する"),
                         ),
@@ -466,6 +489,83 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 再認証してから、連携する Google アカウントを選んでもらう
+class _ReplaceGoogleAccountDialog extends ConsumerStatefulWidget {
+  const _ReplaceGoogleAccountDialog();
+
+  @override
+  ConsumerState<_ReplaceGoogleAccountDialog> createState() =>
+      _ReplaceGoogleAccountDialogState();
+}
+
+class _ReplaceGoogleAccountDialogState
+    extends ConsumerState<_ReplaceGoogleAccountDialog> {
+  bool reauthenticating = true;
+
+  Future<void> _onReauthenticated(User user) async {
+    // API クライアントは作ったときのトークンを使い続けるので、再認証した時刻の入ったトークンで作り直す
+    await user.getIdToken(true);
+    ref.invalidate(firebaseAuthInterceptorProvider);
+    if (!mounted) return;
+    setState(() => reauthenticating = false);
+  }
+
+  Future<void> _pick() async {
+    final result = await _replaceGoogleAccount(context, ref);
+    if (!mounted) return;
+    switch (result) {
+      case _ReplaceResult.replaced:
+        Navigator.of(context).pop();
+      case _ReplaceResult.requiresRecentLogin:
+        setState(() => reauthenticating = true);
+      case _ReplaceResult.cancelled:
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = ref.watch(authenticatedUserProvider);
+
+    return _ReauthenticationDialog(
+      title: '別アカウントと連携する',
+      currentUser: user,
+      reauthenticating: reauthenticating,
+      onReauthenticated: () => _onReauthenticated(user),
+      form: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        ),
+        constraints: const BoxConstraints(maxWidth: 800),
+        padding: const EdgeInsets.all(64),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                '別アカウントと連携する',
+                style: Theme.of(context).textTheme.displaySmall,
+              ),
+            ),
+            const SizedBox(height: 48),
+            const Text('連携する Google アカウントを選んでください。'),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _pick,
+                child: const Text('アカウントを選ぶ'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
