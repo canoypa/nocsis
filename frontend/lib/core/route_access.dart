@@ -44,6 +44,7 @@ const routeAccess = <String, RouteAccess>{
   '/groups/:groupId/console/weather': GroupAccess(_updateGroup),
   '/groups/:groupId/console/slack': GroupAccess(_updateGroup),
   '/groups/:groupId/console/displays': GroupAccess({
+    Permission.accessRead,
     Permission.accessCreate,
     Permission.accessDelete,
   }),

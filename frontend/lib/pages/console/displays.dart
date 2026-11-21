@@ -33,7 +33,7 @@ class ConsoleDisplaysPage extends ConsumerWidget {
             Text('追加のしかた', style: textTheme.titleMedium),
             const SizedBox(height: 8),
             Text(
-              '1. 表示に使う端末のブラウザで ${Uri.base.host}/display を開く。\n'
+              '1. 表示に使う端末のブラウザで ${Uri.base.authority}/display を開く。\n'
               '2. 表示された QR コードをスマートフォンで読み取る。',
               style: const TextStyle(height: 1.8),
             ),
@@ -104,14 +104,14 @@ class _DisplayList extends StatelessWidget {
   }
 }
 
-class _ActiveTile extends ConsumerWidget {
+class _ActiveTile extends StatelessWidget {
   final String groupId;
   final Display display;
 
   const _ActiveTile({required this.groupId, required this.display});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(Symbols.tv),
       title: Text(display.name),
@@ -150,7 +150,12 @@ class _ActiveTile extends ConsumerWidget {
               );
               if (confirmed != true || !context.mounted) return;
 
-              await _remove(context, ref, groupId, display.id);
+              await _remove(
+                context,
+                groupId,
+                display.id,
+                failure: '登録を解除できませんでした。',
+              );
             },
             icon: const Icon(Symbols.logout),
           ),
@@ -160,14 +165,14 @@ class _ActiveTile extends ConsumerWidget {
   }
 }
 
-class _RemovedTile extends ConsumerWidget {
+class _RemovedTile extends StatelessWidget {
   final String groupId;
   final Display display;
 
   const _RemovedTile({required this.groupId, required this.display});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return ListTile(
@@ -180,7 +185,8 @@ class _RemovedTile extends ConsumerWidget {
       subtitle: const Text('登録が解除されています。使うときは端末で登録し直してください。'),
       trailing: IconButton(
         tooltip: '閉じる',
-        onPressed: () => _remove(context, ref, groupId, display.id),
+        onPressed: () =>
+            _remove(context, groupId, display.id, failure: '一覧から除けませんでした。'),
         icon: const Icon(Symbols.close),
       ),
     );
@@ -189,21 +195,33 @@ class _RemovedTile extends ConsumerWidget {
 
 Future<void> _remove(
   BuildContext context,
-  WidgetRef ref,
   String groupId,
-  String displayId,
-) async {
+  String displayId, {
+  required String failure,
+}) async {
+  // 応答を待つあいだに行が消えていることがあるので、行の ref は使わない
+  final container = ProviderScope.containerOf(context);
   final messenger = ScaffoldMessenger.of(context);
-  final client = await ref.read(apiClientProvider.future);
-  final response = await client.apiV1GroupsGroupIdDisplaysDisplayIdDelete(
-    groupId: groupId,
-    displayId: displayId,
-  );
 
-  if (!response.isSuccessful && response.statusCode != 404) {
-    messenger.showSnackBar(const SnackBar(content: Text('登録を解除できませんでした。')));
+  try {
+    final client = await container.read(apiClientProvider.future);
+    final response = await client.apiV1GroupsGroupIdDisplaysDisplayIdDelete(
+      groupId: groupId,
+      displayId: displayId,
+    );
+    if (!response.isSuccessful && response.statusCode != 404) {
+      messenger.showSnackBar(SnackBar(content: Text(failure)));
+    }
+  } catch (_) {
+    messenger.showSnackBar(SnackBar(content: Text(failure)));
   }
-  ref.invalidate(displaysProvider(groupId));
+  container.invalidate(displaysProvider(groupId));
+}
+
+/// backend は UTF-16 の長さで数える。TextField の maxLength は書記素で数えるので合わない
+bool _isValidName(String name) {
+  final trimmed = name.trim();
+  return trimmed.isNotEmpty && trimmed.length <= 50;
 }
 
 class _RegisterDialog extends ConsumerStatefulWidget {
@@ -224,7 +242,7 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
   bool get _canSubmit =>
       !_submitting &&
       RegExp(r'^\d{6}$').hasMatch(_code.text) &&
-      _name.text.trim().isNotEmpty;
+      _isValidName(_name.text);
 
   @override
   void dispose() {
@@ -239,14 +257,25 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
       _error = null;
     });
 
-    final client = await ref.read(apiClientProvider.future);
-    final response = await client.apiV1GroupsGroupIdDisplaysPost(
-      groupId: widget.groupId,
-      body: DisplayCreateJson(code: _code.text, name: _name.text.trim()),
-    );
+    final int? status;
+    try {
+      final client = await ref.read(apiClientProvider.future);
+      final response = await client.apiV1GroupsGroupIdDisplaysPost(
+        groupId: widget.groupId,
+        body: DisplayCreateJson(code: _code.text, name: _name.text.trim()),
+      );
+      status = response.isSuccessful ? null : response.statusCode;
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _submitting = false;
+        _error = '登録できませんでした。';
+      });
+      return;
+    }
     if (!mounted) return;
 
-    if (response.isSuccessful) {
+    if (status == null) {
       ref.invalidate(displaysProvider(widget.groupId));
       Navigator.of(context).pop();
       return;
@@ -254,7 +283,7 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
 
     setState(() {
       _submitting = false;
-      _error = switch (response.statusCode) {
+      _error = switch (status) {
         404 => 'コードが見つからないか、期限が切れています。',
         429 => 'しばらく待ってから入力し直してください。',
         _ => '登録できませんでした。',
@@ -333,7 +362,7 @@ class _RenameDialogState extends ConsumerState<_RenameDialog> {
   bool _submitting = false;
   String? _error;
 
-  bool get _canSubmit => !_submitting && _name.text.trim().isNotEmpty;
+  bool get _canSubmit => !_submitting && _isValidName(_name.text);
 
   @override
   void dispose() {
@@ -347,15 +376,21 @@ class _RenameDialogState extends ConsumerState<_RenameDialog> {
       _error = null;
     });
 
-    final client = await ref.read(apiClientProvider.future);
-    final response = await client.apiV1GroupsGroupIdDisplaysDisplayIdPatch(
-      groupId: widget.groupId,
-      displayId: widget.display.id,
-      body: DisplayPatchJson(name: _name.text.trim()),
-    );
+    bool succeeded;
+    try {
+      final client = await ref.read(apiClientProvider.future);
+      final response = await client.apiV1GroupsGroupIdDisplaysDisplayIdPatch(
+        groupId: widget.groupId,
+        displayId: widget.display.id,
+        body: DisplayPatchJson(name: _name.text.trim()),
+      );
+      succeeded = response.isSuccessful;
+    } catch (_) {
+      succeeded = false;
+    }
     if (!mounted) return;
 
-    if (response.isSuccessful) {
+    if (succeeded) {
       ref.invalidate(displaysProvider(widget.groupId));
       Navigator.of(context).pop();
       return;
