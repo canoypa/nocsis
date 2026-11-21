@@ -2,7 +2,7 @@ import type { UserRecord } from "firebase-admin/auth";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { LoginResult } from "../../../tests/helpers/users.js";
 import { login, loginAnonymously } from "../../../tests/helpers/users.js";
-import { auth } from "../../clients/firebase.js";
+import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
 import { verifyGoogleAccessToken } from "../../services/google_account_service.js";
 
@@ -42,7 +42,12 @@ describe("PUT /api/v1/me/google-account", () => {
   });
 
   afterEach(async () => {
+    vi.restoreAllMocks();
     await auth.deleteUsers(["test_user_1", "test_user_2"]);
+    await firestore
+      .collection("googleAccountSwaps")
+      .doc("test_user_1")
+      .delete();
     vi.mocked(verifyGoogleAccessToken).mockReset();
   });
 
@@ -103,6 +108,51 @@ describe("PUT /api/v1/me/google-account", () => {
 
     expect(res.status).toBe(409);
     expect(await googleIds(user.uid)).toEqual(["google_old"]);
+  });
+
+  // 外すのと付けるのが別の更新なので、付けられなければ Google の連携が無いまま残る
+  const failLinking = (googleIds: string[]) => {
+    const updateUser = auth.updateUser.bind(auth);
+    vi.spyOn(auth, "updateUser").mockImplementation((uid, properties) =>
+      properties.providerToLink &&
+      googleIds.includes(properties.providerToLink.uid ?? "")
+        ? Promise.reject(new Error("unavailable"))
+        : updateUser(uid, properties),
+    );
+  };
+
+  it("新しいアカウントを付けられなければ、元の Google アカウントに戻す", async () => {
+    await auth.updateUser(user.uid, {
+      providerToLink: { providerId: "google.com", uid: "google_old" },
+    });
+    failLinking(["google_new"]);
+
+    const res = await put(loginResult.idToken);
+
+    expect(res.status).toBe(500);
+    expect(await googleIds(user.uid)).toEqual(["google_old"]);
+    const swap = await firestore
+      .collection("googleAccountSwaps")
+      .doc(user.uid)
+      .get();
+    expect(swap.exists).toBe(false);
+  });
+
+  it("元にも戻せなければ、付け直せるよう元の Google アカウントを記録に残す", async () => {
+    await auth.updateUser(user.uid, {
+      providerToLink: { providerId: "google.com", uid: "google_old" },
+    });
+    failLinking(["google_new", "google_old"]);
+
+    const res = await put(loginResult.idToken);
+
+    expect(res.status).toBe(500);
+    expect(await googleIds(user.uid)).toEqual([]);
+    const swap = await firestore
+      .collection("googleAccountSwaps")
+      .doc(user.uid)
+      .get();
+    expect(swap.get("previous.id")).toBe("google_old");
   });
 
   it("アクセストークンを確認できなければ 400 を返し、連携を変えない", async () => {

@@ -1,6 +1,7 @@
 import assert from "node:assert";
+import { FieldValue } from "firebase-admin/firestore";
 import { OAuth2Client } from "google-auth-library";
-import { auth } from "../clients/firebase.js";
+import { auth, firestore } from "../clients/firebase.js";
 import { AppConfig } from "../config/app_config.js";
 
 const GOOGLE_PROVIDER_ID = "google.com";
@@ -44,9 +45,25 @@ export type ReplaceGoogleAccountResult =
   | { ok: true }
   | { ok: false; reason: "linked_to_another_user" };
 
+/** 差し替えの途中で止まったときに、元の Google アカウントを付け直せるよう控えておく */
+const SWAP_COLLECTION = "googleAccountSwaps";
+
+const isAuthError = (err: unknown, ...codes: string[]) =>
+  err instanceof Error && "code" in err && codes.includes(String(err.code));
+
+const linkGoogleAccount = (uid: string, account: GoogleAccount) =>
+  auth.updateUser(uid, {
+    providerToLink: {
+      providerId: GOOGLE_PROVIDER_ID,
+      uid: account.id,
+      email: account.email,
+    },
+  });
+
 /**
  * ユーザーに連携する Google アカウントを差し替える。
- * 外すのと付けるのを1回の更新で行い、途中で Google の連携が無い状態を作らない
+ * Firebase は外すのと付けるのを1回の更新で受け付けない（付ける方を先に検査して
+ * PROVIDER_ALREADY_LINKED になる）ので、外してから付け、付けられなければ元に戻す
  */
 export const replaceGoogleAccount = async (
   uid: string,
@@ -55,11 +72,7 @@ export const replaceGoogleAccount = async (
   const owner = await auth
     .getUserByProviderUid(GOOGLE_PROVIDER_ID, account.id)
     .catch((err: unknown) => {
-      if (
-        err instanceof Error &&
-        "code" in err &&
-        err.code === "auth/user-not-found"
-      ) {
+      if (isAuthError(err, "auth/user-not-found")) {
         return null;
       }
       throw err;
@@ -71,31 +84,61 @@ export const replaceGoogleAccount = async (
   }
 
   const user = await auth.getUser(uid);
-  const linked = user.providerData.some(
+  const linked = user.providerData.find(
     (provider) => provider.providerId === GOOGLE_PROVIDER_ID,
   );
+  const previous: GoogleAccount | undefined = linked && {
+    id: linked.uid,
+    email: linked.email,
+  };
+
+  const swapRef = firestore.collection(SWAP_COLLECTION).doc(uid);
+  if (previous) {
+    await swapRef.set({
+      previous: { id: previous.id, email: previous.email ?? null },
+      next: { id: account.id, email: account.email ?? null },
+      startedAt: FieldValue.serverTimestamp(),
+    });
+    await auth.updateUser(uid, { providersToUnlink: [GOOGLE_PROVIDER_ID] });
+  }
 
   try {
-    await auth.updateUser(uid, {
-      ...(linked ? { providersToUnlink: [GOOGLE_PROVIDER_ID] } : {}),
-      providerToLink: {
-        providerId: GOOGLE_PROVIDER_ID,
-        uid: account.id,
-        email: account.email,
-      },
-    });
+    await linkGoogleAccount(uid, account);
   } catch (err) {
-    // 確かめてから更新するまでの間に、別のユーザーが同じアカウントを連携したとき
+    if (previous) {
+      await restoreGoogleAccount(uid, previous);
+      await swapRef.delete();
+    }
+    // 確かめてから付けるまでの間に、別のユーザーが同じアカウントを連携したとき
     if (
-      err instanceof Error &&
-      "code" in err &&
-      (err.code === "auth/credential-already-in-use" ||
-        err.code === "auth/uid-already-exists")
+      isAuthError(
+        err,
+        "auth/credential-already-in-use",
+        "auth/uid-already-exists",
+      )
     ) {
       return { ok: false, reason: "linked_to_another_user" };
     }
     throw err;
   }
 
+  if (previous) {
+    await swapRef.delete();
+  }
   return { ok: true };
+};
+
+const restoreGoogleAccount = async (uid: string, previous: GoogleAccount) => {
+  try {
+    await linkGoogleAccount(uid, previous);
+  } catch (err) {
+    console.log(
+      JSON.stringify({
+        severity: "ERROR",
+        message: `Google アカウントを元に戻せなかった。${SWAP_COLLECTION} の記録から付け直す`,
+        uid,
+      }),
+    );
+    throw err;
+  }
 };
