@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:chopper/chopper.dart' show Response;
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
@@ -29,9 +30,29 @@ class SettingsTopPage extends ConsumerWidget {
     if (accessToken == null) return;
 
     final client = await clientFuture;
-    final response = await client.apiV1MeGoogleAccountPut(
+    Future<Response<dynamic>> replace() => client.apiV1MeGoogleAccountPut(
       body: GoogleAccountPutJson(accessToken: accessToken),
     );
+
+    var response = await replace();
+
+    if (response.statusCode == 403 &&
+        response.bodyString.contains('requires-recent-login')) {
+      if (!context.mounted) return;
+      final reauthenticated = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => _ReauthenticationDialog(
+          title: '別アカウントと連携する',
+          currentUser: user,
+          reauthenticating: true,
+          onReauthenticated: () async => Navigator.of(dialogContext).pop(true),
+          form: const SizedBox.shrink(),
+        ),
+      );
+      if (reauthenticated != true) return;
+
+      response = await replace();
+    }
 
     if (response.statusCode == 409) {
       messenger.showSnackBar(

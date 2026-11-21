@@ -1362,7 +1362,7 @@
             "description": "Unauthorized"
           },
           "403": {
-            "description": "匿名アカウント"
+            "description": "匿名アカウントか、最後のログインから時間がたっている (`code` が `requires-recent-login`)"
           },
           "409": {
             "description": "その Google アカウントは別のユーザーと連携している"

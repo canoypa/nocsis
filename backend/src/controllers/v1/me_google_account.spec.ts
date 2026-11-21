@@ -124,6 +124,22 @@ describe("PUT /api/v1/me/google-account", () => {
     expect(verifyGoogleAccessToken).not.toHaveBeenCalled();
   });
 
+  it("最後のログインから5分を過ぎていたら、再認証を求めて連携を変えない", async () => {
+    await auth.updateUser(user.uid, {
+      providerToLink: { providerId: "google.com", uid: "google_old" },
+    });
+    const now = Date.now();
+    vi.spyOn(Date, "now").mockReturnValue(now + 6 * 60 * 1000);
+
+    const res = await put(loginResult.idToken);
+    vi.mocked(Date.now).mockRestore();
+
+    expect(res.status).toBe(403);
+    expect(await res.json()).toMatchObject({ code: "requires-recent-login" });
+    expect(verifyGoogleAccessToken).not.toHaveBeenCalled();
+    expect(await googleIds(user.uid)).toEqual(["google_old"]);
+  });
+
   it("匿名アカウントには 403 を返す", async () => {
     const anonymous = await loginAnonymously();
 

@@ -21,6 +21,9 @@ export const meRoutes = new Hono<AuthenticatedEnv>();
 
 type MeResponse = z.infer<typeof meSchema>;
 
+/** Firebase がパスワードの変更などで再認証を求めるまでの時間に合わせる */
+const RECENT_LOGIN_SECONDS = 5 * 60;
+
 meRoutes.use("*", authentication);
 
 meRoutes.get(
@@ -91,7 +94,10 @@ meRoutes.put(
       204: { description: "差し替えた" },
       400: { description: "アクセストークンが無効か、このアプリ向けではない" },
       401: { description: "Unauthorized" },
-      403: { description: "匿名アカウント" },
+      403: {
+        description:
+          "匿名アカウントか、最後のログインから時間がたっている (`code` が `requires-recent-login`)",
+      },
       409: {
         description: "その Google アカウントは別のユーザーと連携している",
       },
@@ -106,6 +112,17 @@ meRoutes.put(
       throw new HTTPException(403, {
         message: "匿名アカウントには連携できません。",
       });
+    }
+
+    // 開いたままの端末や盗まれたトークンで、ログイン方法を差し替えられないようにする
+    if (Date.now() / 1000 - c.get("authTime") > RECENT_LOGIN_SECONDS) {
+      return c.json(
+        {
+          code: "requires-recent-login",
+          message: "続けるには、もう一度ログインしてください。",
+        },
+        403,
+      );
     }
 
     const account = await verifyGoogleAccessToken(
