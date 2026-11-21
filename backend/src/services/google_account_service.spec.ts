@@ -19,6 +19,7 @@ const tokenInfo = (overrides: Record<string, unknown> = {}) =>
       azp: CLIENT_ID,
       sub: "google_user",
       email: "user@example.com",
+      email_verified: "true",
       scope: "openid email",
       expires_in: 3599,
       ...overrides,
@@ -36,6 +37,15 @@ describe("verifyGoogleAccessToken", () => {
     expect(await verifyGoogleAccessToken("token")).toEqual({
       id: "google_user",
       email: "user@example.com",
+    });
+  });
+
+  it("確認されていないメールアドレスは返さない", async () => {
+    externalApiServer.use(tokenInfo({ email_verified: "false" }));
+
+    expect(await verifyGoogleAccessToken("token")).toEqual({
+      id: "google_user",
+      email: undefined,
     });
   });
 

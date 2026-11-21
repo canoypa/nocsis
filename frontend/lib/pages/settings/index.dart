@@ -10,6 +10,10 @@ import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/user.dart';
 
+final _googleAccountPickerLoadedProvider = FutureProvider.autoDispose(
+  (ref) => loadGoogleAccountPicker(),
+);
+
 class SettingsTopPage extends ConsumerWidget {
   const SettingsTopPage({super.key});
 
@@ -17,17 +21,20 @@ class SettingsTopPage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) async {
+    final user = ref.read(authenticatedUserProvider);
+    final messenger = ScaffoldMessenger.of(context);
+    final clientFuture = ref.read(apiClientProvider.future);
+
     final accessToken = await pickGoogleAccountToken();
     if (accessToken == null) return;
 
-    final client = await ref.read(apiClientProvider.future);
+    final client = await clientFuture;
     final response = await client.apiV1MeGoogleAccountPut(
       body: GoogleAccountPutJson(accessToken: accessToken),
     );
 
     if (response.statusCode == 409) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(content: Text('この Google アカウントはすでに別のユーザーと連携されています。')),
       );
       return;
@@ -36,8 +43,10 @@ class SettingsTopPage extends ConsumerWidget {
       throw Exception('Google account replace failed: ${response.statusCode}');
     }
 
-    await ref.read(authenticatedUserProvider).reload();
-    ref.invalidate(currentUserProvider);
+    await user.reload();
+    if (context.mounted) {
+      ref.invalidate(currentUserProvider);
+    }
   }
 
   @override
@@ -48,7 +57,7 @@ class SettingsTopPage extends ConsumerWidget {
         .firstWhereOrNull((e) => e.providerId == GoogleAuthProvider.PROVIDER_ID)
         ?.email;
 
-    loadGoogleAccountPicker();
+    final pickerLoaded = ref.watch(_googleAccountPickerLoadedProvider).hasValue;
 
     return Align(
       alignment: Alignment.topLeft,
@@ -166,7 +175,9 @@ class SettingsTopPage extends ConsumerWidget {
                           ],
                         ),
                         TextButton(
-                          onPressed: () => _replaceGoogleAccount(context, ref),
+                          onPressed: pickerLoaded
+                              ? () => _replaceGoogleAccount(context, ref)
+                              : null,
                           child: const Text("別アカウントと連携する"),
                         ),
                       ],

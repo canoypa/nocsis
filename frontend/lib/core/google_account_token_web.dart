@@ -14,7 +14,11 @@ const _clientIds = {
 Future<void>? _loading;
 
 /// 選ぶ画面を開く前に読み込んでおく。押してから読み込むと、ポップアップがブロックされる
-Future<void> loadGoogleAccountPicker() => _loading ??= gis.loadWebSdk();
+Future<void> loadGoogleAccountPicker() =>
+    _loading ??= gis.loadWebSdk().catchError((Object error) {
+      _loading = null;
+      throw error;
+    });
 
 /// Google アカウントを選んでもらい、そのアカウントのアクセストークンを返す。
 /// 閉じられたら null
@@ -33,7 +37,9 @@ Future<String?> pickGoogleAccountToken() {
       callback: (response) {
         if (completer.isCompleted) return;
         final token = response.access_token;
-        if (token == null) {
+        if (response.error == 'access_denied') {
+          completer.complete(null);
+        } else if (token == null) {
           completer.completeError(
             StateError('Google のトークンを得られませんでした: ${response.error}'),
           );

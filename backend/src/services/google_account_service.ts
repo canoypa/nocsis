@@ -33,7 +33,11 @@ export const verifyGoogleAccessToken = async (
     return null;
   }
 
-  return { id: info.sub, email: info.email };
+  return {
+    id: info.sub,
+    // 型は boolean だが、tokeninfo は "true" / "false" の文字列で返す
+    email: String(info.email_verified) === "true" ? info.email : undefined,
+  };
 };
 
 export type ReplaceGoogleAccountResult =
@@ -71,14 +75,27 @@ export const replaceGoogleAccount = async (
     (provider) => provider.providerId === GOOGLE_PROVIDER_ID,
   );
 
-  await auth.updateUser(uid, {
-    ...(linked ? { providersToUnlink: [GOOGLE_PROVIDER_ID] } : {}),
-    providerToLink: {
-      providerId: GOOGLE_PROVIDER_ID,
-      uid: account.id,
-      email: account.email,
-    },
-  });
+  try {
+    await auth.updateUser(uid, {
+      ...(linked ? { providersToUnlink: [GOOGLE_PROVIDER_ID] } : {}),
+      providerToLink: {
+        providerId: GOOGLE_PROVIDER_ID,
+        uid: account.id,
+        email: account.email,
+      },
+    });
+  } catch (err) {
+    // 確かめてから更新するまでの間に、別のユーザーが同じアカウントを連携したとき
+    if (
+      err instanceof Error &&
+      "code" in err &&
+      (err.code === "auth/credential-already-in-use" ||
+        err.code === "auth/uid-already-exists")
+    ) {
+      return { ok: false, reason: "linked_to_another_user" };
+    }
+    throw err;
+  }
 
   return { ok: true };
 };
