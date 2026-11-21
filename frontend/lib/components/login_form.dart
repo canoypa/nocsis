@@ -1,6 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginForm extends StatefulWidget {
   static const _defaultFormTitle = 'Nocsis';
@@ -171,7 +170,11 @@ class _LoginFormState extends State<LoginForm> {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              SvgPicture.asset("assets/images/google.svg", width: 20),
+              Image.asset(
+                "assets/images/google/google.png",
+                width: 20,
+                excludeFromSemantics: true,
+              ),
               const SizedBox(width: 12),
               const Text("Google で続行"),
             ],
