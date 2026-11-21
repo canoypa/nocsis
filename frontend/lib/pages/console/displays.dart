@@ -284,8 +284,8 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
     setState(() {
       _submitting = false;
       _error = switch (status) {
-        404 => 'コードが見つからないか、期限が切れています。',
-        429 => 'しばらく待ってから入力し直してください。',
+        404 => 'コードが違うか、期限が切れています。ディスプレイのコードを確かめてください。',
+        429 => '間違いが続いたため、少し時間をおいてから入力してください。',
         _ => '登録できませんでした。',
       };
     });
@@ -316,6 +316,7 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
                 border: const OutlineInputBorder(),
                 labelText: 'コード',
                 errorText: _error,
+                errorMaxLines: 3,
               ),
             ),
             const SizedBox(height: 16),
