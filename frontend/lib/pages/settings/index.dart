@@ -4,11 +4,41 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/login_form.dart';
+import 'package:nocsis/core/google_account_token.dart';
 import 'package:nocsis/custom_icons.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
+import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/user.dart';
 
 class SettingsTopPage extends ConsumerWidget {
   const SettingsTopPage({super.key});
+
+  Future<void> _replaceGoogleAccount(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final accessToken = await pickGoogleAccountToken();
+    if (accessToken == null) return;
+
+    final client = await ref.read(apiClientProvider.future);
+    final response = await client.apiV1MeGoogleAccountPut(
+      body: GoogleAccountPutJson(accessToken: accessToken),
+    );
+
+    if (response.statusCode == 409) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('この Google アカウントはすでに別のユーザーと連携されています。')),
+      );
+      return;
+    }
+    if (!response.isSuccessful) {
+      throw Exception('Google account replace failed: ${response.statusCode}');
+    }
+
+    await ref.read(authenticatedUserProvider).reload();
+    ref.invalidate(currentUserProvider);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,9 +48,7 @@ class SettingsTopPage extends ConsumerWidget {
         .firstWhereOrNull((e) => e.providerId == GoogleAuthProvider.PROVIDER_ID)
         ?.email;
 
-    final hasNonGoogleLoginProvider = user.providerData.any(
-      (e) => e.providerId != GoogleAuthProvider.PROVIDER_ID,
-    );
+    loadGoogleAccountPicker();
 
     return Align(
       alignment: Alignment.topLeft,
@@ -138,62 +166,8 @@ class SettingsTopPage extends ConsumerWidget {
                           ],
                         ),
                         TextButton(
-                          onPressed: hasNonGoogleLoginProvider
-                              ? () async {
-                                  try {
-                                    await user.unlink(
-                                      GoogleAuthProvider.PROVIDER_ID,
-                                    );
-                                  } catch (e) {
-                                    if (e is FirebaseAuthException &&
-                                        e.code == 'no-such-provider') {
-                                      // noop
-                                    } else {
-                                      rethrow;
-                                    }
-                                  }
-
-                                  try {
-                                    await user.linkWithPopup(
-                                      GoogleAuthProvider(),
-                                    );
-                                  } catch (e) {
-                                    if (e is FirebaseAuthException &&
-                                        e.code == 'credential-already-in-use') {
-                                      final currentEmail = user.providerData
-                                          .firstWhere(
-                                            (e) =>
-                                                e.providerId ==
-                                                GoogleAuthProvider.PROVIDER_ID,
-                                          )
-                                          .email;
-                                      final sameAccount =
-                                          e.email == currentEmail;
-
-                                      if (!sameAccount) {
-                                        ScaffoldMessenger.of(
-                                          // ignore: use_build_context_synchronously
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'この Google アカウントはすでに別のユーザーと連携されています。',
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    } else {
-                                      rethrow;
-                                    }
-                                  }
-                                }
-                              : null,
-                          child: Tooltip(
-                            message: !hasNonGoogleLoginProvider
-                                ? '別アカウントと連携するには、初めにパスワードを設定してください。'
-                                : '',
-                            child: const Text("別アカウントと連携する"),
-                          ),
+                          onPressed: () => _replaceGoogleAccount(context, ref),
+                          child: const Text("別アカウントと連携する"),
                         ),
                       ],
                     ),
