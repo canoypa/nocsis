@@ -536,7 +536,7 @@ class _ReauthenticationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         color: Theme.of(context).colorScheme.surfaceContainerHigh,
       ),
-      constraints: const BoxConstraints(maxWidth: 1200),
+      constraints: const BoxConstraints(maxWidth: LoginForm.maxWidth + 48),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: child,
