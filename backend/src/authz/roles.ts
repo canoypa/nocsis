@@ -11,10 +11,11 @@ export const PERMISSIONS = [
   "member.create",
   "member.update",
   "member.delete",
-  // 付けるか外すかなので update は無い
+  // role_binding は付けるか外すかなので update は無い
   "role_binding.read",
   "role_binding.create",
   "role_binding.delete",
+
   "display.update",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];

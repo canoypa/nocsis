@@ -225,6 +225,19 @@ describe("教室ディスプレイ", () => {
       expect(response.status).toBe(404);
     });
 
+    it("閲覧だけの相手は名前を変えられないこと", async () => {
+      await clearBindings();
+      await grantGroup(admin.uid, GROUP_ID, "roles/group.viewer");
+
+      const response = await request(
+        `/api/v1/groups/${GROUP_ID}/displays/${device.uid}`,
+        adminLogin.idToken,
+        { method: "PATCH", body: { name: "2年3組 前方" } },
+      );
+
+      expect(response.status).toBe(403);
+    });
+
     it("外すと、付与も匿名アカウントも消えること", async () => {
       const response = await request(
         `/api/v1/groups/${GROUP_ID}/displays/${device.uid}`,
