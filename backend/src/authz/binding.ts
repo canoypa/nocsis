@@ -50,6 +50,30 @@ export const grant = async <R extends ResourceRef>(params: {
   role: RoleForResource<R["type"]>;
   resource: R;
 }): Promise<GrantResult> => {
+  const { ref, data } = bindingDoc(params);
+
+  try {
+    await ref.create(data);
+
+    return "created";
+  } catch (err) {
+    if (isAlreadyExists(err)) {
+      return "already_granted";
+    }
+
+    throw err;
+  }
+};
+
+/**
+ * 付与の1行。ほかの書き込みと同じトランザクションで付けたいときに使う
+ * （付与だけが残る・付与だけが無い、という途中の状態を作らないため）。
+ */
+export const bindingDoc = <R extends ResourceRef>(params: {
+  principal: Principal;
+  role: RoleForResource<R["type"]>;
+  resource: R;
+}) => {
   const { principal, role, resource } = params;
 
   // 型でも弾いているが、CLI のように実行時に組み立てる経路があるので確かめる
@@ -63,26 +87,17 @@ export const grant = async <R extends ResourceRef>(params: {
     throw new Error("subject と resource に | は使えません");
   }
 
-  const ref = firestore
-    .collection(COLLECTION)
-    .doc(bindingId(subjectKey, role, resourceKey));
-
-  try {
-    await ref.create({
+  return {
+    ref: firestore
+      .collection(COLLECTION)
+      .doc(bindingId(subjectKey, role, resourceKey)),
+    data: {
       subject: subjectKey,
       role,
       resource: resourceKey,
       created_at: FieldValue.serverTimestamp(),
-    });
-
-    return "created";
-  } catch (err) {
-    if (isAlreadyExists(err)) {
-      return "already_granted";
-    }
-
-    throw err;
-  }
+    },
+  };
 };
 
 export type RevokeResult = "deleted" | "not_granted";

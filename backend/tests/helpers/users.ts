@@ -33,3 +33,24 @@ export const login = async (user: UserRecord) => {
 
   return parsed.data;
 };
+
+/** 匿名サインインする。端末が /display を開いたときと同じ */
+export const loginAnonymously = async () => {
+  const res = await fetch(
+    "http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=dummy",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ returnSecureToken: true }),
+    },
+  ).then((res) => res.json());
+
+  const parsed = LoginResultSchema.extend({ localId: z.string() }).safeParse(
+    res,
+  );
+  if (!parsed.success) {
+    throw new Error("Failed to parse anonymous sign-up response");
+  }
+
+  return { ...parsed.data, uid: parsed.data.localId };
+};
