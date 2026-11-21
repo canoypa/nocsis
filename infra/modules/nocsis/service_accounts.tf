@@ -10,7 +10,7 @@ locals {
     }
     "backend-runtime" = {
       display_name = "backend runtime"
-      description  = "Cloud Run の backend が実行時に使う。Firestore とログ、ソースマップの読み取り、OPENWEATHERMAP_TOKEN / CALENDAR_ACCOUNT_KEY のみ。"
+      description  = "Cloud Run の backend が実行時に使う。Firestore とログ、Auth のユーザーの読み取り・更新・削除、ソースマップの読み取り、OPENWEATHERMAP_TOKEN / CALENDAR_ACCOUNT_KEY のみ。"
     }
     "functions-runtime" = {
       display_name = "functions runtime"
