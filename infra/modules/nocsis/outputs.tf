@@ -14,8 +14,6 @@ output "import_ids" {
       if !contains([
         "roles/errorreporting.viewer serviceAccount:${var.claude_readonly_email}",
         "roles/iam.workloadIdentityPoolViewer serviceAccount:${var.claude_readonly_email}",
-        "projects/${var.project_id}/roles/authUserRemover serviceAccount:backend-runtime@${var.project_id}.iam.gserviceaccount.com",
-        "projects/${var.project_id}/roles/authUserRemover serviceAccount:functions-runtime@${var.project_id}.iam.gserviceaccount.com",
       ], k)
     }
     # 取り込みの後に足した API は除く。まだ無効な環境で取り込もうとすると plan が落ちる。
