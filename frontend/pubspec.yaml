@@ -60,7 +60,7 @@ flutter:
   assets:
     - assets/images/weather/
     - assets/images/Icon-192.png
-    - assets/images/google.svg
+    - assets/images/google/google.png
 
   fonts:
     - family: CustomIcons

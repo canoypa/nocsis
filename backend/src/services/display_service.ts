@@ -43,7 +43,7 @@ const toDisplay = (doc: FirebaseFirestore.DocumentSnapshot): Display => ({
  * 端末用のコードを発行する。1台につき使えるコードは1つだけにし、前のコードは消す。
  *
  * コードの総当たりで得られるのは「待っている端末を自分のグループに入れること」だけ
- * （登録には access.create が要る）。それも外した回数で止める。
+ * （登録には role_binding.create が要る）。それも外した回数で止める。
  */
 export const issuePairing = async (
   uid: string,

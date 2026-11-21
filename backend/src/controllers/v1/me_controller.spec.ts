@@ -68,9 +68,10 @@ describe("MeController", () => {
               "member.create",
               "member.update",
               "member.delete",
-              "access.read",
-              "access.create",
-              "access.delete",
+              "role_binding.read",
+              "role_binding.create",
+              "role_binding.delete",
+              "display.update",
             ],
           },
           {
