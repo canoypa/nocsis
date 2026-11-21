@@ -180,6 +180,7 @@ class _LoginFormState extends State<LoginForm> {
               Image.asset(
                 "assets/images/google/google.png",
                 width: 20,
+                height: 20,
                 excludeFromSemantics: true,
               ),
               const SizedBox(width: 10),
