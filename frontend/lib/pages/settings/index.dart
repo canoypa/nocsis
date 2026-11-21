@@ -424,6 +424,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
           TextField(
             autofocus: true,
             controller: passwordController,
+            autofillHints: const [AutofillHints.newPassword],
             decoration: InputDecoration(
               labelText: '新しいパスワード',
               border: const OutlineInputBorder(),
