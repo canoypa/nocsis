@@ -15,6 +15,7 @@ class UserAvatar extends ConsumerWidget {
         foregroundImage: user!.photoURL != null
             ? NetworkImage(user.photoURL!)
             : null,
+        onForegroundImageError: (_, _) {},
         child: user.displayName != null
             ? Text(user.displayName![0])
             : const Icon(Symbols.person),
