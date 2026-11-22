@@ -179,14 +179,14 @@ describe("Events Controller", () => {
       expect(Array.isArray(json.items)).toBe(true);
     });
 
-    it("時刻のあるイベントは、日時で返すこと", async () => {
+    it("時刻のあるイベントは、Google の日時を書き換えずに返すこと", async () => {
       mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
         items: [
           {
             id: "meeting",
             summary: "説明会",
-            start: { dateTime: "2024-01-01T01:00:00Z" },
-            end: { dateTime: "2024-01-01T02:30:00Z" },
+            start: { dateTime: "2024-01-01T10:00:00+05:30" },
+            end: { dateTime: "2024-01-01T11:30:00+09:00" },
           },
         ],
       });
@@ -206,10 +206,10 @@ describe("Events Controller", () => {
         items: [
           {
             id: "meeting",
-            startAt: "2024-01-01T01:00:00Z",
-            endAt: "2024-01-01T02:30:00Z",
-            start: { dateTime: "2024-01-01T01:00:00Z" },
-            end: { dateTime: "2024-01-01T02:30:00Z" },
+            startAt: "2024-01-01T10:00:00+05:30",
+            endAt: "2024-01-01T11:30:00+09:00",
+            start: { dateTime: "2024-01-01T10:00:00+05:30" },
+            end: { dateTime: "2024-01-01T11:30:00+09:00" },
             title: "説明会",
             isAllDay: false,
           },
