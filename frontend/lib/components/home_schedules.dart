@@ -7,6 +7,7 @@ import 'package:nocsis/providers/cron.dart';
 import 'package:nocsis/providers/events.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
+import 'package:nocsis/extensions/event_date.dart';
 
 @Dependencies([currentGroupId])
 class HomeSchedules extends ConsumerWidget {
@@ -90,10 +91,6 @@ class HomeSchedules extends ConsumerWidget {
                 ),
               ),
               ...events.items.map((e) {
-                final DateTime? startDate = DateTime.tryParse(
-                  e.startAt as String,
-                );
-
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,8 +100,7 @@ class HomeSchedules extends ConsumerWidget {
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                     Text(
-                      // utc なので表示用にローカルに変換
-                      eventDateFormatter.format(startDate!.toLocal()),
+                      eventDateFormatter.format(e.startDate),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),

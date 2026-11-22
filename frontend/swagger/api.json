@@ -249,6 +249,24 @@
         ],
         "description": "教室ディスプレイの更新に使う JSON データ"
       },
+      "EventTime": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "description": "終日の予定の日付",
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "dateTime": {
+            "description": "時刻のある予定の日時",
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          }
+        },
+        "additionalProperties": false
+      },
       "Event": {
         "type": "object",
         "properties": {
@@ -286,6 +304,14 @@
             ],
             "description": "終了日時"
           },
+          "start": {
+            "$ref": "#/components/schemas/EventTime",
+            "description": "イベントの日付か日時。どちらか一方だけが入る"
+          },
+          "end": {
+            "$ref": "#/components/schemas/EventTime",
+            "description": "終了。終日の予定は翌日の日付で、その日を含まない"
+          },
           "title": {
             "type": "string",
             "description": "タイトル"
@@ -307,6 +333,8 @@
           "id",
           "startAt",
           "endAt",
+          "start",
+          "end",
           "title",
           "isAllDay"
         ],
