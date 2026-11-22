@@ -85,7 +85,6 @@ class EventsView extends ConsumerWidget {
         }
 
         return ListView.builder(
-          controller: ScrollController(),
           itemCount: monthGroups.length,
           itemBuilder: (c, i) {
             final monthGroup = monthGroups[i];
