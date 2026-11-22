@@ -131,7 +131,7 @@ void main() {
   });
 
   group('イベント', () {
-    testWidgets('これからのイベントを月ごとにまとめて出す', (tester) async {
+    testWidgets('これからのイベントを日付つきで出す', (tester) async {
       await pump(tester, const EventsView(), {
         _events: {
           'items': [
@@ -141,10 +141,8 @@ void main() {
         },
       });
 
-      expect(find.text('05月'), findsOneWidget);
       expect(find.text('5月20日'), findsOneWidget);
       expect(find.text('文化祭'), findsOneWidget);
-      expect(find.text('06月'), findsOneWidget);
       expect(find.text('6月3日'), findsOneWidget);
       expect(find.text('体育祭'), findsOneWidget);
     });
