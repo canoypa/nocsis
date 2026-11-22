@@ -225,6 +225,23 @@ void main() {
     expect(controller.text, '987654');
   });
 
+  testWidgets('空の1マス目で 1234567 を貼り付けると 123456 になる', (tester) async {
+    await pump(tester);
+
+    await type(tester, '1234567');
+
+    expect(controller.text, '123456');
+  });
+
+  testWidgets('1 の後の2マス目で 1234567 を貼り付けると 112345 になる', (tester) async {
+    await pump(tester);
+    await type(tester, '1');
+
+    await type(tester, '1234567');
+
+    expect(controller.text, '112345');
+  });
+
   testWidgets('数字以外を含む貼り付けは、何もしない', (tester) async {
     await pump(tester);
     await type(tester, '12');
