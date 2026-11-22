@@ -80,6 +80,32 @@ void main() {
     expect(find.text('taro.google@example.com'), findsOneWidget);
   });
 
+  testWidgets('スマホの幅ではボタンを見出しの下に回し、はみ出さない', (tester) async {
+    await pumpSettings(tester, googleUser(), width: 360);
+
+    expect(tester.takeException(), isNull);
+    for (final (label, button) in [
+      ('メールアドレス', '変更する'),
+      ('Google', '別アカウントと連携する'),
+      ('パスワード', '設定する'),
+    ]) {
+      expect(
+        tester.getTopLeft(find.text(button)).dy,
+        greaterThan(tester.getBottomLeft(find.text(label)).dy),
+        reason: label,
+      );
+    }
+  });
+
+  testWidgets('ログイン方法は Google、パスワードの順に並べる', (tester) async {
+    await pumpSettings(tester, googleUser());
+
+    expect(
+      tester.getTopLeft(find.text('Google')).dy,
+      lessThan(tester.getTopLeft(find.text('パスワード')).dy),
+    );
+  });
+
   Finder passwordRowButton(String label) => find.descendant(
     of: find.ancestor(of: find.text('パスワード'), matching: find.byType(Row)),
     matching: find.text(label),
