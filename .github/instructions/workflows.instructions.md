@@ -18,4 +18,4 @@ paths:
 
 `deploy_prod.yml` の `needs` から lint / test を外さない。ruleset の required status check は admin が bypass できる。「lint / test を通ったものだけが本番に出る」をリポジトリ内で保証できるのは、この `needs` だけ。
 
-`deploy_stg.yml` は速さを優先して、backend と frontend のデプロイは lint / test を待たない。ただし functions のデプロイ (Firestore のルールとインデックスを含む) は待つ。`workflow_dispatch` は PR を経由しないので、ルールがテストを通らずに Staging の実データへ出るのを止められるのはこの `needs` だけ。
+`deploy_stg.yml` は速さを優先して、backend と frontend のデプロイは lint / test を待たない。ただし functions のデプロイは待つ。ここで Firestore のルールも出るので、テストを通っていないルールで本物のアカウントがある Staging のデータを開けないようにする。`workflow_dispatch` は PR を経由しないので、それを止められるのはこの `needs` だけ。
