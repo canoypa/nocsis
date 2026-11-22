@@ -44,32 +44,21 @@ class _GoogleSwapStateNotifier extends Notifier<_GoogleSwapState> {
   _GoogleSwapState build() => _GoogleSwapState.idle;
 
   void set(_GoogleSwapState value) => state = value;
-
-  void finishChoosing() {
-    if (state == _GoogleSwapState.choosing) state = _GoogleSwapState.idle;
-  }
 }
 
-/// Google のアカウント選択を開き、選んだアカウントに連携を差し替える
-Future<_ReplaceResult> _replaceGoogleAccount(
-  BuildContext context,
-  WidgetRef ref, {
-  VoidCallback? onPicked,
-}) async {
-  // onPicked でダイアログを閉じると ref が使えなくなるので、container を通す
-  final container = ProviderScope.containerOf(context, listen: false);
-  final user = container.read(authenticatedUserProvider);
-  final messenger = ScaffoldMessenger.of(context);
-  final clientFuture = container.read(apiClientProvider.future);
+bool _loggedInRecently(DateTime? authTime) =>
+    authTime != null && DateTime.now().difference(authTime) < _recentLogin;
 
-  final accessToken = await pickGoogleAccountToken();
-  if (accessToken == null) return _ReplaceResult.cancelled;
-
-  onPicked?.call();
+/// 選んだアカウントに連携を差し替える
+Future<_ReplaceResult> _submitGoogleAccount(
+  ProviderContainer container,
+  ScaffoldMessengerState messenger,
+  String accessToken,
+) async {
   final swapState = container.read(_googleSwapStateProvider.notifier);
   swapState.set(_GoogleSwapState.replacing);
   try {
-    final client = await clientFuture;
+    final client = await container.read(apiClientProvider.future);
     final response = await client.apiV1MeGoogleAccountPut(
       body: GoogleAccountPutJson(accessToken: accessToken),
     );
@@ -90,12 +79,12 @@ Future<_ReplaceResult> _replaceGoogleAccount(
       throw Exception('Google account replace failed: ${response.statusCode}');
     }
 
-    await user.reload();
+    await container.read(authenticatedUserProvider).reload();
     container.invalidate(currentUserProvider);
     messenger.showSnackBar(const SnackBar(content: Text('Google の連携を変更しました。')));
     return _ReplaceResult.replaced;
   } finally {
-    swapState.set(_GoogleSwapState.idle);
+    swapState.set(_GoogleSwapState.choosing);
   }
 }
 
@@ -110,28 +99,40 @@ class SettingsTopPage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
   ) async {
-    final authTime = ref.read(_authTimeProvider).value;
-    final recentlyLoggedIn =
-        authTime != null && DateTime.now().difference(authTime) < _recentLogin;
+    final container = ProviderScope.containerOf(context, listen: false);
+    final messenger = ScaffoldMessenger.of(context);
     final swapState = ref.read(_googleSwapStateProvider.notifier);
     swapState.set(_GoogleSwapState.choosing);
 
     try {
       // ポップアップは押した直後にしか開けないので、アカウント選択より前に await しない
-      if (recentlyLoggedIn &&
-          await _replaceGoogleAccount(context, ref) !=
-              _ReplaceResult.requiresRecentLogin) {
-        return;
+      String? accessToken;
+      if (_loggedInRecently(ref.read(_authTimeProvider).value)) {
+        accessToken = await pickGoogleAccountToken();
+        if (accessToken == null) return;
       }
-      if (!context.mounted) return;
 
-      await showDialog<void>(
-        context: context,
-        builder: (_) => const _ReplaceGoogleAccountDialog(),
-      );
+      while (true) {
+        if (accessToken == null) {
+          if (!context.mounted) return;
+          accessToken = await showDialog<String>(
+            context: context,
+            builder: (_) => const _ReplaceGoogleAccountDialog(),
+          );
+          if (accessToken == null) return;
+        }
+
+        final result = await _submitGoogleAccount(
+          container,
+          messenger,
+          accessToken,
+        );
+        // 選んでいる間にログインから時間がたったときは、再ログインからやり直す
+        if (result != _ReplaceResult.requiresRecentLogin) return;
+        accessToken = null;
+      }
     } finally {
-      // 選んでダイアログが閉じたあとは、差し替えが終わるまで replacing のまま
-      swapState.finishChoosing();
+      swapState.set(_GoogleSwapState.idle);
     }
   }
 
@@ -577,17 +578,15 @@ class _ReplaceGoogleAccountDialogState
     setState(() => reauthenticating = false);
   }
 
+  /// 選んだアカウントのアクセストークンを返して閉じる
   Future<void> _pick() async {
-    final messenger = ScaffoldMessenger.of(context);
-    final result = await _replaceGoogleAccount(
-      context,
-      ref,
-      onPicked: () => Navigator.of(context).pop(),
-    );
-    // 再認証した直後なので、選ぶまでに5分を過ぎたときだけ起きる
-    if (result == _ReplaceResult.requiresRecentLogin) {
-      messenger.showSnackBar(const SnackBar(content: Text('連携を変更できませんでした。')));
+    if (!_loggedInRecently(ref.read(_authTimeProvider).value)) {
+      setState(() => reauthenticating = true);
+      return;
     }
+    final accessToken = await pickGoogleAccountToken();
+    if (accessToken == null || !mounted) return;
+    Navigator.of(context).pop(accessToken);
   }
 
   @override
