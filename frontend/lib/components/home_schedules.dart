@@ -90,10 +90,6 @@ class HomeSchedules extends ConsumerWidget {
                 ),
               ),
               ...events.items.map((e) {
-                final DateTime? startDate = DateTime.tryParse(
-                  e.startAt as String,
-                );
-
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,7 +100,7 @@ class HomeSchedules extends ConsumerWidget {
                     ),
                     Text(
                       // utc なので表示用にローカルに変換
-                      eventDateFormatter.format(startDate!.toLocal()),
+                      eventDateFormatter.format(e.startAt.toLocal()),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),

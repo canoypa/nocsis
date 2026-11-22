@@ -36,9 +36,7 @@ final eventsProvider = FutureProvider.family<List<MonthEventGroup>, String>((
 
     // 月毎にグループ化
     final monthGroups = groupBy(events, (Event event) {
-      final DateTime? startDate = DateTime.tryParse(event.startAt as String)
-          ?.toLocal();
-      return DateFormat('yyyy-MM').format(startDate!);
+      return DateFormat('yyyy-MM').format(event.startAt.toLocal());
     });
 
     // MonthEventGroupのリストに変換
@@ -99,10 +97,6 @@ class EventsView extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
                         children: monthGroup.items.map((event) {
-                          final DateTime? startDate = DateTime.tryParse(
-                            event.startAt as String,
-                          );
-
                           return BasicCard(
                             primary: Text(
                               event.title,
@@ -110,7 +104,8 @@ class EventsView extends ConsumerWidget {
                             ),
                             // TODO: 日を跨いだりする場合の表示に対応する
                             secondary: Text(
-                              DateFormat("M月d日").format(startDate!.toLocal()),
+                              DateFormat("M月d日")
+                                  .format(event.startAt.toLocal()),
                             ),
                           );
                         }).toList(),
