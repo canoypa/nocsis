@@ -245,6 +245,14 @@ void main() {
     expect(find.text('続けるには、もう一度ログインしてください。'), findsOneWidget);
   });
 
+  testWidgets('タブレットの幅では、見出しをコンソールと同じ大きさにする', (tester) async {
+    await pumpSettings(tester, googleUser(), width: 1000);
+    final textTheme = Theme.of(tester.element(find.text('設定'))).textTheme;
+
+    expect(tester.widget<Text>(find.text('設定')).style, textTheme.headlineLarge);
+    expect(tester.widget<Text>(find.text('アカウント')).style, textTheme.titleLarge);
+  });
+
   group('スマホの幅', () {
     testWidgets('メールアドレスの変更は全画面で開き、閉じるボタンで閉じられる', (tester) async {
       await pumpSettings(tester, googleUser(), width: 599);

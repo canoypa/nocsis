@@ -6,6 +6,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/login_form.dart';
+import 'package:nocsis/components/page_title.dart';
 import 'package:nocsis/core/google_account_token.dart';
 import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
@@ -159,19 +160,9 @@ class SettingsTopPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '設定',
-              style: compact
-                  ? Theme.of(context).textTheme.headlineLarge
-                  : Theme.of(context).textTheme.displayMedium,
-            ),
+            const PageTitle('設定'),
             const SizedBox(height: 48),
-            Text(
-              'アカウント',
-              style: compact
-                  ? Theme.of(context).textTheme.titleLarge
-                  : Theme.of(context).textTheme.headlineMedium,
-            ),
+            const SectionTitle('アカウント'),
             const SizedBox(height: 24),
             Container(
               width: double.infinity,
@@ -204,12 +195,7 @@ class SettingsTopPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 48),
-            Text(
-              'ログイン',
-              style: compact
-                  ? Theme.of(context).textTheme.titleLarge
-                  : Theme.of(context).textTheme.headlineMedium,
-            ),
+            const SectionTitle('ログイン'),
             const SizedBox(height: 24),
             Container(
               decoration: BoxDecoration(
