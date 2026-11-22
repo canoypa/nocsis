@@ -1,7 +1,5 @@
 import { readFileSync } from "node:fs";
 import {
-  assertFails,
-  assertSucceeds,
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from "@firebase/rules-unit-testing";
@@ -15,7 +13,14 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { afterAll, beforeAll, beforeEach, describe, test } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from "vitest";
 
 const mine = {
   subject: "user:device",
@@ -64,55 +69,69 @@ const db = (uid?: string) =>
 
 describe("role_bindings", () => {
   test("自分の付与は、1件でも絞り込んだ一覧でも読める", async () => {
-    await assertSucceeds(getDoc(doc(db("device"), "role_bindings/mine")));
-    await assertSucceeds(
+    await expect(
+      getDoc(doc(db("device"), "role_bindings/mine")),
+    ).resolves.toBeDefined();
+    await expect(
       getDocs(
         query(
           collection(db("device"), "role_bindings"),
           where("subject", "==", "user:device"),
         ),
       ),
-    );
+    ).resolves.toBeDefined();
   });
 
   test("他人の付与は読めない", async () => {
-    await assertFails(getDoc(doc(db("device"), "role_bindings/others")));
-    await assertFails(
+    await expect(
+      getDoc(doc(db("device"), "role_bindings/others")),
+    ).rejects.toMatchObject({ code: "permission-denied" });
+    await expect(
       getDocs(
         query(
           collection(db("device"), "role_bindings"),
           where("subject", "==", "user:someone"),
         ),
       ),
-    );
+    ).rejects.toMatchObject({ code: "permission-denied" });
   });
 
   test("絞り込まない一覧は読めない", async () => {
-    await assertFails(getDocs(collection(db("device"), "role_bindings")));
+    await expect(
+      getDocs(collection(db("device"), "role_bindings")),
+    ).rejects.toMatchObject({ code: "permission-denied" });
   });
 
   test("サインインしていなければ読めない", async () => {
-    await assertFails(getDoc(doc(db(), "role_bindings/mine")));
+    await expect(getDoc(doc(db(), "role_bindings/mine"))).rejects.toMatchObject(
+      { code: "permission-denied" },
+    );
   });
 
   test("自分の付与でも書き換え・削除・作成はできない", async () => {
-    await assertFails(
+    await expect(
       setDoc(doc(db("device"), "role_bindings/mine"), {
         ...mine,
         role: "roles/group.admin",
       }),
-    );
-    await assertFails(deleteDoc(doc(db("device"), "role_bindings/mine")));
-    await assertFails(
+    ).rejects.toMatchObject({ code: "permission-denied" });
+    await expect(
+      deleteDoc(doc(db("device"), "role_bindings/mine")),
+    ).rejects.toMatchObject({ code: "permission-denied" });
+    await expect(
       setDoc(doc(db("device"), "role_bindings/new"), {
         ...mine,
         resource: "group:g2",
       }),
-    );
+    ).rejects.toMatchObject({ code: "permission-denied" });
   });
 });
 
 test("ほかのコレクションは読み書きできない", async () => {
-  await assertFails(getDoc(doc(db("device"), "groups/g1")));
-  await assertFails(setDoc(doc(db("device"), "groups/g2"), { name: "g2" }));
+  await expect(getDoc(doc(db("device"), "groups/g1"))).rejects.toMatchObject({
+    code: "permission-denied",
+  });
+  await expect(
+    setDoc(doc(db("device"), "groups/g2"), { name: "g2" }),
+  ).rejects.toMatchObject({ code: "permission-denied" });
 });
