@@ -13,13 +13,26 @@ paths:
 
 ## 外から見える結果で確かめる
 
-画面なら表示される文言と操作、API ならレスポンスのステータスと本文で確かめる。内部の関数が何回呼ばれたか、provider がどう組まれているかは見ない。実装を組み替えただけでテストが落ちると、落ちたことが壊れたことの合図にならない。外部への呼び出しそのものが結果のとき（Google に問い合わせたか、通知を送ったか）は、回数を見てよい。
+- 画面: 表示される文言と、ボタンなどの操作
+- API: レスポンスのステータスと本文
 
-## 偽物は外部との境目にだけ置く
+内部の関数の呼び出し回数や、provider の組み方は確かめない。実装を組み替えただけで落ちるテストになる。
 
-backend は Firestore と Auth を、functions は `src/{controllers,services}` のテストで Firestore をエミュレータで本物として動かす。偽物にするのは、Google Calendar や天気 API のような外部サービスへの呼び出し（backend は msw）と、frontend から見た API クライアントと Firebase Auth（firebase_auth_mocks）だけ。
+ただし、外部への呼び出し自体が結果のとき（Google に問い合わせたか、通知を送ったか）は、回数を確かめてよい。
 
-エミュレータでは起こせない失敗（Auth の更新エラーなど）を起こすときだけ、内部を spy してよい。既存のテストには内部のサービスを `vi.mock` しているものが残っているが、真似しない。
+## モックは外部サービスにだけ使う
+
+次はエミュレータで動かし、モックにしない。
+
+- backend: Firestore と Auth
+- functions: `src/{controllers,services}` のテストの Firestore
+
+モックにするのは次だけ。
+
+- 外部サービス（Google Calendar、天気 API など）。backend は msw を使う
+- frontend の API クライアントと Firebase Auth（firebase_auth_mocks）
+
+エミュレータで起こせない失敗（Auth の更新エラーなど）を試すときだけ、内部を spy してよい。内部のサービスを `vi.mock` している既存のテストは、真似しない。
 
 ## バグを見つけたら、先に再現するテストを書く
 
@@ -27,4 +40,4 @@ backend は Firestore と Auth を、functions は `src/{controllers,services}` 
 
 ## テストの中で分岐しない
 
-`if` で expect を飛ばすと、その経路を通ったときに何も確かめずに通る。条件ごとにテストを分ける。backend と functions は biome の `useExpect`・`noConditionalExpect`・`noFocusedTests`・`noSkippedTests` で検査している。
+`if` の中に expect を置くと、その条件を通らなかったときに何も確かめずに通る。条件ごとにテストを分ける。
