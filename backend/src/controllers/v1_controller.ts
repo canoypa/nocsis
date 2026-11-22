@@ -7,6 +7,7 @@ import { displaysRoutes } from "./v1/displays_controller.js";
 import { eventsRoutes } from "./v1/events_controller.js";
 import { groupRoutes } from "./v1/group_controller.js";
 import { meRoutes } from "./v1/me_controller.js";
+import { membersRoutes } from "./v1/members_controller.js";
 import { userRoutes } from "./v1/user_controller.js";
 import { weatherRoutes } from "./v1/weather_controller.js";
 
@@ -17,6 +18,7 @@ v1Routes.route("/groups", classesRoutes);
 v1Routes.route("/groups", daydutRoutes);
 v1Routes.route("/groups", displaysRoutes);
 v1Routes.route("/groups", eventsRoutes);
+v1Routes.route("/groups", membersRoutes);
 v1Routes.route("/groups", weatherRoutes);
 v1Routes.route("/display-pairings", displayPairingsRoutes);
 v1Routes.route("/me", meRoutes);
