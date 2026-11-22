@@ -242,12 +242,21 @@ void main() {
     expect(controller.text, '112345');
   });
 
+  testWidgets('貼り付けた文字の前後の空白と改行は除く', (tester) async {
+    await pump(tester);
+
+    await type(tester, ' 123456\n');
+
+    expect(controller.text, '123456');
+  });
+
   testWidgets('数字以外を含む貼り付けは、何もしない', (tester) async {
     await pump(tester);
     await type(tester, '12');
 
     await type(tester, 'abc');
     await type(tester, '987-654');
+    await type(tester, '123 456');
 
     expect(controller.text, '12');
     expect(selectedBox(tester), 2);
