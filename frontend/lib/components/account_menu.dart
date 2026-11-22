@@ -31,35 +31,35 @@ class AccountMenu extends ConsumerWidget {
         );
       },
       menuChildren: [
-        ListTile(
-          title: const Text("設定"),
-          onTap: () => SettingsTopPageRoute(groupId).go(context),
+        MenuItemButton(
+          onPressed: () => SettingsTopPageRoute(groupId).go(context),
+          child: const Text("設定"),
         ),
-        ListTile(
-          title: const Text("ログアウト"),
-          onTap: () {
+        MenuItemButton(
+          onPressed: () {
             FirebaseAuth.instance.signOut();
           },
+          child: const Text("ログアウト"),
         ),
         if (canOpen(ConsoleTopPageRoute.path, granted) ||
             canOpen(ClassroomPageRoute.path, granted))
           const Divider(),
         if (canOpen(ConsoleTopPageRoute.path, granted))
-          ListTile(
-            title: const Text("管理コンソール"),
-            onTap: () => ConsoleTopPageRoute(groupId).go(context),
+          MenuItemButton(
+            onPressed: () => ConsoleTopPageRoute(groupId).go(context),
+            child: const Text("管理コンソール"),
           ),
         if (canOpen(ClassroomPageRoute.path, granted))
-          ListTile(
-            title: const Text("教室ディスプレイを表示"),
-            onTap: () => ClassroomPageRoute(groupId).go(context),
+          MenuItemButton(
+            onPressed: () => ClassroomPageRoute(groupId).go(context),
+            child: const Text("教室ディスプレイを表示"),
           ),
         const Divider(),
-        ListTile(
-          title: const Text("ライセンス"),
-          onTap: () {
+        MenuItemButton(
+          onPressed: () {
             const LicensesPageRoute().go(context);
           },
+          child: const Text("ライセンス"),
         ),
       ],
     );
