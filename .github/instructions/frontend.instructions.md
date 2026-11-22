@@ -26,10 +26,11 @@ paths:
 
 ブラウザの戻るで閉じられるように、ダイアログは go_router の子ルートにする。例は `lib/routes/settings/settings_top_page_route.dart`。
 
-- ルートの `buildPage` で `DialogPage` を返し、`$parentNavigatorKey` を `rootNavigatorKey` にする
+- ルートの `buildPage` で `DialogPage` を返す
+- `$parentNavigatorKey` を `rootNavigatorKey` にする。付けないとシェルルートの中に開き、ドロワーやナビゲーションの上に重ならない
 - 開くときは `push` を使う。`go` は後ろの画面ごと作り直すので、開くときのフェードが飛ぶ
 - 閉じるときは `closeDialog` を使う。`Navigator.pop` で閉じると、閉じた状態が履歴に積まれ、戻るでまた開く
-- 呼び出し元に結果を返せないので、確定の処理はダイアログの中で行う
+- `closeDialog` は履歴を戻して閉じるので、`push` の戻り値で結果を受け取れない。確定の処理 (保存や削除) はダイアログの中で行う
 
 ## 間は spacing でとる
 
@@ -37,11 +38,11 @@ paths:
 
 要素のあいだに `SizedBox` を挟んで個別に調整するのは避ける。挟みたくなったら、まとまりの分け方を見直す。
 
-## 画面を足したら、ルーター経由でも開く
+## 画面を足したら、本物のルーターで URL を開くテストも書く
 
-ウィジェットを直接 pump するテストに加えて、`routerProvider` を通して URL を開き、その URL に留まることを確かめるテストを 1 つ書く (`test/routes/router_test.dart` の `pumpRouter`)。
+画面のウィジェットを `pumpWidget` するテストとは別に、`routerProvider` でその画面の URL を開き、その URL に留まることを確かめるテストを 1 つ書く (`test/routes/router_test.dart` の `pumpRouter`)。
 
-go_router の子ルートは、親の画面も下に作る。親の `initState` が遷移すると、子の画面がすぐ消える。ウィジェット単体のテストでは、これは見つからない。
+ウィジェットだけを開くテストは、リダイレクトや親子のルートを通らない。たとえば子ルートにした画面は、その URL を開くと親ルートの画面も下に作られる。親の画面が `initState` で別の URL に移る作りだと、子の画面は開いてすぐ消える。この不具合は、ウィジェットだけのテストでは見つからない。
 
 ## 文字数は見たとおりに数える
 
