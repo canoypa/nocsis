@@ -10,6 +10,10 @@ resource "google_identity_platform_config" "this" {
     phone_number {
       enabled = false
     }
+    # 教室ディスプレイの端末が使う。使われなくなったアカウントは functions の定期実行が消す
+    anonymous {
+      enabled = true
+    }
   }
 
   lifecycle {

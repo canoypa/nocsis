@@ -68,7 +68,7 @@ displaysRoutes
     }),
     validator("param", groupParamSchema),
     authentication,
-    authorize("access.read", groupOf("groupId")),
+    authorize("role_binding.read", groupOf("groupId")),
     async (c) => {
       const groupId = c.req.param("groupId");
       await assertGroupExists(groupId);
@@ -97,7 +97,7 @@ displaysRoutes
     }),
     validator("param", groupParamSchema),
     authentication,
-    authorize("access.create", groupOf("groupId")),
+    authorize("role_binding.create", groupOf("groupId")),
     // 権限の無い相手に、本文の検証結果 (400) を先に返さない
     validator("json", displayCreateJsonSchema),
     async (c) => {
@@ -142,8 +142,7 @@ displaysRoutes
     }),
     validator("param", displayParamSchema),
     authentication,
-    // 名前は登録の一部。access に update は無いので、登録と同じ権限で変える
-    authorize("access.create", groupOf("groupId")),
+    authorize("display.update", groupOf("groupId")),
     validator("json", displayPatchJsonSchema),
     async (c) => {
       const { groupId, displayId } = c.req.param();
@@ -173,7 +172,7 @@ displaysRoutes
     }),
     validator("param", displayParamSchema),
     authentication,
-    authorize("access.delete", groupOf("groupId")),
+    authorize("role_binding.delete", groupOf("groupId")),
     async (c) => {
       const { groupId, displayId } = c.req.param();
       await assertGroupExists(groupId);

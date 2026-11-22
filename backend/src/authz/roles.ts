@@ -11,10 +11,12 @@ export const PERMISSIONS = [
   "member.create",
   "member.update",
   "member.delete",
-  // 権限を配る能力。招待も表示端末の登録もこれ。付けるか外すかなので update は無い
-  "access.read",
-  "access.create",
-  "access.delete",
+  // role_binding は付けるか外すかなので update は無い
+  "role_binding.read",
+  "role_binding.create",
+  "role_binding.delete",
+
+  "display.update",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
@@ -45,9 +47,10 @@ export const ROLES = {
       "member.create",
       "member.update",
       "member.delete",
-      "access.read",
-      "access.create",
-      "access.delete",
+      "role_binding.read",
+      "role_binding.create",
+      "role_binding.delete",
+      "display.update",
     ],
   },
 } as const satisfies Record<
