@@ -55,7 +55,10 @@ class SettingsLayout extends ConsumerWidget {
                   borderRadius: const BorderRadius.all(Radius.circular(28)),
                 ),
                 child: _scrollable(
-                  padding: EdgeInsets.all(sizeClass < .large ? 24 : 64),
+                  padding: EdgeInsets.all(switch (sizeClass) {
+                    .large => 64,
+                    _ => 24,
+                  }),
                 ),
               ),
             ),
