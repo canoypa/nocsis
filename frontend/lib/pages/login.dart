@@ -6,7 +6,7 @@ import 'package:nocsis/components/login_form.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  void _passwordLogin(
+  Future<bool> _passwordLogin(
     BuildContext context,
     String email,
     String password,
@@ -16,6 +16,7 @@ class LoginPage extends StatelessWidget {
         email: email,
         password: password,
       );
+      return true;
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -29,6 +30,7 @@ class LoginPage extends StatelessWidget {
           ),
         );
       }
+      return false;
     }
   }
 
@@ -54,19 +56,22 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact =
+        MediaQuery.sizeOf(context).width < LoginForm.mediumBreakpoint;
+
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(48),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              LoginForm(
-                onGoogleLogin: () => _googleLogin(context),
-                onPasswordLogin: (email, password) =>
-                    _passwordLogin(context, email, password),
-              ),
-            ],
+      body: SafeArea(
+        child: Align(
+          alignment: compact ? Alignment.topCenter : Alignment.center,
+          child: SingleChildScrollView(
+            padding: compact
+                ? const EdgeInsets.fromLTRB(16, 48, 16, 24)
+                : const EdgeInsets.all(24),
+            child: LoginForm(
+              onGoogleLogin: () => _googleLogin(context),
+              onPasswordLogin: (email, password) =>
+                  _passwordLogin(context, email, password),
+            ),
           ),
         ),
       ),

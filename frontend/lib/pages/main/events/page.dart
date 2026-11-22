@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +8,7 @@ import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
+import 'package:nocsis/extensions/event_date.dart';
 
 // 月毎のイベントグループ
 class MonthEventGroup {
@@ -36,9 +38,7 @@ final eventsProvider = FutureProvider.family<List<MonthEventGroup>, String>((
 
     // 月毎にグループ化
     final monthGroups = groupBy(events, (Event event) {
-      final DateTime? startDate = DateTime.tryParse(event.startAt as String)
-          ?.toLocal();
-      return DateFormat('yyyy-MM').format(startDate!);
+      return DateFormat('yyyy-MM').format(event.startDate);
     });
 
     // MonthEventGroupのリストに変換
@@ -57,6 +57,13 @@ final eventsProvider = FutureProvider.family<List<MonthEventGroup>, String>((
   }
 });
 
+String _monthHeading(String yearMonth) {
+  final month = DateTime.parse('$yearMonth-01');
+  return month.year == DateTime.now().year
+      ? DateFormat('M月').format(month)
+      : DateFormat('yy年M月').format(month);
+}
+
 @Dependencies([currentGroupId])
 class EventsView extends ConsumerWidget {
   const EventsView({super.key});
@@ -72,13 +79,12 @@ class EventsView extends ConsumerWidget {
           return const Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [Icon(Icons.event_available_outlined), Text("予定なし")],
+              children: [Icon(Symbols.event_available), Text("予定なし")],
             ),
           );
         }
 
         return ListView.builder(
-          controller: ScrollController(),
           itemCount: monthGroups.length,
           itemBuilder: (c, i) {
             final monthGroup = monthGroups[i];
@@ -88,15 +94,11 @@ class EventsView extends ConsumerWidget {
                 constraints: const BoxConstraints(maxWidth: 800),
                 child: Column(
                   children: [
-                    ListTile(title: Text("${monthGroup.month.split('-')[1]}月")),
+                    ListTile(title: Text(_monthHeading(monthGroup.month))),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
                         children: monthGroup.items.map((event) {
-                          final DateTime? startDate = DateTime.tryParse(
-                            event.startAt as String,
-                          );
-
                           return BasicCard(
                             primary: Text(
                               event.title,
@@ -104,7 +106,7 @@ class EventsView extends ConsumerWidget {
                             ),
                             // TODO: 日を跨いだりする場合の表示に対応する
                             secondary: Text(
-                              DateFormat("M月d日").format(startDate!.toLocal()),
+                              DateFormat("M月d日").format(event.startDate),
                             ),
                           );
                         }).toList(),
@@ -121,7 +123,16 @@ class EventsView extends ConsumerWidget {
         return const Center(child: Text('Something went wrong'));
       },
       loading: () {
-        return const Center(child: CircularProgressIndicator());
+        return Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: const SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: BasicCardListSkeleton(),
+            ),
+          ),
+        );
       },
     );
   }

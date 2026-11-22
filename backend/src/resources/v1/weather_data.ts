@@ -15,8 +15,12 @@ export const weatherDataSchema = z
 
     hourly: z
       .object({
-        temp: z.array(z.number()).meta({ description: "8時間先までの気温" }),
-        pop: z.array(z.number()).meta({ description: "8時間先までの降水確率" }),
+        temp: z
+          .array(z.number())
+          .meta({ description: "3時間ごと、24時間先までの気温" }),
+        pop: z
+          .array(z.number())
+          .meta({ description: "3時間ごと、24時間先までの降水確率" }),
       })
       .meta({ description: "時間別天気予報" }),
 
@@ -24,7 +28,7 @@ export const weatherDataSchema = z
     threeHour: z
       .array(WeatherNameSchema)
       .length(3)
-      .meta({ description: "3時間先までの天気" }),
+      .meta({ description: "6・9・12時間先の天気" }),
   })
   .meta({
     $id: "WeatherData",

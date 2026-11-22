@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/components/page_title.dart';
 
 class ConsoleCalendarPage extends StatelessWidget {
   const ConsoleCalendarPage({super.key});
@@ -12,14 +13,11 @@ class ConsoleCalendarPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('カレンダー', style: Theme.of(context).textTheme.displayMedium),
+            const PageTitle('カレンダー'),
             const SizedBox(height: 24),
             const Text('授業とイベントを管理します。'),
             const SizedBox(height: 48),
-            Text(
-              'Google カレンダーへのアクセス設定',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            const SectionTitle('Google カレンダーへのアクセス設定'),
             const SizedBox(height: 24),
             const Text(
               'Nocsis がカレンダーにアクセスして授業/イベントを取得できるようにするために、以下のサービスアカウントを対象の Google カレンダーに追加してください。',
@@ -34,7 +32,7 @@ class ConsoleCalendarPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 48),
-            Text('授業', style: Theme.of(context).textTheme.headlineMedium),
+            const SectionTitle('授業'),
             const SizedBox(height: 24),
             const Text('授業を管理している Google カレンダーの ID を入力してください。'),
             const SizedBox(height: 24),
@@ -47,7 +45,7 @@ class ConsoleCalendarPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 48),
-            Text('イベント', style: Theme.of(context).textTheme.headlineMedium),
+            const SectionTitle('イベント'),
             const SizedBox(height: 24),
             const Text('イベントを管理している Google カレンダーの ID を入力してください。'),
             const SizedBox(height: 24),

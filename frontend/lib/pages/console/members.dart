@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/components/page_title.dart';
 
 class ConsoleMemberPage extends StatelessWidget {
   const ConsoleMemberPage({super.key});
@@ -12,7 +13,7 @@ class ConsoleMemberPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('メンバー', style: Theme.of(context).textTheme.displayMedium),
+            const PageTitle('メンバー'),
             const SizedBox(height: 24),
             const Text('グループのメンバーを管理します。'),
             const SizedBox(height: 48),

@@ -11,10 +11,6 @@ on:
         description: "Image built by reusable-build_backend.yml"
         required: true
         type: string
-      tag:
-        description: "Cloud Run revision tag (omit for production)"
-        required: false
-        type: string
       promote:
         description: "Promote to latest traffic after deploy"
         required: false
@@ -64,8 +60,7 @@ jobs:
             --region asia-northeast1 \
             --service-account backend-runtime@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
             --update-env-vars GOOGLE_CLOUD_PROJECT=${{ vars.GCP_PROJECT_ID }} \
-            --no-traffic \
-            ${{ inputs.tag && format('--tag {0}', inputs.tag) || '' }}
+            --no-traffic
       - name: Set Traffic
         if: ${{ inputs.promote }}
         run: gcloud run services update-traffic backend --to-latest --project ${{ vars.GCP_PROJECT_ID }} --region asia-northeast1

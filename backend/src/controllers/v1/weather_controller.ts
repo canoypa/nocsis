@@ -13,8 +13,8 @@ import { groupSchema } from "../../resources/v1/groups.js";
 import { weatherDataSchema } from "../../resources/v1/weather_data.js";
 import {
   fetchWeather,
-  getWeatherNameById,
-} from "../../services/open_weather_map_service.js";
+  getWeatherNameByCode,
+} from "../../services/open_meteo_service.js";
 
 export const weatherRoutes = new Hono<AuthorizedEnv>();
 
@@ -71,14 +71,14 @@ weatherRoutes.get(
     const lat = group.weather_point.lat;
     const lon = group.weather_point.lon;
 
-    const openWeatherData = await fetchWeather({ lat, lon });
+    const weatherData = await fetchWeather({ lat, lon });
 
     const current = {
-      temp: openWeatherData.current.temp,
-      name: getWeatherNameById(openWeatherData.current.weather[0].id),
+      temp: weatherData.current.temp,
+      name: getWeatherNameByCode(weatherData.current.weatherCode),
     };
 
-    const hourly = openWeatherData.hourly.slice(0, 9).reduce(
+    const hourly = weatherData.hourly.slice(0, 9).reduce(
       (p, v) => {
         p.temp.push(Math.round(v.temp));
         p.pop.push(v.pop);
@@ -87,9 +87,9 @@ weatherRoutes.get(
       { temp: [] as number[], pop: [] as number[] },
     );
 
-    const threeHour = openWeatherData.hourly
+    const threeHour = weatherData.hourly
       .slice(1, 4)
-      .map((v) => getWeatherNameById(v.weather[0].id));
+      .map((v) => getWeatherNameByCode(v.weatherCode));
 
     return c.json<WeatherDataResponse>({ current, hourly, threeHour });
   },

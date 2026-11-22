@@ -5,13 +5,9 @@ import type { LoginResult } from "../../../tests/helpers/users.js";
 import { login } from "../../../tests/helpers/users.js";
 import { auth, firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
-import * as openWeatherMapServiceModule from "../../services/open_weather_map_service.js";
+import * as openMeteoServiceModule from "../../services/open_meteo_service.js";
 
 afterEach(clearBindings);
-
-vi.mock("../../services/secret_manager_service.js", () => ({
-  fetchSecret: vi.fn().mockResolvedValue("mock-secret"),
-}));
 
 describe("WeatherController", () => {
   describe("GET /api/v1/groups/:groupId/weather/now", () => {
@@ -40,17 +36,17 @@ describe("WeatherController", () => {
     });
 
     it("気象情報のデータを取得できる", async () => {
-      vi.spyOn(openWeatherMapServiceModule, "fetchWeather").mockResolvedValue({
-        current: { temp: 20, weather: [{ id: 800, main: "Clear" }] },
+      vi.spyOn(openMeteoServiceModule, "fetchWeather").mockResolvedValue({
+        current: { temp: 20, weatherCode: 0 },
         hourly: [
-          { temp: 21, pop: 0.0, weather: [{ id: 803, main: "Clouds" }] },
-          { temp: 22, pop: 0.1, weather: [{ id: 803, main: "Clouds" }] },
-          { temp: 23, pop: 0.2, weather: [{ id: 803, main: "Clouds" }] },
-          { temp: 24, pop: 0.3, weather: [{ id: 803, main: "Clouds" }] },
-          { temp: 25, pop: 0.4, weather: [{ id: 803, main: "Clouds" }] },
-          { temp: 26, pop: 0.5, weather: [{ id: 803, main: "Clouds" }] },
-          { temp: 27, pop: 0.6, weather: [{ id: 803, main: "Clouds" }] },
-          { temp: 28, pop: 0.7, weather: [{ id: 803, main: "Clouds" }] },
+          { temp: 21, pop: 0.0, weatherCode: 3 },
+          { temp: 22, pop: 0.1, weatherCode: 3 },
+          { temp: 23, pop: 0.2, weatherCode: 3 },
+          { temp: 24, pop: 0.3, weatherCode: 3 },
+          { temp: 25, pop: 0.4, weatherCode: 3 },
+          { temp: 26, pop: 0.5, weatherCode: 3 },
+          { temp: 27, pop: 0.6, weatherCode: 3 },
+          { temp: 28, pop: 0.7, weatherCode: 3 },
         ],
       });
 

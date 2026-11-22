@@ -8,7 +8,9 @@ paths:
 
 ## Firestore に直接アクセスしない
 
-`firestore.rules` はクライアント経路を全拒否し、backend と functions が Admin SDK で迂回する前提。必要なデータは Firestore を直接読むのではなく、backend の REST API に生やす（Hosting の `/api/**` が Cloud Run に rewrite される）。
+`firestore.rules` はクライアント経路を拒否し、backend と functions が Admin SDK で迂回する前提。必要なデータは Firestore を直接読むのではなく、backend の REST API に生やす（Hosting の `/api/**` が Cloud Run に rewrite される）。
+
+例外は、教室ディスプレイが自分の付与（`role_bindings` の subject が自分）を購読することだけ。登録の解除にすぐ気づくためで、読める範囲はルールで本人の付与に限っている。
 
 ## 生成物が git に入っていない
 

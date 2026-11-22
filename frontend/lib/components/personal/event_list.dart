@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
+import 'package:nocsis/extensions/event_date.dart';
 
 class EventListView extends StatelessWidget {
   final List<Event> items;
@@ -19,18 +20,9 @@ class EventListView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: (items).map((data) {
-              // FIXME: swagger-dart-code-generator の制限により anyOf が dynamic 型になってしまうので、String として扱う
-              final DateTime? startDate = DateTime.tryParse(
-                data.startAt as String,
-              )?.toLocal();
-
-              final String dateText = startDate != null
-                  ? DateFormat("M月d日").format(startDate)
-                  : "日時不明";
-
               return BasicCard(
                 primary: Text(data.title),
-                secondary: Text(dateText),
+                secondary: Text(DateFormat("M月d日").format(data.startDate)),
               );
             }).toList(),
           ),

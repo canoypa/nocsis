@@ -119,9 +119,9 @@ classesRoutes.get(
     assert(events.items, "イベントが存在しません。");
 
     const classes = events.items.map((item, index) => {
-      // Google Calendar から取得した日時を DateTime で統一処理
-      const startDate = item.start?.dateTime || item.start?.date;
-      const endDate = item.end?.dateTime || item.end?.date;
+      // 終日の予定を授業に数えると、後ろの時限がずれる
+      const startDate = item.start?.dateTime;
+      const endDate = item.end?.dateTime;
 
       if (!startDate || !endDate) {
         throw new HTTPException(500, {
@@ -143,7 +143,7 @@ classesRoutes.get(
       return classSchema.parse({
         startAt: startAt.toISO(),
         endAt: endAt.toISO(),
-        title: item.summary,
+        title: item.summary || "",
         period: index + 1,
       });
     });

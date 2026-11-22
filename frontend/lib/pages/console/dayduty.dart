@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/components/page_title.dart';
 
 class ConsoleDayDutyPage extends StatelessWidget {
   const ConsoleDayDutyPage({super.key});
@@ -12,11 +13,11 @@ class ConsoleDayDutyPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('日直', style: Theme.of(context).textTheme.displayMedium),
+            const PageTitle('日直'),
             const SizedBox(height: 24),
             const Text('日直の確認や周期の設定を行えます。'),
             const SizedBox(height: 48),
-            Text('開始日の設定', style: Theme.of(context).textTheme.headlineMedium),
+            const SectionTitle('開始日の設定'),
             const SizedBox(height: 24),
             const Text(
               '出席番号1番の人が日直になる日付を入力してください。この日が基準になり、翌日は出席番号2番の人が日直になります。',

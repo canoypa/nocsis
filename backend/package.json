@@ -7,6 +7,7 @@
     "build": "tsup src/main.ts --clean --format esm --sourcemap",
     "generate-openapi": "tsx scripts/generate_openapi.ts",
     "grant": "tsx scripts/grant.ts",
+    "revoke": "tsx scripts/revoke.ts",
     "ci": "biome ci",
     "test": "firebase emulators:exec --project demo-nocsis 'pnpm vitest run --coverage'",
     "test:watch": "vitest watch --coverage",
@@ -15,27 +16,29 @@
   "dependencies": {
     "@google-cloud/secret-manager": "^8.0.0",
     "@googleapis/calendar": "^20.2.0",
-    "@hono/node-server": "^2.1.8",
+    "@hono/node-server": "^2.1.9",
     "@hono/standard-validator": "^0.4.1",
     "@jridgewell/trace-mapping": "^0.3.31",
-    "@scalar/hono-api-reference": "^0.12.20",
+    "@scalar/hono-api-reference": "^0.12.22",
     "firebase-admin": "^14.5.1",
     "google-auth-library": "^11.3.4",
-    "hono": "^4.13.18",
+    "hono": "^4.13.19",
     "hono-openapi": "^1.5.0",
     "luxon": "^3.7.2",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.8",
+    "@firebase/rules-unit-testing": "^6.0.0",
     "@types/luxon": "^3.7.6",
     "@types/node": "^24.19.2",
-    "@vitest/coverage-v8": "5.1.0",
+    "@vitest/coverage-v8": "5.1.1",
+    "firebase": "^13.4.0",
     "firebase-tools": "^15.36.0",
-    "msw": "^3.0.6",
+    "msw": "^3.0.7",
     "tsup": "^9.0.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.0",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   }
 }

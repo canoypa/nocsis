@@ -2,7 +2,13 @@ import { firestore } from "../clients/firebase.js";
 import { COLLECTION } from "./binding.js";
 import { type Principal, subject } from "./principal.js";
 import { ancestors, type ResourceRef, serialize } from "./resource.js";
-import { isRoleName, type Permission, permissionsOf } from "./roles.js";
+import {
+  isRoleName,
+  PERMISSIONS,
+  type Permission,
+  permissionsOf,
+  ROLES,
+} from "./roles.js";
 
 /**
  * 判定結果。通した場合は「どの binding で通ったか」を持つ。
@@ -57,17 +63,16 @@ export const can = async (
 };
 
 /**
- * permission を持っている、ある型のリソースの ID 一覧。「自分のグループ一覧」のように、
- * 判定する相手が先に決まっていないときに使う。
+ * ある型のリソースごとに、持っている permission をまとめる。「自分のグループ一覧」のように、
+ * 判定する相手が先に決まっていないときに使う。複数のロールがあれば和集合にする。
  *
  * 祖先への付与はまだ無い（ancestors が自分だけを返す）ので、直接の binding だけを見る。
  * 祖先に付与できるようになったら、ここも祖先から辿る。
  */
-export const resourceIdsWith = async (
+export const permissionsByResource = async (
   principal: Principal,
-  permission: Permission,
   type: ResourceRef["type"],
-): Promise<string[]> => {
+): Promise<Map<string, Permission[]>> => {
   const snapshot = await firestore
     .collection(COLLECTION)
     .where("subject", "==", subject(principal))
@@ -75,17 +80,48 @@ export const resourceIdsWith = async (
     .get();
 
   const prefix = `${type}:`;
-  const ids = snapshot.docs.flatMap((doc) => {
+  const granted = new Map<string, Set<Permission>>();
+
+  for (const doc of snapshot.docs) {
     const { role, resource } = doc.data();
 
-    return isRoleName(role) &&
-      permissionsOf(role).includes(permission) &&
-      typeof resource === "string" &&
-      resource.startsWith(prefix)
-      ? [resource.slice(prefix.length)]
-      : [];
-  });
+    if (
+      !isRoleName(role) ||
+      ROLES[role].scope !== type ||
+      typeof resource !== "string" ||
+      !resource.startsWith(prefix)
+    ) {
+      continue;
+    }
 
-  // 同じリソースに複数のロールがあると重なる
-  return [...new Set(ids)];
+    // 壊れた行1つで、呼び出し側の doc(id) が全体ごと例外にならないようにする
+    const id = resource.slice(prefix.length);
+    if (id === "" || id.includes("/")) {
+      continue;
+    }
+
+    const permissions = granted.get(id) ?? new Set();
+    for (const permission of permissionsOf(role)) {
+      permissions.add(permission);
+    }
+    granted.set(id, permissions);
+  }
+
+  // ROLES の順ではなく PERMISSIONS の順にそろえ、ロールの組み合わせで並びが変わらないようにする
+  return new Map(
+    [...granted].map(([id, permissions]) => [
+      id,
+      PERMISSIONS.filter((permission) => permissions.has(permission)),
+    ]),
+  );
 };
+
+/** permission を持っている、ある型のリソースの ID 一覧 */
+export const resourceIdsWith = async (
+  principal: Principal,
+  permission: Permission,
+  type: ResourceRef["type"],
+): Promise<string[]> =>
+  [...(await permissionsByResource(principal, type))].flatMap(
+    ([id, permissions]) => (permissions.includes(permission) ? [id] : []),
+  );

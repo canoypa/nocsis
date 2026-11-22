@@ -1,4 +1,5 @@
 import assert from "node:assert";
+import type { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
@@ -14,6 +15,11 @@ import {
 } from "../../middlewares/authorize.js";
 import { eventSchema } from "../../resources/v1/events.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
+
+const toEventTime = (time: CalendarV3.Schema$EventDateTime | undefined) =>
+  time?.dateTime
+    ? { dateTime: time.dateTime }
+    : { date: time?.date ?? undefined };
 
 export const eventsRoutes = new Hono<AuthorizedEnv>();
 
@@ -128,16 +134,24 @@ eventsRoutes.get(
     });
     assert(events.items, "イベントが存在しません。");
 
-    const eventItems = events.items.map((item) => {
-      return eventSchema.parse({
+    // 1件の不備で、ほかの予定まで見えなくしない
+    const eventItems = events.items.flatMap((item) => {
+      const result = eventSchema.safeParse({
         id: item.id,
         startAt: item.start?.dateTime || item.start?.date,
         endAt: item.end?.dateTime || item.end?.date,
+        start: toEventTime(item.start),
+        end: toEventTime(item.end),
         title: item.summary || "",
         description: item.description,
         location: item.location,
         isAllDay: !item.start?.dateTime, // dateTimeがない場合は終日イベント
       });
+      if (!result.success) {
+        console.warn("イベントを返せないので除きます:", item.id, result.error);
+        return [];
+      }
+      return [result.data];
     });
 
     return c.json<EventsResponse>({

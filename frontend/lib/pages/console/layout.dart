@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:nocsis/custom_icons.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/templates/drawer_layout.dart';
@@ -20,6 +21,7 @@ class ConsoleLayout extends ConsumerWidget {
     '/console/day_duty': 4,
     '/console/weather': 5,
     '/console/slack': 6,
+    '/console/displays': 7,
   };
 
   int _getNavigationIndex(BuildContext context) {
@@ -46,39 +48,44 @@ class ConsoleLayout extends ConsumerWidget {
       },
       navigationItems: const [
         NavigationDrawerDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home),
+          icon: Icon(Symbols.home),
+          selectedIcon: Icon(Symbols.home, fill: 1),
           label: Text('ホーム'),
         ),
         NavigationDrawerDestination(
-          icon: Icon(Icons.workspaces_outlined),
-          selectedIcon: Icon(Icons.workspaces),
+          icon: Icon(Symbols.workspaces),
+          selectedIcon: Icon(Symbols.workspaces, fill: 1),
           label: Text('グループ'),
         ),
         NavigationDrawerDestination(
-          icon: Icon(Icons.group_outlined),
-          selectedIcon: Icon(Icons.group),
+          icon: Icon(Symbols.group),
+          selectedIcon: Icon(Symbols.group, fill: 1),
           label: Text('メンバー'),
         ),
         NavigationDrawerDestination(
-          icon: Icon(Icons.calendar_today_outlined),
-          selectedIcon: Icon(Icons.calendar_today),
+          icon: Icon(Symbols.calendar_today),
+          selectedIcon: Icon(Symbols.calendar_today, fill: 1),
           label: Text('カレンダー'),
         ),
         NavigationDrawerDestination(
-          icon: Icon(Icons.person_pin_outlined),
-          selectedIcon: Icon(Icons.person_pin_rounded),
+          icon: Icon(Symbols.person_pin),
+          selectedIcon: Icon(Symbols.person_pin, fill: 1),
           label: Text('日直'),
         ),
         NavigationDrawerDestination(
-          icon: Icon(Icons.wb_sunny_outlined),
-          selectedIcon: Icon(Icons.wb_sunny),
+          icon: Icon(Symbols.wb_sunny),
+          selectedIcon: Icon(Symbols.wb_sunny, fill: 1),
           label: Text('気象データ連携'),
         ),
         NavigationDrawerDestination(
           icon: Icon(CustomIcons.slack_outlined),
           selectedIcon: Icon(CustomIcons.slack),
           label: Text('Slack 連携'),
+        ),
+        NavigationDrawerDestination(
+          icon: Icon(Symbols.tv),
+          selectedIcon: Icon(Symbols.tv, fill: 1),
+          label: Text('教室ディスプレイ'),
         ),
       ],
       child: child,

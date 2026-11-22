@@ -1,19 +1,26 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:flutter/services.dart';
 
 class LoginForm extends StatefulWidget {
-  static const _defaultFormTitle = 'ログイン';
-  static const _defaultFormDescription = 'Nocsis を使用するには、ログインする必要があります。';
+  /// Material 3 の breakpoint の境目
+  static const mediumBreakpoint = 600.0;
+  static const expandedBreakpoint = 840.0;
+
+  /// 大きい画面で入力欄やボタンが横に間延びしないよう、中身の幅を抑える
+  static const maxWidth = 412.0;
 
   final String title;
-  final String description;
+  final String? description;
   final VoidCallback onGoogleLogin;
-  final void Function(String email, String password) onPasswordLogin;
+
+  /// ログインできたら true を返す。true のときだけパスワードマネージャーに保存を促す。
+  final Future<bool> Function(String email, String password) onPasswordLogin;
 
   const LoginForm({
     super.key,
-    this.title = _defaultFormTitle,
-    this.description = _defaultFormDescription,
+    this.title = 'ログイン',
+    this.description,
     required this.onGoogleLogin,
     required this.onPasswordLogin,
   });
@@ -39,9 +46,9 @@ class _LoginFormState extends State<LoginForm> {
 
   IconData _passwordVisibilityIcon() {
     if (invisiblePassword) {
-      return Icons.visibility_off_outlined;
+      return Symbols.visibility_off;
     } else {
-      return Icons.visibility_outlined;
+      return Symbols.visibility;
     }
   }
 
@@ -61,63 +68,141 @@ class _LoginFormState extends State<LoginForm> {
     return null;
   }
 
-  void _onEmailAndPasswordFormSubmitted(String email, String password) {
-    if (_formKey.currentState!.validate()) {
-      widget.onPasswordLogin(email, password);
+  @override
+  void dispose() {
+    _passwordFocusNode.dispose();
+    emailFieldController.dispose();
+    passwordFieldController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onEmailAndPasswordFormSubmitted(
+    String email,
+    String password,
+  ) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (await widget.onPasswordLogin(email, password)) {
+      TextInput.finishAutofillContext();
     }
   }
 
   Widget _intro() {
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset("assets/images/Icon-192.png", width: 64),
-          const SizedBox(height: 16),
-          Text(widget.title, style: Theme.of(context).textTheme.displaySmall),
-          const SizedBox(height: 24),
-          Text(
-            widget.description,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-        ],
-      ),
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < LoginForm.mediumBreakpoint;
+    final expanded = width >= LoginForm.expandedBreakpoint;
+    final description = widget.description;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: compact ? 40 : 24,
+      children: [
+        Row(
+          spacing: 16,
+          children: [
+            Image.asset(
+              "assets/images/Icon-192.png",
+              width: 40,
+              excludeFromSemantics: true,
+            ),
+            Text('Nocsis', style: textTheme.titleMedium),
+          ],
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8,
+          children: [
+            // M3 の既定の字間は欧文向けで、和文では間延びする
+            Text(
+              widget.title,
+              style:
+                  (expanded ? textTheme.displaySmall : textTheme.headlineSmall)
+                      ?.copyWith(letterSpacing: 0),
+            ),
+            if (description != null)
+              Text(
+                description,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _form() {
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 24,
-        children: [
-          OutlinedButton(
-            onPressed: widget.onGoogleLogin,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset("assets/images/google.svg", width: 18),
-                const SizedBox(width: 8),
-                const Text("Google で続行"),
-              ],
-            ),
-          ),
-          Text(
+  Widget _orDivider() {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        const Expanded(child: Divider()),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
             'または',
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            style: textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
-          Form(
-            key: _formKey,
+        ),
+        const Expanded(child: Divider()),
+      ],
+    );
+  }
+
+  Widget _actions() {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // G ロゴは色付きの背景に置けないので、tonal ではなく surface の塗りにする
+        OutlinedButton(
+          onPressed: widget.onGoogleLogin,
+          style: OutlinedButton.styleFrom(
+            backgroundColor: colorScheme.surface,
+            foregroundColor: colorScheme.onSurface,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                "assets/images/google/google.png",
+                width: 20,
+                height: 20,
+                excludeFromSemantics: true,
+              ),
+              const SizedBox(width: 10),
+              const Text("Google で続行"),
+            ],
+          ),
+        ),
+        const SizedBox(height: 32),
+        _orDivider(),
+        const SizedBox(height: 32),
+        Form(
+          key: _formKey,
+          child: AutofillGroup(
+            // 既定の commit だと、失敗した入力や Google でのログインでも保存を促してしまう
+            onDisposeAction: AutofillContextAction.cancel,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 24,
               children: [
                 TextFormField(
                   controller: emailFieldController,
-                  autofillHints: const [AutofillHints.email],
+                  autofillHints: const [AutofillHints.username],
+                  keyboardType: TextInputType.emailAddress,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -150,39 +235,35 @@ class _LoginFormState extends State<LoginForm> {
                     );
                   },
                 ),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () {
-                      _onEmailAndPasswordFormSubmitted(
-                        emailFieldController.text,
-                        passwordFieldController.text,
-                      );
-                    },
-                    child: const Text('ログイン'),
-                  ),
-                ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 24),
+        FilledButton(
+          onPressed: () {
+            _onEmailAndPasswordFormSubmitted(
+              emailFieldController.text,
+              passwordFieldController.text,
+            );
+          },
+          child: const Text('ログイン'),
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      ),
-      constraints: const BoxConstraints(maxWidth: 1200),
-      padding: const EdgeInsets.all(64),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 48,
-        children: [_intro(), _form()],
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: LoginForm.maxWidth),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 32,
+          children: [_intro(), _actions()],
+        ),
       ),
     );
   }

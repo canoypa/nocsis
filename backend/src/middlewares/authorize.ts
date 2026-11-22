@@ -2,6 +2,7 @@ import assert from "node:assert";
 import type { Context, MiddlewareHandler } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
+import { COMPOSED_HANDLER } from "hono/utils/constants";
 import { can } from "../authz/check.js";
 import { type Principal, subject, user } from "../authz/principal.js";
 import { group, type ResourceRef, serialize } from "../authz/resource.js";
@@ -30,6 +31,42 @@ export const groupOf =
   };
 
 /**
+ * ルートが認可をどう宣言したか。付け忘れの検査（routes.spec.ts）が読む。
+ * ミドルウェアは関数なので、関数そのものに紐付けて持つ。
+ */
+export type AuthorizationDeclaration =
+  | { kind: "permission"; permission: Permission }
+  | { kind: "skip"; reason: string };
+
+const declarations = new WeakMap<object, AuthorizationDeclaration>();
+
+export const declarationOf = (
+  handler: unknown,
+): AuthorizationDeclaration | undefined => {
+  if (typeof handler !== "function") return undefined;
+
+  // サブアプリに onError があると、route() はハンドラを包み、元を COMPOSED_HANDLER に置く
+  const original: unknown = Reflect.get(handler, COMPOSED_HANDLER) ?? handler;
+
+  return typeof original === "function"
+    ? declarations.get(original)
+    : undefined;
+};
+
+/**
+ * リソースへの認可を行わないことの宣言。何もしない。
+ * 「自分の binding から導く」のように、判定する相手が先に決まっていないルートに置く。
+ */
+export const skipAuthorization = (reason: string): MiddlewareHandler => {
+  const middleware = createMiddleware(async (_c, next) => {
+    await next();
+  });
+  declarations.set(middleware, { kind: "skip", reason });
+
+  return middleware;
+};
+
+/**
  * 強制点（PEP）。`authentication` の後ろに置く。
  *
  * 404 と 403 は `reason` から派生させる。リソース型ごとの対応表は作らない
@@ -38,8 +75,8 @@ export const groupOf =
 export const authorize = (
   permission: Permission,
   resolve: (c: Context<AuthorizedEnv>) => ResourceRef,
-): MiddlewareHandler<AuthorizedEnv> =>
-  createMiddleware<AuthorizedEnv>(async (c, next) => {
+): MiddlewareHandler<AuthorizedEnv> => {
+  const middleware = createMiddleware<AuthorizedEnv>(async (c, next) => {
     const uid = c.get("currentUserId");
     assert(uid);
 
@@ -73,6 +110,10 @@ export const authorize = (
 
     await next();
   });
+  declarations.set(middleware, { kind: "permission", permission });
+
+  return middleware;
+};
 
 export const getPrincipal = (c: Context<AuthorizedEnv>): Principal => {
   const principal = c.get("principal");

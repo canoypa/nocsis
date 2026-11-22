@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { firestore } from "../clients/firebase.js";
-import { bindingId, COLLECTION, grant } from "./binding.js";
+import { bindingId, COLLECTION, grant, revoke } from "./binding.js";
 import { user } from "./principal.js";
 import { group } from "./resource.js";
 
@@ -121,5 +121,50 @@ describe("grant", () => {
     ).rejects.toThrow();
 
     expect((await bindings.get()).empty).toBe(true);
+  });
+});
+
+describe("revoke", () => {
+  it("指定したロールの付与だけを消すこと", async () => {
+    const principal = user("test_user_1");
+    const resource = group("test_group_1");
+    await grant({ principal, role: "roles/group.display", resource });
+    await grant({ principal, role: "roles/group.viewer", resource });
+
+    expect(
+      await revoke({ principal, role: "roles/group.display", resource }),
+    ).toBe("deleted");
+
+    const remaining = await bindings.get();
+    expect(remaining.docs.map((doc) => doc.get("role"))).toEqual([
+      "roles/group.viewer",
+    ]);
+  });
+
+  it("doc ID がハッシュでない行も消すこと", async () => {
+    await bindings.add({
+      subject: "user:test_user_1",
+      role: "roles/group.display",
+      resource: "group:test_group_1",
+    });
+
+    expect(
+      await revoke({
+        principal: user("test_user_1"),
+        role: "roles/group.display",
+        resource: group("test_group_1"),
+      }),
+    ).toBe("deleted");
+    expect((await bindings.get()).empty).toBe(true);
+  });
+
+  it("付与が無ければ何も消さずに知らせること", async () => {
+    expect(
+      await revoke({
+        principal: user("test_user_1"),
+        role: "roles/group.display",
+        resource: group("test_group_1"),
+      }),
+    ).toBe("not_granted");
   });
 });

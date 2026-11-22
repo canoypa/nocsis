@@ -1,14 +1,143 @@
 import 'package:animations/animations.dart';
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/login_form.dart';
+import 'package:nocsis/components/page_title.dart';
+import 'package:nocsis/core/google_account_token.dart';
 import 'package:nocsis/custom_icons.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
+import 'package:nocsis/providers/api_client.dart';
+import 'package:nocsis/providers/firebase.dart';
 import 'package:nocsis/providers/user.dart';
+import 'package:nocsis/routes/dialog_page.dart';
+import 'package:nocsis/routes/router.dart';
+
+/// backend が再認証を求めるまでの時間。backend より少し短くして、選んだあとに弾かれにくくする
+const _recentLogin = Duration(minutes: 4);
+
+/// 最後にログイン (再認証を含む) した時刻
+final _authTimeProvider = StreamProvider.autoDispose<DateTime?>(
+  (ref) => ref
+      .watch(firebaseAuthProvider)
+      .idTokenChanges()
+      .asyncMap((user) async => (await user?.getIdTokenResult())?.authTime),
+);
+
+enum _ReplaceResult { replaced, cancelled, requiresRecentLogin }
+
+enum _GoogleSwapState {
+  idle,
+
+  /// 再ログインかアカウントの選択の途中
+  choosing,
+
+  /// 選んだアカウントへの差し替えを待っている
+  replacing,
+}
+
+final _googleSwapStateProvider =
+    NotifierProvider<_GoogleSwapStateNotifier, _GoogleSwapState>(
+      _GoogleSwapStateNotifier.new,
+    );
+
+class _GoogleSwapStateNotifier extends Notifier<_GoogleSwapState> {
+  @override
+  _GoogleSwapState build() => _GoogleSwapState.idle;
+
+  void set(_GoogleSwapState value) => state = value;
+}
+
+bool _loggedInRecently(DateTime? authTime) =>
+    authTime != null && DateTime.now().difference(authTime) < _recentLogin;
+
+/// 選んだアカウントに連携を差し替える
+Future<_ReplaceResult> _submitGoogleAccount(
+  ProviderContainer container,
+  ScaffoldMessengerState messenger,
+  String accessToken,
+) async {
+  final swapState = container.read(_googleSwapStateProvider.notifier);
+  swapState.set(_GoogleSwapState.replacing);
+  try {
+    final client = await container.read(apiClientProvider.future);
+    final response = await client.apiV1MeGoogleAccountPut(
+      body: GoogleAccountPutJson(accessToken: accessToken),
+    );
+
+    if (response.statusCode == 403 &&
+        response.bodyString.contains('requires-recent-login')) {
+      return _ReplaceResult.requiresRecentLogin;
+    }
+    if (response.statusCode == 409 &&
+        response.bodyString.contains('linked-to-another-user')) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('この Google アカウントはすでに別のユーザーと連携されています。')),
+      );
+      return _ReplaceResult.cancelled;
+    }
+    if (!response.isSuccessful) {
+      messenger.showSnackBar(const SnackBar(content: Text('連携を変更できませんでした。')));
+      throw Exception('Google account replace failed: ${response.statusCode}');
+    }
+
+    await container.read(authenticatedUserProvider).reload();
+    container.invalidate(currentUserProvider);
+    messenger.showSnackBar(const SnackBar(content: Text('Google の連携を変更しました。')));
+    return _ReplaceResult.replaced;
+  } finally {
+    swapState.set(_GoogleSwapState.choosing);
+  }
+}
+
+final _googleAccountPickerLoadedProvider = FutureProvider.autoDispose(
+  (ref) => loadGoogleAccountPicker(),
+);
+
+String _groupId(BuildContext context) =>
+    GoRouterState.of(context).pathParameters['groupId']!;
 
 class SettingsTopPage extends ConsumerWidget {
   const SettingsTopPage({super.key});
+
+  Future<void> _onReplaceGoogleAccountPressed(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final container = ProviderScope.containerOf(context, listen: false);
+    final messenger = ScaffoldMessenger.of(context);
+    final swapState = ref.read(_googleSwapStateProvider.notifier);
+    swapState.set(_GoogleSwapState.choosing);
+
+    final router = GoRouter.of(context);
+    final dialog = ReplaceGoogleAccountDialogRoute(_groupId(context));
+
+    try {
+      if (!_loggedInRecently(ref.read(_authTimeProvider).value)) {
+        dialog.push(context);
+        return;
+      }
+
+      // ポップアップは押した直後にしか開けないので、アカウント選択より前に await しない
+      final accessToken = await pickGoogleAccountToken();
+      if (accessToken == null) return;
+
+      final result = await _submitGoogleAccount(
+        container,
+        messenger,
+        accessToken,
+      );
+      // 選んでいる間にログインから時間がたったときは、再ログインからやり直す
+      if (result == _ReplaceResult.requiresRecentLogin) {
+        router.push(dialog.location);
+      }
+    } finally {
+      swapState.set(_GoogleSwapState.idle);
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,9 +147,11 @@ class SettingsTopPage extends ConsumerWidget {
         .firstWhereOrNull((e) => e.providerId == GoogleAuthProvider.PROVIDER_ID)
         ?.email;
 
-    final hasNonGoogleLoginProvider = user.providerData.any(
-      (e) => e.providerId != GoogleAuthProvider.PROVIDER_ID,
-    );
+    final pickerLoaded = ref.watch(_googleAccountPickerLoadedProvider).hasValue;
+    final swapState = ref.watch(_googleSwapStateProvider);
+    final replacing = swapState == _GoogleSwapState.replacing;
+    ref.watch(_authTimeProvider);
+    final compact = MediaQuery.sizeOf(context).width < 600;
 
     return Align(
       alignment: Alignment.topLeft,
@@ -29,13 +160,22 @@ class SettingsTopPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('設定', style: Theme.of(context).textTheme.displayMedium),
+            const PageTitle('設定'),
             const SizedBox(height: 48),
-            Text('アカウント', style: Theme.of(context).textTheme.headlineMedium),
+            const SectionTitle('アカウント'),
             const SizedBox(height: 24),
-            Row(
-              children: [
-                Column(
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: _ActionRow(
+                compact: compact,
+                content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -46,26 +186,16 @@ class SettingsTopPage extends ConsumerWidget {
                     Text(user.email ?? ''),
                   ],
                 ),
-                const Spacer(),
-                OutlinedButton(
+                action: TextButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return ChangeEmailDialog(
-                          onSubmit: () {
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      },
-                    );
+                    ChangeEmailDialogRoute(_groupId(context)).push(context);
                   },
                   child: const Text('変更する'),
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: 48),
-            Text('ログイン', style: Theme.of(context).textTheme.headlineMedium),
+            const SectionTitle('ログイン'),
             const SizedBox(height: 24),
             Container(
               decoration: BoxDecoration(
@@ -76,52 +206,35 @@ class SettingsTopPage extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  Container(
+                  Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.password),
-                        const SizedBox(width: 8),
-                        const Text('パスワード'),
-                        const Spacer(),
-                        TextButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return ChangePasswordDialog(
-                                  onSubmit: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                );
-                              },
-                            );
-                          },
-                          child:
-                              user.providerData.any(
-                                (e) => e.providerId == 'password',
-                              )
-                              ? const Text('変更する')
-                              : const Text('設定する'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Divider(),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(CustomIcons.google),
-                            const SizedBox(width: 16),
-                            Column(
+                    child: _ActionRow(
+                      compact: compact,
+                      content: Row(
+                        children: [
+                          const Icon(CustomIcons.google),
+                          const SizedBox(width: 16),
+                          Flexible(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text('Google'),
-                                if (googleEmail != null)
+                                if (replacing)
+                                  // メールアドレスの行と同じ高さ
+                                  Container(
+                                    width: 200,
+                                    height: 16,
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  )
+                                else if (googleEmail != null)
                                   Text(
                                     googleEmail,
                                     style: Theme.of(context)
@@ -135,67 +248,42 @@ class SettingsTopPage extends ConsumerWidget {
                                   ),
                               ],
                             ),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed: hasNonGoogleLoginProvider
-                              ? () async {
-                                  try {
-                                    await user.unlink(
-                                      GoogleAuthProvider.PROVIDER_ID,
-                                    );
-                                  } catch (e) {
-                                    if (e is FirebaseAuthException &&
-                                        e.code == 'no-such-provider') {
-                                      // noop
-                                    } else {
-                                      rethrow;
-                                    }
-                                  }
-
-                                  try {
-                                    await user.linkWithPopup(
-                                      GoogleAuthProvider(),
-                                    );
-                                  } catch (e) {
-                                    if (e is FirebaseAuthException &&
-                                        e.code == 'credential-already-in-use') {
-                                      final currentEmail = user.providerData
-                                          .firstWhere(
-                                            (e) =>
-                                                e.providerId ==
-                                                GoogleAuthProvider.PROVIDER_ID,
-                                          )
-                                          .email;
-                                      final sameAccount =
-                                          e.email == currentEmail;
-
-                                      if (!sameAccount) {
-                                        ScaffoldMessenger.of(
-                                          // ignore: use_build_context_synchronously
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'この Google アカウントはすでに別のユーザーと連携されています。',
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    } else {
-                                      rethrow;
-                                    }
-                                  }
-                                }
-                              : null,
-                          child: Tooltip(
-                            message: !hasNonGoogleLoginProvider
-                                ? '別アカウントと連携するには、初めにパスワードを設定してください。'
-                                : '',
-                            child: const Text("別アカウントと連携する"),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      action: TextButton(
+                        onPressed:
+                            pickerLoaded && swapState == _GoogleSwapState.idle
+                            ? () => _onReplaceGoogleAccountPressed(context, ref)
+                            : null,
+                        child: const Text("別アカウントと連携する"),
+                      ),
+                    ),
+                  ),
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _ActionRow(
+                      compact: compact,
+                      content: const Row(
+                        children: [
+                          Icon(Symbols.password),
+                          SizedBox(width: 8),
+                          Text('パスワード'),
+                        ],
+                      ),
+                      action: TextButton(
+                        onPressed: () {
+                          ChangePasswordDialogRoute(_groupId(context))
+                              .push(context);
+                        },
+                        child:
+                            user.providerData.any(
+                              (e) => e.providerId == 'password',
+                            )
+                            ? const Text('変更する')
+                            : const Text('設定する'),
+                      ),
                     ),
                   ),
                 ],
@@ -204,6 +292,36 @@ class SettingsTopPage extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// 狭い幅ではボタンを次の行に回す
+class _ActionRow extends StatelessWidget {
+  final bool compact;
+  final Widget content;
+  final Widget action;
+
+  const _ActionRow({
+    required this.compact,
+    required this.content,
+    required this.action,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [content, const SizedBox(height: 8), action],
+      );
+    }
+    return Row(
+      children: [
+        Expanded(child: content),
+        const SizedBox(width: 16),
+        action,
+      ],
     );
   }
 }
@@ -218,7 +336,34 @@ class ChangeEmailDialog extends ConsumerStatefulWidget {
 }
 
 class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
-  bool reAuthenticated = false;
+  bool reauthenticating = false;
+
+  final TextEditingController emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _changeEmail(User currentUser) async {
+    try {
+      await currentUser.verifyBeforeUpdateEmail(emailController.text);
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) rethrow;
+      final requiresRecentLogin = error.code == 'requires-recent-login';
+      setState(() {
+        reauthenticating = requiresRecentLogin;
+      });
+      if (!requiresRecentLogin) {
+        rethrow;
+      }
+      return;
+    }
+
+    if (!mounted) return;
+    widget.onSubmit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,100 +373,43 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
       return const SizedBox.shrink();
     }
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: PageTransitionSwitcher(
-        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-          return SharedAxisTransition(
-            animation: primaryAnimation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.horizontal,
-            fillColor: Colors.transparent,
-            child: child,
-          );
-        },
-        child: !reAuthenticated ? _loginForm(user) : _changeEmailForm(user),
-      ),
-    );
-  }
-
-  Widget _loginForm(User currentUser) {
-    return LoginForm(
-      title: "メールアドレスを変更する",
-      description: '始めに、現在のアカウントで再認証が必要です。',
-      onGoogleLogin: () async {
-        await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
-
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
-      onPasswordLogin: (email, password) async {
-        final credential = EmailAuthProvider.credential(
-          email: email,
-          password: password,
-        );
-        await currentUser.reauthenticateWithCredential(credential);
-
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
+    return _ReauthenticationDialog(
+      title: 'メールアドレスを変更する',
+      currentUser: user,
+      reauthenticating: reauthenticating,
+      onReauthenticated: () => _changeEmail(user),
+      form: _changeEmailForm(user),
     );
   }
 
   Widget _changeEmailForm(User currentUser) {
-    final TextEditingController emailController = TextEditingController();
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      ),
-      constraints: const BoxConstraints(maxWidth: 800),
-      padding: const EdgeInsets.all(64),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Text(
-              'メールアドレスを変更する',
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
+    return _DialogForm(
+      title: 'メールアドレスを変更する',
+      children: [
+        const Text(
+          '1. 新しいメールアドレスを入力して、「確認する」を押してください。\n2. 入力したメールアドレス宛に確認のメールが届きます。メールに含まれるリンクを開いて、メールアドレスの変更を完了してください。',
+        ),
+        const SizedBox(height: 8),
+        const Text('※ 連携している Google アカウントは変更されません。'),
+        SizedBox(height: _isCompact(context) ? 24 : 48),
+        TextField(
+          autofocus: true,
+          controller: emailController,
+          decoration: const InputDecoration(
+            labelText: '新しいメールアドレス',
+            hintText: 'yourname@gmail.com',
+            border: OutlineInputBorder(),
           ),
-          const SizedBox(height: 48),
-          const Text(
-            '1. 新しいメールアドレスを入力して、「確認する」を押してください。\n2. 入力したメールアドレス宛に確認のメールが届きます。メールに含まれるリンクを開いて、メールアドレスの変更を完了してください。',
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: () => _changeEmail(currentUser),
+            child: const Text('確認する'),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            '※ 連携している Google アカウントは変更されません。\n※ 「新しいメールアドレスでログインできるようになりました」と表示されますが、現在 Google アカウント以外でログインする方法はないため、この内容は無視してください。',
-          ),
-          const SizedBox(height: 48),
-          TextField(
-            autofocus: true,
-            controller: emailController,
-            decoration: const InputDecoration(
-              labelText: '新しいメールアドレス',
-              hintText: 'yourname@gmail.com',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () async {
-                await currentUser.verifyBeforeUpdateEmail(emailController.text);
-
-                widget.onSubmit();
-              },
-              child: const Text('確認する'),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -336,12 +424,79 @@ class ChangePasswordDialog extends ConsumerStatefulWidget {
 }
 
 class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
-  bool reAuthenticated = false;
+  bool reauthenticating = false;
 
   final TextEditingController passwordController = TextEditingController();
   bool invisiblePassword = true;
   bool hasError = false;
   String errorMessage = '';
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void _changePasswordVisibilityCallback() {
+    setState(() {
+      invisiblePassword = invisiblePassword ? false : true;
+    });
+  }
+
+  IconData _passwordVisibilityIcon() {
+    return invisiblePassword ? Symbols.visibility_off : Symbols.visibility;
+  }
+
+  Future<void> _changePassword(User currentUser) async {
+    if (passwordController.text.isEmpty) {
+      setState(() {
+        reauthenticating = false;
+        hasError = true;
+        errorMessage = 'パスワードを入力してください。';
+      });
+      return;
+    }
+
+    try {
+      await currentUser.updatePassword(passwordController.text);
+    } on FirebaseAuthException catch (error) {
+      if (!mounted) rethrow;
+      switch (error.code) {
+        case 'requires-recent-login':
+          setState(() {
+            reauthenticating = true;
+          });
+        case 'weak-password':
+          setState(() {
+            reauthenticating = false;
+            hasError = true;
+            errorMessage = 'パスワードが弱すぎます。';
+          });
+        default:
+          setState(() {
+            reauthenticating = false;
+            hasError = true;
+          });
+          rethrow;
+      }
+      return;
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          reauthenticating = false;
+          hasError = true;
+        });
+      }
+      rethrow;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      hasError = false;
+    });
+
+    widget.onSubmit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -351,8 +506,155 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
       return const SizedBox.shrink();
     }
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
+    return _ReauthenticationDialog(
+      title: 'パスワードを設定する',
+      currentUser: user,
+      reauthenticating: reauthenticating,
+      onReauthenticated: () => _changePassword(user),
+      form: _changePasswordForm(user),
+    );
+  }
+
+  Widget _changePasswordForm(User currentUser) {
+    return _DialogForm(
+      title: 'パスワードを設定する',
+      children: [
+        TextField(
+          autofocus: true,
+          controller: passwordController,
+          autofillHints: const [AutofillHints.newPassword],
+          decoration: InputDecoration(
+            labelText: '新しいパスワード',
+            border: const OutlineInputBorder(),
+            suffixIcon: IconButton(
+              onPressed: _changePasswordVisibilityCallback,
+              icon: Icon(_passwordVisibilityIcon()),
+            ),
+            errorText: hasError ? errorMessage : null,
+          ),
+          obscureText: invisiblePassword,
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: () => _changePassword(currentUser),
+            child: const Text('設定する'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 再認証してから、連携する Google アカウントを選んでもらう
+class ReplaceGoogleAccountDialog extends ConsumerStatefulWidget {
+  const ReplaceGoogleAccountDialog({super.key});
+
+  @override
+  ConsumerState<ReplaceGoogleAccountDialog> createState() =>
+      ReplaceGoogleAccountDialogState();
+}
+
+class ReplaceGoogleAccountDialogState
+    extends ConsumerState<ReplaceGoogleAccountDialog> {
+  bool reauthenticating = true;
+
+  Future<void> _onReauthenticated(User user) async {
+    // API クライアントは作ったときのトークンを使い続けるので、再認証した時刻の入ったトークンで作り直す
+    await user.getIdToken(true);
+    ref.invalidate(firebaseAuthInterceptorProvider);
+    if (!mounted) return;
+    setState(() => reauthenticating = false);
+  }
+
+  /// 閉じてから、選んだアカウントに差し替える
+  Future<void> _pick() async {
+    if (!_loggedInRecently(ref.read(_authTimeProvider).value)) {
+      setState(() => reauthenticating = true);
+      return;
+    }
+    final accessToken = await pickGoogleAccountToken();
+    if (accessToken == null || !mounted) return;
+
+    final container = ProviderScope.containerOf(context, listen: false);
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    final location = GoRouterState.of(context).uri.toString();
+    closeDialog(context);
+
+    try {
+      final result = await _submitGoogleAccount(
+        container,
+        messenger,
+        accessToken,
+      );
+      if (result == _ReplaceResult.requiresRecentLogin) {
+        router.push(location);
+      }
+    } finally {
+      container
+          .read(_googleSwapStateProvider.notifier)
+          .set(_GoogleSwapState.idle);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = ref.watch(authenticatedUserProvider);
+
+    return _ReauthenticationDialog(
+      title: '別アカウントと連携する',
+      currentUser: user,
+      reauthenticating: reauthenticating,
+      onReauthenticated: () => _onReauthenticated(user),
+      form: _DialogForm(
+        title: '別アカウントと連携する',
+        children: [
+          const Text('連携する Google アカウントを選んでください。'),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: _pick,
+              child: const Text('アカウントを選ぶ'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 変更が再認証を求められたときだけ、変更のフォームを再認証の LoginForm に切り替える。
+class _ReauthenticationDialog extends StatefulWidget {
+  final String title;
+  final User currentUser;
+  final bool reauthenticating;
+  final Future<void> Function() onReauthenticated;
+  final Widget form;
+
+  const _ReauthenticationDialog({
+    required this.title,
+    required this.currentUser,
+    required this.reauthenticating,
+    required this.onReauthenticated,
+    required this.form,
+  });
+
+  @override
+  State<_ReauthenticationDialog> createState() =>
+      _ReauthenticationDialogState();
+}
+
+class _ReauthenticationDialogState extends State<_ReauthenticationDialog> {
+  /// 画面を回して幅が変わっても、入力中のフォームを作り直さない
+  final _contentKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    final content = KeyedSubtree(
+      key: _contentKey,
       child: PageTransitionSwitcher(
         transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
           return SharedAxisTransition(
@@ -363,122 +665,145 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
             child: child,
           );
         },
-        child: !reAuthenticated ? _loginForm(user) : _changeEmailForm(user),
+        child: widget.reauthenticating ? _loginForm(context) : widget.form,
+      ),
+    );
+
+    if (!_isCompact(context)) {
+      return Dialog(backgroundColor: Colors.transparent, child: content);
+    }
+    return Dialog.fullscreen(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            tooltip: '閉じる',
+            onPressed: () => closeDialog(context),
+            icon: const Icon(Symbols.close),
+          ),
+        ),
+        body: SafeArea(top: false, child: content),
       ),
     );
   }
 
-  void _changePasswordVisibilityCallback() {
-    setState(() {
-      invisiblePassword = invisiblePassword ? false : true;
-    });
-  }
-
-  IconData _passwordVisibilityIcon() {
-    return invisiblePassword
-        ? Icons.visibility_off_outlined
-        : Icons.visibility_outlined;
-  }
-
-  Widget _loginForm(User currentUser) {
-    return LoginForm(
-      title: "パスワードを設定する",
-      description: '始めに、現在のアカウントで再認証が必要です。',
-      onGoogleLogin: () async {
-        await currentUser.reauthenticateWithPopup(GoogleAuthProvider());
-
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
-      onPasswordLogin: (email, password) async {
-        final credential = EmailAuthProvider.credential(
-          email: email,
-          password: password,
-        );
-        await currentUser.reauthenticateWithCredential(credential);
-
-        setState(() {
-          reAuthenticated = true;
-        });
-      },
-    );
-  }
-
-  Widget _changeEmailForm(User currentUser) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      ),
-      constraints: const BoxConstraints(maxWidth: 800),
-      padding: const EdgeInsets.all(64),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Text(
-              'パスワードを設定する',
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-          ),
-          const SizedBox(height: 48),
-          TextField(
-            autofocus: true,
-            controller: passwordController,
-            decoration: InputDecoration(
-              labelText: '新しいパスワード',
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                onPressed: _changePasswordVisibilityCallback,
-                icon: Icon(_passwordVisibilityIcon()),
-              ),
-              errorText: hasError ? errorMessage : null,
-            ),
-            obscureText: invisiblePassword,
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () async {
-                try {
-                  if (passwordController.text.isEmpty) {
-                    setState(() {
-                      hasError = true;
-                      errorMessage = 'パスワードを入力してください。';
-                    });
-                    return;
-                  }
-
-                  await currentUser.updatePassword(passwordController.text);
-
-                  setState(() {
-                    hasError = false;
-                  });
-
-                  widget.onSubmit();
-                } catch (error) {
-                  setState(() {
-                    hasError = true;
-                  });
-
-                  if (error is FirebaseAuthException &&
-                      error.code == 'weak-password') {
-                    setState(() {
-                      errorMessage = 'パスワードが弱すぎます。';
-                    });
-                  } else {
-                    rethrow;
-                  }
-                }
-              },
-              child: const Text('設定する'),
-            ),
-          ),
-        ],
+  Widget _loginForm(BuildContext context) {
+    return _ReauthenticationCard(
+      child: LoginForm(
+        title: widget.title,
+        description: '続けるには、もう一度ログインしてください。',
+        onGoogleLogin: () async {
+          final googleEmail = widget.currentUser.providerData
+              .firstWhereOrNull(
+                (e) => e.providerId == GoogleAuthProvider.PROVIDER_ID,
+              )
+              ?.email;
+          final provider = GoogleAuthProvider();
+          if (googleEmail != null) {
+            provider.setCustomParameters({'login_hint': googleEmail});
+          }
+          try {
+            await widget.currentUser.reauthenticateWithPopup(provider);
+          } on FirebaseAuthException catch (e) {
+            if (e.code != 'user-mismatch' || !context.mounted) rethrow;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('今ログインしている Google アカウントを選んでください。')),
+            );
+            return;
+          }
+          await widget.onReauthenticated();
+        },
+        onPasswordLogin: (email, password) async {
+          final credential = EmailAuthProvider.credential(
+            email: email,
+            password: password,
+          );
+          await widget.currentUser.reauthenticateWithCredential(credential);
+          await widget.onReauthenticated();
+          return true;
+        },
       ),
     );
   }
 }
+
+/// 再認証の LoginForm にダイアログの面を付ける。
+/// 狭い画面ではキーボードで高さが足りなくなるのでスクロールできるようにする。
+class _ReauthenticationCard extends StatelessWidget {
+  final Widget child;
+
+  const _ReauthenticationCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = _isCompact(context);
+
+    return Container(
+      decoration: _dialogSurface(context, compact: compact),
+      // 全画面のときは幅いっぱいに広げる。Stack の中で中身の幅に縮まないようにする
+      width: compact ? double.infinity : null,
+      constraints: BoxConstraints(
+        maxWidth: compact ? double.infinity : LoginForm.maxWidth + 48,
+      ),
+      child: SingleChildScrollView(
+        padding: compact ? _compactPadding : const EdgeInsets.all(24),
+        child: child,
+      ),
+    );
+  }
+}
+
+/// M3 では、狭い幅で入力欄のあるダイアログは全画面にする
+bool _isCompact(BuildContext context) =>
+    MediaQuery.sizeOf(context).width < LoginForm.mediumBreakpoint;
+
+const _compactPadding = EdgeInsets.fromLTRB(16, 8, 16, 24);
+
+/// 変更のフォームの見出しと面。全画面のときは面を付けない。
+/// 幅が変わっても入力中の欄を作り直さないよう、どちらの幅でも同じ形に組む
+class _DialogForm extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+
+  const _DialogForm({required this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final compact = _isCompact(context);
+
+    return Container(
+      decoration: _dialogSurface(context, compact: compact),
+      width: compact ? double.infinity : null,
+      constraints: const BoxConstraints(maxWidth: 800),
+      child: SingleChildScrollView(
+        padding: compact ? _compactPadding : const EdgeInsets.all(64),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: compact ? Alignment.centerLeft : Alignment.center,
+              child: Text(
+                title,
+                style: compact
+                    ? textTheme.headlineSmall
+                    : textTheme.displaySmall,
+              ),
+            ),
+            SizedBox(height: compact ? 24 : 48),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 全画面のときも DecoratedBox を残し、幅が変わったときに中身を作り直させない
+BoxDecoration _dialogSurface(BuildContext context, {required bool compact}) =>
+    BoxDecoration(
+      borderRadius: BorderRadius.circular(28),
+      color: compact
+          ? null
+          : Theme.of(context).colorScheme.surfaceContainerHigh,
+    );
