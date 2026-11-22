@@ -89,14 +89,6 @@
             "type": "string",
             "description": "名前"
           },
-          "classes_calendar_id": {
-            "type": "string",
-            "description": "授業カレンダーID"
-          },
-          "events_calendar_id": {
-            "type": "string",
-            "description": "イベントカレンダーID"
-          },
           "dayduty_start_date": {
             "type": "string",
             "description": "日直開始日"
