@@ -2,18 +2,15 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 class LoginForm extends StatefulWidget {
-  static const _defaultFormTitle = 'Nocsis';
-  static const _defaultFormDescription = 'ログインして続ける';
-
   /// Material 3 の breakpoint の境目
   static const mediumBreakpoint = 600.0;
   static const expandedBreakpoint = 840.0;
 
-  /// 大きい画面で入力欄やボタンが横に間延びしないよう、ペインの中身の幅を抑える
-  static const paneMaxWidth = 412.0;
+  /// 大きい画面で入力欄やボタンが横に間延びしないよう、中身の幅を抑える
+  static const maxWidth = 412.0;
 
   final String title;
-  final String description;
+  final String? description;
   final VoidCallback onGoogleLogin;
 
   /// ログインできたら true を返す。true のときだけパスワードマネージャーに保存を促す。
@@ -21,8 +18,8 @@ class LoginForm extends StatefulWidget {
 
   const LoginForm({
     super.key,
-    this.title = _defaultFormTitle,
-    this.description = _defaultFormDescription,
+    this.title = 'ログイン',
+    this.description,
     required this.onGoogleLogin,
     required this.onPasswordLogin,
   });
@@ -32,9 +29,6 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  /// 入力欄と高さを揃える (M3 Expressive のボタン M サイズ)
-  static const _buttonSize = Size.fromHeight(56);
-
   final _formKey = GlobalKey<FormState>();
   final _passwordFocusNode = FocusNode();
 
@@ -94,42 +88,49 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
-  ButtonStyle _buttonStyle(TextTheme textTheme) {
-    return ButtonStyle(
-      minimumSize: const WidgetStatePropertyAll(_buttonSize),
-      textStyle: WidgetStatePropertyAll(
-        textTheme.labelLarge?.copyWith(fontSize: 16),
-      ),
-    );
-  }
-
-  Widget _intro({required bool centered}) {
+  Widget _intro() {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final textAlign = centered ? TextAlign.center : TextAlign.start;
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < LoginForm.mediumBreakpoint;
+    final expanded = width >= LoginForm.expandedBreakpoint;
+    final description = widget.description;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: centered
-          ? CrossAxisAlignment.center
-          : CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: compact ? 40 : 24,
       children: [
-        Image.asset("assets/images/Icon-192.png", width: 72),
-        const SizedBox(height: 24),
-        // M3 の既定の字間は欧文向けで、和文では間延びする
-        Text(
-          widget.title,
-          textAlign: textAlign,
-          style: textTheme.headlineMedium?.copyWith(letterSpacing: 0),
+        Row(
+          spacing: 16,
+          children: [
+            Image.asset(
+              "assets/images/Icon-192.png",
+              width: 40,
+              excludeFromSemantics: true,
+            ),
+            Text('Nocsis', style: textTheme.titleMedium),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          widget.description,
-          textAlign: textAlign,
-          style: textTheme.bodyLarge?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            letterSpacing: 0,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8,
+          children: [
+            // M3 の既定の字間は欧文向けで、和文では間延びする
+            Text(
+              widget.title,
+              style:
+                  (expanded ? textTheme.displaySmall : textTheme.headlineSmall)
+                      ?.copyWith(letterSpacing: 0),
+            ),
+            if (description != null)
+              Text(
+                description,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+          ],
         ),
       ],
     );
@@ -157,7 +158,6 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Widget _actions() {
-    final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
@@ -167,11 +167,9 @@ class _LoginFormState extends State<LoginForm> {
         // G ロゴは色付きの背景に置けないので、tonal ではなく surface の塗りにする
         OutlinedButton(
           onPressed: widget.onGoogleLogin,
-          style: _buttonStyle(textTheme).merge(
-            OutlinedButton.styleFrom(
-              backgroundColor: colorScheme.surface,
-              foregroundColor: colorScheme.onSurface,
-            ),
+          style: OutlinedButton.styleFrom(
+            backgroundColor: colorScheme.surface,
+            foregroundColor: colorScheme.onSurface,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -188,9 +186,9 @@ class _LoginFormState extends State<LoginForm> {
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
         _orDivider(),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
         Form(
           key: _formKey,
           child: AutofillGroup(
@@ -198,7 +196,7 @@ class _LoginFormState extends State<LoginForm> {
             onDisposeAction: AutofillContextAction.cancel,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 16,
+              spacing: 24,
               children: [
                 TextFormField(
                   controller: emailFieldController,
@@ -242,7 +240,6 @@ class _LoginFormState extends State<LoginForm> {
         ),
         const SizedBox(height: 24),
         FilledButton(
-          style: _buttonStyle(textTheme),
           onPressed: () {
             _onEmailAndPasswordFormSubmitted(
               emailFieldController.text,
@@ -257,35 +254,15 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.sizeOf(context).width < LoginForm.expandedBreakpoint) {
-      return _pane(
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _intro(centered: true),
-            const SizedBox(height: 48),
-            _actions(),
-          ],
-        ),
-      );
-    }
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      spacing: 24,
-      children: [
-        Expanded(child: _pane(_intro(centered: false))),
-        Expanded(child: _pane(_actions())),
-      ],
-    );
-  }
-
-  Widget _pane(Widget child) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: LoginForm.paneMaxWidth),
-        child: SizedBox(width: double.infinity, child: child),
+        constraints: const BoxConstraints(maxWidth: LoginForm.maxWidth),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 32,
+          children: [_intro(), _actions()],
+        ),
       ),
     );
   }
