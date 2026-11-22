@@ -1,4 +1,5 @@
 import assert from "node:assert";
+import type { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
@@ -14,6 +15,11 @@ import {
 } from "../../middlewares/authorize.js";
 import { eventSchema } from "../../resources/v1/events.js";
 import { fetchGoogleCalendarEvents } from "../../services/google_calendar_service.js";
+
+const toJst = (time: CalendarV3.Schema$EventDateTime | undefined) =>
+  DateTime.fromISO(time?.dateTime || time?.date || "", {
+    zone: AppConfig.TIMEZONE,
+  }).toISO();
 
 export const eventsRoutes = new Hono<AuthorizedEnv>();
 
@@ -132,8 +138,8 @@ eventsRoutes.get(
     const eventItems = events.items.flatMap((item) => {
       const result = eventSchema.safeParse({
         id: item.id,
-        startAt: item.start?.dateTime || item.start?.date,
-        endAt: item.end?.dateTime || item.end?.date,
+        startAt: toJst(item.start),
+        endAt: toJst(item.end),
         title: item.summary || "",
         description: item.description,
         location: item.location,
