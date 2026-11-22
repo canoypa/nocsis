@@ -12,6 +12,11 @@ on:
         description: "Firebase web config JSON (defaults to the production one)"
         required: false
         type: string
+      cache:
+        description: "Restore and save the pub and build_runner caches"
+        required: false
+        type: boolean
+        default: false
     outputs:
       project_id:
         description: "Firebase project the build points at"
@@ -31,7 +36,10 @@ jobs:
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
         uses: jdx/mise-action@v5.2.9
+      # 本番のビルドはキャッシュを使わない。restore-keys は前の実行のキャッシュを
+      # 引き継ぐので、一度書き換えられた中身は依存を戻しても残り、本番に出続ける。
       - name: Setup pub cache
+        if: ${{ inputs.cache }}
         uses: actions/cache@v6.1.0
         with:
           path: ~/.pub-cache
@@ -42,6 +50,7 @@ jobs:
         working-directory: ./frontend
         run: flutter pub get --enforce-lockfile
       - name: Setup build_runner cache
+        if: ${{ inputs.cache }}
         uses: actions/cache@v6.1.0
         with:
           path: frontend/.dart_tool/build

@@ -34,6 +34,8 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/reusable-build_frontend.yml
+    with:
+      cache: true
 
   # レスポンスの項目を外す・任意にするなどの変更は、開いたままの古い画面を壊す。
   # 意図した変更（2段階で出す1段目など）だけ、ラベルを付けて再実行すれば通る。
