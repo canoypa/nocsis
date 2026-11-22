@@ -51,8 +51,12 @@ MockUser userFailingPasswordUpdate(String code) {
 }
 
 void main() {
-  Future<void> pumpSettings(WidgetTester tester, MockUser user) async {
-    tester.view.physicalSize = const Size(1280, 1600);
+  Future<void> pumpSettings(
+    WidgetTester tester,
+    MockUser user, {
+    double width = 1280,
+  }) async {
+    tester.view.physicalSize = Size(width, 1600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
@@ -177,5 +181,72 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('続けるには、もう一度ログインしてください。'), findsOneWidget);
+  });
+
+  group('スマホの幅', () {
+    testWidgets('メールアドレスの変更は全画面で開き、閉じるボタンで閉じられる', (tester) async {
+      await pumpSettings(tester, googleUser(), width: 599);
+
+      await tester.tap(find.text('変更する'));
+      await tester.pumpAndSettle();
+      expect(find.text('メールアドレスを変更する'), findsWidgets);
+
+      await tester.tap(find.byTooltip('閉じる'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('メールアドレスを変更する'), findsNothing);
+    });
+
+    testWidgets('もう一度ログインを求めるときも、閉じるボタンで閉じられる', (tester) async {
+      await pumpSettings(
+        tester,
+        userFailingPasswordUpdate('requires-recent-login'),
+        width: 599,
+      );
+      await tester.tap(find.text('設定する'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'a-strong-password');
+      await tester.tap(find.widgetWithText(FilledButton, '設定する'));
+      await tester.pumpAndSettle();
+      expect(find.text('続けるには、もう一度ログインしてください。'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('閉じる'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('続けるには、もう一度ログインしてください。'), findsNothing);
+    });
+  });
+
+  testWidgets('もう一度ログインを求めているときに幅が変わっても、入力が消えない', (tester) async {
+    await pumpSettings(
+      tester,
+      userFailingPasswordUpdate('requires-recent-login'),
+      width: 599,
+    );
+    await tester.tap(find.text('設定する'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'a-strong-password');
+    await tester.tap(find.widgetWithText(FilledButton, '設定する'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextField, 'メールアドレス'),
+      'typing@example.com',
+    );
+
+    tester.view.physicalSize = const Size(1280, 1600);
+    await tester.pumpAndSettle();
+
+    expect(find.text('typing@example.com'), findsOneWidget);
+    expect(find.byTooltip('閉じる'), findsNothing);
+  });
+
+  testWidgets('広い幅ではダイアログを全画面にしない', (tester) async {
+    await pumpSettings(tester, googleUser());
+
+    await tester.tap(find.text('変更する'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('メールアドレスを変更する'), findsWidgets);
+    expect(find.byTooltip('閉じる'), findsNothing);
   });
 }
