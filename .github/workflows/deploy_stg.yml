@@ -74,6 +74,7 @@ jobs:
     with:
       persist: true
       firebase_web_config: ${{ vars.STG_FIREBASE_WEB_CONFIG }}
+      cache: true
 
   deploy_backend:
     needs: [build_backend]
