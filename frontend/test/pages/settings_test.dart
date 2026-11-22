@@ -318,6 +318,17 @@ void main() {
     expect(find.byTooltip('閉じる'), findsNothing);
   });
 
+  testWidgets('広い幅ではダイアログの外を押すと閉じる', (tester) async {
+    await pumpSettings(tester, googleUser());
+    await tester.tap(find.text('変更する'));
+    await tester.pumpAndSettle();
+
+    await tester.tapAt(const Offset(8, 8));
+    await tester.pumpAndSettle();
+
+    expect(find.text('メールアドレスを変更する'), findsNothing);
+  });
+
   testWidgets('広い幅ではダイアログを全画面にしない', (tester) async {
     await pumpSettings(tester, googleUser());
 
