@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
@@ -34,6 +35,7 @@ class SelectGroupMenu extends ConsumerWidget {
     final groupId = ref.watch(currentGroupIdProvider);
 
     return DropdownButton(
+      icon: const Icon(Symbols.arrow_drop_down),
       items: memberships
           .map(
             (membership) => DropdownMenuItem(
