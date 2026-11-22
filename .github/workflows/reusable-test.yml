@@ -173,6 +173,11 @@ jobs:
         run: flutter pub run build_runner build
       - name: Test
         run: flutter test --coverage
+      - name: Test nocsis_lints
+        working-directory: ./frontend/packages/nocsis_lints
+        run: |
+          dart pub get --enforce-lockfile
+          dart test
       - name: Check coverage threshold
         env:
           THRESHOLD: "51"
