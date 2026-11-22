@@ -160,6 +160,95 @@
         "additionalProperties": false,
         "description": "日直"
       },
+      "Display": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "名前"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "description": "登録した日時"
+          },
+          "removed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "使われなくなり、登録が解除された日時。解除されていなければ null"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "created_at",
+          "removed_at"
+        ],
+        "additionalProperties": false,
+        "description": "教室ディスプレイ"
+      },
+      "Displays": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Display"
+            },
+            "description": "新しく登録した順"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false,
+        "description": "グループの教室ディスプレイ"
+      },
+      "DisplayCreateJson": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "description": "管理者が入力する6桁のコード"
+          },
+          "name": {
+            "description": "名前。50文字まで。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "description": "教室ディスプレイの登録に使う JSON データ"
+      },
+      "DisplayPatchJson": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "名前。50文字まで"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "description": "教室ディスプレイの更新に使う JSON データ"
+      },
       "Event": {
         "type": "object",
         "properties": {
@@ -306,6 +395,28 @@
         "additionalProperties": false,
         "description": "天気データ"
       },
+      "DisplayPairing": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "description": "管理者が入力する6桁のコード"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "description": "コードが使えなくなる日時"
+          }
+        },
+        "required": [
+          "code",
+          "expires_at"
+        ],
+        "additionalProperties": false,
+        "description": "教室ディスプレイを登録するためのコード"
+      },
       "MembershipGroup": {
         "type": "object",
         "properties": {
@@ -334,9 +445,10 @@
           "member.create",
           "member.update",
           "member.delete",
-          "access.read",
-          "access.create",
-          "access.delete"
+          "role_binding.read",
+          "role_binding.create",
+          "role_binding.delete",
+          "display.update"
         ],
         "description": "`<オブジェクト型>.<動作>` の形の権限"
       },
@@ -377,6 +489,20 @@
         ],
         "additionalProperties": false,
         "description": "ログインしているユーザー"
+      },
+      "GoogleAccountPutJson": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1,
+            "description": "連携する Google アカウントで、このアプリに発行されたアクセストークン"
+          }
+        },
+        "required": [
+          "accessToken"
+        ],
+        "description": "連携する Google アカウントの差し替えに使う JSON データ"
       },
       "UserJoinedGroup": {
         "type": "object",
@@ -738,6 +864,282 @@
         ]
       }
     },
+    "/api/v1/groups/{groupId}/displays": {
+      "get": {
+        "operationId": "getApiV1GroupsByGroupIdDisplays",
+        "description": "グループの教室ディスプレイを一覧する",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Displays"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "array",
+                      "items": {}
+                    },
+                    "data": {}
+                  },
+                  "required": [
+                    "success",
+                    "error",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "groupId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "グループのID"
+          }
+        ]
+      },
+      "post": {
+        "operationId": "postApiV1GroupsByGroupIdDisplays",
+        "description": "端末に出ているコードで、教室ディスプレイとして登録する。端末には group.read と member.read だけが付く",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Display"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "グループが無いか、コードが無いか期限切れ"
+          },
+          "429": {
+            "description": "コードを外した回数が多すぎる"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "groupId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "グループのID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisplayCreateJson"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/groups/{groupId}/displays/{displayId}": {
+      "patch": {
+        "operationId": "patchApiV1GroupsByGroupIdDisplaysByDisplayId",
+        "description": "教室ディスプレイの名前を変える",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Display"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "groupId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "グループのID"
+          },
+          {
+            "in": "path",
+            "name": "displayId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "教室ディスプレイのID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisplayPatchJson"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteApiV1GroupsByGroupIdDisplaysByDisplayId",
+        "description": "教室ディスプレイを外す。ほかに付与の無い匿名アカウントは、アカウントごと消す",
+        "responses": {
+          "204": {
+            "description": "外した"
+          },
+          "400": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "array",
+                      "items": {}
+                    },
+                    "data": {}
+                  },
+                  "required": [
+                    "success",
+                    "error",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "groupId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "グループのID"
+          },
+          {
+            "in": "path",
+            "name": "displayId",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "教室ディスプレイのID"
+          }
+        ]
+      }
+    },
     "/api/v1/groups/{groupId}/events": {
       "get": {
         "operationId": "getApiV1GroupsByGroupIdEvents",
@@ -881,6 +1283,64 @@
         ]
       }
     },
+    "/api/v1/display-pairings": {
+      "post": {
+        "operationId": "postApiV1DisplayPairings",
+        "description": "教室ディスプレイを登録するためのコードを発行する。匿名アカウントだけが使える",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisplayPairing"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "匿名アカウントではない"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteApiV1DisplayPairings",
+        "description": "教室ディスプレイの登録をやめる。発行したコードと匿名アカウントを消す。匿名アカウントだけが使える",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "匿名アカウントではない"
+          },
+          "409": {
+            "description": "もう登録されている"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/me": {
       "get": {
         "operationId": "getApiV1Me",
@@ -908,6 +1368,47 @@
             "bearer": []
           }
         ]
+      }
+    },
+    "/api/v1/me/google-account": {
+      "put": {
+        "operationId": "putApiV1MeGoogleAccount",
+        "description": "連携する Google アカウントを差し替える。まだ連携していなければ連携する",
+        "responses": {
+          "204": {
+            "description": "差し替えた"
+          },
+          "400": {
+            "description": "アクセストークンが無効か、このアプリ向けではない"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "匿名アカウントか、最後のログインから時間がたっている (`code` が `requires-recent-login`)"
+          },
+          "409": {
+            "description": "その Google アカウントは別のユーザーと連携している (`code` が `linked-to-another-user`) か、差し替えの途中 (`code` が `in-progress`)"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleAccountPutJson"
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/users/me/groups": {

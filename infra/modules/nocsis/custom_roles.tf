@@ -41,6 +41,20 @@ locals {
         "storage.buckets.update",
       ]
     }
+    # roles/firebaseauth.admin は Auth の設定まで変えられる。
+    authUserRemover = {
+      title       = "Auth user remover"
+      description = "教室ディスプレイの匿名アカウントを確かめて消すための、ユーザーの読み取りと削除のみ。設定には触れない。"
+      stage       = "GA"
+      permissions = ["firebaseauth.users.delete", "firebaseauth.users.get"]
+    }
+    # roles/firebaseauth.admin は Auth の設定まで変えられる。
+    authUserUpdater = {
+      title       = "Auth user updater"
+      description = "連携する Google アカウントの差し替えのための、ユーザーの更新のみ。設定には触れない。"
+      stage       = "GA"
+      permissions = ["firebaseauth.users.update"]
+    }
     # roles/viewer は Firestore のドキュメントまで読めるので、設定の読み取りだけを切り出した。
     claudeConfigReader = {
       title       = "Claude config reader"

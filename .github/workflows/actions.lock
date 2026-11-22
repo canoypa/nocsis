@@ -18,6 +18,7 @@ workflows:
         - 'google-github-actions/auth@v3.0.0'
         - 'google-github-actions/setup-gcloud@v3.0.1'
     '.github/workflows/reusable-build_frontend.yml':
+        - 'actions/cache@v6.1.0'
         - 'actions/checkout@v7.0.1'
         - 'actions/upload-artifact@v7.0.2'
         - 'jdx/mise-action@v5.2.9'

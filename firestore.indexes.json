@@ -17,5 +17,18 @@
       ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    {
+      "collectionGroup": "display_pairings",
+      "fieldPath": "expires_at",
+      "ttl": true,
+      "indexes": []
+    },
+    {
+      "collectionGroup": "display_pairing_failures",
+      "fieldPath": "expires_at",
+      "ttl": true,
+      "indexes": []
+    }
+  ]
 }

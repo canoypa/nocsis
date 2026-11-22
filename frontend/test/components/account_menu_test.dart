@@ -34,25 +34,25 @@ void main() {
     expect(find.text('管理コンソール'), findsOneWidget);
   });
 
-  testWidgets('閲覧だけの相手には管理コンソールも Classroom も出さない', (tester) async {
+  testWidgets('閲覧だけの相手には管理コンソールも教室ディスプレイも出さない', (tester) async {
     await openMenu(tester, {Permission.groupRead});
 
     expect(find.text('管理コンソール'), findsNothing);
-    expect(find.text('Classroom を起動'), findsNothing);
+    expect(find.text('教室ディスプレイを表示'), findsNothing);
     expect(find.text('設定'), findsOneWidget);
   });
 
-  testWidgets('教室の表示端末には Classroom だけを出す', (tester) async {
+  testWidgets('教室ディスプレイには、表示だけを出す', (tester) async {
     await openMenu(tester, {Permission.groupRead, Permission.memberRead});
 
     expect(find.text('管理コンソール'), findsNothing);
-    expect(find.text('Classroom を起動'), findsOneWidget);
+    expect(find.text('教室ディスプレイを表示'), findsOneWidget);
   });
 
-  testWidgets('admin には管理コンソールと Classroom を出す', (tester) async {
+  testWidgets('admin には管理コンソールと教室ディスプレイの表示を出す', (tester) async {
     await openMenu(tester, Permission.values.toSet());
 
     expect(find.text('管理コンソール'), findsOneWidget);
-    expect(find.text('Classroom を起動'), findsOneWidget);
+    expect(find.text('教室ディスプレイを表示'), findsOneWidget);
   });
 }
