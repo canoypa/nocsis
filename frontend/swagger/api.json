@@ -226,9 +226,8 @@
             "description": "管理者が入力する6桁のコード"
           },
           "name": {
-            "description": "名前。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
-            "type": "string",
-            "maxLength": 50
+            "description": "名前。50文字まで。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
+            "type": "string"
           }
         },
         "required": [
@@ -242,8 +241,7 @@
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 50,
-            "description": "名前"
+            "description": "名前。50文字まで"
           }
         },
         "required": [

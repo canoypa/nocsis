@@ -203,6 +203,15 @@ describe("教室ディスプレイ", () => {
 
       expect((await register(code, "あ".repeat(51))).status).toBe(400);
     });
+
+    it("絵文字や濁点を合成した文字も1文字と数えること", async () => {
+      const { code } = await issue();
+      const family = "👨‍👩‍👧";
+      const ga = "か\u3099";
+
+      expect((await register(code, family.repeat(51))).status).toBe(400);
+      expect((await register(code, family.repeat(49) + ga)).status).toBe(201);
+    });
   });
 
   describe("登録した後", () => {
@@ -278,6 +287,18 @@ describe("教室ディスプレイ", () => {
 
       expect(response.status).toBe(200);
       expect(await response.json()).toMatchObject({ name: "2年3組 前方" });
+    });
+
+    it("名前は50文字まで変えられること", async () => {
+      const rename = (name: string) =>
+        request(
+          `/api/v1/groups/${GROUP_ID}/displays/${device.uid}`,
+          adminLogin.idToken,
+          { method: "PATCH", body: { name } },
+        );
+
+      expect((await rename("👍".repeat(50))).status).toBe(200);
+      expect((await rename("👍".repeat(51))).status).toBe(400);
     });
 
     it("無い教室ディスプレイの名前を変えると 404 になること", async () => {
