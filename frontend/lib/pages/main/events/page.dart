@@ -124,7 +124,16 @@ class EventsView extends ConsumerWidget {
         return const Center(child: Text('Something went wrong'));
       },
       loading: () {
-        return const Center(child: CircularProgressIndicator());
+        return Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: const SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: BasicCardListSkeleton(),
+            ),
+          ),
+        );
       },
     );
   }

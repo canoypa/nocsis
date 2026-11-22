@@ -3,6 +3,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nocsis/components/skeleton.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/weather.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
@@ -31,10 +32,14 @@ class WeatherInfo extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
-    final weather = ref.watch(weatherProvider(groupId)).value;
+    final snapshot = ref.watch(weatherProvider(groupId));
+    final weather = snapshot.value;
 
     if (weather == null) {
-      return const SizedBox();
+      // 失敗した後の再試行中も isLoading になる。そのたびに明滅させない
+      return snapshot.isLoading && !snapshot.hasError
+          ? const _WeatherInfoSkeleton()
+          : const SizedBox();
     }
 
     return Column(
@@ -76,6 +81,39 @@ class WeatherInfo extends ConsumerWidget {
                 ..removeLast(),
         ),
       ],
+    );
+  }
+}
+
+class _WeatherInfoSkeleton extends StatelessWidget {
+  const _WeatherInfoSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Skeleton(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SkeletonBlock(width: 80.sp, height: 80.sp, radius: 40.sp),
+              const SizedBox(width: 16),
+              const SkeletonBlock(width: 56, height: 36),
+            ],
+          ),
+          SizedBox(height: 8.sp),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 32.sp,
+            children: [
+              for (var i = 0; i < 3; i++)
+                SkeletonBlock(width: 48.sp, height: 48.sp, radius: 24.sp),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
