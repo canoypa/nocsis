@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,7 @@ import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/firebase.dart';
 import 'package:nocsis/providers/user.dart';
+import 'package:nocsis/routes/router.dart';
 
 /// backend が再認証を求めるまでの時間。backend より少し短くして、選んだあとに弾かれにくくする
 const _recentLogin = Duration(minutes: 4);
@@ -93,6 +95,9 @@ final _googleAccountPickerLoadedProvider = FutureProvider.autoDispose(
   (ref) => loadGoogleAccountPicker(),
 );
 
+String _groupId(BuildContext context) =>
+    GoRouterState.of(context).pathParameters['groupId']!;
+
 class SettingsTopPage extends ConsumerWidget {
   const SettingsTopPage({super.key});
 
@@ -116,10 +121,8 @@ class SettingsTopPage extends ConsumerWidget {
       while (true) {
         if (accessToken == null) {
           if (!context.mounted) return;
-          accessToken = await showDialog<String>(
-            context: context,
-            builder: (_) => const _ReplaceGoogleAccountDialog(),
-          );
+          accessToken = await ReplaceGoogleAccountDialogRoute(_groupId(context))
+              .push<String>(context);
           if (accessToken == null) return;
         }
 
@@ -196,16 +199,8 @@ class SettingsTopPage extends ConsumerWidget {
                 ),
                 action: TextButton(
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return ChangeEmailDialog(
-                          onSubmit: () {
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      },
-                    );
+                    ChangeEmailDialogRoute(_groupId(context))
+                        .push<void>(context);
                   },
                   child: const Text('変更する'),
                 ),
@@ -296,16 +291,8 @@ class SettingsTopPage extends ConsumerWidget {
                       ),
                       action: TextButton(
                         onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return ChangePasswordDialog(
-                                onSubmit: () {
-                                  Navigator.of(context).pop();
-                                },
-                              );
-                            },
-                          );
+                          ChangePasswordDialogRoute(_groupId(context))
+                              .push<void>(context);
                         },
                         child:
                             user.providerData.any(
@@ -580,16 +567,16 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
 }
 
 /// 再認証してから、連携する Google アカウントを選んでもらう
-class _ReplaceGoogleAccountDialog extends ConsumerStatefulWidget {
-  const _ReplaceGoogleAccountDialog();
+class ReplaceGoogleAccountDialog extends ConsumerStatefulWidget {
+  const ReplaceGoogleAccountDialog({super.key});
 
   @override
-  ConsumerState<_ReplaceGoogleAccountDialog> createState() =>
-      _ReplaceGoogleAccountDialogState();
+  ConsumerState<ReplaceGoogleAccountDialog> createState() =>
+      ReplaceGoogleAccountDialogState();
 }
 
-class _ReplaceGoogleAccountDialogState
-    extends ConsumerState<_ReplaceGoogleAccountDialog> {
+class ReplaceGoogleAccountDialogState
+    extends ConsumerState<ReplaceGoogleAccountDialog> {
   bool reauthenticating = true;
 
   Future<void> _onReauthenticated(User user) async {

@@ -10,6 +10,15 @@ import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// テストでは画像を取りに行けないので、アイコンの画像を持たない人にする
+// ignore: must_be_immutable
+class _UserWithoutPhoto extends MockUser {
+  _UserWithoutPhoto() : super(uid: 'u1', email: 'taro@example.com');
+
+  @override
+  String? get photoURL => null;
+}
+
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
@@ -193,6 +202,45 @@ void main() {
         Uri.parse(currentLocation(container)).queryParameters['continue-uri'],
         '/display/register?code=123456',
       );
+    });
+  });
+
+  group('設定のダイアログ', () {
+    const member = Me(
+      memberships: [
+        Membership(
+          group: MembershipGroup(id: 'g1', name: 'グループ'),
+          permissions: [Permission.groupRead],
+        ),
+      ],
+    );
+
+    Future<ProviderContainer> openEmailDialog(WidgetTester tester) async {
+      final container = await pumpRouter(
+        tester,
+        '/groups/g1/settings/email',
+        MockFirebaseAuth(signedIn: true, mockUser: _UserWithoutPhoto()),
+        me: member,
+      );
+      await tester.pump(const Duration(seconds: 1));
+      return container;
+    }
+
+    testWidgets('URL で開いたダイアログに、そのまま留まる', (tester) async {
+      final container = await openEmailDialog(tester);
+
+      expect(currentLocation(container), '/groups/g1/settings/email');
+      expect(find.text('メールアドレスを変更する'), findsWidgets);
+    });
+
+    testWidgets('ブラウザの戻るで設定の URL に戻ると、ダイアログが閉じる', (tester) async {
+      final container = await openEmailDialog(tester);
+
+      container.read(routerProvider).go('/groups/g1/settings');
+      await tester.pumpAndSettle();
+
+      expect(find.text('メールアドレスを変更する'), findsNothing);
+      expect(find.text('設定'), findsWidgets);
     });
   });
 }
