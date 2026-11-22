@@ -1,4 +1,5 @@
 import 'package:chopper/chopper.dart' as chopper;
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -76,6 +77,26 @@ void main() {
 
     expect(find.text('登録済みの端末'), findsOneWidget);
     expect(find.text('まだありません。'), findsOneWidget);
+  });
+
+  testWidgets('端末で開く URL をコピーできる', (tester) async {
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String;
+        }
+        return null;
+      },
+    );
+    await pumpPage(tester);
+
+    await tester.tap(find.byTooltip('URL をコピー'));
+    await tester.pump();
+
+    expect(copied, endsWith('/display'));
+    expect(find.text('URL をコピーしました'), findsOneWidget);
   });
 
   testWidgets('確かめてから登録を解除する', (tester) async {
