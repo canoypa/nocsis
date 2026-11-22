@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-/// ダイアログをルートのページとして開く。URL に載るので、ブラウザの戻るで閉じられる
+/// ダイアログをルートのページとして開く。push すると履歴に積まれるので、ブラウザの戻るで閉じられる
 class DialogPage<T> extends Page<T> {
   final WidgetBuilder builder;
 

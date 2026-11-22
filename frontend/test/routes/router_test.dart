@@ -226,9 +226,6 @@ void main() {
       return container;
     }
 
-    Future<ProviderContainer> openEmailDialog(WidgetTester tester) =>
-        open(tester, '/groups/g1/settings/email');
-
     for (final (path, title) in [
       ('email', 'メールアドレスを変更する'),
       ('password', 'パスワードを設定する'),
@@ -242,20 +239,25 @@ void main() {
       });
     }
 
-    testWidgets('メールアドレスの「変更する」で、ダイアログの URL に移る', (tester) async {
+    testWidgets('メールアドレスの「変更する」で、URL を変えずにダイアログを開く', (tester) async {
       final container = await open(tester, '/groups/g1/settings');
 
       await tester.tap(find.text('変更する'));
       await tester.pumpAndSettle();
 
-      expect(currentLocation(container), '/groups/g1/settings/email');
+      expect(currentLocation(container), '/groups/g1/settings');
       expect(find.text('メールアドレスを変更する'), findsWidgets);
     });
 
-    testWidgets('ブラウザの戻るで設定の URL に戻ると、ダイアログが閉じる', (tester) async {
-      final container = await openEmailDialog(tester);
+    testWidgets('ブラウザの戻るで開く前の履歴に戻ると、ダイアログが閉じる', (tester) async {
+      final container = await open(tester, '/groups/g1/settings');
+      final provider = container.read(routerProvider).routeInformationProvider;
+      final beforeOpening = provider.value;
 
-      container.read(routerProvider).go('/groups/g1/settings');
+      await tester.tap(find.text('変更する'));
+      await tester.pumpAndSettle();
+      // ブラウザの戻るは、開く前の履歴の URL と state を渡してくる
+      provider.didPushRouteInformation(beforeOpening);
       await tester.pumpAndSettle();
 
       expect(find.text('メールアドレスを変更する'), findsNothing);
