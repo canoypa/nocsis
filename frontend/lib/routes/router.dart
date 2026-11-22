@@ -178,21 +178,31 @@ GoRouter router(Ref ref) {
       return null;
     }
 
+    // 待ち受けを開いたことのあるスマートフォンでも、読み取った QR から登録できるようにする
+    if (path == DisplayRegisterPageRoute.path) {
+      return LoginPageRoute(continueUri: state.uri).location;
+    }
+
     try {
       final groupId = (await readMe(currentUser.uid))
           .memberships
           .firstOrNull
           ?.group
           .id;
-      if (groupId != null) {
-        return '/groups/$groupId/classroom';
-      }
-    } catch (_) {
-      // 登録を待つ画面が、登録済みなら教室の画面へ進める
-      ref.invalidate(meProvider(currentUser.uid));
-    }
 
-    return DisplayPageRoute.path;
+      return groupId == null
+          ? DisplayPageRoute.path
+          : '/groups/$groupId/classroom';
+    } catch (_) {
+      ref.invalidate(meProvider(currentUser.uid));
+      // 止めると、登録済みの端末が通信の回復を待てない
+      final sharedPreferences = await SharedPreferences.getInstance();
+      final groupId = sharedPreferences.getString('latest_group_id');
+
+      return groupId == null
+          ? DisplayPageRoute.path
+          : '/groups/$groupId/classroom';
+    }
   }
 
   Future<String?> redirectLoggedInUser(GoRouterState state) async {

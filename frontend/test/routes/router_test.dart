@@ -180,5 +180,19 @@ void main() {
         expect(currentLocation(container), '/groups/g1/classroom');
       });
     }
+
+    testWidgets('QR コードから開いた登録画面は、ログインしてから開く', (tester) async {
+      final container = await pumpRouter(
+        tester,
+        '/display/register?code=123456',
+        MockFirebaseAuth(signedIn: true, mockUser: device),
+      );
+      await tester.pump();
+
+      expect(
+        Uri.parse(currentLocation(container)).queryParameters['continue-uri'],
+        '/display/register?code=123456',
+      );
+    });
   });
 }
