@@ -135,7 +135,7 @@ void main() {
     await tester.tap(find.text('コードで登録'));
     await tester.pumpAndSettle();
     await tester.enterText(find.widgetWithText(TextField, 'コード'), '123456');
-    await tester.enterText(find.widgetWithText(TextField, '名前'), ' 2年3組 前方 ');
+    await tester.enterText(find.widgetWithText(TextField, '名前'), ' 前方 ');
     await tester.pump();
     await tester.tap(find.widgetWithText(TextButton, '登録'));
     await tester.pumpAndSettle();
@@ -143,7 +143,7 @@ void main() {
     verify(
       () => mockApi.apiV1GroupsGroupIdDisplaysPost(
         groupId: 'g1',
-        body: const DisplayCreateJson(code: '123456', name: '2年3組 前方'),
+        body: const DisplayCreateJson(code: '123456', name: '前方'),
       ),
     ).called(1);
     expect(find.text('コードが違うか、期限が切れています。ディスプレイのコードを確かめてください。'), findsOneWidget);
