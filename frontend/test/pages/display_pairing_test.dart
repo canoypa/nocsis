@@ -44,6 +44,7 @@ void main() {
       initialLocation: '/display',
       routes: [
         GoRoute(path: '/', builder: (_, _) => const Text('トップ')),
+        GoRoute(path: '/login', builder: (_, _) => const Text('ログイン')),
         GoRoute(
           path: '/display',
           builder: (_, _) => const DisplayPairingPage(),
@@ -100,5 +101,64 @@ void main() {
 
     expect(find.text('トップ'), findsOneWidget);
     verifyNever(() => mockApi.apiV1DisplayPairingsPost());
+  });
+
+  testWidgets('登録をやめると、サインアウトしてログイン画面へ移る', (tester) async {
+    when(() => mockApi.apiV1DisplayPairingsDelete())
+        .thenAnswer((_) async => _response(204));
+    final auth = MockFirebaseAuth();
+    await pumpPage(tester, auth);
+
+    await tester.tap(find.text('登録をやめる'));
+    await tester.pumpAndSettle();
+
+    verify(() => mockApi.apiV1DisplayPairingsDelete()).called(1);
+    expect(auth.currentUser, isNull);
+    expect(
+      (await SharedPreferences.getInstance()).getBool(displayDeviceKey),
+      isNull,
+    );
+    expect(find.text('ログイン'), findsOneWidget);
+  });
+
+  testWidgets('やめるのと同時に登録されていたら、教室の画面へ進む', (tester) async {
+    when(() => mockApi.apiV1DisplayPairingsDelete())
+        .thenAnswer((_) async => _response(409));
+    final auth = MockFirebaseAuth();
+    await pumpPage(tester, auth);
+    me = const Me(
+      memberships: [
+        Membership(
+          group: MembershipGroup(id: 'g1', name: '1年1組'),
+          permissions: [Permission.groupRead],
+        ),
+      ],
+    );
+
+    await tester.tap(find.text('登録をやめる'));
+    await tester.pumpAndSettle();
+
+    expect(auth.currentUser, isNotNull);
+    expect(find.text('教室 g1'), findsOneWidget);
+  });
+
+  testWidgets('やめられなかったときは、待ち受けに留まる', (tester) async {
+    when(() => mockApi.apiV1DisplayPairingsDelete())
+        .thenAnswer((_) async => _response(500));
+    final auth = MockFirebaseAuth();
+    await pumpPage(tester, auth);
+
+    await tester.tap(find.text('登録をやめる'));
+    await tester.pump();
+    await tester.pump();
+
+    expect(auth.currentUser, isNotNull);
+    expect(find.text('登録をやめる'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, '登録をやめる'))
+          .onPressed,
+      isNotNull,
+    );
   });
 }
