@@ -40,7 +40,7 @@ paths:
 
 ## 幅の判定は `WindowSizeClass` で行う
 
-幅でレイアウトを変えるときは、`lib/core/window_size_class.dart` の `WindowSizeClass` を読む。境目の数値を画面ごとに書くと、M3 の window size class とずれたまま増える。
+幅でレイアウトを変えるときは、`lib/core/window_size_class.dart` の `context.windowSizeClass` を読み、`context.windowSizeClass == .compact` や `>= .large` のように比べる。境目の数値を画面ごとに書くと、M3 の window size class とずれたまま増える。
 
 ## 画面を足したら、本物のルーターで URL を開くテストも書く
 

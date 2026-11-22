@@ -16,9 +16,11 @@ enum WindowSizeClass {
     return large;
   }
 
-  factory WindowSizeClass.of(BuildContext context) =>
-      WindowSizeClass.fromWidth(MediaQuery.sizeOf(context).width);
-
   bool operator <(WindowSizeClass other) => index < other.index;
   bool operator >=(WindowSizeClass other) => index >= other.index;
+}
+
+extension WindowSizeClassOf on BuildContext {
+  WindowSizeClass get windowSizeClass =>
+      WindowSizeClass.fromWidth(MediaQuery.sizeOf(this).width);
 }

@@ -57,7 +57,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final compact = WindowSizeClass.of(context) == WindowSizeClass.compact;
+    final compact = context.windowSizeClass == .compact;
 
     return Scaffold(
       body: SafeArea(

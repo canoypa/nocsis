@@ -89,9 +89,9 @@ class _LoginFormState extends State<LoginForm> {
   Widget _intro() {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final sizeClass = WindowSizeClass.of(context);
-    final compact = sizeClass == WindowSizeClass.compact;
-    final expanded = sizeClass >= WindowSizeClass.expanded;
+    final sizeClass = context.windowSizeClass;
+    final compact = sizeClass == .compact;
+    final expanded = sizeClass >= .expanded;
     final description = widget.description;
 
     return Column(

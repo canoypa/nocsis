@@ -16,7 +16,7 @@ class PersonalEventsPageRoute extends GoRouteData
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    final isMobile = WindowSizeClass.of(context) < WindowSizeClass.large;
+    final isMobile = context.windowSizeClass < .large;
 
     return CustomTransitionPage(
       key: state.pageKey,

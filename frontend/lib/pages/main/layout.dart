@@ -115,8 +115,7 @@ class MainPage extends ConsumerWidget {
     return LayoutBuilder(
       builder: ((context, constraints) {
         final isLargeScreen =
-            WindowSizeClass.fromWidth(constraints.minWidth) >=
-            WindowSizeClass.large;
+            WindowSizeClass.fromWidth(constraints.minWidth) >= .large;
 
         return Scaffold(
           appBar: AppBar(actions: const [SelectGroupMenu(), AccountMenu()]),
