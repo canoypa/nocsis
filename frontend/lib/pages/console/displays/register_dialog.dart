@@ -92,6 +92,7 @@ class _RegisterDisplayDialogState extends ConsumerState<RegisterDisplayDialog> {
               controller: _code,
               errorText: _error,
               onChanged: (_) => setState(() {}),
+              onSubmitted: () => _canSubmit ? _submit() : null,
             ),
             const SizedBox(height: 40),
             TextField(
