@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/components/personal/class_list.dart';
 import 'package:nocsis/components/personal/event_list.dart';
 import 'package:nocsis/providers/day_schedules.dart';
@@ -40,7 +41,10 @@ class DaySchedule extends ConsumerWidget {
         );
       },
       loading: () {
-        return const Center(child: CircularProgressIndicator());
+        return const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: BasicCardListSkeleton(),
+        );
       },
       error: (error, stackTrace) {
         return const Center(child: Text('Something went wrong'));

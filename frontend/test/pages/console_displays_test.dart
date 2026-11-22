@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chopper/chopper.dart' as chopper;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,6 +70,35 @@ void main() {
     expect(find.text('登録が解除されています。使うときは端末で登録し直してください。'), findsOneWidget);
     expect(find.byTooltip('登録を解除'), findsOneWidget);
     expect(find.byTooltip('閉じる'), findsOneWidget);
+  });
+
+  testWidgets('読み込み中は一覧の形のスケルトンを出し、読み込んだら端末に替える', (tester) async {
+    final response = Completer<chopper.Response<Displays>>();
+    when(() => mockApi.apiV1GroupsGroupIdDisplaysGet(groupId: 'g1'))
+        .thenAnswer((_) => response.future);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          currentGroupIdProvider.overrideWithValue('g1'),
+          apiClientProvider.overrideWith((ref) async => mockApi),
+        ],
+        child: const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(child: ConsoleDisplaysPage()),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.bySemanticsLabel('読み込み中'), findsOneWidget);
+    expect(find.text('1年1組 黒板横'), findsNothing);
+
+    response.complete(_response(200, Displays(items: [active])));
+    await tester.pumpAndSettle();
+
+    expect(find.bySemanticsLabel('読み込み中'), findsNothing);
+    expect(find.text('1年1組 黒板横'), findsOneWidget);
   });
 
   testWidgets('1台も無いときも、一覧の場所を出す', (tester) async {
