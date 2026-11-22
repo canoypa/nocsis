@@ -36,6 +36,9 @@ jobs:
             }
           done
 
+  # backend と frontend のデプロイは lint と test を待たない。Staging は変更を
+  # 確かめる場所なので、待つより先に載せる。Firestore のルールはテストを通る前に
+  # 出すと Staging の実データを開けてしまうので、functions のデプロイだけは待つ。
   lint:
     permissions:
       contents: read
@@ -72,9 +75,10 @@ jobs:
     with:
       persist: true
       firebase_web_config: ${{ vars.STG_FIREBASE_WEB_CONFIG }}
+      cache: true
 
   deploy_backend:
-    needs: [lint, test, build_backend]
+    needs: [build_backend]
     permissions:
       id-token: write
     uses: ./.github/workflows/reusable-deploy_backend.yml
@@ -93,7 +97,7 @@ jobs:
       environment: Staging
 
   deploy_frontend:
-    needs: [lint, test, build_frontend, deploy_backend, deploy_functions]
+    needs: [build_frontend, deploy_backend]
     permissions:
       contents: read
       id-token: write

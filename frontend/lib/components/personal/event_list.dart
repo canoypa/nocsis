@@ -20,17 +20,12 @@ class EventListView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: (items).map((data) {
               // FIXME: swagger-dart-code-generator の制限により anyOf が dynamic 型になってしまうので、String として扱う
-              final DateTime? startDate = DateTime.tryParse(
-                data.startAt as String,
-              )?.toLocal();
-
-              final String dateText = startDate != null
-                  ? DateFormat("M月d日").format(startDate)
-                  : "日時不明";
+              final startDate = DateTime.parse(data.startAt as String)
+                  .toLocal();
 
               return BasicCard(
                 primary: Text(data.title),
-                secondary: Text(dateText),
+                secondary: Text(DateFormat("M月d日").format(startDate)),
               );
             }).toList(),
           ),
