@@ -15,6 +15,8 @@ import 'package:nocsis/pages/console/layout.dart';
 import 'package:nocsis/pages/console/members.dart';
 import 'package:nocsis/pages/console/slack.dart';
 import 'package:nocsis/pages/console/weather.dart';
+import 'package:nocsis/pages/display/pairing.dart';
+import 'package:nocsis/pages/display/register.dart';
 import 'package:nocsis/pages/group/group_layout.dart';
 import 'package:nocsis/pages/licenses.dart';
 import 'package:nocsis/pages/login.dart';
@@ -43,6 +45,7 @@ part 'console/console_shell_route.dart';
 part 'console/console_slack_page_route.dart';
 part 'console/console_top_page_route.dart';
 part 'console/console_weather_page_route.dart';
+part 'display_page_route.dart';
 part 'group/group_shell_route.dart';
 part 'licenses_page_route.dart';
 part 'login_page_route.dart';
@@ -55,7 +58,14 @@ part 'settings/settings_top_page_route.dart';
 part 'top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
-  routes: [groupShellRoute, licensesPageRoute, loginPageRoute, topPageRoute],
+  routes: [
+    displayPageRoute,
+    displayRegisterPageRoute,
+    groupShellRoute,
+    licensesPageRoute,
+    loginPageRoute,
+    topPageRoute,
+  ],
 )
 class AppShell extends ShellRouteData {
   @override
@@ -111,7 +121,10 @@ GoRouter router(Ref ref) {
 
     final me = await readMe(uid);
     if (me.memberships.isEmpty) {
-      return null;
+      // 登録が解除された端末は、また登録を待つ画面に戻す
+      final isAnonymous =
+          ref.read(firebaseAuthProvider).currentUser?.isAnonymous ?? false;
+      return isAnonymous ? DisplayPageRoute.path : null;
     }
 
     final firstGroupId = me.memberships.first.group.id;
@@ -123,12 +136,25 @@ GoRouter router(Ref ref) {
         : "/groups/$firstGroupId${uri.path}";
   }
 
-  String? redirectNotLoggedInUser(GoRouterState state) {
+  Future<String?> redirectNotLoggedInUser(GoRouterState state) async {
     final currentUser = ref.read(firebaseAuthProvider).currentUser;
-    final isLoggedIn = currentUser != null;
+    final sharedPreferences = await SharedPreferences.getInstance();
 
-    if (isLoggedIn || isPublic(state.fullPath ?? '')) {
+    if (currentUser != null) {
+      if (!currentUser.isAnonymous) {
+        await sharedPreferences.remove(displayDeviceKey);
+      }
       return null;
+    }
+
+    if (isPublic(state.fullPath ?? '')) {
+      return null;
+    }
+
+    // 登録を解除された端末はアカウントごと消え、サインアウトされる。ログイン画面に
+    // 出しても教室には操作する人がいないので、また登録を待つ画面に戻す
+    if (sharedPreferences.getBool(displayDeviceKey) ?? false) {
+      return DisplayPageRoute.path;
     }
 
     final continueUri = state.uri.toString() == "/" ? null : state.uri;
@@ -137,7 +163,8 @@ GoRouter router(Ref ref) {
 
   Future<String?> redirectLoggedInUser(GoRouterState state) async {
     final currentUser = ref.read(firebaseAuthProvider).currentUser;
-    final isLoggedIn = currentUser != null;
+    // 端末の匿名アカウントのままでも、人のアカウントでログインし直せるようにする
+    final isLoggedIn = currentUser != null && !currentUser.isAnonymous;
 
     if (!isLoggedIn || state.matchedLocation != LoginPageRoute().location) {
       return null;
@@ -197,6 +224,10 @@ GoRouter router(Ref ref) {
       await sharedPreferences.remove('latest_group_id');
     }
 
+    if (ref.read(firebaseAuthProvider).currentUser?.isAnonymous ?? false) {
+      return DisplayPageRoute.path;
+    }
+
     // 権限が無いことと、グループの存在を区別しない
     throw const _PageNotFound();
   }
@@ -207,7 +238,7 @@ GoRouter router(Ref ref) {
     // redirect で投げた例外もここに来る。どれも開けるページが無いという意味なので 404 に寄せる
     errorBuilder: (context, state) => const ErrorPage(),
     redirect: (context, state) async {
-      return redirectNotLoggedInUser(state) ??
+      return await redirectNotLoggedInUser(state) ??
           await redirectLoggedInUser(state) ??
           await redirectFromTopPage(state.uri) ??
           await redirectByAccess(state);

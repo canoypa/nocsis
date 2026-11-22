@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/core/deployed_version.dart';
 import 'package:nocsis/core/reload_page.dart';
+import 'package:nocsis/providers/firebase.dart';
 import 'package:nocsis/providers/during_class_data.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
@@ -74,6 +75,8 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
   @override
   Widget build(BuildContext context) {
     final groupId = ref.watch(currentGroupIdProvider);
+    final isDevice =
+        ref.watch(firebaseAuthProvider).currentUser?.isAnonymous ?? false;
     final duringClassData = ref
         .watch(duringClassDataProvider(groupId))
         .maybeWhen(data: (data) => data, orElse: () => null);
@@ -110,46 +113,48 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
                 );
               },
             ),
-            AnimatedOpacity(
-              opacity: _isMouseMoving ? 1 : 0,
-              duration: const Duration(milliseconds: 100),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 600),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerHighest,
-                      border: Border.all(
-                        width: 2,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: ListView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      children: [
-                        ListTile(
-                          title: const Text('教室ディスプレイを終了'),
-                          onTap: () {
-                            if (GoRouter.of(context).canPop()) {
-                              GoRouter.of(context).pop();
-                            } else {
-                              ConsoleTopPageRoute(groupId).go(context);
-                            }
-                          },
+            // 端末の匿名アカウントはコンソールを開けないので、戻り先が無い
+            if (!isDevice)
+              AnimatedOpacity(
+                opacity: _isMouseMoving ? 1 : 0,
+                duration: const Duration(milliseconds: 100),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
+                        border: Border.all(
+                          width: 2,
+                          color: Theme.of(context).colorScheme.outline,
                         ),
-                      ],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: ListView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        children: [
+                          ListTile(
+                            title: const Text('教室ディスプレイを終了'),
+                            onTap: () {
+                              if (GoRouter.of(context).canPop()) {
+                                GoRouter.of(context).pop();
+                              } else {
+                                ConsoleTopPageRoute(groupId).go(context);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),
