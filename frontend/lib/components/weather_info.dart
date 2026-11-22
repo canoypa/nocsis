@@ -36,7 +36,8 @@ class WeatherInfo extends ConsumerWidget {
     final weather = snapshot.value;
 
     if (weather == null) {
-      return snapshot.isLoading
+      // 失敗した後の再試行中も isLoading になる。そのたびに明滅させない
+      return snapshot.isLoading && !snapshot.hasError
           ? const _WeatherInfoSkeleton()
           : const SizedBox();
     }
