@@ -221,6 +221,32 @@ void main() {
       expect(find.text('「黒板横」の登録を解除しますか？'), findsOneWidget);
     });
 
+    for (final (button, finder, text) in [
+      ('コードで登録', find.text('コードで登録'), 'ディスプレイに表示されているコードを入力してください。'),
+      ('名前を変更', find.byTooltip('名前を変更'), '名前を変更'),
+      ('登録を解除', find.byTooltip('登録を解除'), '「黒板横」の登録を解除しますか？'),
+    ]) {
+      testWidgets('「$button」で開いたダイアログは、ブラウザの戻るで閉じる', (tester) async {
+        givenPermissions(Permission.values.toList());
+        await pumpApp(tester, '/groups/g1/console/displays');
+        final provider = container
+            .read(routerProvider)
+            .routeInformationProvider;
+        final beforeOpening = provider.value;
+
+        await tester.tap(finder);
+        await tester.pumpAndSettle();
+        expect(find.text(text), findsOneWidget);
+
+        // ブラウザの戻るは、開く前の履歴の URL と state を渡してくる
+        provider.didPushRouteInformation(beforeOpening);
+        await tester.pumpAndSettle();
+
+        expect(find.text(text), findsNothing);
+        expect(currentLocation(), '/groups/g1/console/displays');
+      });
+    }
+
     testWidgets('group.update を持たない相手には 404 を出す', (tester) async {
       givenPermissions([Permission.groupRead]);
 
