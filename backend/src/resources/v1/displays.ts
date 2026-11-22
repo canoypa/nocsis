@@ -15,7 +15,17 @@ export const displayPairingSchema = z
     description: "教室ディスプレイを登録するためのコード",
   });
 
-const displayName = z.string().trim().min(1).max(50);
+const graphemes = new Intl.Segmenter("ja", { granularity: "grapheme" });
+
+// max() は UTF-16 で数えるので、絵文字や濁点を合成した文字が見た目より長くなる
+const withinDisplayNameLength = (name: string) =>
+  [...graphemes.segment(name)].length <= 50;
+
+const displayName = z
+  .string()
+  .trim()
+  .min(1)
+  .refine(withinDisplayNameLength, "名前は50文字まで");
 
 export const displaySchema = z
   .object({
@@ -44,10 +54,15 @@ export const displaysSchema = z
 export const displayCreateJsonSchema = z
   .object({
     code: displayPairingSchema.shape.code,
-    name: z.string().trim().max(50).optional().meta({
-      description:
-        "名前。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
-    }),
+    name: z
+      .string()
+      .trim()
+      .refine(withinDisplayNameLength, "名前は50文字まで")
+      .optional()
+      .meta({
+        description:
+          "名前。見た目で50文字まで。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
+      }),
   })
   .meta({
     $id: "DisplayCreateJson",
@@ -56,7 +71,7 @@ export const displayCreateJsonSchema = z
 
 export const displayPatchJsonSchema = z
   .object({
-    name: displayName.meta({ description: "名前" }),
+    name: displayName.meta({ description: "名前。見た目で50文字まで" }),
   })
   .meta({
     $id: "DisplayPatchJson",
