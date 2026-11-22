@@ -135,7 +135,7 @@ class DrawerLayout extends ConsumerWidget {
           return SingleChildScrollView(
             child: Container(
               constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
               child: child,
             ),
           );
