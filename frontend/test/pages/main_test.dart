@@ -93,6 +93,10 @@ void main() {
       });
 
       expect(find.text('文化祭'), findsOneWidget);
+      expect(
+        find.text(DateFormat('M月d日').format(DateTime.now())),
+        findsOneWidget,
+      );
       expect(find.text('予定なし'), findsNothing);
     });
 
