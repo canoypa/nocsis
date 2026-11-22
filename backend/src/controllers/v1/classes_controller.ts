@@ -138,7 +138,7 @@ classesRoutes.get(
         classSchema.parse({
           startAt: startAt.toISO(),
           endAt: endAt.toISO(),
-          title: item.summary,
+          title: item.summary || "",
           period: index + 1,
         }),
       ];
