@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
@@ -9,28 +10,20 @@ import 'package:riverpod_annotation/experimental/scope.dart';
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {
-  home(
-    label: "ホーム",
-    icon: Icons.school_outlined,
-    selectedIcon: Icons.school,
-    pagePath: "/groups/:groupId",
-  ),
+  home(label: "ホーム", icon: Symbols.school, pagePath: "/groups/:groupId"),
   events(
     label: "イベント",
-    icon: Icons.event_outlined,
-    selectedIcon: Icons.event,
+    icon: Symbols.event,
     pagePath: "/groups/:groupId/events",
   );
 
   final String label;
   final IconData icon;
-  final IconData selectedIcon;
   final String pagePath;
 
   const Navigation({
     required this.label,
     required this.icon,
-    required this.selectedIcon,
     required this.pagePath,
   });
 
@@ -67,7 +60,7 @@ class MainPage extends ConsumerWidget {
             (e) => NavigationRailDestination(
               label: Text(e.label),
               icon: Icon(e.icon),
-              selectedIcon: Icon(e.selectedIcon),
+              selectedIcon: Icon(e.icon, fill: 1),
             ),
           )
           .toList(),
@@ -96,7 +89,7 @@ class MainPage extends ConsumerWidget {
             (e) => NavigationDestination(
               label: e.label,
               icon: Icon(e.icon),
-              selectedIcon: Icon(e.selectedIcon),
+              selectedIcon: Icon(e.icon, fill: 1),
             ),
           )
           .toList(),

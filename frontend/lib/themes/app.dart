@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 ThemeData _createTheme({required ThemeMode mode}) {
   final buttonStyle = ButtonStyle(
@@ -13,6 +14,12 @@ ThemeData _createTheme({required ThemeMode mode}) {
     elevatedButtonTheme: ElevatedButtonThemeData(style: buttonStyle),
     outlinedButtonTheme: OutlinedButtonThemeData(style: buttonStyle),
     textButtonTheme: TextButtonThemeData(style: buttonStyle),
+    actionIconTheme: ActionIconThemeData(
+      backButtonIconBuilder: (_) => const Icon(Symbols.arrow_back),
+      closeButtonIconBuilder: (_) => const Icon(Symbols.close),
+      drawerButtonIconBuilder: (_) => const Icon(Symbols.menu),
+      endDrawerButtonIconBuilder: (_) => const Icon(Symbols.menu),
+    ),
   );
 
   return base.copyWith(

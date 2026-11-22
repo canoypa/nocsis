@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:nocsis/providers/daydudy.dart';
@@ -22,7 +23,7 @@ class Daydudy extends ConsumerWidget {
 
     return Row(
       children: [
-        Icon(Icons.person_pin_outlined, size: 48.sp),
+        Icon(Symbols.person_pin, size: 48.sp),
         const SizedBox(width: 8),
         Text(daydudy.name, style: Theme.of(context).textTheme.titleMedium),
       ],

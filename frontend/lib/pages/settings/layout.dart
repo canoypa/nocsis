@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
@@ -28,7 +29,7 @@ class SettingsLayout extends ConsumerWidget {
       backgroundColor: background,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_outlined),
+          icon: const Icon(Symbols.arrow_back),
           onPressed: () {
             if (GoRouter.of(context).canPop()) {
               GoRouter.of(context).pop();

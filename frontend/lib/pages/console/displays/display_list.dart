@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/components/skeleton.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/pages/console/displays/rename_dialog.dart';
 import 'package:nocsis/providers/api_client.dart';
@@ -21,6 +22,38 @@ class EmptyDisplayList extends StatelessWidget {
         child: Text(
           'まだありません。',
           style: TextStyle(color: colorScheme.onSurfaceVariant),
+        ),
+      ),
+    );
+  }
+}
+
+/// 読み込み中の [DisplayList]。端末の数は分からないので 2 行出す
+class DisplayListSkeleton extends StatelessWidget {
+  const DisplayListSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card.outlined(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: Skeleton(
+        child: Column(
+          children: [
+            for (final (index, width) in [140.0, 100.0].indexed) ...[
+              if (index > 0)
+                Divider(height: 1, color: colorScheme.outlineVariant),
+              ListTile(
+                leading: const SkeletonBlock(width: 24, height: 24),
+                title: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SkeletonBlock(width: width),
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
