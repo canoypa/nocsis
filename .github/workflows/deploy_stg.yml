@@ -36,8 +36,9 @@ jobs:
             }
           done
 
-  # デプロイは lint と test を待たない。同じ検査は PR の CI でも走り、Staging は
-  # 変更を確かめる場所なので、待つより先に載せる。結果はこの実行に残る。
+  # backend と frontend のデプロイは lint と test を待たない。Staging は変更を
+  # 確かめる場所なので、待つより先に載せる。Firestore のルールはテストを通る前に
+  # 出すと Staging の実データを開けてしまうので、functions のデプロイだけは待つ。
   lint:
     permissions:
       contents: read
@@ -87,7 +88,7 @@ jobs:
       promote: true
 
   deploy_functions:
-    needs: [build_functions]
+    needs: [lint, test, build_functions]
     permissions:
       contents: read
       id-token: write
@@ -96,7 +97,7 @@ jobs:
       environment: Staging
 
   deploy_frontend:
-    needs: [build_frontend, deploy_backend, deploy_functions]
+    needs: [build_frontend, deploy_backend]
     permissions:
       contents: read
       id-token: write
