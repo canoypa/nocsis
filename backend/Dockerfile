@@ -5,7 +5,7 @@ ENV NODE_ENV=production
 
 FROM base AS builder-base
 
-ENV PNPM_VERSION=12.20.0
+ENV PNPM_VERSION=12.21.0
 
 RUN npm install --global pnpm@${PNPM_VERSION}
 
