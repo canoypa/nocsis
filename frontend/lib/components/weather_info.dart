@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nocsis/components/skeleton.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/weather.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
@@ -32,16 +33,19 @@ class WeatherInfo extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
-    final snapshot = ref.watch(weatherProvider(groupId));
-    final weather = snapshot.value;
+    // 15分ごとの読み直しや失敗した後の読み直しでは、前の表示のままにする
+    return ref
+        .watch(weatherProvider(groupId))
+        .when(
+          skipLoadingOnReload: true,
+          skipError: true,
+          data: (weather) => _weather(context, weather),
+          error: (_, _) => const SizedBox(),
+          loading: () => const _WeatherInfoSkeleton(),
+        );
+  }
 
-    if (weather == null) {
-      // 失敗した後の再試行中も isLoading になる。そのたびに明滅させない
-      return snapshot.isLoading && !snapshot.hasError
-          ? const _WeatherInfoSkeleton()
-          : const SizedBox();
-    }
-
+  Widget _weather(BuildContext context, WeatherData weather) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
