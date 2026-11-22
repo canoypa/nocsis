@@ -69,6 +69,15 @@ void main() {
     expect(find.byTooltip('閉じる'), findsOneWidget);
   });
 
+  testWidgets('1台も無いときも、一覧の場所を出す', (tester) async {
+    when(() => mockApi.apiV1GroupsGroupIdDisplaysGet(groupId: 'g1'))
+        .thenAnswer((_) async => _response(200, const Displays(items: [])));
+    await pumpPage(tester);
+
+    expect(find.text('登録済みの端末'), findsOneWidget);
+    expect(find.text('まだありません。'), findsOneWidget);
+  });
+
   testWidgets('確かめてから登録を解除する', (tester) async {
     when(
       () => mockApi.apiV1GroupsGroupIdDisplaysDisplayIdDelete(

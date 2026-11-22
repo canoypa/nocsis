@@ -57,10 +57,11 @@ class ConsoleDisplaysPage extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
+            Text('登録済みの端末', style: textTheme.titleMedium),
+            const SizedBox(height: 8),
             switch (displays) {
-              AsyncData(:final value) when value.isEmpty =>
-                const SizedBox.shrink(),
+              AsyncData(:final value) when value.isEmpty => const _EmptyList(),
               AsyncData(:final value) => _DisplayList(
                 groupId: groupId,
                 displays: value,
@@ -69,6 +70,27 @@ class ConsoleDisplaysPage extends ConsumerWidget {
               _ => const LinearProgressIndicator(),
             },
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyList extends StatelessWidget {
+  const _EmptyList();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card.outlined(
+      margin: EdgeInsets.zero,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          'まだありません。',
+          style: TextStyle(color: colorScheme.onSurfaceVariant),
         ),
       ),
     );
