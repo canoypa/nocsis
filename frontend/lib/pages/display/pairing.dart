@@ -32,6 +32,7 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
   DateTime? _reissueAt;
   Timer? _timer;
   bool _polling = false;
+  bool _leaving = false;
 
   @override
   void initState() {
@@ -116,8 +117,34 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
       }
     }
 
+    // やめた直後に問い合わせが終わると、消したアカウントを作り直してしまう
+    if (_leaving) return;
     await auth.signInAnonymously();
     ref.invalidate(apiClientProvider);
+  }
+
+  Future<void> _cancel() async {
+    setState(() => _leaving = true);
+    _timer?.cancel();
+
+    try {
+      final client = await ref.read(apiClientProvider.future);
+      final response = await client.apiV1DisplayPairingsDelete();
+      // 押したのと同時に登録されていたら、そのまま教室の画面へ進める
+      if (response.statusCode == 409) {
+        if (!mounted) return;
+        setState(() => _leaving = false);
+        await _poll();
+        return;
+      }
+    } catch (_) {
+      // 消せなかったコードは期限で、アカウントは使われなくなった端末の掃除で消える
+    }
+
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(displayDeviceKey);
+    await ref.read(firebaseAuthProvider).signOut();
+    if (mounted) context.go('/login');
   }
 
   /// 期限はサーバの時刻なので、端末の時計がずれていても効くよう、残り時間に直して数える
@@ -137,7 +164,10 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
 
         return Theme(
           data: theme,
-          child: _PairingView(pairing: _pairing),
+          child: _PairingView(
+            pairing: _pairing,
+            onCancel: _leaving ? null : _cancel,
+          ),
         );
       },
     );
@@ -146,8 +176,9 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
 
 class _PairingView extends StatelessWidget {
   final DisplayPairing? pairing;
+  final VoidCallback? onCancel;
 
-  const _PairingView({required this.pairing});
+  const _PairingView({required this.pairing, required this.onCancel});
 
   @override
   Widget build(BuildContext context) {
@@ -247,6 +278,8 @@ class _PairingView extends StatelessWidget {
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
+                SizedBox(width: 16.r),
+                TextButton(onPressed: onCancel, child: const Text('登録をやめる')),
               ],
             ),
           ),
