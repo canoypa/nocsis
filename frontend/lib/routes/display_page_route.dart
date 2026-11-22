@@ -28,15 +28,20 @@ class DisplayPageRoute extends GoRouteData with $DisplayPageRoute {
 
 class DisplayRegisterPageRoute extends GoRouteData
     with $DisplayRegisterPageRoute {
-  final String code;
+  /// 手で URL を打つと抜けることがある
+  final String? code;
 
-  const DisplayRegisterPageRoute({required this.code});
+  const DisplayRegisterPageRoute({this.code});
+
+  @override
+  String? redirect(BuildContext context, GoRouterState state) =>
+      code == null ? const TopPageRoute().location : null;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: DisplayRegisterPage(code: code),
+      child: DisplayRegisterPage(code: code ?? ''),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,

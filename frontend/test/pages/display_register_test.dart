@@ -87,11 +87,11 @@ void main() {
     expect(find.text('一覧 g1'), findsOneWidget);
   });
 
-  testWidgets('期限が切れていれば、読み取り直すよう出す', (tester) async {
+  testWidgets('コードが使えなければ、読み取り直すよう出す', (tester) async {
     await pumpPage(tester, 404);
 
     expect(
-      find.text('コードの期限が切れています。ディスプレイの QR コードを読み取り直してください。'),
+      find.text('コードが違うか、期限が切れています。ディスプレイの QR コードを読み取り直してください。'),
       findsOneWidget,
     );
   });

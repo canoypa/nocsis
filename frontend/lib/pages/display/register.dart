@@ -68,7 +68,7 @@ class _DisplayRegisterPageState extends ConsumerState<DisplayRegisterPage> {
     setState(() {
       _submitting = false;
       _error = switch (status) {
-        404 => 'コードの期限が切れています。ディスプレイの QR コードを読み取り直してください。',
+        404 => 'コードが違うか、期限が切れています。ディスプレイの QR コードを読み取り直してください。',
         429 => '間違いが続いたため、少し時間をおいてから登録してください。',
         _ => '登録できませんでした。',
       };
