@@ -17,8 +17,15 @@ class SettingsLayout extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
 
+    final width = MediaQuery.sizeOf(context).width;
+    final compact = width < 600;
+    final colorScheme = Theme.of(context).colorScheme;
+    final background = compact
+        ? colorScheme.surface
+        : colorScheme.surfaceContainer;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+      backgroundColor: background,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_outlined),
@@ -32,30 +39,38 @@ class SettingsLayout extends ConsumerWidget {
         ),
         actions: const [SelectGroupMenu(), AccountMenu()],
         centerTitle: false,
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-        surfaceTintColor: Theme.of(context).colorScheme.surfaceContainer,
+        backgroundColor: background,
+        surfaceTintColor: background,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Container(
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.all(Radius.circular(28)),
-          ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: Container(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  padding: const EdgeInsets.all(64),
-                  child: child,
+      body: compact
+          ? _scrollable(padding: const EdgeInsets.fromLTRB(16, 8, 16, 24))
+          : Padding(
+              padding: const EdgeInsets.all(8),
+              child: Container(
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: const BorderRadius.all(Radius.circular(28)),
                 ),
-              );
-            },
+                child: _scrollable(
+                  padding: EdgeInsets.all(width < 1200 ? 24 : 64),
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget _scrollable({required EdgeInsets padding}) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: Container(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            padding: padding,
+            child: child,
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
