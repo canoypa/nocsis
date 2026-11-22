@@ -71,10 +71,10 @@ describe("教室ディスプレイ", () => {
     return (await response.json()) as { code: string; expires_at: string };
   };
 
-  const register = (code: string, name = "1年1組 黒板横") =>
+  const register = (code: string, name: string | null = "1年1組 黒板横") =>
     request(`/api/v1/groups/${GROUP_ID}/displays`, adminLogin.idToken, {
       method: "POST",
-      body: { code, name },
+      body: name === null ? { code } : { code, name },
     });
 
   describe("POST /api/v1/display-pairings", () => {
@@ -133,6 +133,29 @@ describe("教室ディスプレイ", () => {
       expect((await register(code)).status).toBe(404);
     });
 
+    it("名前を省くか空にすると、使われていない一番小さい「ディスプレイ N」を付けること", async () => {
+      const displaysOf = firestore.collection(`groups/${GROUP_ID}/displays`);
+      await displaysOf
+        .doc("a")
+        .set({ name: "ディスプレイ 1", created_at: Timestamp.now() });
+      await displaysOf
+        .doc("b")
+        .set({ name: "ディスプレイ 3", created_at: Timestamp.now() });
+      await displaysOf
+        .doc("c")
+        .set({ name: "前方", created_at: Timestamp.now() });
+
+      const first = await register((await issue()).code, null);
+      expect(await first.json()).toMatchObject({ name: "ディスプレイ 2" });
+
+      const second = await register((await issue()).code, "  ");
+      expect(await second.json()).toMatchObject({ name: "ディスプレイ 2" });
+
+      await Promise.all(
+        ["a", "b", "c"].map((id) => displaysOf.doc(id).delete()),
+      );
+    });
+
     it("期限の切れたコードは 404 になること", async () => {
       const { code } = await issue();
       await firestore
@@ -175,10 +198,10 @@ describe("教室ディスプレイ", () => {
       expect((await register(code)).status).toBe(404);
     });
 
-    it("名前が空なら 400 を返すこと", async () => {
+    it("名前が50文字を超えたら 400 を返すこと", async () => {
       const { code } = await issue();
 
-      expect((await register(code, "  ")).status).toBe(400);
+      expect((await register(code, "あ".repeat(51))).status).toBe(400);
     });
   });
 

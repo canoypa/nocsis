@@ -39,6 +39,7 @@ dependencies:
   material_symbols_icons: ^4.2960.0
   qr_flutter: ^4.1.0
   cloud_firestore: ^7.2.0
+  google_identity_services_web: ^0.3.3+1
 
 dev_dependencies:
   flutter_test:
