@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nocsis/pages/console/displays/display_name.dart';
 
 void main() {
-  test('名前の長さは、絵文字や濁点を合成した文字も見た目の1文字で数える', () {
+  test('絵文字や濁点を合成した文字も1文字と数える', () {
     const family = '👨‍👩‍👧';
     const ga = 'が';
 
