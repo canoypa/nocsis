@@ -127,7 +127,7 @@ class EventsView extends ConsumerWidget {
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 800),
-            child: const Padding(
+            child: const SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 8),
               child: BasicCardListSkeleton(),
             ),

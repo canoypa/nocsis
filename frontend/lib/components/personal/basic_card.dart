@@ -18,7 +18,7 @@ class BasicCard extends StatelessWidget {
   }
 }
 
-/// 読み込み中の [BasicCard] の並び。中身の数は分からないので 3 枚出す
+/// 読み込み中の、見出しと [BasicCard] の並び。中身の数は分からないので 3 枚出す
 class BasicCardListSkeleton extends StatelessWidget {
   const BasicCardListSkeleton({super.key});
 
@@ -28,6 +28,12 @@ class BasicCardListSkeleton extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const ListTile(
+            title: Align(
+              alignment: Alignment.centerLeft,
+              child: SkeletonBlock(width: 48, height: 16),
+            ),
+          ),
           for (final width in [80.0, 64.0, 72.0])
             BasicCard(
               primary: Align(
