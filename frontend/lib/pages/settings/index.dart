@@ -584,7 +584,7 @@ class _ReplaceGoogleAccountDialogState
 }
 
 /// 変更が再認証を求められたときだけ、変更のフォームを再認証の LoginForm に切り替える。
-class _ReauthenticationDialog extends StatelessWidget {
+class _ReauthenticationDialog extends StatefulWidget {
   final String title;
   final User currentUser;
   final bool reauthenticating;
@@ -600,18 +600,30 @@ class _ReauthenticationDialog extends StatelessWidget {
   });
 
   @override
+  State<_ReauthenticationDialog> createState() =>
+      _ReauthenticationDialogState();
+}
+
+class _ReauthenticationDialogState extends State<_ReauthenticationDialog> {
+  /// 画面を回して幅が変わっても、入力中のフォームを作り直さない
+  final _contentKey = GlobalKey();
+
+  @override
   Widget build(BuildContext context) {
-    final content = PageTransitionSwitcher(
-      transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-        return SharedAxisTransition(
-          animation: primaryAnimation,
-          secondaryAnimation: secondaryAnimation,
-          transitionType: SharedAxisTransitionType.horizontal,
-          fillColor: Colors.transparent,
-          child: child,
-        );
-      },
-      child: reauthenticating ? _loginForm(context) : form,
+    final content = KeyedSubtree(
+      key: _contentKey,
+      child: PageTransitionSwitcher(
+        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+          return SharedAxisTransition(
+            animation: primaryAnimation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.horizontal,
+            fillColor: Colors.transparent,
+            child: child,
+          );
+        },
+        child: widget.reauthenticating ? _loginForm(context) : widget.form,
+      ),
     );
 
     if (!_isCompact(context)) {
@@ -626,7 +638,7 @@ class _ReauthenticationDialog extends StatelessWidget {
             icon: const Icon(Symbols.close),
           ),
         ),
-        body: content,
+        body: SafeArea(top: false, child: content),
       ),
     );
   }
@@ -634,10 +646,10 @@ class _ReauthenticationDialog extends StatelessWidget {
   Widget _loginForm(BuildContext context) {
     return _ReauthenticationCard(
       child: LoginForm(
-        title: title,
+        title: widget.title,
         description: '続けるには、もう一度ログインしてください。',
         onGoogleLogin: () async {
-          final googleEmail = currentUser.providerData
+          final googleEmail = widget.currentUser.providerData
               .firstWhereOrNull(
                 (e) => e.providerId == GoogleAuthProvider.PROVIDER_ID,
               )
@@ -647,7 +659,7 @@ class _ReauthenticationDialog extends StatelessWidget {
             provider.setCustomParameters({'login_hint': googleEmail});
           }
           try {
-            await currentUser.reauthenticateWithPopup(provider);
+            await widget.currentUser.reauthenticateWithPopup(provider);
           } on FirebaseAuthException catch (e) {
             if (e.code != 'user-mismatch' || !context.mounted) rethrow;
             ScaffoldMessenger.of(context).showSnackBar(
@@ -655,15 +667,15 @@ class _ReauthenticationDialog extends StatelessWidget {
             );
             return;
           }
-          await onReauthenticated();
+          await widget.onReauthenticated();
         },
         onPasswordLogin: (email, password) async {
           final credential = EmailAuthProvider.credential(
             email: email,
             password: password,
           );
-          await currentUser.reauthenticateWithCredential(credential);
-          await onReauthenticated();
+          await widget.currentUser.reauthenticateWithCredential(credential);
+          await widget.onReauthenticated();
           return true;
         },
       ),
@@ -680,17 +692,13 @@ class _ReauthenticationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (_isCompact(context)) {
-      return SingleChildScrollView(padding: _compactPadding, child: child);
-    }
+    final compact = _isCompact(context);
+
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      ),
+      decoration: _dialogSurface(context, compact: compact),
       constraints: const BoxConstraints(maxWidth: 1200),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: compact ? _compactPadding : const EdgeInsets.all(24),
         child: child,
       ),
     );
@@ -703,7 +711,8 @@ bool _isCompact(BuildContext context) =>
 
 const _compactPadding = EdgeInsets.fromLTRB(16, 8, 16, 24);
 
-/// 変更のフォームの見出しと面。全画面のときは面を付けない
+/// 変更のフォームの見出しと面。全画面のときは面を付けない。
+/// 幅が変わっても入力中の欄を作り直さないよう、どちらの幅でも同じ形に組む
 class _DialogForm extends StatelessWidget {
   final String title;
   final List<Widget> children;
@@ -713,37 +722,40 @@ class _DialogForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final compact = _isCompact(context);
 
-    if (_isCompact(context)) {
-      return SingleChildScrollView(
-        padding: _compactPadding,
+    return Container(
+      decoration: _dialogSurface(context, compact: compact),
+      constraints: const BoxConstraints(maxWidth: 800),
+      child: SingleChildScrollView(
+        padding: compact ? _compactPadding : const EdgeInsets.all(64),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: textTheme.headlineSmall),
-            const SizedBox(height: 24),
+            Align(
+              alignment: compact ? Alignment.centerLeft : Alignment.center,
+              child: Text(
+                title,
+                style: compact
+                    ? textTheme.headlineSmall
+                    : textTheme.displaySmall,
+              ),
+            ),
+            SizedBox(height: compact ? 24 : 48),
             ...children,
           ],
         ),
-      );
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      ),
-      constraints: const BoxConstraints(maxWidth: 800),
-      padding: const EdgeInsets.all(64),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(child: Text(title, style: textTheme.displaySmall)),
-          const SizedBox(height: 48),
-          ...children,
-        ],
       ),
     );
   }
 }
+
+/// 全画面のときも DecoratedBox を残し、幅が変わったときに中身を作り直させない
+BoxDecoration _dialogSurface(BuildContext context, {required bool compact}) =>
+    BoxDecoration(
+      borderRadius: BorderRadius.circular(28),
+      color: compact
+          ? null
+          : Theme.of(context).colorScheme.surfaceContainerHigh,
+    );
