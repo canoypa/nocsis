@@ -110,6 +110,77 @@ describe("PUT /api/v1/me/google-account", () => {
     expect(await googleIds(user.uid)).toEqual(["google_old"]);
   });
 
+  it("確かめた後に別のユーザーが同じアカウントを連携していたら 409 を返し、元のアカウントに戻す", async () => {
+    await auth.createUser({ uid: "test_user_2" });
+    await auth.updateUser(user.uid, {
+      providerToLink: { providerId: "google.com", uid: "google_old" },
+    });
+    vi.spyOn(auth, "getUserByProviderUid").mockImplementationOnce(async () => {
+      // 確かめた直後に、別のユーザーが連携する
+      await auth.updateUser("test_user_2", {
+        providerToLink: { providerId: "google.com", uid: "google_new" },
+      });
+      throw Object.assign(new Error("not found"), {
+        code: "auth/user-not-found",
+      });
+    });
+    // エミュレータは連携済みのアカウントでも付けられてしまうので、本番の拒否を真似る
+    const updateUser = auth.updateUser.bind(auth);
+    vi.spyOn(auth, "updateUser").mockImplementation((uid, properties) =>
+      uid === user.uid && properties.providerToLink?.uid === "google_new"
+        ? Promise.reject(
+            Object.assign(new Error("FEDERATED_USER_ID_ALREADY_LINKED"), {
+              code: "auth/internal-error",
+            }),
+          )
+        : updateUser(uid, properties),
+    );
+
+    const res = await put(loginResult.idToken);
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toMatchObject({ code: "linked-to-another-user" });
+    expect(await googleIds(user.uid)).toEqual(["google_old"]);
+  });
+
+  it("同じユーザーの差し替えが途中なら 409 を返し、連携を変えない", async () => {
+    await auth.updateUser(user.uid, {
+      providerToLink: { providerId: "google.com", uid: "google_old" },
+    });
+    await firestore
+      .collection("googleAccountSwaps")
+      .doc(user.uid)
+      .set({ previous: { id: "google_old" } });
+
+    const res = await put(loginResult.idToken);
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toMatchObject({ code: "in-progress" });
+    expect(await googleIds(user.uid)).toEqual(["google_old"]);
+  });
+
+  it("外すのに失敗したら、差し替えの記録を残さない", async () => {
+    await auth.updateUser(user.uid, {
+      providerToLink: { providerId: "google.com", uid: "google_old" },
+    });
+    const updateUser = auth.updateUser.bind(auth);
+    vi.spyOn(auth, "updateUser").mockImplementation((uid, properties) =>
+      properties.providersToUnlink
+        ? Promise.reject(new Error("unavailable"))
+        : updateUser(uid, properties),
+    );
+
+    const res = await put(loginResult.idToken);
+
+    expect(res.status).toBe(500);
+    expect(await googleIds(user.uid)).toEqual(["google_old"]);
+    const swap = await firestore
+      .collection("googleAccountSwaps")
+      .doc(user.uid)
+      .get();
+    expect(swap.exists).toBe(false);
+  });
+
   // 外すのと付けるのが別の更新なので、付けられなければ Google の連携が無いまま残る
   const failLinking = (googleIds: string[]) => {
     const updateUser = auth.updateUser.bind(auth);

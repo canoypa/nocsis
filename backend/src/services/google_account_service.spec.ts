@@ -57,6 +57,14 @@ describe("verifyGoogleAccessToken", () => {
     expect(await verifyGoogleAccessToken("token")).toBeNull();
   });
 
+  it("Google 側の障害は、無効なトークンとして扱わない", async () => {
+    externalApiServer.use(
+      http.post(TOKEN_INFO_URL, () => new HttpResponse(null, { status: 503 })),
+    );
+
+    await expect(verifyGoogleAccessToken("token")).rejects.toThrow();
+  });
+
   it("無効なトークンなら null を返す", async () => {
     externalApiServer.use(
       http.post(TOKEN_INFO_URL, () =>

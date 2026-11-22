@@ -26,8 +26,13 @@ export const verifyGoogleAccessToken = async (
   let info: Awaited<ReturnType<OAuth2Client["getTokenInfo"]>>;
   try {
     info = await oauth2Client.getTokenInfo(accessToken);
-  } catch {
-    return null;
+  } catch (err) {
+    // 無効なトークンは 400 で返る。Google 側の障害は、トークンのせいにしない
+    const status = (err as { response?: { status?: number } }).response?.status;
+    if (status !== undefined && status < 500) {
+      return null;
+    }
+    throw err;
   }
 
   if (info.aud !== clientId || !info.sub) {
@@ -43,7 +48,7 @@ export const verifyGoogleAccessToken = async (
 
 export type ReplaceGoogleAccountResult =
   | { ok: true }
-  | { ok: false; reason: "linked_to_another_user" };
+  | { ok: false; reason: "linked_to_another_user" | "in_progress" };
 
 /** 差し替えの途中で止まったときに、元の Google アカウントを付け直せるよう控えておく */
 const SWAP_COLLECTION = "googleAccountSwaps";
@@ -60,6 +65,14 @@ const linkGoogleAccount = (uid: string, account: GoogleAccount) =>
     },
   });
 
+const findGoogleAccountOwner = (googleId: string) =>
+  auth
+    .getUserByProviderUid(GOOGLE_PROVIDER_ID, googleId)
+    .catch((err: unknown) => {
+      if (isAuthError(err, "auth/user-not-found")) return null;
+      throw err;
+    });
+
 /**
  * ユーザーに連携する Google アカウントを差し替える。
  * Firebase は外すのと付けるのを1回の更新で受け付けない（付ける方を先に検査して
@@ -69,14 +82,7 @@ export const replaceGoogleAccount = async (
   uid: string,
   account: GoogleAccount,
 ): Promise<ReplaceGoogleAccountResult> => {
-  const owner = await auth
-    .getUserByProviderUid(GOOGLE_PROVIDER_ID, account.id)
-    .catch((err: unknown) => {
-      if (isAuthError(err, "auth/user-not-found")) {
-        return null;
-      }
-      throw err;
-    });
+  const owner = await findGoogleAccountOwner(account.id);
   if (owner) {
     return owner.uid === uid
       ? { ok: true }
@@ -94,29 +100,42 @@ export const replaceGoogleAccount = async (
 
   const swapRef = firestore.collection(SWAP_COLLECTION).doc(uid);
   if (previous) {
-    await swapRef.set({
-      previous: { id: previous.id, email: previous.email ?? null },
-      next: { id: account.id, email: account.email ?? null },
-      startedAt: FieldValue.serverTimestamp(),
-    });
-    await auth.updateUser(uid, { providersToUnlink: [GOOGLE_PROVIDER_ID] });
+    // 同じユーザーの差し替えが重なると、互いの外す・付けるが入り混じる。
+    // 元に戻せなかった記録が残っているときも、付け直すまで進めない
+    const started = await swapRef
+      .create({
+        previous: { id: previous.id, email: previous.email ?? null },
+        next: { id: account.id, email: account.email ?? null },
+        startedAt: FieldValue.serverTimestamp(),
+      })
+      .then(
+        () => true,
+        (err: unknown) => {
+          if (isFirestoreAlreadyExists(err)) return false;
+          throw err;
+        },
+      );
+    if (!started) return { ok: false, reason: "in_progress" };
+
+    try {
+      await auth.updateUser(uid, { providersToUnlink: [GOOGLE_PROVIDER_ID] });
+    } catch (err) {
+      await swapRef.delete();
+      throw err;
+    }
   }
 
   try {
     await linkGoogleAccount(uid, account);
   } catch (err) {
     if (previous) {
-      await restoreGoogleAccount(uid, previous);
+      await restoreGoogleAccount(uid, previous, err);
       await swapRef.delete();
     }
-    // 確かめてから付けるまでの間に、別のユーザーが同じアカウントを連携したとき
-    if (
-      isAuthError(
-        err,
-        "auth/credential-already-in-use",
-        "auth/uid-already-exists",
-      )
-    ) {
+    // 確かめてから付けるまでの間に、別のユーザーが同じアカウントを連携したとき。
+    // Admin SDK はこのエラー (FEDERATED_USER_ID_ALREADY_LINKED) を internal-error にするので、持ち主を見直す
+    const owner = await findGoogleAccountOwner(account.id);
+    if (owner && owner.uid !== uid) {
       return { ok: false, reason: "linked_to_another_user" };
     }
     throw err;
@@ -128,17 +147,37 @@ export const replaceGoogleAccount = async (
   return { ok: true };
 };
 
-const restoreGoogleAccount = async (uid: string, previous: GoogleAccount) => {
-  try {
-    await linkGoogleAccount(uid, previous);
-  } catch (err) {
-    console.log(
-      JSON.stringify({
-        severity: "ERROR",
-        message: `Google アカウントを元に戻せなかった。${SWAP_COLLECTION} の記録から付け直す`,
-        uid,
-      }),
-    );
-    throw err;
+// gRPC の ALREADY_EXISTS
+const isFirestoreAlreadyExists = (err: unknown) =>
+  err instanceof Error && "code" in err && err.code === 6;
+
+const RESTORE_ATTEMPTS = 3;
+
+const restoreGoogleAccount = async (
+  uid: string,
+  previous: GoogleAccount,
+  linkError: unknown,
+) => {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= RESTORE_ATTEMPTS; attempt++) {
+    try {
+      await linkGoogleAccount(uid, previous);
+      return;
+    } catch (err) {
+      lastError = err;
+      if (attempt < RESTORE_ATTEMPTS) {
+        await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+      }
+    }
   }
+  console.log(
+    JSON.stringify({
+      severity: "ERROR",
+      message: `Google アカウントを元に戻せなかった。${SWAP_COLLECTION} の記録から付け直す`,
+      uid,
+      linkError: String(linkError),
+      restoreError: String(lastError),
+    }),
+  );
+  throw new Error("Google アカウントを元に戻せなかった", { cause: lastError });
 };

@@ -99,7 +99,8 @@ meRoutes.put(
           "匿名アカウントか、最後のログインから時間がたっている (`code` が `requires-recent-login`)",
       },
       409: {
-        description: "その Google アカウントは別のユーザーと連携している",
+        description:
+          "その Google アカウントは別のユーザーと連携している (`code` が `linked-to-another-user`) か、差し替えの途中 (`code` が `in-progress`)",
       },
       500: { description: "Internal Server Error" },
     },
@@ -136,10 +137,19 @@ meRoutes.put(
 
     const result = await replaceGoogleAccount(getCurrentUserId(c), account);
     if (!result.ok) {
-      throw new HTTPException(409, {
-        message:
-          "この Google アカウントはすでに別のユーザーと連携されています。",
-      });
+      return c.json(
+        result.reason === "linked_to_another_user"
+          ? {
+              code: "linked-to-another-user",
+              message:
+                "この Google アカウントはすでに別のユーザーと連携されています。",
+            }
+          : {
+              code: "in-progress",
+              message: "連携の変更を処理しています。",
+            },
+        409,
+      );
     }
 
     return c.body(null, 204);

@@ -1366,7 +1366,7 @@
             "description": "匿名アカウントか、最後のログインから時間がたっている (`code` が `requires-recent-login`)"
           },
           "409": {
-            "description": "その Google アカウントは別のユーザーと連携している"
+            "description": "その Google アカウントは別のユーザーと連携している (`code` が `linked-to-another-user`) か、差し替えの途中 (`code` が `in-progress`)"
           },
           "500": {
             "description": "Internal Server Error"
