@@ -44,7 +44,7 @@ class SettingsLayout extends ConsumerWidget {
         surfaceTintColor: background,
       ),
       body: compact
-          ? _scrollable(padding: const EdgeInsets.fromLTRB(16, 8, 16, 24))
+          ? _scrollable(padding: const EdgeInsets.fromLTRB(16, 24, 16, 24))
           : Padding(
               padding: const EdgeInsets.all(8),
               child: Container(
