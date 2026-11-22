@@ -2,7 +2,11 @@ import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nocsis/generated/api_client/api.enums.swagger.dart';
+import 'package:nocsis/generated/api_client/api.models.swagger.dart';
+import 'package:nocsis/providers/cron.dart';
 import 'package:nocsis/providers/firebase.dart';
+import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -65,11 +69,19 @@ void main() {
   Future<ProviderContainer> pumpRouter(
     WidgetTester tester,
     String location,
-    MockFirebaseAuth auth,
-  ) async {
+    MockFirebaseAuth auth, {
+    Me? me,
+  }) async {
     tester.binding.platformDispatcher.defaultRouteNameTestValue = location;
     final container = ProviderContainer(
-      overrides: [firebaseAuthProvider.overrideWithValue(auth)],
+      overrides: [
+        firebaseAuthProvider.overrideWithValue(auth),
+        if (me != null)
+          meProvider(auth.currentUser!.uid).overrideWith((ref) async => me),
+        // 教室の画面の時計は、止められない待ちで回り続ける
+        for (final format in ['* * * * *', '*/15 * * * *', '0 0 * * *'])
+          cronProvider(format).overrideWith((ref) => const Stream.empty()),
+      ],
     );
     addTearDown(container.dispose);
     addTearDown(
@@ -130,5 +142,43 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(currentLocation(container), '/display/register?code=123456');
+  });
+
+  group('端末の匿名アカウント', () {
+    final device = MockUser(uid: 'd1', isAnonymous: true);
+    const registered = Me(
+      memberships: [
+        Membership(
+          group: MembershipGroup(id: 'g1', name: 'グループ'),
+          permissions: [Permission.groupRead, Permission.memberRead],
+        ),
+      ],
+    );
+
+    for (final location in ['/', '/groups/g1', '/groups/g1/settings']) {
+      testWidgets('登録前に $location を開くと、登録を待つ画面に戻す', (tester) async {
+        final container = await pumpRouter(
+          tester,
+          location,
+          MockFirebaseAuth(signedIn: true, mockUser: device),
+          me: const Me(memberships: []),
+        );
+        await tester.pump();
+
+        expect(currentLocation(container), '/display');
+      });
+
+      testWidgets('登録後に $location を開くと、教室の画面に戻す', (tester) async {
+        final container = await pumpRouter(
+          tester,
+          location,
+          MockFirebaseAuth(signedIn: true, mockUser: device),
+          me: registered,
+        );
+        await tester.pump();
+
+        expect(currentLocation(container), '/groups/g1/classroom');
+      });
+    }
   });
 }

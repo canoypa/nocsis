@@ -121,10 +121,7 @@ GoRouter router(Ref ref) {
 
     final me = await readMe(uid);
     if (me.memberships.isEmpty) {
-      // 登録が解除された端末は、また登録を待つ画面に戻す
-      final isAnonymous =
-          ref.read(firebaseAuthProvider).currentUser?.isAnonymous ?? false;
-      return isAnonymous ? DisplayPageRoute.path : null;
+      return null;
     }
 
     final firstGroupId = me.memberships.first.group.id;
@@ -159,6 +156,43 @@ GoRouter router(Ref ref) {
 
     final continueUri = state.uri.toString() == "/" ? null : state.uri;
     return LoginPageRoute(continueUri: continueUri).location;
+  }
+
+  /// 端末の匿名アカウントは、登録を待つ画面と教室の画面に留める
+  Future<String?> redirectDevice(GoRouterState state) async {
+    final currentUser = ref.read(firebaseAuthProvider).currentUser;
+    final path = state.fullPath;
+    if (currentUser == null || !currentUser.isAnonymous || path == null) {
+      return null;
+    }
+
+    const deviceRoutes = {
+      DisplayPageRoute.path,
+      // ClassroomPageRoute を参照すると、ルーターが currentGroupId に依存することになる
+      '/groups/:groupId/classroom',
+      // 人のアカウントでログインし直せるようにする
+      LoginPageRoute.path,
+      LicensesPageRoute.path,
+    };
+    if (deviceRoutes.contains(path)) {
+      return null;
+    }
+
+    try {
+      final groupId = (await readMe(currentUser.uid))
+          .memberships
+          .firstOrNull
+          ?.group
+          .id;
+      if (groupId != null) {
+        return '/groups/$groupId/classroom';
+      }
+    } catch (_) {
+      // 登録を待つ画面が、登録済みなら教室の画面へ進める
+      ref.invalidate(meProvider(currentUser.uid));
+    }
+
+    return DisplayPageRoute.path;
   }
 
   Future<String?> redirectLoggedInUser(GoRouterState state) async {
@@ -239,6 +273,7 @@ GoRouter router(Ref ref) {
     errorBuilder: (context, state) => const ErrorPage(),
     redirect: (context, state) async {
       return await redirectNotLoggedInUser(state) ??
+          await redirectDevice(state) ??
           await redirectLoggedInUser(state) ??
           await redirectFromTopPage(state.uri) ??
           await redirectByAccess(state);
