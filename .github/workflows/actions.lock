@@ -52,6 +52,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'google-github-actions/auth@v3.0.0'
         - 'jdx/mise-action@v5.3.0'
+    '.github/workflows/warm_cache.yml': []
 dependencies:
     'actions/cache@v6.1.0':
         ref: 'v6.1.0'
