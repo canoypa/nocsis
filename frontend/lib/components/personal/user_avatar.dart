@@ -11,15 +11,17 @@ class UserAvatar extends ConsumerWidget {
     final userSnapshot = ref.watch(authProvider);
 
     return userSnapshot.when(
-      data: (user) => CircleAvatar(
-        foregroundImage: user!.photoURL != null
-            ? NetworkImage(user.photoURL!)
-            : null,
-        onForegroundImageError: (_, _) {},
-        child: user.displayName != null
-            ? Text(user.displayName![0])
-            : const Icon(Symbols.person),
-      ),
+      data: (user) => user == null
+          ? const Icon(Symbols.person)
+          : CircleAvatar(
+              foregroundImage: user.photoURL != null
+                  ? NetworkImage(user.photoURL!)
+                  : null,
+              onForegroundImageError: (_, _) {},
+              child: user.displayName != null
+                  ? Text(user.displayName![0])
+                  : const Icon(Symbols.person),
+            ),
       error: (error, a) => const CircleAvatar(child: Icon(Symbols.person)),
       loading: () => const Icon(Symbols.person),
     );
