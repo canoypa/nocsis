@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter/services.dart';
 
 class LoginForm extends StatefulWidget {
@@ -45,9 +46,9 @@ class _LoginFormState extends State<LoginForm> {
 
   IconData _passwordVisibilityIcon() {
     if (invisiblePassword) {
-      return Icons.visibility_off_outlined;
+      return Symbols.visibility_off;
     } else {
-      return Icons.visibility_outlined;
+      return Symbols.visibility;
     }
   }
 

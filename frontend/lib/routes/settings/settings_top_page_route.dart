@@ -49,7 +49,7 @@ class ChangeEmailDialogRoute extends GoRouteData with $ChangeEmailDialogRoute {
     return DialogPage(
       key: state.pageKey,
       builder: (context) =>
-          ChangeEmailDialog(onSubmit: () => Navigator.of(context).pop()),
+          ChangeEmailDialog(onSubmit: () => closeDialog(context)),
     );
   }
 }
@@ -68,7 +68,7 @@ class ChangePasswordDialogRoute extends GoRouteData
     return DialogPage(
       key: state.pageKey,
       builder: (context) =>
-          ChangePasswordDialog(onSubmit: () => Navigator.of(context).pop()),
+          ChangePasswordDialog(onSubmit: () => closeDialog(context)),
     );
   }
 }

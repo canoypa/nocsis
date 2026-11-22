@@ -12,6 +12,7 @@ import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/firebase.dart';
 import 'package:nocsis/providers/user.dart';
+import 'package:nocsis/routes/dialog_page.dart';
 import 'package:nocsis/routes/router.dart';
 
 /// backend が再認証を求めるまでの時間。backend より少し短くして、選んだあとに弾かれにくくする
@@ -280,7 +281,7 @@ class SettingsTopPage extends ConsumerWidget {
                       compact: compact,
                       content: const Row(
                         children: [
-                          Icon(Icons.password),
+                          Icon(Symbols.password),
                           SizedBox(width: 8),
                           Text('パスワード'),
                         ],
@@ -457,9 +458,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
   }
 
   IconData _passwordVisibilityIcon() {
-    return invisiblePassword
-        ? Icons.visibility_off_outlined
-        : Icons.visibility_outlined;
+    return invisiblePassword ? Symbols.visibility_off : Symbols.visibility;
   }
 
   Future<void> _changePassword(User currentUser) async {
@@ -596,7 +595,7 @@ class ReplaceGoogleAccountDialogState
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
     final location = GoRouterState.of(context).uri.toString();
-    Navigator.of(context).pop();
+    closeDialog(context);
 
     try {
       final result = await _submitGoogleAccount(
@@ -692,7 +691,7 @@ class _ReauthenticationDialogState extends State<_ReauthenticationDialog> {
         appBar: AppBar(
           leading: IconButton(
             tooltip: '閉じる',
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => closeDialog(context),
             icon: const Icon(Symbols.close),
           ),
         ),

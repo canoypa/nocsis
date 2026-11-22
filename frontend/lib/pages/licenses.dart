@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -32,7 +33,7 @@ class LicensesPage extends ConsumerWidget {
         slivers: [
           SliverAppBar.large(
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(Symbols.arrow_back),
               onPressed: () {
                 if (context.canPop()) {
                   context.pop();

@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -79,7 +80,7 @@ class EventsView extends ConsumerWidget {
           return const Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [Icon(Icons.event_available_outlined), Text("予定なし")],
+              children: [Icon(Symbols.event_available), Text("予定なし")],
             ),
           );
         }
