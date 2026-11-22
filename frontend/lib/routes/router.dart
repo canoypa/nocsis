@@ -26,6 +26,7 @@ import 'package:nocsis/pages/main/layout.dart';
 import 'package:nocsis/pages/no_group.dart';
 import 'package:nocsis/pages/not_found.dart';
 import 'package:nocsis/pages/settings/index.dart';
+import 'package:nocsis/routes/dialog_page.dart';
 import 'package:nocsis/pages/settings/layout.dart';
 import 'package:nocsis/providers/auth.dart';
 import 'package:nocsis/providers/current_group_id.dart';
@@ -56,6 +57,8 @@ part 'router.g.dart';
 part 'settings/settings_shell_route.dart';
 part 'settings/settings_top_page_route.dart';
 part 'top_page_route.dart';
+
+final rootNavigatorKey = GlobalKey<NavigatorState>();
 
 @TypedShellRoute<AppShell>(
   routes: [
@@ -277,6 +280,7 @@ GoRouter router(Ref ref) {
   }
 
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     routes: $appRoutes,
     refreshListenable: refresher,
     // redirect で投げた例外もここに来る。どれも開けるページが無いという意味なので 404 に寄せる
