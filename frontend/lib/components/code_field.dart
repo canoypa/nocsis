@@ -60,8 +60,9 @@ class _CodeFieldState extends State<CodeField> {
     // 入力欄が自分のタップで置いた位置を、あとから上書きする
     WidgetsBinding.instance
       ..addPostFrameCallback((_) {
-        widget.controller.selection = TextSelection.collapsed(
-          offset: index.clamp(0, widget.controller.text.length),
+        widget.controller.selection = _boxSelection(
+          index,
+          widget.controller.text,
         );
       })
       ..scheduleFrame();
@@ -74,7 +75,7 @@ class _CodeFieldState extends State<CodeField> {
     final text = widget.controller.text;
     final hasError = widget.errorText != null;
     final selection = widget.controller.selection;
-    final position = selection.isValid ? selection.baseOffset : text.length;
+    final position = selection.isValid ? selection.start : text.length;
     // 6桁そろって末尾にいるときは、次に打てるマスが無い
     final current = _focusNode.hasFocus && position < CodeField.length
         ? position
@@ -97,7 +98,7 @@ class _CodeFieldState extends State<CodeField> {
           border: Border.all(color: color, width: isCurrent ? 2 : 1),
         ),
         child: Text(
-          i < text.length ? text[i] : '',
+          i < text.length ? text[i].trim() : '',
           style: textTheme.headlineMedium,
         ),
       );
@@ -157,10 +158,33 @@ class _CodeFieldState extends State<CodeField> {
   }
 }
 
-/// 全角の数字も受け付け、途中の桁で打つとその桁を書き換える
+/// 空いた桁は空白で持つ
+const _empty = ' ';
+
+/// 今の桁の文字を選んでおくと、打てば置き換わり、Backspace ではその桁が消える
+TextSelection _boxSelection(int index, String text) => index < text.length
+    ? TextSelection(baseOffset: index, extentOffset: index + 1)
+    : TextSelection.collapsed(offset: text.length);
+
+/// 1マスに1桁。打つとその桁を書き換え、消すとその桁だけを空ける。全角の数字も受け付ける
 class _CodeFormatter extends TextInputFormatter {
   static final _fullWidthDigit = RegExp('[０-９]');
   static final _nonDigit = RegExp('[^0-9]');
+
+  static String _digits(String text) => text
+      .replaceAllMapped(
+        _fullWidthDigit,
+        (m) => String.fromCharCode(m[0]!.codeUnitAt(0) - 0xFEE0),
+      )
+      .replaceAll(_nonDigit, '');
+
+  static TextEditingValue _value(List<String> slots, int index) {
+    final text = slots.join().trimRight();
+    return TextEditingValue(
+      text: text,
+      selection: _boxSelection(index.clamp(0, text.length), text),
+    );
+  }
 
   @override
   TextEditingValue formatEditUpdate(
@@ -172,60 +196,63 @@ class _CodeFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    String digits(String text) => text
-        .replaceAllMapped(
-          _fullWidthDigit,
-          (m) => String.fromCharCode(m[0]!.codeUnitAt(0) - 0xFEE0),
-        )
-        .replaceAll(_nonDigit, '');
-
     final old = oldValue.text;
+    final next = newValue.text;
     final start = oldValue.selection.isValid
         ? oldValue.selection.start
         : old.length;
     final end = oldValue.selection.isValid
         ? oldValue.selection.end
         : old.length;
+    final slots = old.split('');
     final before = old.substring(0, start);
     final after = old.substring(end);
 
-    // 消したときや、何かを選んで置き換えたときは、そのまま詰める
-    if (newValue.text.length <= old.length - (end - start) ||
-        !newValue.text.startsWith(before) ||
-        !newValue.text.endsWith(after)) {
-      final text = digits(newValue.text);
-      final clipped = text.length > CodeField.length
-          ? text.substring(0, CodeField.length)
-          : text;
-      final offset = digits(
-        newValue.text.substring(
-          0,
-          newValue.selection.isValid
-              ? newValue.selection.baseOffset.clamp(0, newValue.text.length)
-              : newValue.text.length,
-        ),
-      ).length.clamp(0, clipped.length);
-      return TextEditingValue(
-        text: clipped,
-        selection: TextSelection.collapsed(offset: offset),
-      );
+    if (next.length < old.length) {
+      // 1マスを選んだまま消した
+      if (end - start == 1 && next == before + after) {
+        if (old[start] != _empty) {
+          slots[start] = _empty;
+          return _value(slots, start);
+        }
+        if (start == 0) return _value(slots, 0);
+        slots[start - 1] = _empty;
+        return _value(slots, start - 1);
+      }
+      // 末尾の空いたマスで Backspace
+      if (start == end &&
+          start > 0 &&
+          next == old.substring(0, start - 1) + after) {
+        slots[start - 1] = _empty;
+        return _value(slots, start - 1);
+      }
+      if (start != end && next == before + after) {
+        for (var i = start; i < end; i++) {
+          slots[i] = _empty;
+        }
+        return _value(slots, start);
+      }
+    } else if (next.startsWith(before) && next.endsWith(after)) {
+      final typed = _digits(next.substring(start, next.length - after.length));
+      if (typed.isEmpty) return oldValue;
+
+      for (var i = 0; i < typed.length; i++) {
+        final index = start + i;
+        if (index >= CodeField.length) break;
+        if (index < slots.length) {
+          slots[index] = typed[i];
+        } else {
+          slots.add(typed[i]);
+        }
+      }
+      return _value(slots, start + typed.length);
     }
 
-    final typed = digits(
-      newValue.text.substring(start, newValue.text.length - after.length),
-    );
-    final rest = after.length > typed.length
-        ? after.substring(typed.length)
-        : '';
-    var text = before + typed + rest;
-    if (text.length > CodeField.length) {
-      text = text.substring(0, CodeField.length);
+    // 判別できない書き換えは、数字だけを前から詰める
+    var digits = _digits(next);
+    if (digits.length > CodeField.length) {
+      digits = digits.substring(0, CodeField.length);
     }
-    return TextEditingValue(
-      text: text,
-      selection: TextSelection.collapsed(
-        offset: (start + typed.length).clamp(0, text.length),
-      ),
-    );
+    return _value(digits.split(''), digits.length);
   }
 }
