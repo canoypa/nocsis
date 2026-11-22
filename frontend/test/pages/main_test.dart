@@ -85,14 +85,16 @@ void main() {
     });
 
     testWidgets('授業がなくイベントだけの日は、イベントを出す', (tester) async {
+      final now = DateTime.now();
       await pump(tester, const MainView(), {
         _classes: {'items': []},
         _events: {
-          'items': [_event('文化祭', DateTime.now())],
+          'items': [_event('文化祭', now)],
         },
       });
 
       expect(find.text('文化祭'), findsOneWidget);
+      expect(find.text(DateFormat('M月d日').format(now)), findsOneWidget);
       expect(find.text('予定なし'), findsNothing);
     });
 
