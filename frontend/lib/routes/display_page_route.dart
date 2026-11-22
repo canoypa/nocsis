@@ -2,7 +2,11 @@ part of 'package:nocsis/routes/router.dart';
 
 const displayPageRoute = TypedGoRoute<DisplayPageRoute>(
   path: DisplayPageRoute.path,
-  routes: [TypedGoRoute<DisplayRegisterPageRoute>(path: 'register')],
+);
+
+// 子にすると下に待ち受けの画面も積まれ、人のアカウントはそこでトップへ戻される
+const displayRegisterPageRoute = TypedGoRoute<DisplayRegisterPageRoute>(
+  path: DisplayRegisterPageRoute.path,
 );
 
 class DisplayPageRoute extends GoRouteData with $DisplayPageRoute {
@@ -28,6 +32,8 @@ class DisplayPageRoute extends GoRouteData with $DisplayPageRoute {
 
 class DisplayRegisterPageRoute extends GoRouteData
     with $DisplayRegisterPageRoute {
+  static const path = '/display/register';
+
   /// 手で URL を打つと抜けることがある
   final String? code;
 

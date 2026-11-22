@@ -118,4 +118,17 @@ void main() {
 
     expect(currentLocation(container), '/display');
   });
+
+  testWidgets('QR コードから開いた登録画面に、そのまま留まる', (tester) async {
+    SharedPreferences.setMockInitialValues({'latest_group_id': 'g1'});
+
+    final container = await pumpRouter(
+      tester,
+      '/display/register?code=123456',
+      MockFirebaseAuth(signedIn: true, mockUser: MockUser(uid: 'u1')),
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(currentLocation(container), '/display/register?code=123456');
+  });
 }

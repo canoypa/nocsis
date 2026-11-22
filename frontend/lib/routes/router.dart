@@ -60,6 +60,7 @@ part 'top_page_route.dart';
 @TypedShellRoute<AppShell>(
   routes: [
     displayPageRoute,
+    displayRegisterPageRoute,
     groupShellRoute,
     licensesPageRoute,
     loginPageRoute,
