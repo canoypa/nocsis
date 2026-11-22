@@ -15,7 +15,7 @@ export const displayPairingSchema = z
     description: "教室ディスプレイを登録するためのコード",
   });
 
-const graphemes = new Intl.Segmenter("ja", { granularity: "grapheme" });
+const graphemes = new Intl.Segmenter();
 
 // max() は UTF-16 で数えるので、絵文字や濁点を合成した文字が見た目より長くなる
 const withinDisplayNameLength = (name: string) =>
