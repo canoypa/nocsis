@@ -30,13 +30,14 @@ class ConsoleDisplaysPage extends ConsumerWidget {
             const SizedBox(height: 24),
             const Text('教室に予定や天気を出しておく画面です。'),
             const SizedBox(height: 16),
-            Text('追加のしかた', style: textTheme.titleMedium),
+            Text('登録方法', style: textTheme.titleMedium),
             const SizedBox(height: 8),
-            Text(
-              '1. 表示に使う端末のブラウザで ${Uri.base.authority}/display を開く。\n'
-              '2. 表示された QR コードをスマートフォンで読み取る。',
-              style: const TextStyle(height: 1.8),
+            const Text('1. 表示に使う端末のブラウザで、次の URL を開く。'),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 0, 8),
+              child: _DisplayUrlField(),
             ),
+            const Text('2. 表示された QR コードをスマートフォンで読み取る。'),
             const SizedBox(height: 24),
             Wrap(
               spacing: 8,
@@ -74,6 +75,59 @@ class ConsoleDisplaysPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+Uri _displayUrl() => Uri(
+  scheme: Uri.base.scheme,
+  host: Uri.base.host,
+  port: Uri.base.hasPort ? Uri.base.port : null,
+  path: '/display',
+);
+
+class _DisplayUrlField extends StatefulWidget {
+  const _DisplayUrlField();
+
+  @override
+  State<_DisplayUrlField> createState() => _DisplayUrlFieldState();
+}
+
+class _DisplayUrlFieldState extends State<_DisplayUrlField> {
+  final _controller = TextEditingController(text: _displayUrl().toString());
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 480),
+      child: TextField(
+        controller: _controller,
+        readOnly: true,
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          isDense: true,
+          suffixIcon: IconButton(
+            tooltip: 'URL をコピー',
+            onPressed: () => _copyDisplayUrl(context),
+            icon: const Icon(Symbols.content_copy),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> _copyDisplayUrl(BuildContext context) async {
+  await Clipboard.setData(ClipboardData(text: _displayUrl().toString()));
+  if (!context.mounted) return;
+
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(const SnackBar(content: Text('URL をコピーしました')));
 }
 
 class _EmptyList extends StatelessWidget {
