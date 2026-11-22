@@ -36,6 +36,8 @@ jobs:
             }
           done
 
+  # デプロイは lint と test を待たない。同じ検査は PR の CI でも走り、Staging は
+  # 変更を確かめる場所なので、待つより先に載せる。結果はこの実行に残る。
   lint:
     permissions:
       contents: read
@@ -74,7 +76,7 @@ jobs:
       firebase_web_config: ${{ vars.STG_FIREBASE_WEB_CONFIG }}
 
   deploy_backend:
-    needs: [lint, test, build_backend]
+    needs: [build_backend]
     permissions:
       id-token: write
     uses: ./.github/workflows/reusable-deploy_backend.yml
@@ -84,7 +86,7 @@ jobs:
       promote: true
 
   deploy_functions:
-    needs: [lint, test, build_functions]
+    needs: [build_functions]
     permissions:
       contents: read
       id-token: write
@@ -93,7 +95,7 @@ jobs:
       environment: Staging
 
   deploy_frontend:
-    needs: [lint, test, build_frontend, deploy_backend, deploy_functions]
+    needs: [build_frontend, deploy_backend, deploy_functions]
     permissions:
       contents: read
       id-token: write
