@@ -48,11 +48,13 @@ class DrawerLayout extends ConsumerWidget {
             context,
             groupId,
             navigation: _buildRail(context),
+            contentPadding: 24,
           ),
           _WindowSize.large => _buildWithPane(
             context,
             groupId,
             navigation: _buildDrawer(context),
+            contentPadding: 64,
           ),
         };
       },
@@ -174,6 +176,7 @@ class DrawerLayout extends ConsumerWidget {
     BuildContext context,
     String groupId, {
     required Widget navigation,
+    required double contentPadding,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -207,7 +210,7 @@ class DrawerLayout extends ConsumerWidget {
                         constraints: BoxConstraints(
                           minHeight: constraints.maxHeight,
                         ),
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(contentPadding),
                         child: child,
                       ),
                     );
