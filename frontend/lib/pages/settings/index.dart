@@ -110,30 +110,27 @@ class SettingsTopPage extends ConsumerWidget {
     final swapState = ref.read(_googleSwapStateProvider.notifier);
     swapState.set(_GoogleSwapState.choosing);
 
+    final router = GoRouter.of(context);
+    final dialog = ReplaceGoogleAccountDialogRoute(_groupId(context));
+
     try {
-      // ポップアップは押した直後にしか開けないので、アカウント選択より前に await しない
-      String? accessToken;
-      if (_loggedInRecently(ref.read(_authTimeProvider).value)) {
-        accessToken = await pickGoogleAccountToken();
-        if (accessToken == null) return;
+      if (!_loggedInRecently(ref.read(_authTimeProvider).value)) {
+        dialog.go(context);
+        return;
       }
 
-      while (true) {
-        if (accessToken == null) {
-          if (!context.mounted) return;
-          accessToken = await ReplaceGoogleAccountDialogRoute(_groupId(context))
-              .push<String>(context);
-          if (accessToken == null) return;
-        }
+      // ポップアップは押した直後にしか開けないので、アカウント選択より前に await しない
+      final accessToken = await pickGoogleAccountToken();
+      if (accessToken == null) return;
 
-        final result = await _submitGoogleAccount(
-          container,
-          messenger,
-          accessToken,
-        );
-        // 選んでいる間にログインから時間がたったときは、再ログインからやり直す
-        if (result != _ReplaceResult.requiresRecentLogin) return;
-        accessToken = null;
+      final result = await _submitGoogleAccount(
+        container,
+        messenger,
+        accessToken,
+      );
+      // 選んでいる間にログインから時間がたったときは、再ログインからやり直す
+      if (result == _ReplaceResult.requiresRecentLogin) {
+        router.go(dialog.location);
       }
     } finally {
       swapState.set(_GoogleSwapState.idle);
@@ -199,8 +196,7 @@ class SettingsTopPage extends ConsumerWidget {
                 ),
                 action: TextButton(
                   onPressed: () {
-                    ChangeEmailDialogRoute(_groupId(context))
-                        .push<void>(context);
+                    ChangeEmailDialogRoute(_groupId(context)).go(context);
                   },
                   child: const Text('変更する'),
                 ),
@@ -292,7 +288,7 @@ class SettingsTopPage extends ConsumerWidget {
                       action: TextButton(
                         onPressed: () {
                           ChangePasswordDialogRoute(_groupId(context))
-                              .push<void>(context);
+                              .go(context);
                         },
                         child:
                             user.providerData.any(
@@ -587,7 +583,7 @@ class ReplaceGoogleAccountDialogState
     setState(() => reauthenticating = false);
   }
 
-  /// 選んだアカウントのアクセストークンを返して閉じる
+  /// 閉じてから、選んだアカウントに差し替える
   Future<void> _pick() async {
     if (!_loggedInRecently(ref.read(_authTimeProvider).value)) {
       setState(() => reauthenticating = true);
@@ -595,7 +591,27 @@ class ReplaceGoogleAccountDialogState
     }
     final accessToken = await pickGoogleAccountToken();
     if (accessToken == null || !mounted) return;
-    Navigator.of(context).pop(accessToken);
+
+    final container = ProviderScope.containerOf(context, listen: false);
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    final location = GoRouterState.of(context).uri.toString();
+    Navigator.of(context).pop();
+
+    try {
+      final result = await _submitGoogleAccount(
+        container,
+        messenger,
+        accessToken,
+      );
+      if (result == _ReplaceResult.requiresRecentLogin) {
+        router.go(location);
+      }
+    } finally {
+      container
+          .read(_googleSwapStateProvider.notifier)
+          .set(_GoogleSwapState.idle);
+    }
   }
 
   @override

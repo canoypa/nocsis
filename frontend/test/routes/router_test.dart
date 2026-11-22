@@ -215,19 +215,38 @@ void main() {
       ],
     );
 
-    Future<ProviderContainer> openEmailDialog(WidgetTester tester) async {
+    Future<ProviderContainer> open(WidgetTester tester, String location) async {
       final container = await pumpRouter(
         tester,
-        '/groups/g1/settings/email',
+        location,
         MockFirebaseAuth(signedIn: true, mockUser: _UserWithoutPhoto()),
         me: member,
       );
-      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
       return container;
     }
 
-    testWidgets('URL で開いたダイアログに、そのまま留まる', (tester) async {
-      final container = await openEmailDialog(tester);
+    Future<ProviderContainer> openEmailDialog(WidgetTester tester) =>
+        open(tester, '/groups/g1/settings/email');
+
+    for (final (path, title) in [
+      ('email', 'メールアドレスを変更する'),
+      ('password', 'パスワードを設定する'),
+      ('google-account', '別アカウントと連携する'),
+    ]) {
+      testWidgets('/settings/$path を開くと「$title」のダイアログに留まる', (tester) async {
+        final container = await open(tester, '/groups/g1/settings/$path');
+
+        expect(currentLocation(container), '/groups/g1/settings/$path');
+        expect(find.text(title), findsWidgets);
+      });
+    }
+
+    testWidgets('メールアドレスの「変更する」で、ダイアログの URL に移る', (tester) async {
+      final container = await open(tester, '/groups/g1/settings');
+
+      await tester.tap(find.text('変更する'));
+      await tester.pumpAndSettle();
 
       expect(currentLocation(container), '/groups/g1/settings/email');
       expect(find.text('メールアドレスを変更する'), findsWidgets);

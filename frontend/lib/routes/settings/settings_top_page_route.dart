@@ -73,7 +73,6 @@ class ChangePasswordDialogRoute extends GoRouteData
   }
 }
 
-/// 選んだ Google アカウントのアクセストークンを返して閉じる
 class ReplaceGoogleAccountDialogRoute extends GoRouteData
     with $ReplaceGoogleAccountDialogRoute {
   static const path = 'google-account';
@@ -84,8 +83,8 @@ class ReplaceGoogleAccountDialogRoute extends GoRouteData
   const ReplaceGoogleAccountDialogRoute(this.groupId);
 
   @override
-  Page<String> buildPage(BuildContext context, GoRouterState state) {
-    return DialogPage<String>(
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return DialogPage(
       key: state.pageKey,
       builder: (_) => const ReplaceGoogleAccountDialog(),
     );
