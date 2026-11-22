@@ -226,15 +226,12 @@
             "description": "管理者が入力する6桁のコード"
           },
           "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 50,
-            "description": "名前"
+            "description": "名前。50文字まで。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
+            "type": "string"
           }
         },
         "required": [
-          "code",
-          "name"
+          "code"
         ],
         "description": "教室ディスプレイの登録に使う JSON データ"
       },
@@ -244,8 +241,7 @@
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 50,
-            "description": "名前"
+            "description": "名前。50文字まで"
           }
         },
         "required": [
@@ -493,6 +489,20 @@
         ],
         "additionalProperties": false,
         "description": "ログインしているユーザー"
+      },
+      "GoogleAccountPutJson": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "minLength": 1,
+            "description": "連携する Google アカウントで、このアプリに発行されたアクセストークン"
+          }
+        },
+        "required": [
+          "accessToken"
+        ],
+        "description": "連携する Google アカウントの差し替えに使う JSON データ"
       },
       "UserJoinedGroup": {
         "type": "object",
@@ -1332,6 +1342,47 @@
             "bearer": []
           }
         ]
+      }
+    },
+    "/api/v1/me/google-account": {
+      "put": {
+        "operationId": "putApiV1MeGoogleAccount",
+        "description": "連携する Google アカウントを差し替える。まだ連携していなければ連携する",
+        "responses": {
+          "204": {
+            "description": "差し替えた"
+          },
+          "400": {
+            "description": "アクセストークンが無効か、このアプリ向けではない"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "匿名アカウントか、最後のログインから時間がたっている (`code` が `requires-recent-login`)"
+          },
+          "409": {
+            "description": "その Google アカウントは別のユーザーと連携している (`code` が `linked-to-another-user`) か、差し替えの途中 (`code` が `in-progress`)"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleAccountPutJson"
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/users/me/groups": {
