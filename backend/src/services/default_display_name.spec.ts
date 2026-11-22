@@ -9,17 +9,6 @@ describe("defaultDisplayName", () => {
     );
   });
 
-  it("全角や空白の揺れも、同じ番号として数えること", () => {
-    expect(
-      defaultDisplayName([
-        "ディスプレイ１",
-        "ディスプレイ2",
-        "ディスプレイ　3",
-        "ディスプレイ 04",
-      ]),
-    ).toBe("ディスプレイ 5");
-  });
-
   it("ほかの名前は数えないこと", () => {
     expect(
       defaultDisplayName(["前方", "ディスプレイ 1 横", "ディスプレイ"]),

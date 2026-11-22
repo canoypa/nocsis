@@ -153,14 +153,13 @@ export const registerDisplay = async (params: {
   };
 };
 
-// 全角の数字や空白、空白の有無の揺れで、同じに見える名前を付けないよう NFKC にそろえて比べる
-const DEFAULT_NAME = /^ディスプレイ\s*(\d+)$/;
+const DEFAULT_NAME = /^ディスプレイ ([1-9]\d*)$/;
 
 /** 名前に使われていない一番小さい番号で「ディスプレイ N」を作る */
 export const defaultDisplayName = (names: string[]): string => {
   const used = new Set(
     names.flatMap((name) => {
-      const match = DEFAULT_NAME.exec(name.normalize("NFKC").trim());
+      const match = DEFAULT_NAME.exec(name);
       return match ? [Number(match[1])] : [];
     }),
   );
