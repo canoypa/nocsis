@@ -67,6 +67,14 @@ void main() {
     expect(find.text('メンバー'), findsOneWidget);
   });
 
+  testWidgets('スマホの幅では、本文をアプリバーから 24 離す', (tester) async {
+    await pumpAt(tester, 400);
+
+    final appBar = tester.getRect(find.byType(AppBar));
+    final body = tester.getRect(find.text('本文'));
+    expect(body.top - appBar.bottom, 24);
+  });
+
   testWidgets('スマホの幅でもメニューの戻る矢印で前の画面に戻れる', (tester) async {
     await pumpAt(tester, 400);
 
