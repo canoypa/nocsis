@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
+import 'package:nocsis/extensions/date_time.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 
 class EventListView extends StatelessWidget {
@@ -19,7 +20,7 @@ class EventListView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: (items).map((data) {
-              final startDate = data.startAt.toLocal();
+              final startDate = data.startAt.toJst();
 
               return BasicCard(
                 primary: Text(data.title),

@@ -98,6 +98,30 @@ void main() {
       expect(find.text('予定なし'), findsNothing);
     });
 
+    testWidgets('終日のイベントは、日本時間の日付で出す', (tester) async {
+      final todayInJapan = DateTime.now().toUtc().add(const Duration(hours: 9));
+      final date = DateFormat('yyyy-MM-dd').format(todayInJapan);
+      await pump(tester, const MainView(), {
+        _classes: {'items': []},
+        _events: {
+          'items': [
+            {
+              'id': 'festival',
+              'title': '文化祭',
+              'startAt': '${date}T00:00:00.000+09:00',
+              'endAt': '${date}T00:00:00.000+09:00',
+              'isAllDay': true,
+            },
+          ],
+        },
+      });
+
+      expect(
+        find.text(DateFormat('M月d日').format(todayInJapan)),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('授業もイベントもない日は「予定なし」を出す', (tester) async {
       await pump(tester, const MainView(), {
         _classes: {'items': []},
@@ -195,6 +219,25 @@ void main() {
 
       expect(find.text('${_twoDigitYear(nextYear)}年5月'), findsOneWidget);
       expect(find.text('${_twoDigitYear(nextYear + 1)}年5月'), findsOneWidget);
+    });
+
+    testWidgets('終日のイベントは、日本時間の日付と月で出す', (tester) async {
+      await pump(tester, const EventsView(), {
+        _events: {
+          'items': [
+            {
+              'id': 'festival',
+              'title': '文化祭',
+              'startAt': '2030-06-01T00:00:00.000+09:00',
+              'endAt': '2030-06-02T00:00:00.000+09:00',
+              'isAllDay': true,
+            },
+          ],
+        },
+      });
+
+      expect(find.text('30年6月'), findsOneWidget);
+      expect(find.text('6月1日'), findsOneWidget);
     });
 
     testWidgets('イベントがなければ「予定なし」を出す', (tester) async {

@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
+import 'package:nocsis/extensions/date_time.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/current_group_id.dart';
@@ -36,7 +37,7 @@ final eventsProvider = FutureProvider.family<List<MonthEventGroup>, String>((
 
     // 月毎にグループ化
     final monthGroups = groupBy(events, (Event event) {
-      return DateFormat('yyyy-MM').format(event.startAt.toLocal());
+      return DateFormat('yyyy-MM').format(event.startAt.toJst());
     });
 
     // MonthEventGroupのリストに変換
@@ -104,8 +105,7 @@ class EventsView extends ConsumerWidget {
                             ),
                             // TODO: 日を跨いだりする場合の表示に対応する
                             secondary: Text(
-                              DateFormat("M月d日")
-                                  .format(event.startAt.toLocal()),
+                              DateFormat("M月d日").format(event.startAt.toJst()),
                             ),
                           );
                         }).toList(),

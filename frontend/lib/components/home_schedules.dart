@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:nocsis/extensions/date_time.dart';
 import 'package:nocsis/providers/classes.dart';
 import 'package:nocsis/providers/cron.dart';
 import 'package:nocsis/providers/events.dart';
@@ -99,8 +100,7 @@ class HomeSchedules extends ConsumerWidget {
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                     Text(
-                      // utc なので表示用にローカルに変換
-                      eventDateFormatter.format(e.startAt.toLocal()),
+                      eventDateFormatter.format(e.startAt.toJst()),
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
