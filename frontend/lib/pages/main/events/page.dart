@@ -57,6 +57,13 @@ final eventsProvider = FutureProvider.family<List<MonthEventGroup>, String>((
   }
 });
 
+String _monthHeading(String yearMonth) {
+  final month = DateTime.parse('$yearMonth-01');
+  return month.year == DateTime.now().year
+      ? DateFormat('M月').format(month)
+      : DateFormat('yy年M月').format(month);
+}
+
 @Dependencies([currentGroupId])
 class EventsView extends ConsumerWidget {
   const EventsView({super.key});
@@ -78,7 +85,6 @@ class EventsView extends ConsumerWidget {
         }
 
         return ListView.builder(
-          controller: ScrollController(),
           itemCount: monthGroups.length,
           itemBuilder: (c, i) {
             final monthGroup = monthGroups[i];
@@ -88,7 +94,7 @@ class EventsView extends ConsumerWidget {
                 constraints: const BoxConstraints(maxWidth: 800),
                 child: Column(
                   children: [
-                    ListTile(title: Text("${monthGroup.month.split('-')[1]}月")),
+                    ListTile(title: Text(_monthHeading(monthGroup.month))),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
