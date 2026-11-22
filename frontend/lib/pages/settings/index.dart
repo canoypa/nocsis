@@ -115,7 +115,7 @@ class SettingsTopPage extends ConsumerWidget {
 
     try {
       if (!_loggedInRecently(ref.read(_authTimeProvider).value)) {
-        dialog.push(context);
+        dialog.go(context);
         return;
       }
 
@@ -287,12 +287,8 @@ class SettingsTopPage extends ConsumerWidget {
                       ),
                       action: TextButton(
                         onPressed: () {
-                          showDialog<void>(
-                            context: context,
-                            builder: (context) => ChangePasswordDialog(
-                              onSubmit: () => Navigator.of(context).pop(),
-                            ),
-                          );
+                          ChangePasswordDialogRoute(_groupId(context))
+                              .go(context);
                         },
                         child:
                             user.providerData.any(
