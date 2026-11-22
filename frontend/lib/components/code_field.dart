@@ -30,13 +30,41 @@ class _CodeFieldState extends State<CodeField> {
   @override
   void initState() {
     super.initState();
-    _focusNode.addListener(() => setState(() {}));
+    _focusNode.addListener(_redraw);
+    widget.controller.addListener(_redraw);
   }
 
   @override
   void dispose() {
+    widget.controller.removeListener(_redraw);
     _focusNode.dispose();
     super.dispose();
+  }
+
+  void _redraw() => setState(() {});
+
+  /// 押したマスの桁から打ち直せるようにする
+  void _moveTo(double x) {
+    var left = 0.0;
+    var index = CodeField.length - 1;
+    for (var i = 0; i < CodeField.length; i++) {
+      if (i > 0) left += i == 3 ? CodeField._groupGap : CodeField._gap;
+      if (x < left + CodeField._boxWidth) {
+        index = i;
+        break;
+      }
+      left += CodeField._boxWidth;
+    }
+
+    _focusNode.requestFocus();
+    // 入力欄が自分のタップで置いた位置を、あとから上書きする
+    WidgetsBinding.instance
+      ..addPostFrameCallback((_) {
+        widget.controller.selection = TextSelection.collapsed(
+          offset: index.clamp(0, widget.controller.text.length),
+        );
+      })
+      ..scheduleFrame();
   }
 
   @override
@@ -45,8 +73,11 @@ class _CodeFieldState extends State<CodeField> {
     final colorScheme = Theme.of(context).colorScheme;
     final text = widget.controller.text;
     final hasError = widget.errorText != null;
-    final current = _focusNode.hasFocus
-        ? text.length.clamp(0, CodeField.length - 1)
+    final selection = widget.controller.selection;
+    final position = selection.isValid ? selection.baseOffset : text.length;
+    // 6桁そろって末尾にいるときは、次に打てるマスが無い
+    final current = _focusNode.hasFocus && position < CodeField.length
+        ? position
         : null;
 
     Widget box(int i) {
@@ -90,23 +121,23 @@ class _CodeFieldState extends State<CodeField> {
               ],
             ),
             Positioned.fill(
-              child: Opacity(
-                opacity: 0,
-                child: TextField(
-                  controller: widget.controller,
-                  focusNode: _focusNode,
-                  autofocus: true,
-                  showCursor: false,
-                  keyboardType: TextInputType.number,
-                  autofillHints: const [AutofillHints.oneTimeCode],
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(CodeField.length),
-                  ],
-                  onChanged: widget.onChanged,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    labelText: 'コード',
+              child: Listener(
+                behavior: HitTestBehavior.translucent,
+                onPointerUp: (event) => _moveTo(event.localPosition.dx),
+                child: Opacity(
+                  opacity: 0,
+                  child: TextField(
+                    controller: widget.controller,
+                    focusNode: _focusNode,
+                    autofocus: true,
+                    showCursor: false,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [_CodeFormatter()],
+                    onChanged: widget.onChanged,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      labelText: 'コード',
+                    ),
                   ),
                 ),
               ),
@@ -122,6 +153,79 @@ class _CodeFieldState extends State<CodeField> {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// 全角の数字も受け付け、途中の桁で打つとその桁を書き換える
+class _CodeFormatter extends TextInputFormatter {
+  static final _fullWidthDigit = RegExp('[０-９]');
+  static final _nonDigit = RegExp('[^0-9]');
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // 変換中に書き換えると、IME が確定前の文字を見失う
+    if (newValue.composing.isValid && !newValue.composing.isCollapsed) {
+      return newValue;
+    }
+
+    String digits(String text) => text
+        .replaceAllMapped(
+          _fullWidthDigit,
+          (m) => String.fromCharCode(m[0]!.codeUnitAt(0) - 0xFEE0),
+        )
+        .replaceAll(_nonDigit, '');
+
+    final old = oldValue.text;
+    final start = oldValue.selection.isValid
+        ? oldValue.selection.start
+        : old.length;
+    final end = oldValue.selection.isValid
+        ? oldValue.selection.end
+        : old.length;
+    final before = old.substring(0, start);
+    final after = old.substring(end);
+
+    // 消したときや、何かを選んで置き換えたときは、そのまま詰める
+    if (newValue.text.length <= old.length - (end - start) ||
+        !newValue.text.startsWith(before) ||
+        !newValue.text.endsWith(after)) {
+      final text = digits(newValue.text);
+      final clipped = text.length > CodeField.length
+          ? text.substring(0, CodeField.length)
+          : text;
+      final offset = digits(
+        newValue.text.substring(
+          0,
+          newValue.selection.isValid
+              ? newValue.selection.baseOffset.clamp(0, newValue.text.length)
+              : newValue.text.length,
+        ),
+      ).length.clamp(0, clipped.length);
+      return TextEditingValue(
+        text: clipped,
+        selection: TextSelection.collapsed(offset: offset),
+      );
+    }
+
+    final typed = digits(
+      newValue.text.substring(start, newValue.text.length - after.length),
+    );
+    final rest = after.length > typed.length
+        ? after.substring(typed.length)
+        : '';
+    var text = before + typed + rest;
+    if (text.length > CodeField.length) {
+      text = text.substring(0, CodeField.length);
+    }
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(
+        offset: (start + typed.length).clamp(0, text.length),
+      ),
     );
   }
 }
