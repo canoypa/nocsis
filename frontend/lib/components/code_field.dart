@@ -33,7 +33,7 @@ class CodeField extends StatefulWidget {
 class _CodeFieldState extends State<CodeField> {
   static const _empty = ' ';
   static final _fullWidthDigit = RegExp('[０-９]');
-  static final _nonDigit = RegExp('[^0-9]');
+  static final _onlyDigits = RegExp(r'^[0-9]+$');
 
   late final _focusNode = FocusNode(onKeyEvent: _onKey);
   late final _formatter = TextInputFormatter.withFunction((oldValue, newValue) {
@@ -85,12 +85,10 @@ class _CodeFieldState extends State<CodeField> {
 
   void _redraw() => setState(() {});
 
-  static String _digits(String text) => text
-      .replaceAllMapped(
-        _fullWidthDigit,
-        (m) => String.fromCharCode(m[0]!.codeUnitAt(0) - 0xFEE0),
-      )
-      .replaceAll(_nonDigit, '');
+  static String _halfWidth(String text) => text.replaceAllMapped(
+    _fullWidthDigit,
+    (m) => String.fromCharCode(m[0]!.codeUnitAt(0) - 0xFEE0),
+  );
 
   List<String> get _slots => [
     for (var i = 0; i < CodeField.length; i++)
@@ -141,13 +139,8 @@ class _CodeFieldState extends State<CodeField> {
       return _valueOf(slots);
     }
 
-    final digits = _digits(inserted);
-    // 6桁ちょうどはコードそのものなので全体を置き換える。7桁以上はどの6桁か決められない
-    if (digits.length == CodeField.length) {
-      _index = CodeField.length - 1;
-      return _valueOf(digits.split(''));
-    }
-    if (digits.isEmpty || digits.length > CodeField.length) {
+    final digits = _halfWidth(inserted);
+    if (!_onlyDigits.hasMatch(digits)) {
       return _valueOf(slots);
     }
 

@@ -204,34 +204,33 @@ void main() {
     expect(selectedBox(tester), 2);
   });
 
-  testWidgets('6桁を貼り付けると、どのマスからでも全体を置き換える', (tester) async {
+  testWidgets('貼り付けると、選んだマスから書き換え、6マスを越えた分は切り落とす', (tester) async {
     await pump(tester);
     await type(tester, '123456');
     await tapBox(tester, 2);
 
-    await type(tester, 'コード: ９８７-６５４');
+    await type(tester, '９８７６５');
 
-    expect(controller.text, '987654');
+    expect(controller.text, '129876');
     expect(selectedBox(tester), 5);
   });
 
-  testWidgets('6桁未満を貼り付けると、選んだマスから上書きする', (tester) async {
+  testWidgets('先頭のマスで6桁を貼り付けると、全体が置き換わる', (tester) async {
     await pump(tester);
     await type(tester, '123456');
-    await tapBox(tester, 1);
+    await tapBox(tester, 0);
 
-    await type(tester, '9-8');
+    await type(tester, '987654');
 
-    expect(controller.text, '198456');
-    expect(selectedBox(tester), 3);
+    expect(controller.text, '987654');
   });
 
-  testWidgets('数字が無いか7桁以上の貼り付けは、何もしない', (tester) async {
+  testWidgets('数字以外を含む貼り付けは、何もしない', (tester) async {
     await pump(tester);
     await type(tester, '12');
 
     await type(tester, 'abc');
-    await type(tester, '090-1234-5678');
+    await type(tester, '987-654');
 
     expect(controller.text, '12');
     expect(selectedBox(tester), 2);
