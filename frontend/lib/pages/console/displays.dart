@@ -328,7 +328,6 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: '名前',
-                hintText: '例: 1年1組 黒板横',
               ),
             ),
           ],
