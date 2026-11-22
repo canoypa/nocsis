@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
@@ -127,6 +128,21 @@ void main() {
       await tester.tap(find.byIcon(Icons.navigate_before));
       await tester.pumpAndSettle();
       expect(shownDate(), today);
+    });
+  });
+
+  group('ホームの日付', () {
+    testWidgets('日本時間の今日の日付を出す', (tester) async {
+      await pump(tester, const MainView(), {
+        _classes: {'items': []},
+        _events: {'items': []},
+      });
+      final todayInJapan = DateTime.now().toUtc().add(const Duration(hours: 9));
+
+      expect(
+        find.text(DateFormat('M月d日 (E)', 'ja_JP').format(todayInJapan)),
+        findsOneWidget,
+      );
     });
   });
 

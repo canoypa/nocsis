@@ -34,8 +34,7 @@ class _MainViewState extends State<MainView> {
   DateTime _parseEpochDay(int epochDay) {
     final int epoch = epochDay * Duration.millisecondsPerDay;
 
-    // UTC として処理されるため -9 時間
-    return DateTime.fromMillisecondsSinceEpoch(epoch).subtract(zoneDiff);
+    return DateTime.fromMillisecondsSinceEpoch(epoch, isUtc: true);
   }
 
   @override
