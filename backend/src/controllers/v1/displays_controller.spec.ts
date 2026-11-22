@@ -131,6 +131,20 @@ describe("教室ディスプレイ", () => {
       expect((await auth.getUser(device.uid)).uid).toBe(device.uid);
     });
 
+    it("消えたグループの付与だけが残っていれば、やめられること", async () => {
+      await grantGroup(device.uid, "deleted_group", "roles/group.display");
+
+      expect((await cancel()).status).toBe(204);
+
+      expect(
+        (await can(user(device.uid), "group.read", group("deleted_group")))
+          .allowed,
+      ).toBe(false);
+      await expect(auth.getUser(device.uid)).rejects.toMatchObject({
+        code: "auth/user-not-found",
+      });
+    });
+
     it("匿名でないアカウントには 403 を返すこと", async () => {
       expect((await cancel(adminLogin.idToken)).status).toBe(403);
       expect((await auth.getUser(admin.uid)).uid).toBe(admin.uid);

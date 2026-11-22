@@ -92,17 +92,22 @@ export const cancelPairing = async (
 ): Promise<"cancelled" | "registered"> => {
   const registered = await firestore.runTransaction(async (tx) => {
     const bindings = await tx.get(
-      firestore
-        .collection(BINDINGS)
-        .where("subject", "==", subject(user(uid)))
-        .limit(1),
+      firestore.collection(BINDINGS).where("subject", "==", subject(user(uid))),
     );
-    if (!bindings.empty) return true;
+    // グループが消えても付与が残っていることがある。それは登録とみなさない
+    const groups = bindings.docs.map((doc) =>
+      firestore.doc(
+        `groups/${String(doc.get("resource")).replace(/^group:/, "")}`,
+      ),
+    );
+    const existing = groups.length > 0 ? await tx.getAll(...groups) : [];
+    if (existing.some((snapshot) => snapshot.exists)) return true;
 
     const pairings = await tx.get(
       firestore.collection(PAIRINGS).where("uid", "==", uid),
     );
     for (const doc of pairings.docs) tx.delete(doc.ref);
+    for (const doc of bindings.docs) tx.delete(doc.ref);
 
     return false;
   });
