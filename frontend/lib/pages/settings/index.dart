@@ -231,40 +231,6 @@ class SettingsTopPage extends ConsumerWidget {
                     padding: const EdgeInsets.all(16),
                     child: _ActionRow(
                       compact: compact,
-                      content: const Row(
-                        children: [
-                          Icon(Icons.password),
-                          SizedBox(width: 8),
-                          Text('パスワード'),
-                        ],
-                      ),
-                      action: TextButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return ChangePasswordDialog(
-                                onSubmit: () {
-                                  Navigator.of(context).pop();
-                                },
-                              );
-                            },
-                          );
-                        },
-                        child:
-                            user.providerData.any(
-                              (e) => e.providerId == 'password',
-                            )
-                            ? const Text('変更する')
-                            : const Text('設定する'),
-                      ),
-                    ),
-                  ),
-                  const Divider(),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: _ActionRow(
-                      compact: compact,
                       content: Row(
                         children: [
                           const Icon(CustomIcons.google),
@@ -312,6 +278,40 @@ class SettingsTopPage extends ConsumerWidget {
                             ? () => _onReplaceGoogleAccountPressed(context, ref)
                             : null,
                         child: const Text("別アカウントと連携する"),
+                      ),
+                    ),
+                  ),
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _ActionRow(
+                      compact: compact,
+                      content: const Row(
+                        children: [
+                          Icon(Icons.password),
+                          SizedBox(width: 8),
+                          Text('パスワード'),
+                        ],
+                      ),
+                      action: TextButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return ChangePasswordDialog(
+                                onSubmit: () {
+                                  Navigator.of(context).pop();
+                                },
+                              );
+                            },
+                          );
+                        },
+                        child:
+                            user.providerData.any(
+                              (e) => e.providerId == 'password',
+                            )
+                            ? const Text('変更する')
+                            : const Text('設定する'),
                       ),
                     ),
                   ),
