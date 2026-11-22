@@ -172,6 +172,52 @@ describe("ClassesController", () => {
       });
     });
 
+    it("日時のない授業があっても、ほかの授業を元の時限のまま返すこと", async () => {
+      mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
+        items: [
+          {
+            summary: "1限目",
+            start: { dateTime: "2024-01-01T09:00:00+09:00" },
+            end: { dateTime: "2024-01-01T10:30:00+09:00" },
+          },
+          { summary: "日時なし" },
+          {
+            summary: "3限目",
+            start: { dateTime: "2024-01-01T13:00:00+09:00" },
+            end: { dateTime: "2024-01-01T14:30:00+09:00" },
+          },
+        ],
+      });
+
+      const response = await app.request(
+        "/api/v1/groups/test_group_1/classes?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z",
+        {
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            Accept: "application/json",
+          },
+        },
+      );
+
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({
+        items: [
+          {
+            startAt: "2024-01-01T09:00:00.000+09:00",
+            endAt: "2024-01-01T10:30:00.000+09:00",
+            title: "1限目",
+            period: 1,
+          },
+          {
+            startAt: "2024-01-01T13:00:00.000+09:00",
+            endAt: "2024-01-01T14:30:00.000+09:00",
+            title: "3限目",
+            period: 3,
+          },
+        ],
+      });
+    });
+
     describe("グループが存在しない場合", () => {
       it("404エラーになること", async () => {
         const response = await app.request(

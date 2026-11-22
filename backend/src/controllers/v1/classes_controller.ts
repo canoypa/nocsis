@@ -118,34 +118,30 @@ classesRoutes.get(
     });
     assert(events.items, "イベントが存在しません。");
 
-    const classes = events.items.map((item, index) => {
-      // Google Calendar から取得した日時を DateTime で統一処理
-      const startDate = item.start?.dateTime || item.start?.date;
-      const endDate = item.end?.dateTime || item.end?.date;
-
-      if (!startDate || !endDate) {
-        throw new HTTPException(500, {
-          message: "イベントの開始日時または終了日時が取得できませんでした。",
-        });
-      }
-
-      const startAt = DateTime.fromISO(startDate, {
-        zone: AppConfig.TIMEZONE,
-      });
-      const endAt = DateTime.fromISO(endDate, { zone: AppConfig.TIMEZONE });
+    // 1件の不備で、ほかの授業まで見えなくしない。時限は除いた分を詰めずに数える
+    const classes = events.items.flatMap((item, index) => {
+      const startAt = DateTime.fromISO(
+        item.start?.dateTime || item.start?.date || "",
+        { zone: AppConfig.TIMEZONE },
+      );
+      const endAt = DateTime.fromISO(
+        item.end?.dateTime || item.end?.date || "",
+        { zone: AppConfig.TIMEZONE },
+      );
 
       if (!startAt.isValid || !endAt.isValid) {
-        throw new HTTPException(500, {
-          message: "日時の変換に失敗しました。",
-        });
+        console.warn("授業の日時が読めないので除きます:", item.summary);
+        return [];
       }
 
-      return classSchema.parse({
-        startAt: startAt.toISO(),
-        endAt: endAt.toISO(),
-        title: item.summary,
-        period: index + 1,
-      });
+      return [
+        classSchema.parse({
+          startAt: startAt.toISO(),
+          endAt: endAt.toISO(),
+          title: item.summary,
+          period: index + 1,
+        }),
+      ];
     });
 
     return c.json<ClassesResponse>({
