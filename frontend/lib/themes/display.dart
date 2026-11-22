@@ -5,12 +5,15 @@ import 'package:nocsis/themes/app.dart';
 
 ThemeData _base = darkTheme;
 
-ThemeData createDisplayTheme(BuildContext context) {
+/// [textScale] は 960x540 を基準にした文字の倍率。遠くから読む教室の画面は大きくする
+ThemeData createDisplayTheme(BuildContext context, {double textScale = 3}) {
   final theme = Theme.of(context);
 
   return _base.copyWith(
     textTheme: GoogleFonts.notoSansJpTextTheme(
-      theme.textTheme.merge(_base.textTheme).apply(fontSizeFactor: 3.sp),
+      theme.textTheme
+          .merge(_base.textTheme)
+          .apply(fontSizeFactor: textScale.sp),
     ),
   );
 }

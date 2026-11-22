@@ -24,6 +24,14 @@ export const bindingId = (
     .update(`${subjectKey}|${role}|${resourceKey}`)
     .digest("hex");
 
+const assertScope = (role: RoleName, resource: ResourceRef) => {
+  if (ROLES[role].scope !== resource.type) {
+    throw new Error(
+      `ロール ${role} は ${resource.type} に付与できません（scope: ${ROLES[role].scope}）`,
+    );
+  }
+};
+
 export type GrantResult = "created" | "already_granted";
 
 /** そのリソース型に付与できるロール。scope が合わない組み合わせは型で弾く */
@@ -42,34 +50,10 @@ export const grant = async <R extends ResourceRef>(params: {
   role: RoleForResource<R["type"]>;
   resource: R;
 }): Promise<GrantResult> => {
-  const { principal, role, resource } = params;
-
-  // 型でも弾いているが、CLI のように実行時に組み立てる経路があるので確かめる
-  if (ROLES[role].scope !== resource.type) {
-    throw new Error(
-      `ロール ${role} は ${resource.type} に付与できません（scope: ${ROLES[role].scope}）`,
-    );
-  }
-
-  const subjectKey = subject(principal);
-  const resourceKey = serialize(resource);
-
-  // 区切りを含む ID を通すと、別の3つ組が同じ doc ID になり得る
-  if (subjectKey.includes("|") || resourceKey.includes("|")) {
-    throw new Error("subject と resource に | は使えません");
-  }
-
-  const ref = firestore
-    .collection(COLLECTION)
-    .doc(bindingId(subjectKey, role, resourceKey));
+  const { ref, data } = bindingDoc(params);
 
   try {
-    await ref.create({
-      subject: subjectKey,
-      role,
-      resource: resourceKey,
-      created_at: FieldValue.serverTimestamp(),
-    });
+    await ref.create(data);
 
     return "created";
   } catch (err) {
@@ -79,4 +63,74 @@ export const grant = async <R extends ResourceRef>(params: {
 
     throw err;
   }
+};
+
+/**
+ * 付与の1行。ほかの書き込みと同じトランザクションで付けたいときに使う
+ * （付与だけが残る・付与だけが無い、という途中の状態を作らないため）。
+ */
+export const bindingDoc = <R extends ResourceRef>(params: {
+  principal: Principal;
+  role: RoleForResource<R["type"]>;
+  resource: R;
+}) => {
+  const { principal, role, resource } = params;
+
+  // 型でも弾いているが、CLI のように実行時に組み立てる経路があるので確かめる
+  assertScope(role, resource);
+
+  const subjectKey = subject(principal);
+  const resourceKey = serialize(resource);
+
+  // 区切りを含む ID を通すと、別の3つ組が同じ doc ID になり得る
+  if (subjectKey.includes("|") || resourceKey.includes("|")) {
+    throw new Error("subject と resource に | は使えません");
+  }
+
+  return {
+    ref: firestore
+      .collection(COLLECTION)
+      .doc(bindingId(subjectKey, role, resourceKey)),
+    data: {
+      subject: subjectKey,
+      role,
+      resource: resourceKey,
+      created_at: FieldValue.serverTimestamp(),
+    },
+  };
+};
+
+export type RevokeResult = "deleted" | "not_granted";
+
+/**
+ * 付与を外す。認可と同じくフィールドで探す（doc ID で消すと、手で入れた行のように
+ * ID がハッシュでない行が残り、権限も残る）。
+ */
+export const revoke = async (params: {
+  principal: Principal;
+  role: RoleName;
+  resource: ResourceRef;
+}): Promise<RevokeResult> => {
+  const { principal, role, resource } = params;
+
+  assertScope(role, resource);
+
+  const snapshot = await firestore
+    .collection(COLLECTION)
+    .where("subject", "==", subject(principal))
+    .where("role", "==", role)
+    .where("resource", "==", serialize(resource))
+    .get();
+
+  if (snapshot.empty) {
+    return "not_granted";
+  }
+
+  const batch = firestore.batch();
+  for (const doc of snapshot.docs) {
+    batch.delete(doc.ref);
+  }
+  await batch.commit();
+
+  return "deleted";
 };

@@ -20,6 +20,22 @@
     }
   },
 
+  "overrides": [
+    {
+      "includes": ["**/*.spec.ts", "**/*.test.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "useExpect": "error",
+            "noConditionalExpect": "error",
+            "noFocusedTests": "error",
+            "noSkippedTests": "error"
+          }
+        }
+      }
+    }
+  ],
+
   "assist": {
     "actions": {
       "source": {

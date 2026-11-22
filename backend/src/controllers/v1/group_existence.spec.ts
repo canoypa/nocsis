@@ -28,11 +28,34 @@ describe("binding が残ったまま、グループが消えている場合", ()
     "/api/v1/groups/deleted_group/events?from=2024-01-01T00:00:00%2B09:00&limit=1",
     "/api/v1/groups/deleted_group/weather/now",
     "/api/v1/groups/deleted_group/dayduty",
+    "/api/v1/groups/deleted_group/displays",
   ])("%s は 404 になること", async (path) => {
     const response = await app.request(path, {
       headers: {
         Authorization: `Bearer ${loginResult.idToken}`,
         Accept: "application/json",
+      },
+    });
+
+    expect(response.status).toBe(404);
+  });
+
+  it.each([
+    [
+      "POST",
+      "/api/v1/groups/deleted_group/displays",
+      { code: "000000", name: "名前" },
+    ],
+    ["PATCH", "/api/v1/groups/deleted_group/displays/any", { name: "名前" }],
+    ["DELETE", "/api/v1/groups/deleted_group/displays/any", undefined],
+  ])("%s %s は 404 になること", async (method, path, body) => {
+    const response = await app.request(path, {
+      method,
+      body: body ? JSON.stringify(body) : undefined,
+      headers: {
+        Authorization: `Bearer ${loginResult.idToken}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
     });
 

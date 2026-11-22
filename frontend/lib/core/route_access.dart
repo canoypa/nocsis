@@ -35,6 +35,9 @@ const routeAccess = <String, RouteAccess>{
   '/login': PublicAccess(),
   '/': SignedInAccess(),
   '/licenses': PublicAccess(),
+  // 端末はこの画面で匿名サインインする
+  '/display': PublicAccess(),
+  '/display/register': SignedInAccess(),
   '/groups/:groupId': GroupAccess({Permission.groupRead}),
   '/groups/:groupId/console': GroupAccess({..._updateGroup, ..._manageMembers}),
   '/groups/:groupId/console/group': GroupAccess(_updateGroup),
@@ -43,6 +46,12 @@ const routeAccess = <String, RouteAccess>{
   '/groups/:groupId/console/day_duty': GroupAccess(_updateGroup),
   '/groups/:groupId/console/weather': GroupAccess(_updateGroup),
   '/groups/:groupId/console/slack': GroupAccess(_updateGroup),
+  '/groups/:groupId/console/displays': GroupAccess({
+    Permission.roleBindingRead,
+    Permission.roleBindingCreate,
+    Permission.roleBindingDelete,
+    Permission.displayUpdate,
+  }),
   // 日直（メンバーの一覧）を出すのは教室の画面だけ
   '/groups/:groupId/classroom': GroupAccess({Permission.memberRead}),
 };

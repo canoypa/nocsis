@@ -179,6 +179,43 @@ describe("Events Controller", () => {
       expect(Array.isArray(json.items)).toBe(true);
     });
 
+    it("日時のないイベントがあっても、ほかのイベントを返すこと", async () => {
+      mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
+        items: [
+          { id: "no-date", summary: "日時なし" },
+          {
+            id: "festival",
+            summary: "文化祭",
+            start: { date: "2024-01-01" },
+            end: { date: "2024-01-02" },
+          },
+        ],
+      });
+
+      const response = await app.request(
+        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&limit=10",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+          },
+        },
+      );
+
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({
+        items: [
+          {
+            id: "festival",
+            startAt: "2024-01-01",
+            endAt: "2024-01-02",
+            title: "文化祭",
+            isAllDay: true,
+          },
+        ],
+      });
+    });
+
     it("toパラメータありで正常にイベント一覧を取得できること", async () => {
       const response = await app.request(
         "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&to=2024-01-02T00:00:00%2B09:00&limit=10",

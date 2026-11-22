@@ -1,6 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class LoginForm extends StatefulWidget {
   static const _defaultFormTitle = 'Nocsis';
@@ -159,20 +158,32 @@ class _LoginFormState extends State<LoginForm> {
 
   Widget _actions() {
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        FilledButton.tonal(
+        // G ロゴは色付きの背景に置けないので、tonal ではなく surface の塗りにする
+        OutlinedButton(
           onPressed: widget.onGoogleLogin,
-          style: _buttonStyle(textTheme),
+          style: _buttonStyle(textTheme).merge(
+            OutlinedButton.styleFrom(
+              backgroundColor: colorScheme.surface,
+              foregroundColor: colorScheme.onSurface,
+            ),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              SvgPicture.asset("assets/images/google.svg", width: 20),
-              const SizedBox(width: 12),
+              Image.asset(
+                "assets/images/google/google.png",
+                width: 20,
+                height: 20,
+                excludeFromSemantics: true,
+              ),
+              const SizedBox(width: 10),
               const Text("Google で続行"),
             ],
           ),
