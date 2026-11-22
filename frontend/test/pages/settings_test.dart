@@ -51,8 +51,12 @@ MockUser userFailingPasswordUpdate(String code) {
 }
 
 void main() {
-  Future<void> pumpSettings(WidgetTester tester, MockUser user) async {
-    tester.view.physicalSize = const Size(1280, 1600);
+  Future<void> pumpSettings(
+    WidgetTester tester,
+    MockUser user, {
+    double width = 1280,
+  }) async {
+    tester.view.physicalSize = Size(width, 1600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
@@ -74,6 +78,32 @@ void main() {
 
     expect(find.text('taro@example.com'), findsOneWidget);
     expect(find.text('taro.google@example.com'), findsOneWidget);
+  });
+
+  testWidgets('スマホの幅ではボタンを見出しの下に回し、はみ出さない', (tester) async {
+    await pumpSettings(tester, googleUser(), width: 360);
+
+    expect(tester.takeException(), isNull);
+    for (final (label, button) in [
+      ('メールアドレス', '変更する'),
+      ('Google', '別アカウントと連携する'),
+      ('パスワード', '設定する'),
+    ]) {
+      expect(
+        tester.getTopLeft(find.text(button)).dy,
+        greaterThan(tester.getBottomLeft(find.text(label)).dy),
+        reason: label,
+      );
+    }
+  });
+
+  testWidgets('ログイン方法は Google、パスワードの順に並べる', (tester) async {
+    await pumpSettings(tester, googleUser());
+
+    expect(
+      tester.getTopLeft(find.text('Google')).dy,
+      lessThan(tester.getTopLeft(find.text('パスワード')).dy),
+    );
   });
 
   Finder passwordRowButton(String label) => find.descendant(
