@@ -146,7 +146,6 @@ class _DisplayRegisterPageState extends ConsumerState<DisplayRegisterPage> {
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: '名前',
-                  hintText: '例: 1年1組 黒板横',
                 ),
               ),
               if (_error != null) ...[
