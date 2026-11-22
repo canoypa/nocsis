@@ -115,7 +115,7 @@ class SettingsTopPage extends ConsumerWidget {
 
     try {
       if (!_loggedInRecently(ref.read(_authTimeProvider).value)) {
-        dialog.go(context);
+        dialog.push(context);
         return;
       }
 
@@ -130,7 +130,7 @@ class SettingsTopPage extends ConsumerWidget {
       );
       // 選んでいる間にログインから時間がたったときは、再ログインからやり直す
       if (result == _ReplaceResult.requiresRecentLogin) {
-        router.go(dialog.location);
+        router.push(dialog.location);
       }
     } finally {
       swapState.set(_GoogleSwapState.idle);
@@ -196,7 +196,7 @@ class SettingsTopPage extends ConsumerWidget {
                 ),
                 action: TextButton(
                   onPressed: () {
-                    ChangeEmailDialogRoute(_groupId(context)).go(context);
+                    ChangeEmailDialogRoute(_groupId(context)).push(context);
                   },
                   child: const Text('変更する'),
                 ),
@@ -288,7 +288,7 @@ class SettingsTopPage extends ConsumerWidget {
                       action: TextButton(
                         onPressed: () {
                           ChangePasswordDialogRoute(_groupId(context))
-                              .go(context);
+                              .push(context);
                         },
                         child:
                             user.providerData.any(
@@ -605,7 +605,7 @@ class ReplaceGoogleAccountDialogState
         accessToken,
       );
       if (result == _ReplaceResult.requiresRecentLogin) {
-        router.go(location);
+        router.push(location);
       }
     } finally {
       container
