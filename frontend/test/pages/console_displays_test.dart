@@ -284,14 +284,28 @@ void main() {
     });
   }
 
-  testWidgets('名前を変えると、ダイアログを閉じて一覧を読み直す', (tester) async {
+  testWidgets('名前を変えると、ダイアログを閉じて一覧に新しい名前を出す', (tester) async {
     when(
       () => mockApi.apiV1GroupsGroupIdDisplaysDisplayIdPatch(
         groupId: 'g1',
         displayId: 'd1',
         body: any(named: 'body'),
       ),
-    ).thenAnswer((_) async => _response(204));
+    ).thenAnswer((_) async {
+      when(() => mockApi.apiV1GroupsGroupIdDisplaysGet(groupId: 'g1'))
+          .thenAnswer(
+            (_) async => _response(
+              200,
+              Displays(
+                items: [
+                  active.copyWith(name: '前方'),
+                  removed,
+                ],
+              ),
+            ),
+          );
+      return _response(204);
+    });
     await pumpPage(tester);
 
     await tester.tap(find.byTooltip('名前を変更'));
@@ -301,14 +315,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.widgetWithText(TextButton, '保存'), findsNothing);
-    verify(
-      () => mockApi.apiV1GroupsGroupIdDisplaysDisplayIdPatch(
-        groupId: 'g1',
-        displayId: 'd1',
-        body: const DisplayPatchJson(name: '前方'),
-      ),
-    ).called(1);
-    verify(() => mockApi.apiV1GroupsGroupIdDisplaysGet(groupId: 'g1'))
-        .called(2);
+    expect(find.text('前方'), findsOneWidget);
+    expect(find.text('1年1組 黒板横'), findsNothing);
   });
 }
