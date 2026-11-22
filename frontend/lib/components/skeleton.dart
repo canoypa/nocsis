@@ -16,6 +16,7 @@ class _SkeletonState extends State<Skeleton>
     vsync: this,
     duration: const Duration(milliseconds: 1500),
   );
+  late final _opacity = Tween<double>(begin: 0.5, end: 1).animate(_controller);
 
   @override
   void didChangeDependencies() {
@@ -38,10 +39,7 @@ class _SkeletonState extends State<Skeleton>
     return Semantics(
       label: '読み込み中',
       child: ExcludeSemantics(
-        child: FadeTransition(
-          opacity: Tween<double>(begin: 0.5, end: 1).animate(_controller),
-          child: widget.child,
-        ),
+        child: FadeTransition(opacity: _opacity, child: widget.child),
       ),
     );
   }
