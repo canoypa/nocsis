@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/components/during_class_progress.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/cron.dart';
+import 'package:nocsis/extensions/schedule_title.dart';
 
 class DuringClassScreen extends ConsumerWidget {
   final Class? data;
@@ -42,7 +43,7 @@ class DuringClassScreen extends ConsumerWidget {
                   ),
                   const Text("・"),
                   Text(
-                    classData.title,
+                    classData.shownTitle,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ],

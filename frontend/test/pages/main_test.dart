@@ -134,6 +134,27 @@ void main() {
       expect(find.text(DateFormat('M月d日').format(today)), findsOneWidget);
     });
 
+    testWidgets('タイトルのない授業とイベントは「(No title)」と出す', (tester) async {
+      final today = DateTime.now();
+      await pump(tester, const MainView(), {
+        _classes: {
+          'items': [
+            {
+              'title': '',
+              'period': 1,
+              'startAt': today.toUtc().toIso8601String(),
+              'endAt': today.toUtc().toIso8601String(),
+            },
+          ],
+        },
+        _events: {
+          'items': [_event('', today)],
+        },
+      });
+
+      expect(find.text('(No title)'), findsNWidgets(2));
+    });
+
     testWidgets('授業もイベントもない日は「予定なし」を出す', (tester) async {
       await pump(tester, const MainView(), {
         _classes: {'items': []},
@@ -242,6 +263,16 @@ void main() {
 
       expect(find.text('30年6月'), findsOneWidget);
       expect(find.text('6月1日'), findsOneWidget);
+    });
+
+    testWidgets('タイトルのないイベントは「(No title)」と出す', (tester) async {
+      await pump(tester, const EventsView(), {
+        _events: {
+          'items': [_event('', DateTime(2030, 5, 20, 9))],
+        },
+      });
+
+      expect(find.text('(No title)'), findsOneWidget);
     });
 
     testWidgets('イベントがなければ「予定なし」を出す', (tester) async {

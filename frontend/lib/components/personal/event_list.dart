@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:nocsis/components/personal/basic_card.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/extensions/event_date.dart';
+import 'package:nocsis/extensions/schedule_title.dart';
 
 class EventListView extends StatelessWidget {
   final List<Event> items;
@@ -21,7 +22,7 @@ class EventListView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: (items).map((data) {
               return BasicCard(
-                primary: Text(data.title),
+                primary: Text(data.shownTitle),
                 secondary: Text(DateFormat("M月d日").format(data.startDate)),
               );
             }).toList(),

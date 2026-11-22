@@ -8,6 +8,7 @@ import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:nocsis/extensions/event_date.dart';
+import 'package:nocsis/extensions/schedule_title.dart';
 
 // 月毎のイベントグループ
 class MonthEventGroup {
@@ -100,7 +101,7 @@ class EventsView extends ConsumerWidget {
                         children: monthGroup.items.map((event) {
                           return BasicCard(
                             primary: Text(
-                              event.title,
+                              event.shownTitle,
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             // TODO: 日を跨いだりする場合の表示に対応する
