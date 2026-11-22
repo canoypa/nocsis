@@ -31,7 +31,8 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
   DisplayPairing? _pairing;
   DateTime? _reissueAt;
   Timer? _timer;
-  bool _polling = false;
+  Future<void>? _polling;
+  bool _leaving = false;
 
   @override
   void initState() {
@@ -58,14 +59,20 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool(displayDeviceKey, true);
 
+    await _startPolling();
+  }
+
+  Future<void> _startPolling() async {
     await _poll();
     if (!mounted) return;
     _timer = Timer.periodic(_pollInterval, (_) => _poll());
   }
 
-  Future<void> _poll() async {
-    if (_polling || !mounted) return;
-    _polling = true;
+  Future<void> _poll() =>
+      _polling ??= _pollOnce().whenComplete(() => _polling = null);
+
+  Future<void> _pollOnce() async {
+    if (!mounted || _leaving) return;
 
     try {
       await _signIn();
@@ -83,7 +90,8 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
       }
 
       final reissueAt = _reissueAt;
-      if (reissueAt == null || !DateTime.now().isBefore(reissueAt)) {
+      if (!_leaving &&
+          (reissueAt == null || !DateTime.now().isBefore(reissueAt))) {
         final issued = await client.apiV1DisplayPairingsPost();
         final pairing = issued.body;
         if (issued.isSuccessful && pairing != null && mounted) {
@@ -95,8 +103,6 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
       }
     } catch (_) {
       // 通信が戻れば次の問い合わせで続きから進む
-    } finally {
-      _polling = false;
     }
   }
 
@@ -116,8 +122,38 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
       }
     }
 
+    // やめた直後に問い合わせが終わると、消したアカウントを作り直してしまう
+    if (_leaving) return;
     await auth.signInAnonymously();
     ref.invalidate(apiClientProvider);
+  }
+
+  Future<void> _cancel() async {
+    final auth = ref.read(firebaseAuthProvider);
+    final client = ref.read(apiClientProvider.future);
+    setState(() => _leaving = true);
+    _timer?.cancel();
+    // 途中の問い合わせが後から届くと、消したアカウントにコードを発行し直してしまう
+    await _polling;
+
+    int? status;
+    try {
+      status = (await (await client).apiV1DisplayPairingsDelete()).statusCode;
+    } catch (_) {}
+    if (!mounted) return;
+
+    // 409 は押したのと同時に登録されたとき。問い合わせを続ければ教室の画面へ進む。
+    // 消せなかったときも、コードが残ったまま抜けると登録されてしまうので待ち受けに戻す
+    if (status != 204) {
+      setState(() => _leaving = false);
+      await _startPolling();
+      return;
+    }
+
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(displayDeviceKey);
+    await auth.signOut();
+    if (mounted) context.go('/login');
   }
 
   /// 期限はサーバの時刻なので、端末の時計がずれていても効くよう、残り時間に直して数える
@@ -137,7 +173,10 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
 
         return Theme(
           data: theme,
-          child: _PairingView(pairing: _pairing),
+          child: _PairingView(
+            pairing: _pairing,
+            onCancel: _leaving ? null : _cancel,
+          ),
         );
       },
     );
@@ -146,8 +185,9 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
 
 class _PairingView extends StatelessWidget {
   final DisplayPairing? pairing;
+  final VoidCallback? onCancel;
 
-  const _PairingView({required this.pairing});
+  const _PairingView({required this.pairing, required this.onCancel});
 
   @override
   Widget build(BuildContext context) {
@@ -232,21 +272,28 @@ class _PairingView extends StatelessWidget {
             bottom: 32.r,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              spacing: 16.r,
               children: [
-                SizedBox.square(
-                  dimension: 14.r,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.r,
-                    color: colorScheme.primary,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 12.r,
+                  children: [
+                    SizedBox.square(
+                      dimension: 14.r,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.r,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                    Text(
+                      '登録を待っています',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 12.r),
-                Text(
-                  '登録を待っています',
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
+                TextButton(onPressed: onCancel, child: const Text('登録をやめる')),
               ],
             ),
           ),

@@ -81,6 +81,48 @@ export const issuePairing = async (
   throw new Error("コードを発行できませんでした");
 };
 
+/**
+ * 端末が登録をやめる。コードを消し、匿名アカウントも消す。
+ *
+ * 付与の有無とコードの削除を同じトランザクションで見るので、登録と同時に呼ばれても、
+ * 登録された端末のアカウントを消すことはない。
+ */
+export const cancelPairing = async (
+  uid: string,
+): Promise<"cancelled" | "registered"> => {
+  const registered = await firestore.runTransaction(async (tx) => {
+    const bindings = await tx.get(
+      firestore.collection(BINDINGS).where("subject", "==", subject(user(uid))),
+    );
+    // グループが消えても付与が残っていることがある。それは登録とみなさない
+    const groups = bindings.docs.map((doc) =>
+      firestore.doc(
+        `groups/${String(doc.get("resource")).replace(/^group:/, "")}`,
+      ),
+    );
+    const existing = groups.length > 0 ? await tx.getAll(...groups) : [];
+    if (existing.some((snapshot) => snapshot.exists)) return true;
+
+    const pairings = await tx.get(
+      firestore.collection(PAIRINGS).where("uid", "==", uid),
+    );
+    for (const doc of pairings.docs) tx.delete(doc.ref);
+    for (const doc of bindings.docs) tx.delete(doc.ref);
+
+    return false;
+  });
+
+  if (registered) return "registered";
+
+  if (await isAnonymous(uid)) {
+    await auth.deleteUser(uid).catch((err) => {
+      if (!isUserNotFound(err)) throw err;
+    });
+  }
+
+  return "cancelled";
+};
+
 const isLive = (doc: FirebaseFirestore.DocumentSnapshot) =>
   (doc.get("expires_at") as Timestamp).toMillis() > Date.now();
 

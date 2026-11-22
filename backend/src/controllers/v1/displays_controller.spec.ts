@@ -107,6 +107,50 @@ describe("教室ディスプレイ", () => {
     });
   });
 
+  describe("DELETE /api/v1/display-pairings", () => {
+    const cancel = (idToken = device.idToken) =>
+      request("/api/v1/display-pairings", idToken, { method: "DELETE" });
+
+    it("コードを使えなくし、匿名アカウントを消すこと", async () => {
+      const { code } = await issue();
+
+      expect((await cancel()).status).toBe(204);
+
+      expect((await register(code)).status).toBe(404);
+      await expect(auth.getUser(device.uid)).rejects.toMatchObject({
+        code: "auth/user-not-found",
+      });
+    });
+
+    it("もう登録された端末は 409 を返し、アカウントを残すこと", async () => {
+      const { code } = await issue();
+      expect((await register(code)).status).toBe(201);
+
+      expect((await cancel()).status).toBe(409);
+
+      expect((await auth.getUser(device.uid)).uid).toBe(device.uid);
+    });
+
+    it("消えたグループの付与だけが残っていれば、やめられること", async () => {
+      await grantGroup(device.uid, "deleted_group", "roles/group.display");
+
+      expect((await cancel()).status).toBe(204);
+
+      expect(
+        (await can(user(device.uid), "group.read", group("deleted_group")))
+          .allowed,
+      ).toBe(false);
+      await expect(auth.getUser(device.uid)).rejects.toMatchObject({
+        code: "auth/user-not-found",
+      });
+    });
+
+    it("匿名でないアカウントには 403 を返すこと", async () => {
+      expect((await cancel(adminLogin.idToken)).status).toBe(403);
+      expect((await auth.getUser(admin.uid)).uid).toBe(admin.uid);
+    });
+  });
+
   describe("POST /api/v1/groups/:groupId/displays", () => {
     it("端末に教室ディスプレイの権限だけが付き、コードは使い切られること", async () => {
       const { code } = await issue();
