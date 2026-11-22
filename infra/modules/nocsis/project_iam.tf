@@ -18,6 +18,7 @@ locals {
     ]
     "serviceAccount:backend-runtime@${var.project_id}.iam.gserviceaccount.com" = [
       "projects/${var.project_id}/roles/authUserRemover",
+      "projects/${var.project_id}/roles/authUserUpdater",
       "roles/datastore.user",
       "roles/logging.logWriter",
     ]

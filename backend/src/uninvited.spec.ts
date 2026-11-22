@@ -87,6 +87,7 @@ describe("どのグループにも招かれていないアカウント", () => {
     ).toEqual(
       [
         "GET /api/v1/me",
+        "PUT /api/v1/me/google-account",
         "GET /api/v1/users/me/groups",
         "POST /api/v1/client-errors",
         "POST /api/v1/display-pairings",
