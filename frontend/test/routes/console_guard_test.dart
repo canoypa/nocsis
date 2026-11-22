@@ -78,7 +78,7 @@ void main() {
   testWidgets('group.update を持たない相手がコンソールの URL を開くと 404 を出す', (tester) async {
     givenPermissions([Permission.groupRead, Permission.memberRead]);
 
-    await pumpApp(tester, '/groups/g1/console/group');
+    await pumpApp(tester, '/groups/g1/console');
 
     expect(find.text('404: Page not found'), findsOneWidget);
     expect(find.text('管理コンソール'), findsNothing);
@@ -95,7 +95,7 @@ void main() {
   testWidgets('group.update を持つ相手はコンソールを開ける', (tester) async {
     givenPermissions([Permission.groupRead, Permission.groupUpdate]);
 
-    await pumpApp(tester, '/groups/g1/console/group');
+    await pumpApp(tester, '/groups/g1/console');
 
     expect(find.text('404: Page not found'), findsNothing);
     expect(find.text('管理コンソール'), findsWidgets);

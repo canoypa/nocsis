@@ -15,19 +15,22 @@ class ConsoleLayout extends ConsumerWidget {
 
   static final Map<String, int> _routeToIndex = {
     '/console': 0,
-    '/console/group': 1,
-    '/console/member': 2,
-    '/console/calendar': 3,
-    '/console/day_duty': 4,
-    '/console/weather': 5,
-    '/console/slack': 6,
-    '/console/displays': 7,
+    '/console/member': 1,
+    '/console/calendar': 2,
+    '/console/day_duty': 3,
+    '/console/weather': 4,
+    '/console/slack': 5,
+    '/console/displays': 6,
   };
 
   int _getNavigationIndex(BuildContext context) {
-    final location = GoRouterState.of(context).fullPath!;
+    final location = GoRouterState.of(context).fullPath!
+        .replaceFirst('/groups/:groupId', '');
+    // ダイアログは画面の子ルートなので、開いている間も元の画面を選んだままにする
     final routeKey = _routeToIndex.keys.firstWhere(
-      (key) => location.replaceFirst('/groups/:groupId', '') == key,
+      (key) =>
+          key != '/console' &&
+          (location == key || location.startsWith('$key/')),
       orElse: () => '/console',
     );
     return _routeToIndex[routeKey]!;
@@ -47,11 +50,6 @@ class ConsoleLayout extends ConsumerWidget {
         GoRouter.of(context).go("/groups/$groupId$route");
       },
       navigationItems: const [
-        NavigationDrawerDestination(
-          icon: Icon(Symbols.home),
-          selectedIcon: Icon(Symbols.home, fill: 1),
-          label: Text('ホーム'),
-        ),
         NavigationDrawerDestination(
           icon: Icon(Symbols.workspaces),
           selectedIcon: Icon(Symbols.workspaces, fill: 1),

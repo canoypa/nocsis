@@ -40,7 +40,6 @@ const routeAccess = <String, RouteAccess>{
   '/display/register': SignedInAccess(),
   '/groups/:groupId': GroupAccess({Permission.groupRead}),
   '/groups/:groupId/console': GroupAccess({..._updateGroup, ..._manageMembers}),
-  '/groups/:groupId/console/group': GroupAccess(_updateGroup),
   '/groups/:groupId/console/member': GroupAccess(_manageMembers),
   '/groups/:groupId/console/calendar': GroupAccess(_updateGroup),
   '/groups/:groupId/console/day_duty': GroupAccess(_updateGroup),

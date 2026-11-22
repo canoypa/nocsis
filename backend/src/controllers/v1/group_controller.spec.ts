@@ -345,6 +345,57 @@ describe("GroupController", () => {
         });
       });
 
+      describe("名前が空白だけの場合", () => {
+        it("400エラーになること", async () => {
+          const response = await app.request("/api/v1/groups/test_group_1", {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ name: "  " }),
+          });
+
+          expect(response.status).toBe(400);
+        });
+      });
+
+      describe("名前が50文字を超える場合", () => {
+        it("400エラーになること", async () => {
+          const response = await app.request("/api/v1/groups/test_group_1", {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ name: "あ".repeat(51) }),
+          });
+
+          expect(response.status).toBe(400);
+        });
+      });
+
+      describe("名前が絵文字で50文字の場合", () => {
+        it("前後の空白を除いて更新できること", async () => {
+          const name = "👨‍👩‍👧".repeat(50);
+          const response = await app.request("/api/v1/groups/test_group_1", {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ name: ` ${name} ` }),
+          });
+          const body = await response.json();
+
+          expect(response.status).toBe(200);
+          expect(body.name).toBe(name);
+        });
+      });
+
       describe("存在しないフィールドが含まれる場合", () => {
         it("400エラーになること", async () => {
           const response = await app.request("/api/v1/groups/test_group_1", {

@@ -9,7 +9,7 @@ import {
   authorize,
   groupOf,
 } from "../../middlewares/authorize.js";
-import { groupSchema } from "../../resources/v1/groups.js";
+import { groupName, groupSchema } from "../../resources/v1/groups.js";
 
 export const groupRoutes = new Hono<AuthorizedEnv>();
 
@@ -25,6 +25,7 @@ const paramSchema = z
 // 管理者が変えられると、そのアカウントが読める別のグループのカレンダーまで読めてしまう
 const patchJsonSchema = groupSchema
   .omit({ id: true, classes_calendar_id: true, events_calendar_id: true })
+  .extend({ name: groupName.meta({ description: "名前。50文字まで" }) })
   .partial()
   .refine((data) => Object.keys(data).length > 0)
   .meta({

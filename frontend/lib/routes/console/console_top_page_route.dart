@@ -17,7 +17,7 @@ class ConsoleTopPageRoute extends GoRouteData with $ConsoleTopPageRoute {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return CustomTransitionPage(
       key: state.pageKey,
-      child: const ConsoleTopPage(),
+      child: const ConsoleGroupPage(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeThroughTransition(
           animation: animation,
