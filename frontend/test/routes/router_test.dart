@@ -10,6 +10,15 @@ import 'package:nocsis/providers/me.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// テストでは画像を取りに行けないので、アイコンの画像を持たない人にする
+// ignore: must_be_immutable
+class _UserWithoutPhoto extends MockUser {
+  _UserWithoutPhoto() : super(uid: 'u1', email: 'taro@example.com');
+
+  @override
+  String? get photoURL => null;
+}
+
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
@@ -193,6 +202,64 @@ void main() {
         Uri.parse(currentLocation(container)).queryParameters['continue-uri'],
         '/display/register?code=123456',
       );
+    });
+  });
+
+  group('設定のダイアログ', () {
+    const member = Me(
+      memberships: [
+        Membership(
+          group: MembershipGroup(id: 'g1', name: 'グループ'),
+          permissions: [Permission.groupRead],
+        ),
+      ],
+    );
+
+    Future<ProviderContainer> open(WidgetTester tester, String location) async {
+      final container = await pumpRouter(
+        tester,
+        location,
+        MockFirebaseAuth(signedIn: true, mockUser: _UserWithoutPhoto()),
+        me: member,
+      );
+      await tester.pumpAndSettle();
+      return container;
+    }
+
+    Future<ProviderContainer> openEmailDialog(WidgetTester tester) =>
+        open(tester, '/groups/g1/settings/email');
+
+    for (final (path, title) in [
+      ('email', 'メールアドレスを変更する'),
+      ('password', 'パスワードを設定する'),
+      ('google-account', '別アカウントと連携する'),
+    ]) {
+      testWidgets('/settings/$path を開くと「$title」のダイアログに留まる', (tester) async {
+        final container = await open(tester, '/groups/g1/settings/$path');
+
+        expect(currentLocation(container), '/groups/g1/settings/$path');
+        expect(find.text(title), findsWidgets);
+      });
+    }
+
+    testWidgets('メールアドレスの「変更する」で、ダイアログの URL に移る', (tester) async {
+      final container = await open(tester, '/groups/g1/settings');
+
+      await tester.tap(find.text('変更する'));
+      await tester.pumpAndSettle();
+
+      expect(currentLocation(container), '/groups/g1/settings/email');
+      expect(find.text('メールアドレスを変更する'), findsWidgets);
+    });
+
+    testWidgets('ブラウザの戻るで設定の URL に戻ると、ダイアログが閉じる', (tester) async {
+      final container = await openEmailDialog(tester);
+
+      container.read(routerProvider).go('/groups/g1/settings');
+      await tester.pumpAndSettle();
+
+      expect(find.text('メールアドレスを変更する'), findsNothing);
+      expect(find.text('設定'), findsWidgets);
     });
   });
 }

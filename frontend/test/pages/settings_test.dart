@@ -2,10 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mock_exceptions/mock_exceptions.dart';
 import 'package:nocsis/pages/settings/index.dart';
 import 'package:nocsis/providers/firebase.dart';
+import 'package:nocsis/routes/router.dart';
 
 class _Provider extends Fake implements UserInfo {
   @override
@@ -50,6 +52,40 @@ MockUser userFailingPasswordUpdate(String code) {
   return user;
 }
 
+/// 設定の画面とダイアログのルートだけを持つルーター
+GoRouter settingsRouter() {
+  GoRoute dialog(String path, GoRouteData Function() route) => GoRoute(
+    path: path,
+    parentNavigatorKey: rootNavigatorKey,
+    pageBuilder: (context, state) => route().buildPage(context, state),
+  );
+
+  return GoRouter(
+    navigatorKey: rootNavigatorKey,
+    initialLocation: '/groups/g1/settings',
+    routes: [
+      GoRoute(
+        path: '/groups/:groupId/settings',
+        builder: (context, state) => const Scaffold(body: SettingsTopPage()),
+        routes: [
+          dialog(
+            ChangeEmailDialogRoute.path,
+            () => const ChangeEmailDialogRoute('g1'),
+          ),
+          dialog(
+            ChangePasswordDialogRoute.path,
+            () => const ChangePasswordDialogRoute('g1'),
+          ),
+          dialog(
+            ReplaceGoogleAccountDialogRoute.path,
+            () => const ReplaceGoogleAccountDialogRoute('g1'),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
 void main() {
   Future<void> pumpSettings(
     WidgetTester tester,
@@ -67,7 +103,7 @@ void main() {
             MockFirebaseAuth(signedIn: true, mockUser: user),
           ),
         ],
-        child: const MaterialApp(home: Scaffold(body: SettingsTopPage())),
+        child: MaterialApp.router(routerConfig: settingsRouter()),
       ),
     );
     await tester.pumpAndSettle();
@@ -241,6 +277,22 @@ void main() {
 
       expect(find.text('続けるには、もう一度ログインしてください。'), findsNothing);
     });
+  });
+
+  testWidgets('スマホの幅でもう一度ログインを求めるとき、フォームを画面の中央に置く', (tester) async {
+    await pumpSettings(
+      tester,
+      userFailingPasswordUpdate('requires-recent-login'),
+      width: 599,
+    );
+    await tester.tap(find.text('設定する'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'a-strong-password');
+    await tester.tap(find.widgetWithText(FilledButton, '設定する'));
+    await tester.pumpAndSettle();
+
+    final button = tester.getRect(find.widgetWithText(FilledButton, 'ログイン'));
+    expect(button.center.dx, moreOrLessEquals(599 / 2));
   });
 
   testWidgets('もう一度ログインを求めているときに幅が変わっても、入力が消えない', (tester) async {
