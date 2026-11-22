@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
-import 'package:nocsis/pages/console/displays.dart';
+import 'package:nocsis/pages/console/displays/page.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 
