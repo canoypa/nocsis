@@ -47,6 +47,7 @@ class _CodeFieldState extends State<CodeField> {
   var _index = 0;
 
   /// 狭い幅では、マスと間隔を同じ割合で縮める
+  var _scale = 1.0;
 
   @override
   void initState() {
@@ -192,7 +193,8 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   /// 押したマスを選ぶ。まだ前に空いたマスがあれば、そこより先へは進めない
-  void _select(double x) {
+  void _select(double scaledX) {
+    final x = scaledX / _scale;
     var left = 0.0;
     var index = CodeField.length - 1;
     for (var i = 0; i < CodeField.length; i++) {
@@ -225,8 +227,8 @@ class _CodeFieldState extends State<CodeField> {
           : colorScheme.outline;
 
       return Container(
-        width: CodeField._boxWidth,
-        height: 64,
+        width: CodeField._boxWidth * _scale,
+        height: 64 * _scale,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
@@ -238,46 +240,51 @@ class _CodeFieldState extends State<CodeField> {
 
     Widget group(int from) => Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: CodeField._gap,
+      spacing: CodeField._gap * _scale,
       children: [for (var i = from; i < from + 3; i++) box(i)],
     );
 
     return Column(
       spacing: 8,
       children: [
-        Stack(
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: CodeField._groupGap,
-              children: [group(0), group(3)],
-            ),
-            Positioned.fill(
-              child: Listener(
-                behavior: HitTestBehavior.translucent,
-                onPointerDown: (_) => _pointerDown = true,
-                onPointerUp: (event) => _select(event.localPosition.dx),
-                child: Opacity(
-                  opacity: 0,
-                  child: TextField(
-                    controller: widget.controller,
-                    focusNode: _focusNode,
-                    autofocus: true,
-                    showCursor: false,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [_formatter],
-                    onChanged: widget.onChanged,
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => widget.onSubmitted?.call(),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      labelText: 'コード',
+        LayoutBuilder(
+          builder: (context, constraints) {
+            _scale = (constraints.maxWidth / CodeField.width).clamp(0.0, 1.0);
+            return Stack(
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: CodeField._groupGap * _scale,
+                  children: [group(0), group(3)],
+                ),
+                Positioned.fill(
+                  child: Listener(
+                    behavior: HitTestBehavior.translucent,
+                    onPointerDown: (_) => _pointerDown = true,
+                    onPointerUp: (event) => _select(event.localPosition.dx),
+                    child: Opacity(
+                      opacity: 0,
+                      child: TextField(
+                        controller: widget.controller,
+                        focusNode: _focusNode,
+                        autofocus: true,
+                        showCursor: false,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [_formatter],
+                        onChanged: widget.onChanged,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => widget.onSubmitted?.call(),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          labelText: 'コード',
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
         if (hasError)
           Text(

@@ -253,4 +253,30 @@ void main() {
 
     expect(submitted, 1);
   });
+
+  testWidgets('狭い幅でも、マスがはみ出さない', (tester) async {
+    await pump(tester, width: 280);
+
+    expect(tester.takeException(), isNull);
+    final right = tester.getTopRight(find.byType(CodeField)).dx;
+    final lastBox = tester
+        .getTopRight(
+          find
+              .descendant(
+                of: find.byType(CodeField),
+                matching: find.byType(Container),
+              )
+              .last,
+        )
+        .dx;
+    expect(lastBox, lessThanOrEqualTo(right));
+
+    // 縮めても、押したマスを選べる
+    await type(tester, '1234');
+    final origin = tester.getTopLeft(find.byType(CodeField));
+    final scale = 280 / CodeField.width;
+    await tester.tapAt(origin + Offset((64 + 28) * scale, 20));
+    await tester.pump();
+    expect(selectedBox(tester), 1);
+  });
 }
