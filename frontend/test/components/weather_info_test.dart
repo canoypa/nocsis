@@ -17,10 +17,11 @@ import 'package:nocsis/providers/weather.dart';
 import '../helpers/mock_api_client.dart';
 
 void main() {
-  testWidgets('読み込めなかった後の読み直し中は、スケルトンを出さない', (tester) async {
+  testWidgets('読み込めなかった後の 15 分ごとの読み直し中は、スケルトンを出さない', (tester) async {
     final mockApi = MockApi();
     final reloaded = Completer<chopper.Response<WeatherData>>();
     var failing = true;
+    final cron = StreamController<DateTime>();
     when(() => mockApi.apiV1GroupsGroupIdWeatherNowGet(groupId: 'g1'))
         .thenAnswer((_) {
           return failing
@@ -30,8 +31,7 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         apiClientProvider.overrideWith((ref) async => mockApi),
-        cronProvider('*/15 * * * *')
-            .overrideWith((ref) => const Stream.empty()),
+        cronProvider('*/15 * * * *').overrideWith((ref) => cron.stream),
       ],
       retry: (_, _) => null,
     );
@@ -54,7 +54,7 @@ void main() {
     expect(container.read(weatherProvider('g1')).hasError, isTrue);
 
     failing = false;
-    container.invalidate(weatherProvider('g1'));
+    cron.add(DateTime(2026, 11, 22, 9, 15));
     await tester.pump();
     await tester.pump();
 
