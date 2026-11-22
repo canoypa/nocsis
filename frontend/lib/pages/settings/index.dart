@@ -24,42 +24,65 @@ final _authTimeProvider = StreamProvider.autoDispose<DateTime?>(
 
 enum _ReplaceResult { replaced, cancelled, requiresRecentLogin }
 
+/// 選んだ Google アカウントへの差し替えを待っている間は true
+final _replacingGoogleAccountProvider =
+    NotifierProvider<_ReplacingGoogleAccount, bool>(
+      _ReplacingGoogleAccount.new,
+    );
+
+class _ReplacingGoogleAccount extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void set(bool value) => state = value;
+}
+
 /// Google のアカウント選択を開き、選んだアカウントに連携を差し替える
 Future<_ReplaceResult> _replaceGoogleAccount(
   BuildContext context,
-  WidgetRef ref,
-) async {
-  final user = ref.read(authenticatedUserProvider);
+  WidgetRef ref, {
+  VoidCallback? onPicked,
+}) async {
+  // onPicked でダイアログを閉じると ref が使えなくなるので、container を通す
+  final container = ProviderScope.containerOf(context, listen: false);
+  final user = container.read(authenticatedUserProvider);
   final messenger = ScaffoldMessenger.of(context);
-  final clientFuture = ref.read(apiClientProvider.future);
+  final clientFuture = container.read(apiClientProvider.future);
 
   final accessToken = await pickGoogleAccountToken();
   if (accessToken == null) return _ReplaceResult.cancelled;
 
-  final client = await clientFuture;
-  final response = await client.apiV1MeGoogleAccountPut(
-    body: GoogleAccountPutJson(accessToken: accessToken),
-  );
-
-  if (response.statusCode == 403 &&
-      response.bodyString.contains('requires-recent-login')) {
-    return _ReplaceResult.requiresRecentLogin;
-  }
-  if (response.statusCode == 409) {
-    messenger.showSnackBar(
-      const SnackBar(content: Text('この Google アカウントはすでに別のユーザーと連携されています。')),
+  onPicked?.call();
+  final replacing = container.read(_replacingGoogleAccountProvider.notifier);
+  replacing.set(true);
+  try {
+    final client = await clientFuture;
+    final response = await client.apiV1MeGoogleAccountPut(
+      body: GoogleAccountPutJson(accessToken: accessToken),
     );
-    return _ReplaceResult.cancelled;
-  }
-  if (!response.isSuccessful) {
-    throw Exception('Google account replace failed: ${response.statusCode}');
-  }
 
-  await user.reload();
-  if (context.mounted) {
-    ref.invalidate(currentUserProvider);
+    if (response.statusCode == 403 &&
+        response.bodyString.contains('requires-recent-login')) {
+      return _ReplaceResult.requiresRecentLogin;
+    }
+    if (response.statusCode == 409 &&
+        response.bodyString.contains('linked-to-another-user')) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('この Google アカウントはすでに別のユーザーと連携されています。')),
+      );
+      return _ReplaceResult.cancelled;
+    }
+    if (!response.isSuccessful) {
+      messenger.showSnackBar(const SnackBar(content: Text('連携を変更できませんでした。')));
+      throw Exception('Google account replace failed: ${response.statusCode}');
+    }
+
+    await user.reload();
+    container.invalidate(currentUserProvider);
+    return _ReplaceResult.replaced;
+  } finally {
+    replacing.set(false);
   }
-  return _ReplaceResult.replaced;
 }
 
 final _googleAccountPickerLoadedProvider = FutureProvider.autoDispose(
@@ -100,6 +123,7 @@ class SettingsTopPage extends ConsumerWidget {
         ?.email;
 
     final pickerLoaded = ref.watch(_googleAccountPickerLoadedProvider).hasValue;
+    final replacing = ref.watch(_replacingGoogleAccountProvider);
     ref.watch(_authTimeProvider);
 
     return Align(
@@ -193,32 +217,36 @@ class SettingsTopPage extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            const Icon(CustomIcons.google),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Google'),
-                                if (googleEmail != null)
-                                  Text(
-                                    googleEmail,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurfaceVariant,
-                                        ),
-                                  ),
-                              ],
-                            ),
-                          ],
+                        Opacity(
+                          // M3 の無効な内容の不透明度
+                          opacity: replacing ? 0.38 : 1,
+                          child: Row(
+                            children: [
+                              const Icon(CustomIcons.google),
+                              const SizedBox(width: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('Google'),
+                                  if (googleEmail != null)
+                                    Text(
+                                      googleEmail,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                          ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                         TextButton(
-                          onPressed: pickerLoaded
+                          onPressed: pickerLoaded && !replacing
                               ? () =>
                                     _onReplaceGoogleAccountPressed(context, ref)
                               : null,
@@ -516,15 +544,15 @@ class _ReplaceGoogleAccountDialogState
   }
 
   Future<void> _pick() async {
-    final result = await _replaceGoogleAccount(context, ref);
-    if (!mounted) return;
-    switch (result) {
-      case _ReplaceResult.replaced:
-        Navigator.of(context).pop();
-      case _ReplaceResult.requiresRecentLogin:
-        setState(() => reauthenticating = true);
-      case _ReplaceResult.cancelled:
-        break;
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await _replaceGoogleAccount(
+      context,
+      ref,
+      onPicked: () => Navigator.of(context).pop(),
+    );
+    // 再認証した直後なので、選ぶまでに5分を過ぎたときだけ起きる
+    if (result == _ReplaceResult.requiresRecentLogin) {
+      messenger.showSnackBar(const SnackBar(content: Text('連携を変更できませんでした。')));
     }
   }
 
