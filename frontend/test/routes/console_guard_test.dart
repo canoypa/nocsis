@@ -189,4 +189,45 @@ void main() {
 
     expect(currentLocation(), '/groups/g1/console');
   });
+
+  group('教室ディスプレイのダイアログの URL', () {
+    const location = '/groups/g1/console/displays/d1/remove';
+
+    setUp(() {
+      when(() => mockApi.apiV1GroupsGroupIdDisplaysGet(groupId: 'g1'))
+          .thenAnswer(
+            (_) async => chopper.Response(
+              http.Response('', 200),
+              Displays(
+                items: [
+                  Display(
+                    id: 'd1',
+                    name: '黒板横',
+                    createdAt: DateTime(2026, 11, 1),
+                    removedAt: null,
+                  ),
+                ],
+              ),
+            ),
+          );
+    });
+
+    testWidgets('group.update を持つ相手は、そのダイアログに留まる', (tester) async {
+      givenPermissions(Permission.values.toList());
+
+      await pumpApp(tester, location);
+
+      expect(currentLocation(), location);
+      expect(find.text('「黒板横」の登録を解除しますか？'), findsOneWidget);
+    });
+
+    testWidgets('group.update を持たない相手には 404 を出す', (tester) async {
+      givenPermissions([Permission.groupRead]);
+
+      await pumpApp(tester, location);
+
+      expect(find.text('404: Page not found'), findsOneWidget);
+      expect(find.text('「黒板横」の登録を解除しますか？'), findsNothing);
+    });
+  });
 }

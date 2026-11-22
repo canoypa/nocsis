@@ -4,6 +4,7 @@ import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/pages/console/displays/display_name.dart';
 import 'package:nocsis/providers/api_client.dart';
 import 'package:nocsis/providers/displays.dart';
+import 'package:nocsis/routes/dialog_page.dart';
 
 class RenameDisplayDialog extends ConsumerStatefulWidget {
   final String groupId;
@@ -55,7 +56,7 @@ class _RenameDisplayDialogState extends ConsumerState<RenameDisplayDialog> {
 
     if (succeeded) {
       ref.invalidate(displaysProvider(widget.groupId));
-      Navigator.of(context).pop();
+      closeDialog(context);
       return;
     }
 
@@ -86,7 +87,7 @@ class _RenameDisplayDialogState extends ConsumerState<RenameDisplayDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => closeDialog(context),
           child: const Text('キャンセル'),
         ),
         TextButton(
