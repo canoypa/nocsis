@@ -70,7 +70,7 @@ class ConsoleDisplaysPage extends ConsumerWidget {
                 displays: value,
               ),
               AsyncError() => const Text('教室ディスプレイを読み込めませんでした。'),
-              _ => const LinearProgressIndicator(),
+              _ => const DisplayListSkeleton(),
             },
           ],
         ),
