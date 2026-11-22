@@ -141,4 +141,24 @@ void main() {
     expect(auth.currentUser, isNotNull);
     expect(find.text('教室 g1'), findsOneWidget);
   });
+
+  testWidgets('やめられなかったときは、待ち受けに留まる', (tester) async {
+    when(() => mockApi.apiV1DisplayPairingsDelete())
+        .thenAnswer((_) async => _response(500));
+    final auth = MockFirebaseAuth();
+    await pumpPage(tester, auth);
+
+    await tester.tap(find.text('登録をやめる'));
+    await tester.pump();
+    await tester.pump();
+
+    expect(auth.currentUser, isNotNull);
+    expect(find.text('登録をやめる'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, '登録をやめる'))
+          .onPressed,
+      isNotNull,
+    );
+  });
 }
