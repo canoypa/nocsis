@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/components/page_title.dart';
 import 'package:nocsis/pages/console/displays/display_list.dart';
 import 'package:nocsis/pages/console/displays/register_dialog.dart';
 import 'package:nocsis/pages/console/displays/url_field.dart';
@@ -26,7 +27,7 @@ class ConsoleDisplaysPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('教室ディスプレイ', style: textTheme.displayMedium),
+            const PageTitle('教室ディスプレイ'),
             const SizedBox(height: 24),
             const Text('教室に予定や天気を出しておく画面です。'),
             const SizedBox(height: 16),
