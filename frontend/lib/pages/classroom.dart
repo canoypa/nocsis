@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/core/deployed_version.dart';
 import 'package:nocsis/core/reload_page.dart';
+import 'package:nocsis/providers/display_binding.dart';
 import 'package:nocsis/providers/firebase.dart';
 import 'package:nocsis/providers/during_class_data.dart';
 import 'package:nocsis/providers/current_group_id.dart';
@@ -75,8 +76,16 @@ class _ClassroomPageState extends ConsumerState<ClassroomPage> {
   @override
   Widget build(BuildContext context) {
     final groupId = ref.watch(currentGroupIdProvider);
-    final isDevice =
-        ref.watch(firebaseAuthProvider).currentUser?.isAnonymous ?? false;
+    final user = ref.watch(firebaseAuthProvider).currentUser;
+    final isDevice = user?.isAnonymous ?? false;
+    if (user != null && isDevice) {
+      // サインアウトすれば、ルーターが登録を待つ画面に戻す
+      ref.listen(displayBoundProvider(user.uid, groupId), (_, next) {
+        if (next.value == false) {
+          ref.read(firebaseAuthProvider).signOut();
+        }
+      });
+    }
     final duringClassData = ref
         .watch(duringClassDataProvider(groupId))
         .maybeWhen(data: (data) => data, orElse: () => null);

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -54,6 +55,7 @@ Future<void> _main(ErrorReporter reporter) async {
 
   if (kDebugMode) {
     await FirebaseAuth.instance.useAuthEmulator("localhost", 9099);
+    FirebaseFirestore.instance.useFirestoreEmulator("localhost", 8888);
   }
 
   runApp(const ProviderScope(child: MyApp()));
