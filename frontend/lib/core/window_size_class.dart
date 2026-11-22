@@ -15,6 +15,9 @@ enum WindowSizeClass {
     if (width < 1200) return expanded;
     return large;
   }
+
+  bool operator <(WindowSizeClass other) => index < other.index;
+  bool operator >=(WindowSizeClass other) => index >= other.index;
 }
 
 extension WindowSizeClassOf on BuildContext {

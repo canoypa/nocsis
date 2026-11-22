@@ -95,10 +95,7 @@ class _LoginFormState extends State<LoginForm> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: switch (sizeClass) {
-        .compact => 40,
-        _ => 24,
-      },
+      spacing: sizeClass < .medium ? 40 : 24,
       children: [
         Row(
           spacing: 16,
@@ -118,10 +115,11 @@ class _LoginFormState extends State<LoginForm> {
             // M3 の既定の字間は欧文向けで、和文では間延びする
             Text(
               widget.title,
-              style: switch (sizeClass) {
-                .expanded || .large => textTheme.displaySmall,
-                _ => textTheme.headlineSmall,
-              }?.copyWith(letterSpacing: 0),
+              style:
+                  (sizeClass >= .expanded
+                          ? textTheme.displaySmall
+                          : textTheme.headlineSmall)
+                      ?.copyWith(letterSpacing: 0),
             ),
             if (description != null)
               Text(

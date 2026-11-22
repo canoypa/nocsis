@@ -20,7 +20,7 @@ class SettingsLayout extends ConsumerWidget {
     final groupId = ref.watch(currentGroupIdProvider);
 
     final sizeClass = context.windowSizeClass;
-    final compact = sizeClass == .compact;
+    final compact = sizeClass < .medium;
     final colorScheme = Theme.of(context).colorScheme;
     final background = compact
         ? colorScheme.surface
@@ -55,10 +55,7 @@ class SettingsLayout extends ConsumerWidget {
                   borderRadius: const BorderRadius.all(Radius.circular(28)),
                 ),
                 child: _scrollable(
-                  padding: EdgeInsets.all(switch (sizeClass) {
-                    .large => 64,
-                    _ => 24,
-                  }),
+                  padding: EdgeInsets.all(sizeClass >= .large ? 64 : 24),
                 ),
               ),
             ),

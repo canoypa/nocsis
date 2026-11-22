@@ -10,4 +10,11 @@ void main() {
     expect(WindowSizeClass.fromWidth(1199), WindowSizeClass.expanded);
     expect(WindowSizeClass.fromWidth(1200), WindowSizeClass.large);
   });
+
+  test('狭い順に大小を比べられる', () {
+    expect(WindowSizeClass.medium < WindowSizeClass.large, isTrue);
+    expect(WindowSizeClass.large < WindowSizeClass.large, isFalse);
+    expect(WindowSizeClass.large >= WindowSizeClass.expanded, isTrue);
+    expect(WindowSizeClass.compact >= WindowSizeClass.medium, isFalse);
+  });
 }

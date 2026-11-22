@@ -38,9 +38,14 @@ paths:
 
 要素のあいだに `SizedBox` を挟んで個別に調整するのは避ける。挟みたくなったら、まとまりの分け方を見直す。
 
-## 幅の判定は `WindowSizeClass` で行う
+## 幅の判定は `WindowSizeClass` で、その幅以上かどうかで行う
 
-幅でレイアウトを変えるときは、`lib/core/window_size_class.dart` の `context.windowSizeClass` を読む。1 つの幅かどうかは `context.windowSizeClass == .compact` で、幅ごとに値を変えるときは `switch` で出し分ける。境目の数値を画面ごとに書くと、M3 の window size class とずれたまま増える。
+幅でレイアウトを変えるときは、`lib/core/window_size_class.dart` の `context.windowSizeClass` を読む。一覧と詳細のペインのように、自分に与えられた幅で決めるものは `LayoutBuilder` の幅を `WindowSizeClass.fromWidth` に渡す。
+
+M3 の区分は幅の下限で決まり、あとから区分が足されることがある。区分を名指しせず、その幅以上かどうかで判定する。
+
+- 二択は `context.windowSizeClass >= .expanded` や `< .medium` で書く
+- 3 つ以上に分けるときは、`switch` で大きい方から `>= .large => …, >= .medium => …, _ => …` と並べる
 
 ## 画面を足したら、本物のルーターで URL を開くテストも書く
 

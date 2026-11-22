@@ -152,7 +152,7 @@ class SettingsTopPage extends ConsumerWidget {
     final swapState = ref.watch(_googleSwapStateProvider);
     final replacing = swapState == _GoogleSwapState.replacing;
     ref.watch(_authTimeProvider);
-    final compact = context.windowSizeClass == .compact;
+    final compact = context.windowSizeClass < .medium;
 
     return Align(
       alignment: Alignment.topLeft,
@@ -754,7 +754,7 @@ class _ReauthenticationCard extends StatelessWidget {
 }
 
 /// M3 では、狭い幅で入力欄のあるダイアログは全画面にする
-bool _isCompact(BuildContext context) => context.windowSizeClass == .compact;
+bool _isCompact(BuildContext context) => context.windowSizeClass < .medium;
 
 const _compactPadding = EdgeInsets.fromLTRB(16, 8, 16, 24);
 

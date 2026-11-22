@@ -33,19 +33,19 @@ class DrawerLayout extends ConsumerWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return switch (WindowSizeClass.fromWidth(constraints.maxWidth)) {
-          .compact => _buildCompact(context, groupId),
-          .medium || .expanded => _buildWithPane(
-            context,
-            groupId,
-            navigation: _buildRail(context),
-            contentPadding: 24,
-          ),
-          .large => _buildWithPane(
+          >= .large => _buildWithPane(
             context,
             groupId,
             navigation: _buildDrawer(context),
             contentPadding: 64,
           ),
+          >= .medium => _buildWithPane(
+            context,
+            groupId,
+            navigation: _buildRail(context),
+            contentPadding: 24,
+          ),
+          _ => _buildCompact(context, groupId),
         };
       },
     );
