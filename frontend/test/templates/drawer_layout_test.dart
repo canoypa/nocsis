@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -71,7 +72,7 @@ void main() {
 
     await tester.tap(find.byTooltip('メニュー'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.arrow_back_outlined));
+    await tester.tap(find.byIcon(Symbols.arrow_back));
     await tester.pumpAndSettle();
 
     expect(find.text('前の画面'), findsOneWidget);
@@ -112,19 +113,19 @@ class _Console extends StatelessWidget {
       onDestinationSelected: (_) {},
       navigationItems: const [
         NavigationDrawerDestination(
-          icon: Icon(Icons.home_outlined),
+          icon: Icon(Symbols.home),
           label: Text('ホーム'),
         ),
         NavigationDrawerDestination(
-          icon: Icon(Icons.group_outlined),
+          icon: Icon(Symbols.group),
           label: Text('メンバー'),
         ),
         NavigationDrawerDestination(
-          icon: Icon(Icons.calendar_today_outlined),
+          icon: Icon(Symbols.calendar_today),
           label: Text('カレンダー'),
         ),
         NavigationDrawerDestination(
-          icon: Icon(Icons.wb_sunny_outlined),
+          icon: Icon(Symbols.wb_sunny),
           label: Text('気象データ連携'),
         ),
       ],

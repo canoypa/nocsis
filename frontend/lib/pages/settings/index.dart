@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
@@ -288,7 +289,7 @@ class SettingsTopPage extends ConsumerWidget {
                       compact: compact,
                       content: const Row(
                         children: [
-                          Icon(Icons.password),
+                          Icon(Symbols.password),
                           SizedBox(width: 8),
                           Text('パスワード'),
                         ],
@@ -491,9 +492,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
   }
 
   IconData _passwordVisibilityIcon() {
-    return invisiblePassword
-        ? Icons.visibility_off_outlined
-        : Icons.visibility_outlined;
+    return invisiblePassword ? Symbols.visibility_off : Symbols.visibility;
   }
 
   Future<void> _changePassword(User currentUser) async {

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -70,7 +71,7 @@ class WeatherInfo extends ConsumerWidget {
                       height: 48.sp,
                     ),
                   )
-                  .expand((e) => [e, Icon(Icons.navigate_next, size: 32.sp)])
+                  .expand((e) => [e, Icon(Symbols.navigate_next, size: 32.sp)])
                   .toList()
                 ..removeLast(),
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
@@ -161,11 +162,11 @@ void main() {
       String shownDate() => tester.widget<Text>(dateLabel).data!;
       final today = shownDate();
 
-      await tester.tap(find.byIcon(Icons.navigate_next));
+      await tester.tap(find.byIcon(Symbols.navigate_next));
       await tester.pumpAndSettle();
       expect(shownDate(), isNot(today));
 
-      await tester.tap(find.byIcon(Icons.navigate_before));
+      await tester.tap(find.byIcon(Symbols.navigate_before));
       await tester.pumpAndSettle();
       expect(shownDate(), today);
     });

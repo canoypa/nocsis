@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/components/account_menu.dart';
@@ -67,7 +68,7 @@ class DrawerLayout extends ConsumerWidget {
     VoidCallback? beforeNavigate,
   }) {
     return IconButton(
-      icon: const Icon(Icons.arrow_back_outlined),
+      icon: const Icon(Symbols.arrow_back),
       onPressed: () {
         final router = GoRouter.of(context);
         beforeNavigate?.call();
@@ -88,7 +89,7 @@ class DrawerLayout extends ConsumerWidget {
       appBar: AppBar(
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
+            icon: const Icon(Symbols.menu),
             tooltip: 'メニュー',
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
