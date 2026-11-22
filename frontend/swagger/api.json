@@ -87,7 +87,8 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "名前"
+            "minLength": 1,
+            "description": "名前。50文字まで"
           },
           "dayduty_start_date": {
             "type": "string",

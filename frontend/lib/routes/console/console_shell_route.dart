@@ -4,7 +4,6 @@ part of 'package:nocsis/routes/router.dart';
 const consoleShellRoute = TypedShellRoute<ConsoleShellRoute>(
   routes: [
     consoleTopPageRoute,
-    consoleGroupPageRoute,
     consoleMemberPageRoute,
     consoleCalendarPageRoute,
     consoleDayDutyPageRoute,

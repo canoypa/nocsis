@@ -43,13 +43,13 @@ void main() {
   });
 
   test('子は親の宣言に条件を足す（祖先の宣言もすべて満たす必要がある）', () {
-    // console/group は group.update だけを要るが、/groups/:groupId の group.read も要る
+    // console/day_duty は group.update だけを要るが、/groups/:groupId の group.read も要る
     expect(
-      canOpen('/groups/:groupId/console/group', {Permission.groupUpdate}),
+      canOpen('/groups/:groupId/console/day_duty', {Permission.groupUpdate}),
       isFalse,
     );
     expect(
-      canOpen('/groups/:groupId/console/group', {
+      canOpen('/groups/:groupId/console/day_duty', {
         Permission.groupRead,
         Permission.groupUpdate,
       }),

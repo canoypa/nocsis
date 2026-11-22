@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nocsis/components/action_row.dart';
 import 'package:nocsis/components/login_form.dart';
 import 'package:nocsis/components/page_title.dart';
 import 'package:nocsis/core/google_account_token.dart';
@@ -152,7 +153,6 @@ class SettingsTopPage extends ConsumerWidget {
     final swapState = ref.watch(_googleSwapStateProvider);
     final replacing = swapState == _GoogleSwapState.replacing;
     ref.watch(_authTimeProvider);
-    final compact = context.windowSizeClass < .medium;
 
     return Align(
       alignment: Alignment.topLeft,
@@ -174,8 +174,7 @@ class SettingsTopPage extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.all(16),
-              child: _ActionRow(
-                compact: compact,
+              child: ActionRow(
                 content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -209,8 +208,7 @@ class SettingsTopPage extends ConsumerWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: _ActionRow(
-                      compact: compact,
+                    child: ActionRow(
                       content: Row(
                         children: [
                           const Icon(CustomIcons.google),
@@ -264,8 +262,7 @@ class SettingsTopPage extends ConsumerWidget {
                   const Divider(),
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: _ActionRow(
-                      compact: compact,
+                    child: ActionRow(
                       content: const Row(
                         children: [
                           Icon(Symbols.password),
@@ -293,36 +290,6 @@ class SettingsTopPage extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-/// 狭い幅ではボタンを次の行に回す
-class _ActionRow extends StatelessWidget {
-  final bool compact;
-  final Widget content;
-  final Widget action;
-
-  const _ActionRow({
-    required this.compact,
-    required this.content,
-    required this.action,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (compact) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [content, const SizedBox(height: 8), action],
-      );
-    }
-    return Row(
-      children: [
-        Expanded(child: content),
-        const SizedBox(width: 16),
-        action,
-      ],
     );
   }
 }
