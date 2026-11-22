@@ -139,7 +139,7 @@ class _CodeFieldState extends State<CodeField> {
       return _valueOf(slots);
     }
 
-    final digits = _halfWidth(inserted);
+    final digits = _halfWidth(inserted.trim());
     if (!_onlyDigits.hasMatch(digits)) {
       return _valueOf(slots);
     }
