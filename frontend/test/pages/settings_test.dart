@@ -243,6 +243,22 @@ void main() {
     });
   });
 
+  testWidgets('スマホの幅でもう一度ログインを求めるとき、フォームを画面の中央に置く', (tester) async {
+    await pumpSettings(
+      tester,
+      userFailingPasswordUpdate('requires-recent-login'),
+      width: 599,
+    );
+    await tester.tap(find.text('設定する'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'a-strong-password');
+    await tester.tap(find.widgetWithText(FilledButton, '設定する'));
+    await tester.pumpAndSettle();
+
+    final button = tester.getRect(find.widgetWithText(FilledButton, 'ログイン'));
+    expect(button.center.dx, moreOrLessEquals(599 / 2));
+  });
+
   testWidgets('もう一度ログインを求めているときに幅が変わっても、入力が消えない', (tester) async {
     await pumpSettings(
       tester,

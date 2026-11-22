@@ -751,7 +751,11 @@ class _ReauthenticationCard extends StatelessWidget {
 
     return Container(
       decoration: _dialogSurface(context, compact: compact),
-      constraints: const BoxConstraints(maxWidth: LoginForm.maxWidth + 48),
+      // 全画面のときは幅いっぱいに広げる。Stack の中で中身の幅に縮まないようにする
+      width: compact ? double.infinity : null,
+      constraints: BoxConstraints(
+        maxWidth: compact ? double.infinity : LoginForm.maxWidth + 48,
+      ),
       child: SingleChildScrollView(
         padding: compact ? _compactPadding : const EdgeInsets.all(24),
         child: child,
@@ -781,6 +785,7 @@ class _DialogForm extends StatelessWidget {
 
     return Container(
       decoration: _dialogSurface(context, compact: compact),
+      width: compact ? double.infinity : null,
       constraints: const BoxConstraints(maxWidth: 800),
       child: SingleChildScrollView(
         padding: compact ? _compactPadding : const EdgeInsets.all(64),
