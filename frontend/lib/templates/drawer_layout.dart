@@ -196,7 +196,7 @@ class DrawerLayout extends ConsumerWidget {
           navigation,
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 16, 16),
+              padding: const EdgeInsets.all(8),
               child: Container(
                 clipBehavior: Clip.hardEdge,
                 decoration: BoxDecoration(
