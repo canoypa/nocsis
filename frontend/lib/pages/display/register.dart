@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:nocsis/generated/api_client/api.enums.swagger.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/providers/api_client.dart';
@@ -128,6 +129,8 @@ class _DisplayRegisterPageState extends ConsumerState<DisplayRegisterPage> {
               DropdownMenu<String>(
                 expandedInsets: EdgeInsets.zero,
                 label: const Text('グループ'),
+                trailingIcon: const Icon(Symbols.arrow_drop_down),
+                selectedTrailingIcon: const Icon(Symbols.arrow_drop_up),
                 initialSelection: _selected,
                 onSelected: (value) => setState(() => _groupId = value),
                 dropdownMenuEntries: [

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ToggleDay extends StatelessWidget {
   final String label;
@@ -18,13 +19,13 @@ class ToggleDay extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
-          icon: const Icon(Icons.navigate_before),
+          icon: const Icon(Symbols.navigate_before),
           padding: const EdgeInsets.all(16),
           onPressed: onClickLeft,
         ),
         Text(label),
         IconButton(
-          icon: const Icon(Icons.navigate_next),
+          icon: const Icon(Symbols.navigate_next),
           padding: const EdgeInsets.all(16),
           onPressed: onClickRight,
         ),

@@ -280,7 +280,7 @@ class SettingsTopPage extends ConsumerWidget {
                       compact: compact,
                       content: const Row(
                         children: [
-                          Icon(Icons.password),
+                          Icon(Symbols.password),
                           SizedBox(width: 8),
                           Text('パスワード'),
                         ],
@@ -457,9 +457,7 @@ class ChangePasswordDialogState extends ConsumerState<ChangePasswordDialog> {
   }
 
   IconData _passwordVisibilityIcon() {
-    return invisiblePassword
-        ? Icons.visibility_off_outlined
-        : Icons.visibility_outlined;
+    return invisiblePassword ? Symbols.visibility_off : Symbols.visibility;
   }
 
   Future<void> _changePassword(User currentUser) async {
