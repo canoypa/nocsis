@@ -91,7 +91,7 @@ class _DisplayRegisterPageState extends ConsumerState<DisplayRegisterPage> {
     final me = uid == null ? null : ref.watch(meProvider(uid)).value;
     final groups = _groups = [
       for (final membership in me?.memberships ?? const <Membership>[])
-        if (membership.permissions.contains(Permission.accessCreate))
+        if (membership.permissions.contains(Permission.roleBindingCreate))
           membership.group,
     ];
     final code = widget.code;

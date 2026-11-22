@@ -59,7 +59,7 @@ void main() {
                 ),
                 Membership(
                   group: MembershipGroup(id: 'g1', name: '1年1組'),
-                  permissions: [Permission.accessCreate],
+                  permissions: [Permission.roleBindingCreate],
                 ),
               ],
             ),
