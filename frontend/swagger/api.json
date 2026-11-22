@@ -226,15 +226,12 @@
             "description": "管理者が入力する6桁のコード"
           },
           "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 50,
-            "description": "名前"
+            "description": "名前。50文字まで。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
+            "type": "string"
           }
         },
         "required": [
-          "code",
-          "name"
+          "code"
         ],
         "description": "教室ディスプレイの登録に使う JSON データ"
       },
@@ -244,8 +241,7 @@
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 50,
-            "description": "名前"
+            "description": "名前。50文字まで"
           }
         },
         "required": [
@@ -1307,6 +1303,32 @@
           },
           "403": {
             "description": "匿名アカウントではない"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteApiV1DisplayPairings",
+        "description": "教室ディスプレイの登録をやめる。発行したコードと匿名アカウントを消す。匿名アカウントだけが使える",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "匿名アカウントではない"
+          },
+          "409": {
+            "description": "もう登録されている"
           },
           "500": {
             "description": "Internal Server Error"

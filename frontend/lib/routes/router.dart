@@ -8,12 +8,15 @@ import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
+import 'package:nocsis/pages/console/displays/page.dart';
 import 'package:nocsis/pages/console/group.dart';
 import 'package:nocsis/pages/console/index.dart';
 import 'package:nocsis/pages/console/layout.dart';
 import 'package:nocsis/pages/console/members.dart';
 import 'package:nocsis/pages/console/slack.dart';
 import 'package:nocsis/pages/console/weather.dart';
+import 'package:nocsis/pages/display/pairing.dart';
+import 'package:nocsis/pages/display/register.dart';
 import 'package:nocsis/pages/group/group_layout.dart';
 import 'package:nocsis/pages/licenses.dart';
 import 'package:nocsis/pages/login.dart';
@@ -35,12 +38,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 part 'classroom_page_route.dart';
 part 'console/console_calendar_page_route.dart';
 part 'console/console_day_duty_page_route.dart';
+part 'console/console_displays_page_route.dart';
 part 'console/console_group_page_route.dart';
 part 'console/console_member_page_route.dart';
 part 'console/console_shell_route.dart';
 part 'console/console_slack_page_route.dart';
 part 'console/console_top_page_route.dart';
 part 'console/console_weather_page_route.dart';
+part 'display_page_route.dart';
 part 'group/group_shell_route.dart';
 part 'licenses_page_route.dart';
 part 'login_page_route.dart';
@@ -53,7 +58,14 @@ part 'settings/settings_top_page_route.dart';
 part 'top_page_route.dart';
 
 @TypedShellRoute<AppShell>(
-  routes: [groupShellRoute, licensesPageRoute, loginPageRoute, topPageRoute],
+  routes: [
+    displayPageRoute,
+    displayRegisterPageRoute,
+    groupShellRoute,
+    licensesPageRoute,
+    loginPageRoute,
+    topPageRoute,
+  ],
 )
 class AppShell extends ShellRouteData {
   @override
@@ -121,21 +133,82 @@ GoRouter router(Ref ref) {
         : "/groups/$firstGroupId${uri.path}";
   }
 
-  String? redirectNotLoggedInUser(GoRouterState state) {
+  Future<String?> redirectNotLoggedInUser(GoRouterState state) async {
     final currentUser = ref.read(firebaseAuthProvider).currentUser;
-    final isLoggedIn = currentUser != null;
+    final sharedPreferences = await SharedPreferences.getInstance();
 
-    if (isLoggedIn || isPublic(state.fullPath ?? '')) {
+    if (currentUser != null) {
+      if (!currentUser.isAnonymous) {
+        await sharedPreferences.remove(displayDeviceKey);
+      }
       return null;
+    }
+
+    if (isPublic(state.fullPath ?? '')) {
+      return null;
+    }
+
+    // 登録を解除された端末はアカウントごと消え、サインアウトされる。ログイン画面に
+    // 出しても教室には操作する人がいないので、また登録を待つ画面に戻す
+    if (sharedPreferences.getBool(displayDeviceKey) ?? false) {
+      return DisplayPageRoute.path;
     }
 
     final continueUri = state.uri.toString() == "/" ? null : state.uri;
     return LoginPageRoute(continueUri: continueUri).location;
   }
 
+  /// 端末の匿名アカウントは、登録を待つ画面と教室の画面に留める
+  Future<String?> redirectDevice(GoRouterState state) async {
+    final currentUser = ref.read(firebaseAuthProvider).currentUser;
+    final path = state.fullPath;
+    if (currentUser == null || !currentUser.isAnonymous || path == null) {
+      return null;
+    }
+
+    const deviceRoutes = {
+      DisplayPageRoute.path,
+      // ClassroomPageRoute を参照すると、ルーターが currentGroupId に依存することになる
+      '/groups/:groupId/classroom',
+      // 人のアカウントでログインし直せるようにする
+      LoginPageRoute.path,
+      LicensesPageRoute.path,
+    };
+    if (deviceRoutes.contains(path)) {
+      return null;
+    }
+
+    // 待ち受けを開いたことのあるスマートフォンでも、読み取った QR から登録できるようにする
+    if (path == DisplayRegisterPageRoute.path) {
+      return LoginPageRoute(continueUri: state.uri).location;
+    }
+
+    try {
+      final groupId = (await readMe(currentUser.uid))
+          .memberships
+          .firstOrNull
+          ?.group
+          .id;
+
+      return groupId == null
+          ? DisplayPageRoute.path
+          : '/groups/$groupId/classroom';
+    } catch (_) {
+      ref.invalidate(meProvider(currentUser.uid));
+      // 止めると、登録済みの端末が通信の回復を待てない
+      final sharedPreferences = await SharedPreferences.getInstance();
+      final groupId = sharedPreferences.getString('latest_group_id');
+
+      return groupId == null
+          ? DisplayPageRoute.path
+          : '/groups/$groupId/classroom';
+    }
+  }
+
   Future<String?> redirectLoggedInUser(GoRouterState state) async {
     final currentUser = ref.read(firebaseAuthProvider).currentUser;
-    final isLoggedIn = currentUser != null;
+    // 端末の匿名アカウントのままでも、人のアカウントでログインし直せるようにする
+    final isLoggedIn = currentUser != null && !currentUser.isAnonymous;
 
     if (!isLoggedIn || state.matchedLocation != LoginPageRoute().location) {
       return null;
@@ -195,6 +268,10 @@ GoRouter router(Ref ref) {
       await sharedPreferences.remove('latest_group_id');
     }
 
+    if (ref.read(firebaseAuthProvider).currentUser?.isAnonymous ?? false) {
+      return DisplayPageRoute.path;
+    }
+
     // 権限が無いことと、グループの存在を区別しない
     throw const _PageNotFound();
   }
@@ -205,7 +282,8 @@ GoRouter router(Ref ref) {
     // redirect で投げた例外もここに来る。どれも開けるページが無いという意味なので 404 に寄せる
     errorBuilder: (context, state) => const ErrorPage(),
     redirect: (context, state) async {
-      return redirectNotLoggedInUser(state) ??
+      return await redirectNotLoggedInUser(state) ??
+          await redirectDevice(state) ??
           await redirectLoggedInUser(state) ??
           await redirectFromTopPage(state.uri) ??
           await redirectByAccess(state);

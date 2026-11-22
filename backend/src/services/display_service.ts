@@ -81,6 +81,48 @@ export const issuePairing = async (
   throw new Error("コードを発行できませんでした");
 };
 
+/**
+ * 端末が登録をやめる。コードを消し、匿名アカウントも消す。
+ *
+ * 付与の有無とコードの削除を同じトランザクションで見るので、登録と同時に呼ばれても、
+ * 登録された端末のアカウントを消すことはない。
+ */
+export const cancelPairing = async (
+  uid: string,
+): Promise<"cancelled" | "registered"> => {
+  const registered = await firestore.runTransaction(async (tx) => {
+    const bindings = await tx.get(
+      firestore.collection(BINDINGS).where("subject", "==", subject(user(uid))),
+    );
+    // グループが消えても付与が残っていることがある。それは登録とみなさない
+    const groups = bindings.docs.map((doc) =>
+      firestore.doc(
+        `groups/${String(doc.get("resource")).replace(/^group:/, "")}`,
+      ),
+    );
+    const existing = groups.length > 0 ? await tx.getAll(...groups) : [];
+    if (existing.some((snapshot) => snapshot.exists)) return true;
+
+    const pairings = await tx.get(
+      firestore.collection(PAIRINGS).where("uid", "==", uid),
+    );
+    for (const doc of pairings.docs) tx.delete(doc.ref);
+    for (const doc of bindings.docs) tx.delete(doc.ref);
+
+    return false;
+  });
+
+  if (registered) return "registered";
+
+  if (await isAnonymous(uid)) {
+    await auth.deleteUser(uid).catch((err) => {
+      if (!isUserNotFound(err)) throw err;
+    });
+  }
+
+  return "cancelled";
+};
+
 const isLive = (doc: FirebaseFirestore.DocumentSnapshot) =>
   (doc.get("expires_at") as Timestamp).toMillis() > Date.now();
 
@@ -98,7 +140,7 @@ export const registerDisplay = async (params: {
   callerUid: string;
   groupId: string;
   code: string;
-  name: string;
+  name?: string;
 }): Promise<RegisterResult> => {
   const { callerUid, groupId, code, name } = params;
   const failureRef = firestore.collection(FAILURES).doc(callerUid);
@@ -120,13 +162,21 @@ export const registerDisplay = async (params: {
       resource: group(groupId),
     });
     const existingBinding = await tx.get(binding.ref);
+    // 同時に登録された端末と同じ番号にならないよう、名前もトランザクションの中で読む
+    const others = name
+      ? undefined
+      : (await tx.get(displays(groupId))).docs.filter((doc) => doc.id !== uid);
 
     // 発行してから、メールや Google を結びつけた・消された、ということがある
     if (!(await isAnonymous(uid))) return undefined;
 
     tx.delete(pairingRef);
     tx.set(displays(groupId).doc(uid), {
-      name,
+      name:
+        name ||
+        defaultDisplayName(
+          others?.map((doc) => doc.get("name") as string) ?? [],
+        ),
       created_at: Timestamp.now(),
     });
     if (!existingBinding.exists) tx.create(binding.ref, binding.data);
@@ -143,6 +193,23 @@ export const registerDisplay = async (params: {
     ok: true,
     display: toDisplay(await displays(groupId).doc(uid).get()),
   };
+};
+
+const DEFAULT_NAME = /^ディスプレイ ([1-9]\d*)$/;
+
+/** 名前に使われていない一番小さい番号で「ディスプレイ N」を作る */
+export const defaultDisplayName = (names: string[]): string => {
+  const used = new Set(
+    names.flatMap((name) => {
+      const match = DEFAULT_NAME.exec(name);
+      return match ? [Number(match[1])] : [];
+    }),
+  );
+
+  let n = 1;
+  while (used.has(n)) n++;
+
+  return `ディスプレイ ${n}`;
 };
 
 const tooManyFailures = async (ref: FirebaseFirestore.DocumentReference) => {

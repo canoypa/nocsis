@@ -128,8 +128,9 @@ eventsRoutes.get(
     });
     assert(events.items, "イベントが存在しません。");
 
-    const eventItems = events.items.map((item) => {
-      return eventSchema.parse({
+    // 1件の不備で、ほかの予定まで見えなくしない
+    const eventItems = events.items.flatMap((item) => {
+      const result = eventSchema.safeParse({
         id: item.id,
         startAt: item.start?.dateTime || item.start?.date,
         endAt: item.end?.dateTime || item.end?.date,
@@ -138,6 +139,11 @@ eventsRoutes.get(
         location: item.location,
         isAllDay: !item.start?.dateTime, // dateTimeがない場合は終日イベント
       });
+      if (!result.success) {
+        console.warn("イベントを返せないので除きます:", item.id, result.error);
+        return [];
+      }
+      return [result.data];
     });
 
     return c.json<EventsResponse>({

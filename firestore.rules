@@ -1,11 +1,15 @@
 rules_version = '2';
 
-// このアプリはクライアントから Firestore へ直接アクセスしない。
-// backend (Cloud Run) / functions は Admin SDK 経由でルールを迂回するため、
-// クライアント経路は全面的に拒否する。将来クライアント直アクセスが必要になった
-// 場合のみ、対象コレクションに限定して緩和すること。
+// クライアントは Firestore を直接読まない。backend (Cloud Run) / functions は
+// Admin SDK でルールを迂回する。教室ディスプレイが登録の解除にすぐ気づけるよう、
+// 自分の付与を読むことだけを開ける。
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /role_bindings/{bindingId} {
+      allow get, list: if request.auth != null
+        && resource.data.subject == 'user:' + request.auth.uid;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
