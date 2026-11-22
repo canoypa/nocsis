@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:nocsis/pages/main/events/page.dart';
 import 'package:nocsis/pages/main/home/page.dart';
@@ -21,6 +22,8 @@ Map<String, Object> _event(String title, DateTime startAt) => {
   'endAt': startAt.add(const Duration(hours: 1)).toUtc().toIso8601String(),
   'isAllDay': false,
 };
+
+String _twoDigitYear(int year) => (year % 100).toString().padLeft(2, '0');
 
 @Dependencies([currentGroupId])
 void main() {
@@ -130,6 +133,21 @@ void main() {
     });
   });
 
+  group('ホームの日付', () {
+    testWidgets('日本時間の今日の日付を出す', (tester) async {
+      await pump(tester, const MainView(), {
+        _classes: {'items': []},
+        _events: {'items': []},
+      });
+      final todayInJapan = DateTime.now().toUtc().add(const Duration(hours: 9));
+
+      expect(
+        find.text(DateFormat('M月d日 (E)', 'ja_JP').format(todayInJapan)),
+        findsOneWidget,
+      );
+    });
+  });
+
   group('イベント', () {
     testWidgets('これからのイベントを日付つきで出す', (tester) async {
       await pump(tester, const EventsView(), {
@@ -145,6 +163,36 @@ void main() {
       expect(find.text('文化祭'), findsOneWidget);
       expect(find.text('6月3日'), findsOneWidget);
       expect(find.text('体育祭'), findsOneWidget);
+    });
+
+    testWidgets('月の見出しは、今年の月なら年を省き、来年以降なら年を付ける', (tester) async {
+      final now = DateTime.now();
+      await pump(tester, const EventsView(), {
+        _events: {
+          'items': [
+            _event('今年のイベント', DateTime(now.year, now.month, now.day, 23)),
+            _event('来年のイベント', DateTime(now.year + 1, 5, 20, 9)),
+          ],
+        },
+      });
+
+      expect(find.text('${now.month}月'), findsOneWidget);
+      expect(find.text('${_twoDigitYear(now.year + 1)}年5月'), findsOneWidget);
+    });
+
+    testWidgets('年が違えば、同じ月でも見出しを分ける', (tester) async {
+      final nextYear = DateTime.now().year + 1;
+      await pump(tester, const EventsView(), {
+        _events: {
+          'items': [
+            _event('来年のイベント', DateTime(nextYear, 5, 20, 9)),
+            _event('再来年のイベント', DateTime(nextYear + 1, 5, 20, 9)),
+          ],
+        },
+      });
+
+      expect(find.text('${_twoDigitYear(nextYear)}年5月'), findsOneWidget);
+      expect(find.text('${_twoDigitYear(nextYear + 1)}年5月'), findsOneWidget);
     });
 
     testWidgets('イベントがなければ「予定なし」を出す', (tester) async {
