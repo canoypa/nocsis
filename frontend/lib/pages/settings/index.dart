@@ -15,6 +15,7 @@ import 'package:nocsis/providers/firebase.dart';
 import 'package:nocsis/providers/user.dart';
 import 'package:nocsis/routes/dialog_page.dart';
 import 'package:nocsis/routes/router.dart';
+import 'package:nocsis/core/window_size_class.dart';
 
 /// backend が再認証を求めるまでの時間。backend より少し短くして、選んだあとに弾かれにくくする
 const _recentLogin = Duration(minutes: 4);
@@ -151,7 +152,7 @@ class SettingsTopPage extends ConsumerWidget {
     final swapState = ref.watch(_googleSwapStateProvider);
     final replacing = swapState == _GoogleSwapState.replacing;
     ref.watch(_authTimeProvider);
-    final compact = MediaQuery.sizeOf(context).width < 600;
+    final compact = context.windowSizeClass < .medium;
 
     return Align(
       alignment: Alignment.topLeft,
@@ -753,8 +754,7 @@ class _ReauthenticationCard extends StatelessWidget {
 }
 
 /// M3 では、狭い幅で入力欄のあるダイアログは全画面にする
-bool _isCompact(BuildContext context) =>
-    MediaQuery.sizeOf(context).width < LoginForm.mediumBreakpoint;
+bool _isCompact(BuildContext context) => context.windowSizeClass < .medium;
 
 const _compactPadding = EdgeInsets.fromLTRB(16, 8, 16, 24);
 

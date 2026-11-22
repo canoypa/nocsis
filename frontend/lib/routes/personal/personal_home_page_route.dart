@@ -15,7 +15,7 @@ class PersonalHomePageRoute extends GoRouteData with $PersonalHomePageRoute {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    final isMobile = MediaQuery.of(context).size.width < 1200;
+    final isMobile = context.windowSizeClass < .large;
 
     return CustomTransitionPage(
       key: state.pageKey,

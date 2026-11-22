@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:nocsis/components/login_form.dart';
+import 'package:nocsis/core/window_size_class.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -56,8 +57,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final compact =
-        MediaQuery.sizeOf(context).width < LoginForm.mediumBreakpoint;
+    final compact = context.windowSizeClass < .medium;
 
     return Scaffold(
       body: SafeArea(

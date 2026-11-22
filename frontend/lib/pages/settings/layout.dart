@@ -7,6 +7,7 @@ import 'package:nocsis/components/select_group_menu.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
+import 'package:nocsis/core/window_size_class.dart';
 
 @Dependencies([currentGroupId])
 class SettingsLayout extends ConsumerWidget {
@@ -18,8 +19,8 @@ class SettingsLayout extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final groupId = ref.watch(currentGroupIdProvider);
 
-    final width = MediaQuery.sizeOf(context).width;
-    final compact = width < 600;
+    final sizeClass = context.windowSizeClass;
+    final compact = sizeClass < .medium;
     final colorScheme = Theme.of(context).colorScheme;
     final background = compact
         ? colorScheme.surface
@@ -54,7 +55,7 @@ class SettingsLayout extends ConsumerWidget {
                   borderRadius: const BorderRadius.all(Radius.circular(28)),
                 ),
                 child: _scrollable(
-                  padding: EdgeInsets.all(width < 1200 ? 24 : 64),
+                  padding: EdgeInsets.all(sizeClass >= .large ? 64 : 24),
                 ),
               ),
             ),
