@@ -149,6 +149,7 @@ class SettingsTopPage extends ConsumerWidget {
     final swapState = ref.watch(_googleSwapStateProvider);
     final replacing = swapState == _GoogleSwapState.replacing;
     ref.watch(_authTimeProvider);
+    final compact = MediaQuery.sizeOf(context).width < 600;
 
     return Align(
       alignment: Alignment.topLeft,
@@ -157,13 +158,32 @@ class SettingsTopPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('設定', style: Theme.of(context).textTheme.displayMedium),
+            Text(
+              '設定',
+              style: compact
+                  ? Theme.of(context).textTheme.headlineLarge
+                  : Theme.of(context).textTheme.displayMedium,
+            ),
             const SizedBox(height: 48),
-            Text('アカウント', style: Theme.of(context).textTheme.headlineMedium),
+            Text(
+              'アカウント',
+              style: compact
+                  ? Theme.of(context).textTheme.titleLarge
+                  : Theme.of(context).textTheme.headlineMedium,
+            ),
             const SizedBox(height: 24),
-            Row(
-              children: [
-                Column(
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: _ActionRow(
+                compact: compact,
+                content: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -174,8 +194,7 @@ class SettingsTopPage extends ConsumerWidget {
                     Text(user.email ?? ''),
                   ],
                 ),
-                const Spacer(),
-                OutlinedButton(
+                action: TextButton(
                   onPressed: () {
                     showDialog(
                       context: context,
@@ -190,10 +209,15 @@ class SettingsTopPage extends ConsumerWidget {
                   },
                   child: const Text('変更する'),
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: 48),
-            Text('ログイン', style: Theme.of(context).textTheme.headlineMedium),
+            Text(
+              'ログイン',
+              style: compact
+                  ? Theme.of(context).textTheme.titleLarge
+                  : Theme.of(context).textTheme.headlineMedium,
+            ),
             const SizedBox(height: 24),
             Container(
               decoration: BoxDecoration(
@@ -204,48 +228,16 @@ class SettingsTopPage extends ConsumerWidget {
               ),
               child: Column(
                 children: [
-                  Container(
+                  Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.password),
-                        const SizedBox(width: 8),
-                        const Text('パスワード'),
-                        const Spacer(),
-                        TextButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return ChangePasswordDialog(
-                                  onSubmit: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                );
-                              },
-                            );
-                          },
-                          child:
-                              user.providerData.any(
-                                (e) => e.providerId == 'password',
-                              )
-                              ? const Text('変更する')
-                              : const Text('設定する'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Divider(),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(CustomIcons.google),
-                            const SizedBox(width: 16),
-                            Column(
+                    child: _ActionRow(
+                      compact: compact,
+                      content: Row(
+                        children: [
+                          const Icon(CustomIcons.google),
+                          const SizedBox(width: 16),
+                          Flexible(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text('Google'),
@@ -278,17 +270,50 @@ class SettingsTopPage extends ConsumerWidget {
                                   ),
                               ],
                             ),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed:
-                              pickerLoaded && swapState == _GoogleSwapState.idle
-                              ? () =>
-                                    _onReplaceGoogleAccountPressed(context, ref)
-                              : null,
-                          child: const Text("別アカウントと連携する"),
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
+                      action: TextButton(
+                        onPressed:
+                            pickerLoaded && swapState == _GoogleSwapState.idle
+                            ? () => _onReplaceGoogleAccountPressed(context, ref)
+                            : null,
+                        child: const Text("別アカウントと連携する"),
+                      ),
+                    ),
+                  ),
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _ActionRow(
+                      compact: compact,
+                      content: const Row(
+                        children: [
+                          Icon(Icons.password),
+                          SizedBox(width: 8),
+                          Text('パスワード'),
+                        ],
+                      ),
+                      action: TextButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return ChangePasswordDialog(
+                                onSubmit: () {
+                                  Navigator.of(context).pop();
+                                },
+                              );
+                            },
+                          );
+                        },
+                        child:
+                            user.providerData.any(
+                              (e) => e.providerId == 'password',
+                            )
+                            ? const Text('変更する')
+                            : const Text('設定する'),
+                      ),
                     ),
                   ),
                 ],
@@ -297,6 +322,36 @@ class SettingsTopPage extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// 狭い幅ではボタンを次の行に回す
+class _ActionRow extends StatelessWidget {
+  final bool compact;
+  final Widget content;
+  final Widget action;
+
+  const _ActionRow({
+    required this.compact,
+    required this.content,
+    required this.action,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [content, const SizedBox(height: 8), action],
+      );
+    }
+    return Row(
+      children: [
+        Expanded(child: content),
+        const SizedBox(width: 16),
+        action,
+      ],
     );
   }
 }
@@ -696,7 +751,7 @@ class _ReauthenticationCard extends StatelessWidget {
 
     return Container(
       decoration: _dialogSurface(context, compact: compact),
-      constraints: const BoxConstraints(maxWidth: 1200),
+      constraints: const BoxConstraints(maxWidth: LoginForm.maxWidth + 48),
       child: SingleChildScrollView(
         padding: compact ? _compactPadding : const EdgeInsets.all(24),
         child: child,
