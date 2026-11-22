@@ -92,8 +92,33 @@ class _CodeFieldState extends State<CodeField> {
 
   List<String> get _slots => [
     for (var i = 0; i < CodeField.length; i++)
-      i < widget.controller.text.length ? widget.controller.text[i] : _empty,
+      i < _committed.length ? _committed[i] : _empty,
   ];
+
+  /// 変換中の文字を除いた、確定済みの入力
+  String get _committed {
+    final value = widget.controller.value;
+    if (!_isComposing(value)) return value.text;
+    return value.composing.textBefore(value.text) +
+        value.composing.textAfter(value.text);
+  }
+
+  static bool _isComposing(TextEditingValue value) =>
+      value.composing.isValid && !value.composing.isCollapsed;
+
+  /// 変換中は、数字だけのときに限って選んだマスから見せる
+  List<String> get _shownSlots {
+    final slots = _slots;
+    final value = widget.controller.value;
+    if (!_isComposing(value)) return slots;
+
+    final digits = _halfWidth(value.composing.textInside(value.text).trim());
+    if (!_onlyDigits.hasMatch(digits)) return slots;
+    for (var i = 0; i < digits.length && _index + i < CodeField.length; i++) {
+      slots[_index + i] = digits[i];
+    }
+    return slots;
+  }
 
   TextEditingValue _valueOf(List<String> slots) {
     final text = slots.join().trimRight();
@@ -106,9 +131,7 @@ class _CodeFieldState extends State<CodeField> {
 
   TextEditingValue _format(TextEditingValue newValue) {
     // 変換中に書き換えると、IME が確定前の文字を見失う
-    if (newValue.composing.isValid && !newValue.composing.isCollapsed) {
-      return newValue;
-    }
+    if (_isComposing(newValue)) return newValue;
 
     final slots = _slots;
     final committed = slots.join().trimRight();
@@ -153,8 +176,7 @@ class _CodeFieldState extends State<CodeField> {
   }
 
   /// 空いたマスより先は選べない
-  int get _lastSelectable =>
-      widget.controller.text.length.clamp(0, CodeField.length - 1);
+  int get _lastSelectable => _committed.length.clamp(0, CodeField.length - 1);
 
   /// 入力欄のカーソルは使わないので、カーソルを動かすキーと Delete はマスの操作に読み替える
   KeyEventResult _onKey(FocusNode node, KeyEvent event) {
@@ -208,7 +230,7 @@ class _CodeFieldState extends State<CodeField> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final slots = _slots;
+    final slots = _shownSlots;
     final hasError = widget.errorText != null;
 
     Widget box(int i) {
