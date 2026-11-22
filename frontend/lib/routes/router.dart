@@ -8,7 +8,7 @@ import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';
 import 'package:nocsis/pages/console/dayduty.dart';
-import 'package:nocsis/pages/console/displays.dart';
+import 'package:nocsis/pages/console/displays/page.dart';
 import 'package:nocsis/pages/console/group.dart';
 import 'package:nocsis/pages/console/index.dart';
 import 'package:nocsis/pages/console/layout.dart';
