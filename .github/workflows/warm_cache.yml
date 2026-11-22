@@ -1,0 +1,26 @@
+name: Warm Caches
+
+# ブランチと PR の実行は、自分のスコープに加えて既定ブランチ (develop) のキャッシュを
+# 読める。ここで lint と test を流して develop のスコープにキャッシュを作り、各ブランチが
+# 同じキャッシュを自分用に作り直さないようにする。
+on:
+  push:
+    branches: [ develop ]
+
+permissions: {}
+
+# 実行中のジョブを取り消すとキャッシュが保存されないので、取り消さない。
+concurrency:
+  group: Warm Caches
+  cancel-in-progress: false
+
+jobs:
+  lint:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-lint.yml
+
+  test:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-test.yml
