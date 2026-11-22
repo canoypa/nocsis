@@ -204,7 +204,7 @@ describe("教室ディスプレイ", () => {
       expect((await register(code, "あ".repeat(51))).status).toBe(400);
     });
 
-    it("名前の長さは、絵文字や濁点を合成した文字も見た目の1文字で数えること", async () => {
+    it("絵文字や濁点を合成した文字も1文字と数えること", async () => {
       const { code } = await issue();
       const family = "👨‍👩‍👧";
       const ga = "か\u3099";
@@ -289,7 +289,7 @@ describe("教室ディスプレイ", () => {
       expect(await response.json()).toMatchObject({ name: "2年3組 前方" });
     });
 
-    it("名前は見た目で50文字まで変えられること", async () => {
+    it("名前は50文字まで変えられること", async () => {
       const rename = (name: string) =>
         request(
           `/api/v1/groups/${GROUP_ID}/displays/${device.uid}`,

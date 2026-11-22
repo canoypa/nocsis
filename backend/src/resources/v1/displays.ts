@@ -17,7 +17,7 @@ export const displayPairingSchema = z
 
 const graphemes = new Intl.Segmenter();
 
-// max() は UTF-16 で数えるので、絵文字や濁点を合成した文字が見た目より長くなる
+// max() は UTF-16 で数えるので、絵文字や濁点を合成した文字が2文字以上になる
 const withinDisplayNameLength = (name: string) =>
   [...graphemes.segment(name)].length <= 50;
 
@@ -61,7 +61,7 @@ export const displayCreateJsonSchema = z
       .optional()
       .meta({
         description:
-          "名前。見た目で50文字まで。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
+          "名前。50文字まで。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
       }),
   })
   .meta({
@@ -71,7 +71,7 @@ export const displayCreateJsonSchema = z
 
 export const displayPatchJsonSchema = z
   .object({
-    name: displayName.meta({ description: "名前。見た目で50文字まで" }),
+    name: displayName.meta({ description: "名前。50文字まで" }),
   })
   .meta({
     $id: "DisplayPatchJson",
