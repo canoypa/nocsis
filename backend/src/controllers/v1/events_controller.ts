@@ -18,11 +18,7 @@ import { fetchGoogleCalendarEvents } from "../../services/google_calendar_servic
 
 const toEventTime = (time: CalendarV3.Schema$EventDateTime | undefined) =>
   time?.dateTime
-    ? {
-        dateTime: DateTime.fromISO(time.dateTime, {
-          zone: AppConfig.TIMEZONE,
-        }).toISO(),
-      }
+    ? { dateTime: time.dateTime }
     : { date: time?.date ?? undefined };
 
 export const eventsRoutes = new Hono<AuthorizedEnv>();

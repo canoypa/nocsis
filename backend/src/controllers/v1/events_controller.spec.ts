@@ -179,43 +179,52 @@ describe("Events Controller", () => {
       expect(Array.isArray(json.items)).toBe(true);
     });
 
-    it("時刻のあるイベントは、日本時間の日時で返すこと", async () => {
-      mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
-        items: [
-          {
-            id: "meeting",
-            summary: "説明会",
-            start: { dateTime: "2024-01-01T01:00:00Z" },
-            end: { dateTime: "2024-01-01T02:30:00Z" },
-          },
-        ],
-      });
+    it.each([
+      {
+        start: "2024-01-01T10:00:00+05:30",
+        end: "2024-01-01T11:30:00+09:00",
+      },
+      { start: "2024-01-01T01:00:00Z", end: "2024-01-01T02:30:00Z" },
+    ])(
+      "時刻のあるイベントは、Google の日時 ($start) を書き換えずに返すこと",
+      async ({ start, end }) => {
+        mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
+          items: [
+            {
+              id: "meeting",
+              summary: "説明会",
+              start: { dateTime: start },
+              end: { dateTime: end },
+            },
+          ],
+        });
 
-      const response = await app.request(
-        "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&limit=10",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${loginResult.idToken}`,
-          },
-        },
-      );
-
-      expect(response.status).toBe(200);
-      expect(await response.json()).toEqual({
-        items: [
+        const response = await app.request(
+          "/api/v1/groups/test_group_1/events?from=2024-01-01T00:00:00%2B09:00&limit=10",
           {
-            id: "meeting",
-            startAt: "2024-01-01T01:00:00Z",
-            endAt: "2024-01-01T02:30:00Z",
-            start: { dateTime: "2024-01-01T10:00:00.000+09:00" },
-            end: { dateTime: "2024-01-01T11:30:00.000+09:00" },
-            title: "説明会",
-            isAllDay: false,
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+            },
           },
-        ],
-      });
-    });
+        );
+
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual({
+          items: [
+            {
+              id: "meeting",
+              startAt: start,
+              endAt: end,
+              start: { dateTime: start },
+              end: { dateTime: end },
+              title: "説明会",
+              isAllDay: false,
+            },
+          ],
+        });
+      },
+    );
 
     it("日時のないイベントがあっても、ほかのイベントを返すこと", async () => {
       mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
