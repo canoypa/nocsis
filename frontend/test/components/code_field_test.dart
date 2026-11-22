@@ -23,15 +23,54 @@ void main() {
         ),
       ),
     );
+    await tester.pump();
   }
 
   Finder field() => find.byType(TextField);
 
-  /// 左から index 番目のマスを押す
-  Future<void> tapBox(WidgetTester tester, int index) async {
+  Offset boxCenter(WidgetTester tester, int index) {
     final origin = tester.getTopLeft(find.byType(CodeField));
     final left = index * (56 + 8) + (index >= 3 ? 24 - 8 : 0);
-    await tester.tapAt(origin + Offset(left + 28.0, 32));
+    return origin + Offset(left + 28.0, 32);
+  }
+
+  Future<void> tapBox(WidgetTester tester, int index) async {
+    await tester.tapAt(boxCenter(tester, index));
+    await tester.pump();
+  }
+
+  /// 選ばれているマス。枠が太い
+  int? selectedBox(WidgetTester tester) {
+    final boxes = tester
+        .widgetList<Container>(
+          find.descendant(
+            of: find.byType(CodeField),
+            matching: find.byType(Container),
+          ),
+        )
+        .where((c) => c.decoration is BoxDecoration)
+        .toList();
+    for (var i = 0; i < boxes.length; i++) {
+      final border = (boxes[i].decoration! as BoxDecoration).border! as Border;
+      if (border.top.width == 2) return i;
+    }
+    return null;
+  }
+
+  /// 入力欄の末尾に打ったのと同じ
+  Future<void> type(WidgetTester tester, String text) async {
+    final value = controller.text + text;
+    tester.testTextInput.updateEditingValue(
+      TextEditingValue(
+        text: value,
+        selection: TextSelection.collapsed(offset: value.length),
+      ),
+    );
+    await tester.pump();
+  }
+
+  Future<void> backspace(WidgetTester tester) async {
+    await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
     await tester.pump();
   }
 
@@ -43,73 +82,76 @@ void main() {
     expect(controller.text, '123456');
   });
 
-  testWidgets('6桁より先は入らない', (tester) async {
+  testWidgets('6桁を打っても6マス目に留まり、その先へは入らない', (tester) async {
     await pump(tester);
 
-    await tester.enterText(field(), '1234567');
+    await type(tester, '123456');
+    expect(selectedBox(tester), 5);
 
-    expect(controller.text, '123456');
+    await type(tester, '7');
+    expect(controller.text, '123457');
+    expect(selectedBox(tester), 5);
   });
 
-  testWidgets('押したマスの桁を、打ち直した数字で書き換える', (tester) async {
+  testWidgets('Backspace は選んだマスの桁を消し、前のマスへ移る', (tester) async {
     await pump(tester);
-    await tester.enterText(field(), '123456');
-    await tester.pump();
+    await type(tester, '123456');
 
-    await tapBox(tester, 2);
-    expect(
-      controller.selection,
-      const TextSelection(baseOffset: 2, extentOffset: 3),
-    );
+    await backspace(tester);
+    expect(controller.text, '12345');
+    expect(selectedBox(tester), 4);
 
-    // 選んだ1文字を、打った数字で置き換えたのと同じ
-    tester.testTextInput.updateEditingValue(
-      const TextEditingValue(
-        text: '129456',
-        selection: TextSelection.collapsed(offset: 3),
-      ),
-    );
-    await tester.pump();
-
-    expect(controller.text, '129456');
-    expect(
-      controller.selection,
-      const TextSelection(baseOffset: 3, extentOffset: 4),
-    );
+    await backspace(tester);
+    expect(controller.text, '1234');
+    expect(selectedBox(tester), 3);
   });
 
-  testWidgets('押したマスで Backspace を押すと、その桁だけが空き、後ろは詰めない', (tester) async {
+  testWidgets('途中のマスで Backspace を押すと、その桁だけが空き、後ろは詰めない', (tester) async {
     await pump(tester);
-    await tester.enterText(field(), '123456');
-    await tester.pump();
+    await type(tester, '123456');
 
     await tapBox(tester, 2);
-    await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
-    await tester.pump();
+    expect(selectedBox(tester), 2);
+
+    await backspace(tester);
+    expect(controller.text, '12 456');
+    expect(selectedBox(tester), 1);
+
+    await backspace(tester);
+    expect(controller.text, '1  456');
+    expect(selectedBox(tester), 0);
+  });
+
+  testWidgets('空いたマスで Backspace を押すと、消さずに前のマスへ移る', (tester) async {
+    await pump(tester);
+    await type(tester, '123456');
+    await tapBox(tester, 2);
+    await backspace(tester);
+    await tapBox(tester, 2);
+
+    await backspace(tester);
 
     expect(controller.text, '12 456');
-    expect(find.text('3'), findsNothing);
-    expect(find.text('4'), findsOneWidget);
-
-    // 空いた桁でもう一度押すと、1つ前の桁を消して戻る
-    await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
-    await tester.pump();
-
-    expect(controller.text, '1  456');
-    expect(
-      controller.selection,
-      const TextSelection(baseOffset: 1, extentOffset: 2),
-    );
+    expect(selectedBox(tester), 1);
   });
 
-  testWidgets('末尾から Backspace を押すと、1桁ずつ消える', (tester) async {
+  testWidgets('選んだマスに打つと、その桁を書き換えて次のマスへ移る', (tester) async {
     await pump(tester);
-    await tester.enterText(field(), '123');
-    await tester.pump();
+    await type(tester, '123456');
 
-    await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
-    await tester.pump();
+    await tapBox(tester, 2);
+    await type(tester, '9');
 
-    expect(controller.text, '12');
+    expect(controller.text, '129456');
+    expect(selectedBox(tester), 3);
+  });
+
+  testWidgets('空いたマスより先は選べない', (tester) async {
+    await pump(tester);
+    await type(tester, '12');
+
+    await tapBox(tester, 5);
+
+    expect(selectedBox(tester), 2);
   });
 }

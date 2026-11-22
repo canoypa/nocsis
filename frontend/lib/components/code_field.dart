@@ -1,7 +1,11 @@
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
-/// 入力欄は1つのまま、見た目だけ6マスに描く。貼り付けや削除を普通の入力欄のまま扱える
+/// 入力欄は1つのまま、見た目だけ6マスに描く。貼り付けや IME を普通の入力欄のまま扱える
+///
+/// マスには普通の入力欄のような文字の間のカーソルが無く、いつもどれか1マスを選んでいる。
+/// 打つと選んだマスの桁を書き換えて次へ進み、Backspace は選んだマスの桁を消して前へ戻る。
+/// 後ろの桁は詰めない。空いた桁は空白で持つ
 class CodeField extends StatefulWidget {
   static const length = 6;
   static const _boxWidth = 56.0;
@@ -25,11 +29,25 @@ class CodeField extends StatefulWidget {
 }
 
 class _CodeFieldState extends State<CodeField> {
+  static const _empty = ' ';
+  static final _fullWidthDigit = RegExp('[０-９]');
+  static final _nonDigit = RegExp('[^0-9]');
+
   final _focusNode = FocusNode();
+  late final _formatter = TextInputFormatter.withFunction((oldValue, newValue) {
+    final value = _format(newValue);
+    // 空いたマスで消したときは文字が変わらず、選んだマスだけが動く
+    _redraw();
+    return value;
+  });
+
+  /// 選んでいるマス
+  var _index = 0;
 
   @override
   void initState() {
     super.initState();
+    _index = widget.controller.text.length.clamp(0, CodeField.length - 1);
     _focusNode.addListener(_redraw);
     widget.controller.addListener(_redraw);
   }
@@ -43,8 +61,67 @@ class _CodeFieldState extends State<CodeField> {
 
   void _redraw() => setState(() {});
 
-  /// 押したマスの桁から打ち直せるようにする
-  void _moveTo(double x) {
+  static String _digits(String text) => text
+      .replaceAllMapped(
+        _fullWidthDigit,
+        (m) => String.fromCharCode(m[0]!.codeUnitAt(0) - 0xFEE0),
+      )
+      .replaceAll(_nonDigit, '');
+
+  List<String> get _slots => [
+    for (var i = 0; i < CodeField.length; i++)
+      i < widget.controller.text.length ? widget.controller.text[i] : _empty,
+  ];
+
+  TextEditingValue _valueOf(List<String> slots) {
+    final text = slots.join().trimRight();
+    // 入力欄のカーソルはいつも末尾に置く。消す・打つの区別だけを入力欄から受け取る
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+
+  TextEditingValue _format(TextEditingValue newValue) {
+    // 変換中に書き換えると、IME が確定前の文字を見失う
+    if (newValue.composing.isValid && !newValue.composing.isCollapsed) {
+      return newValue;
+    }
+
+    final slots = _slots;
+    final committed = slots.join().trimRight();
+    final next = newValue.text;
+
+    if (next.length < committed.length && committed.startsWith(next)) {
+      slots[_index] = _empty;
+      _index = (_index - 1).clamp(0, CodeField.length - 1);
+      return _valueOf(slots);
+    }
+
+    if (next.startsWith(committed)) {
+      final typed = _digits(next.substring(committed.length));
+      if (typed.isEmpty) return _valueOf(slots);
+
+      for (final digit in typed.split('')) {
+        slots[_index] = digit;
+        if (_index == CodeField.length - 1) break;
+        _index++;
+      }
+      return _valueOf(slots);
+    }
+
+    // 全部を選んで貼り付けたときなど。数字だけを前から詰める
+    final digits = _digits(next);
+    final filled = [
+      for (var i = 0; i < CodeField.length; i++)
+        i < digits.length ? digits[i] : _empty,
+    ];
+    _index = digits.length.clamp(0, CodeField.length - 1);
+    return _valueOf(filled);
+  }
+
+  /// 押したマスを選ぶ。まだ前に空いたマスがあれば、そこより先へは進めない
+  void _select(double x) {
     var left = 0.0;
     var index = CodeField.length - 1;
     for (var i = 0; i < CodeField.length; i++) {
@@ -57,12 +134,18 @@ class _CodeFieldState extends State<CodeField> {
     }
 
     _focusNode.requestFocus();
-    // 入力欄が自分のタップで置いた位置を、あとから上書きする
+    setState(() {
+      _index = index.clamp(
+        0,
+        widget.controller.text.length.clamp(0, CodeField.length - 1),
+      );
+    });
+    // 入力欄が自分のタップで置いたカーソルを、末尾に戻す
     WidgetsBinding.instance
       ..addPostFrameCallback((_) {
-        widget.controller.selection = _boxSelection(
-          index,
-          widget.controller.text,
+        final text = widget.controller.text;
+        widget.controller.selection = TextSelection.collapsed(
+          offset: text.length,
         );
       })
       ..scheduleFrame();
@@ -72,17 +155,11 @@ class _CodeFieldState extends State<CodeField> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final text = widget.controller.text;
+    final slots = _slots;
     final hasError = widget.errorText != null;
-    final selection = widget.controller.selection;
-    final position = selection.isValid ? selection.start : text.length;
-    // 6桁そろって末尾にいるときは、次に打てるマスが無い
-    final current = _focusNode.hasFocus && position < CodeField.length
-        ? position
-        : null;
 
     Widget box(int i) {
-      final isCurrent = i == current;
+      final isCurrent = _focusNode.hasFocus && i == _index;
       final color = hasError
           ? colorScheme.error
           : isCurrent
@@ -97,34 +174,30 @@ class _CodeFieldState extends State<CodeField> {
           borderRadius: BorderRadius.circular(4),
           border: Border.all(color: color, width: isCurrent ? 2 : 1),
         ),
-        child: Text(
-          i < text.length ? text[i].trim() : '',
-          style: textTheme.headlineMedium,
-        ),
+        child: Text(slots[i].trim(), style: textTheme.headlineMedium),
       );
     }
 
+    Widget group(int from) => Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: CodeField._gap,
+      children: [for (var i = from; i < from + 3; i++) box(i)],
+    );
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 8,
       children: [
         Stack(
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                for (var i = 0; i < CodeField.length; i++) ...[
-                  if (i > 0)
-                    SizedBox(
-                      width: i == 3 ? CodeField._groupGap : CodeField._gap,
-                    ),
-                  box(i),
-                ],
-              ],
+              spacing: CodeField._groupGap,
+              children: [group(0), group(3)],
             ),
             Positioned.fill(
               child: Listener(
                 behavior: HitTestBehavior.translucent,
-                onPointerUp: (event) => _moveTo(event.localPosition.dx),
+                onPointerUp: (event) => _select(event.localPosition.dx),
                 child: Opacity(
                   opacity: 0,
                   child: TextField(
@@ -132,8 +205,9 @@ class _CodeFieldState extends State<CodeField> {
                     focusNode: _focusNode,
                     autofocus: true,
                     showCursor: false,
+                    enableInteractiveSelection: false,
                     keyboardType: TextInputType.number,
-                    inputFormatters: [_CodeFormatter()],
+                    inputFormatters: [_formatter],
                     onChanged: widget.onChanged,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
@@ -146,113 +220,11 @@ class _CodeFieldState extends State<CodeField> {
           ],
         ),
         if (hasError)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              widget.errorText!,
-              style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
-            ),
+          Text(
+            widget.errorText!,
+            style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
           ),
       ],
     );
-  }
-}
-
-/// 空いた桁は空白で持つ
-const _empty = ' ';
-
-/// 今の桁の文字を選んでおくと、打てば置き換わり、Backspace ではその桁が消える
-TextSelection _boxSelection(int index, String text) => index < text.length
-    ? TextSelection(baseOffset: index, extentOffset: index + 1)
-    : TextSelection.collapsed(offset: text.length);
-
-/// 1マスに1桁。打つとその桁を書き換え、消すとその桁だけを空ける。全角の数字も受け付ける
-class _CodeFormatter extends TextInputFormatter {
-  static final _fullWidthDigit = RegExp('[０-９]');
-  static final _nonDigit = RegExp('[^0-9]');
-
-  static String _digits(String text) => text
-      .replaceAllMapped(
-        _fullWidthDigit,
-        (m) => String.fromCharCode(m[0]!.codeUnitAt(0) - 0xFEE0),
-      )
-      .replaceAll(_nonDigit, '');
-
-  static TextEditingValue _value(List<String> slots, int index) {
-    final text = slots.join().trimRight();
-    return TextEditingValue(
-      text: text,
-      selection: _boxSelection(index.clamp(0, text.length), text),
-    );
-  }
-
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    // 変換中に書き換えると、IME が確定前の文字を見失う
-    if (newValue.composing.isValid && !newValue.composing.isCollapsed) {
-      return newValue;
-    }
-
-    final old = oldValue.text;
-    final next = newValue.text;
-    final start = oldValue.selection.isValid
-        ? oldValue.selection.start
-        : old.length;
-    final end = oldValue.selection.isValid
-        ? oldValue.selection.end
-        : old.length;
-    final slots = old.split('');
-    final before = old.substring(0, start);
-    final after = old.substring(end);
-
-    if (next.length < old.length) {
-      // 1マスを選んだまま消した
-      if (end - start == 1 && next == before + after) {
-        if (old[start] != _empty) {
-          slots[start] = _empty;
-          return _value(slots, start);
-        }
-        if (start == 0) return _value(slots, 0);
-        slots[start - 1] = _empty;
-        return _value(slots, start - 1);
-      }
-      // 末尾の空いたマスで Backspace
-      if (start == end &&
-          start > 0 &&
-          next == old.substring(0, start - 1) + after) {
-        slots[start - 1] = _empty;
-        return _value(slots, start - 1);
-      }
-      if (start != end && next == before + after) {
-        for (var i = start; i < end; i++) {
-          slots[i] = _empty;
-        }
-        return _value(slots, start);
-      }
-    } else if (next.startsWith(before) && next.endsWith(after)) {
-      final typed = _digits(next.substring(start, next.length - after.length));
-      if (typed.isEmpty) return oldValue;
-
-      for (var i = 0; i < typed.length; i++) {
-        final index = start + i;
-        if (index >= CodeField.length) break;
-        if (index < slots.length) {
-          slots[index] = typed[i];
-        } else {
-          slots.add(typed[i]);
-        }
-      }
-      return _value(slots, start + typed.length);
-    }
-
-    // 判別できない書き換えは、数字だけを前から詰める
-    var digits = _digits(next);
-    if (digits.length > CodeField.length) {
-      digits = digits.substring(0, CodeField.length);
-    }
-    return _value(digits.split(''), digits.length);
   }
 }
