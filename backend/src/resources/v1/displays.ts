@@ -44,7 +44,10 @@ export const displaysSchema = z
 export const displayCreateJsonSchema = z
   .object({
     code: displayPairingSchema.shape.code,
-    name: displayName.meta({ description: "名前" }),
+    name: z.string().trim().max(50).optional().meta({
+      description:
+        "名前。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
+    }),
   })
   .meta({
     $id: "DisplayCreateJson",

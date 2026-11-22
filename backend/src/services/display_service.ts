@@ -98,7 +98,7 @@ export const registerDisplay = async (params: {
   callerUid: string;
   groupId: string;
   code: string;
-  name: string;
+  name?: string;
 }): Promise<RegisterResult> => {
   const { callerUid, groupId, code, name } = params;
   const failureRef = firestore.collection(FAILURES).doc(callerUid);
@@ -120,13 +120,21 @@ export const registerDisplay = async (params: {
       resource: group(groupId),
     });
     const existingBinding = await tx.get(binding.ref);
+    // 同時に登録された端末と同じ番号にならないよう、名前もトランザクションの中で読む
+    const others = name
+      ? undefined
+      : (await tx.get(displays(groupId))).docs.filter((doc) => doc.id !== uid);
 
     // 発行してから、メールや Google を結びつけた・消された、ということがある
     if (!(await isAnonymous(uid))) return undefined;
 
     tx.delete(pairingRef);
     tx.set(displays(groupId).doc(uid), {
-      name,
+      name:
+        name ||
+        defaultDisplayName(
+          others?.map((doc) => doc.get("name") as string) ?? [],
+        ),
       created_at: Timestamp.now(),
     });
     if (!existingBinding.exists) tx.create(binding.ref, binding.data);
@@ -143,6 +151,23 @@ export const registerDisplay = async (params: {
     ok: true,
     display: toDisplay(await displays(groupId).doc(uid).get()),
   };
+};
+
+const DEFAULT_NAME = /^ディスプレイ ([1-9]\d*)$/;
+
+/** 名前に使われていない一番小さい番号で「ディスプレイ N」を作る */
+export const defaultDisplayName = (names: string[]): string => {
+  const used = new Set(
+    names.flatMap((name) => {
+      const match = DEFAULT_NAME.exec(name);
+      return match ? [Number(match[1])] : [];
+    }),
+  );
+
+  let n = 1;
+  while (used.has(n)) n++;
+
+  return `ディスプレイ ${n}`;
 };
 
 const tooManyFailures = async (ref: FirebaseFirestore.DocumentReference) => {

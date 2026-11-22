@@ -226,15 +226,13 @@
             "description": "管理者が入力する6桁のコード"
           },
           "name": {
+            "description": "名前。省くか空にすると、グループで使われていない「ディスプレイ N」を付ける",
             "type": "string",
-            "minLength": 1,
-            "maxLength": 50,
-            "description": "名前"
+            "maxLength": 50
           }
         },
         "required": [
-          "code",
-          "name"
+          "code"
         ],
         "description": "教室ディスプレイの登録に使う JSON データ"
       },
