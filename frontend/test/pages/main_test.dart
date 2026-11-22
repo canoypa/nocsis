@@ -15,13 +15,30 @@ import '../helpers/fake_backend.dart';
 const _classes = '/api/v1/groups/g1/classes';
 const _events = '/api/v1/groups/g1/events';
 
-Map<String, Object> _event(String title, DateTime startAt) => {
-  'id': title,
-  'title': title,
-  'startAt': startAt.toUtc().toIso8601String(),
-  'endAt': startAt.add(const Duration(hours: 1)).toUtc().toIso8601String(),
-  'isAllDay': false,
-};
+Map<String, Object> _event(String title, DateTime startAt) {
+  final start = startAt.toUtc().toIso8601String();
+  final end = startAt.add(const Duration(hours: 1)).toUtc().toIso8601String();
+  return {
+    'id': title,
+    'title': title,
+    'startAt': start,
+    'endAt': end,
+    'start': {'dateTime': start},
+    'end': {'dateTime': end},
+    'isAllDay': false,
+  };
+}
+
+Map<String, Object> _allDayEvent(String title, String date, String nextDate) =>
+    {
+      'id': title,
+      'title': title,
+      'startAt': date,
+      'endAt': nextDate,
+      'start': {'date': date},
+      'end': {'date': nextDate},
+      'isAllDay': true,
+    };
 
 String _twoDigitYear(int year) => (year % 100).toString().padLeft(2, '0');
 
@@ -96,6 +113,46 @@ void main() {
       expect(find.text('文化祭'), findsOneWidget);
       expect(find.text(DateFormat('M月d日').format(now)), findsOneWidget);
       expect(find.text('予定なし'), findsNothing);
+    });
+
+    testWidgets('終日のイベントは、その日の日付で出す', (tester) async {
+      final today = DateTime.now();
+      await pump(tester, const MainView(), {
+        _classes: {'items': []},
+        _events: {
+          'items': [
+            _allDayEvent(
+              '文化祭',
+              DateFormat('yyyy-MM-dd').format(today),
+              DateFormat('yyyy-MM-dd')
+                  .format(today.add(const Duration(days: 1))),
+            ),
+          ],
+        },
+      });
+
+      expect(find.text(DateFormat('M月d日').format(today)), findsOneWidget);
+    });
+
+    testWidgets('タイトルのない授業とイベントは「(No title)」と出す', (tester) async {
+      final today = DateTime.now();
+      await pump(tester, const MainView(), {
+        _classes: {
+          'items': [
+            {
+              'title': '',
+              'period': 1,
+              'startAt': today.toUtc().toIso8601String(),
+              'endAt': today.toUtc().toIso8601String(),
+            },
+          ],
+        },
+        _events: {
+          'items': [_event('', today)],
+        },
+      });
+
+      expect(find.text('(No title)'), findsNWidgets(2));
     });
 
     testWidgets('授業もイベントもない日は「予定なし」を出す', (tester) async {
@@ -195,6 +252,27 @@ void main() {
 
       expect(find.text('${_twoDigitYear(nextYear)}年5月'), findsOneWidget);
       expect(find.text('${_twoDigitYear(nextYear + 1)}年5月'), findsOneWidget);
+    });
+
+    testWidgets('終日のイベントは、その日の日付と月で出す', (tester) async {
+      await pump(tester, const EventsView(), {
+        _events: {
+          'items': [_allDayEvent('文化祭', '2030-06-01', '2030-06-02')],
+        },
+      });
+
+      expect(find.text('30年6月'), findsOneWidget);
+      expect(find.text('6月1日'), findsOneWidget);
+    });
+
+    testWidgets('タイトルのないイベントは「(No title)」と出す', (tester) async {
+      await pump(tester, const EventsView(), {
+        _events: {
+          'items': [_event('', DateTime(2030, 5, 20, 9))],
+        },
+      });
+
+      expect(find.text('(No title)'), findsOneWidget);
     });
 
     testWidgets('イベントがなければ「予定なし」を出す', (tester) async {
