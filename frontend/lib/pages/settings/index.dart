@@ -24,17 +24,30 @@ final _authTimeProvider = StreamProvider.autoDispose<DateTime?>(
 
 enum _ReplaceResult { replaced, cancelled, requiresRecentLogin }
 
-/// 選んだ Google アカウントへの差し替えを待っている間は true
-final _replacingGoogleAccountProvider =
-    NotifierProvider<_ReplacingGoogleAccount, bool>(
-      _ReplacingGoogleAccount.new,
+enum _GoogleSwapState {
+  idle,
+
+  /// 再ログインかアカウントの選択の途中
+  choosing,
+
+  /// 選んだアカウントへの差し替えを待っている
+  replacing,
+}
+
+final _googleSwapStateProvider =
+    NotifierProvider<_GoogleSwapStateNotifier, _GoogleSwapState>(
+      _GoogleSwapStateNotifier.new,
     );
 
-class _ReplacingGoogleAccount extends Notifier<bool> {
+class _GoogleSwapStateNotifier extends Notifier<_GoogleSwapState> {
   @override
-  bool build() => false;
+  _GoogleSwapState build() => _GoogleSwapState.idle;
 
-  void set(bool value) => state = value;
+  void set(_GoogleSwapState value) => state = value;
+
+  void finishChoosing() {
+    if (state == _GoogleSwapState.choosing) state = _GoogleSwapState.idle;
+  }
 }
 
 /// Google のアカウント選択を開き、選んだアカウントに連携を差し替える
@@ -53,8 +66,8 @@ Future<_ReplaceResult> _replaceGoogleAccount(
   if (accessToken == null) return _ReplaceResult.cancelled;
 
   onPicked?.call();
-  final replacing = container.read(_replacingGoogleAccountProvider.notifier);
-  replacing.set(true);
+  final swapState = container.read(_googleSwapStateProvider.notifier);
+  swapState.set(_GoogleSwapState.replacing);
   try {
     final client = await clientFuture;
     final response = await client.apiV1MeGoogleAccountPut(
@@ -79,9 +92,10 @@ Future<_ReplaceResult> _replaceGoogleAccount(
 
     await user.reload();
     container.invalidate(currentUserProvider);
+    messenger.showSnackBar(const SnackBar(content: Text('Google の連携を変更しました。')));
     return _ReplaceResult.replaced;
   } finally {
-    replacing.set(false);
+    swapState.set(_GoogleSwapState.idle);
   }
 }
 
@@ -99,19 +113,26 @@ class SettingsTopPage extends ConsumerWidget {
     final authTime = ref.read(_authTimeProvider).value;
     final recentlyLoggedIn =
         authTime != null && DateTime.now().difference(authTime) < _recentLogin;
+    final swapState = ref.read(_googleSwapStateProvider.notifier);
+    swapState.set(_GoogleSwapState.choosing);
 
-    // ポップアップは押した直後にしか開けないので、アカウント選択より前に await しない
-    if (recentlyLoggedIn &&
-        await _replaceGoogleAccount(context, ref) !=
-            _ReplaceResult.requiresRecentLogin) {
-      return;
+    try {
+      // ポップアップは押した直後にしか開けないので、アカウント選択より前に await しない
+      if (recentlyLoggedIn &&
+          await _replaceGoogleAccount(context, ref) !=
+              _ReplaceResult.requiresRecentLogin) {
+        return;
+      }
+      if (!context.mounted) return;
+
+      await showDialog<void>(
+        context: context,
+        builder: (_) => const _ReplaceGoogleAccountDialog(),
+      );
+    } finally {
+      // 選んでダイアログが閉じたあとは、差し替えが終わるまで replacing のまま
+      swapState.finishChoosing();
     }
-    if (!context.mounted) return;
-
-    await showDialog<void>(
-      context: context,
-      builder: (_) => const _ReplaceGoogleAccountDialog(),
-    );
   }
 
   @override
@@ -123,7 +144,8 @@ class SettingsTopPage extends ConsumerWidget {
         ?.email;
 
     final pickerLoaded = ref.watch(_googleAccountPickerLoadedProvider).hasValue;
-    final replacing = ref.watch(_replacingGoogleAccountProvider);
+    final swapState = ref.watch(_googleSwapStateProvider);
+    final replacing = swapState == _GoogleSwapState.replacing;
     ref.watch(_authTimeProvider);
 
     return Align(
@@ -217,36 +239,48 @@ class SettingsTopPage extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Opacity(
-                          // M3 の無効な内容の不透明度
-                          opacity: replacing ? 0.38 : 1,
-                          child: Row(
-                            children: [
-                              const Icon(CustomIcons.google),
-                              const SizedBox(width: 16),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Google'),
-                                  if (googleEmail != null)
-                                    Text(
-                                      googleEmail,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurfaceVariant,
-                                          ),
+                        Row(
+                          children: [
+                            const Icon(CustomIcons.google),
+                            const SizedBox(width: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Google'),
+                                if (replacing)
+                                  // メールアドレスの行と同じ高さ
+                                  Container(
+                                    width: 200,
+                                    height: 16,
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 2,
                                     ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  )
+                                else if (googleEmail != null)
+                                  Text(
+                                    googleEmail,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                        ),
+                                  ),
+                              ],
+                            ),
+                          ],
                         ),
                         TextButton(
-                          onPressed: pickerLoaded && !replacing
+                          onPressed:
+                              pickerLoaded && swapState == _GoogleSwapState.idle
                               ? () =>
                                     _onReplaceGoogleAccountPressed(context, ref)
                               : null,
