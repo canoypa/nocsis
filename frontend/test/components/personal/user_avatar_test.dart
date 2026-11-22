@@ -40,4 +40,11 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byIcon(Symbols.person), findsOneWidget);
   });
+
+  testWidgets('名前が空文字でも描ける', (tester) async {
+    await pumpSignedIn(tester, displayName: '');
+
+    expect(tester.takeException(), isNull);
+    expect(find.byIcon(Symbols.person), findsOneWidget);
+  });
 }
