@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/components/page_title.dart';
 
 class ConsoleSlackPage extends StatelessWidget {
   const ConsoleSlackPage({super.key});
@@ -12,11 +13,11 @@ class ConsoleSlackPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Slack 連携', style: Theme.of(context).textTheme.displayMedium),
+            const PageTitle('Slack 連携'),
             const SizedBox(height: 24),
             const Text('Slack への各種通知メッセージの送信を管理します。'),
             const SizedBox(height: 48),
-            Text('トークン', style: Theme.of(context).textTheme.headlineMedium),
+            const SectionTitle('トークン'),
             const SizedBox(height: 24),
             TextField(
               controller: TextEditingController(text: 'WIP'),
@@ -28,7 +29,7 @@ class ConsoleSlackPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 48),
-            Text('イベント通知', style: Theme.of(context).textTheme.headlineMedium),
+            const SectionTitle('イベント通知'),
             const SizedBox(height: 24),
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -58,7 +59,7 @@ class ConsoleSlackPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 48),
-            Text('日直通知', style: Theme.of(context).textTheme.headlineMedium),
+            const SectionTitle('日直通知'),
             const SizedBox(height: 24),
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

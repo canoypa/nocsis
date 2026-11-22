@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/components/page_title.dart';
 
 class ConsoleGroupPage extends StatelessWidget {
   const ConsoleGroupPage({super.key});
@@ -12,7 +13,7 @@ class ConsoleGroupPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('グループ', style: Theme.of(context).textTheme.displayMedium),
+            const PageTitle('グループ'),
             const SizedBox(height: 24),
             const Text('グループに関する情報を管理します。'),
             const SizedBox(height: 48),

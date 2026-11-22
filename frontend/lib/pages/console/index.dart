@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/components/page_title.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
@@ -19,7 +20,7 @@ class ConsoleTopPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('管理コンソール', style: Theme.of(context).textTheme.displayMedium),
+            const PageTitle('管理コンソール'),
             const SizedBox(height: 24),
             Text('かなり開発中です', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 48),
