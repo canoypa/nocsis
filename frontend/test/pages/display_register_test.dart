@@ -20,7 +20,11 @@ void main() {
     registerFallbackValue(const DisplayCreateJson(code: '', name: ''));
   });
 
-  Future<void> pumpPage(WidgetTester tester, int status) async {
+  Future<void> pumpPage(
+    WidgetTester tester,
+    int status, {
+    String name = '黒板横',
+  }) async {
     mockApi = MockApi();
     when(
       () => mockApi.apiV1GroupsGroupIdDisplaysPost(
@@ -69,7 +73,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.enterText(find.widgetWithText(TextField, '名前'), '黒板横');
+    await tester.enterText(find.widgetWithText(TextField, '名前（任意）'), name);
     await tester.pump();
     await tester.tap(find.widgetWithText(FilledButton, '登録'));
     await tester.pumpAndSettle();
@@ -94,5 +98,16 @@ void main() {
       find.text('コードが違うか、期限が切れています。ディスプレイの QR コードを読み取り直してください。'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('名前は空のままでも登録できる', (tester) async {
+    await pumpPage(tester, 201, name: '');
+
+    verify(
+      () => mockApi.apiV1GroupsGroupIdDisplaysPost(
+        groupId: 'g1',
+        body: const DisplayCreateJson(code: '482913', name: ''),
+      ),
+    ).called(1);
   });
 }

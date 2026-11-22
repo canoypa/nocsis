@@ -35,10 +35,7 @@ class _DisplayRegisterPageState extends ConsumerState<DisplayRegisterPage> {
   bool get _canSubmit {
     final name = _name.text.trim();
     // backend と同じく UTF-16 の長さで数える
-    return !_submitting &&
-        _selected != null &&
-        name.isNotEmpty &&
-        name.length <= 50;
+    return !_submitting && _selected != null && name.length <= 50;
   }
 
   Future<void> _submit() async {
@@ -145,7 +142,7 @@ class _DisplayRegisterPageState extends ConsumerState<DisplayRegisterPage> {
                 onChanged: (_) => setState(() {}),
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: '名前',
+                  labelText: '名前（任意）',
                 ),
               ),
               if (_error != null) ...[

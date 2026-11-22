@@ -318,7 +318,7 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
   bool get _canSubmit =>
       !_submitting &&
       RegExp(r'^\d{6}$').hasMatch(_code.text) &&
-      _isValidName(_name.text);
+      (_name.text.trim().isEmpty || _isValidName(_name.text));
 
   @override
   void dispose() {
@@ -370,32 +370,22 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      icon: const Icon(Symbols.tv),
       title: const Text('コードで登録'),
       content: SizedBox(
-        width: 400,
+        width: _CodeField.width,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('ディスプレイに表示されている 6 桁のコードを入力してください。'),
-            const SizedBox(height: 16),
-            TextField(
+            const Text('ディスプレイに表示されているコードを入力してください。'),
+            const SizedBox(height: 24),
+            _CodeField(
               controller: _code,
-              autofocus: true,
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(6),
-              ],
+              errorText: _error,
               onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: 'コード',
-                errorText: _error,
-                errorMaxLines: 3,
-              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 40),
             TextField(
               controller: _name,
               maxLength: 50,
@@ -403,7 +393,7 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
               onSubmitted: (_) => _canSubmit ? _submit() : null,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: '名前',
+                labelText: '名前（任意）',
               ),
             ),
           ],
@@ -418,6 +408,130 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
           onPressed: _canSubmit ? _submit : null,
           child: const Text('登録'),
         ),
+      ],
+    );
+  }
+}
+
+/// 入力欄は1つのまま、見た目だけ6マスに描く。貼り付けや削除を普通の入力欄のまま扱える
+class _CodeField extends StatefulWidget {
+  static const length = 6;
+  static const _boxWidth = 56.0;
+  static const _gap = 8.0;
+  static const _groupGap = 24.0;
+  static const width = _boxWidth * length + _gap * (length - 2) + _groupGap;
+
+  final TextEditingController controller;
+  final String? errorText;
+  final ValueChanged<String> onChanged;
+
+  const _CodeField({
+    required this.controller,
+    required this.errorText,
+    required this.onChanged,
+  });
+
+  @override
+  State<_CodeField> createState() => _CodeFieldState();
+}
+
+class _CodeFieldState extends State<_CodeField> {
+  final _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final text = widget.controller.text;
+    final hasError = widget.errorText != null;
+    final current = _focusNode.hasFocus
+        ? text.length.clamp(0, _CodeField.length - 1)
+        : null;
+
+    Widget box(int i) {
+      final isCurrent = i == current;
+      final color = hasError
+          ? colorScheme.error
+          : isCurrent
+          ? colorScheme.primary
+          : colorScheme.outline;
+
+      return Container(
+        width: _CodeField._boxWidth,
+        height: 64,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: color, width: isCurrent ? 2 : 1),
+        ),
+        child: Text(
+          i < text.length ? text[i] : '',
+          style: textTheme.headlineMedium,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Stack(
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < _CodeField.length; i++) ...[
+                  if (i > 0)
+                    SizedBox(
+                      width: i == 3 ? _CodeField._groupGap : _CodeField._gap,
+                    ),
+                  box(i),
+                ],
+              ],
+            ),
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0,
+                child: TextField(
+                  controller: widget.controller,
+                  focusNode: _focusNode,
+                  autofocus: true,
+                  showCursor: false,
+                  keyboardType: TextInputType.number,
+                  autofillHints: const [AutofillHints.oneTimeCode],
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(_CodeField.length),
+                  ],
+                  onChanged: widget.onChanged,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    labelText: 'コード',
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (hasError)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              widget.errorText!,
+              style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
+            ),
+          ),
       ],
     );
   }
