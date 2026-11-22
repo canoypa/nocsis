@@ -365,9 +365,7 @@ class ChangeEmailDialogState extends ConsumerState<ChangeEmailDialog> {
           '1. 新しいメールアドレスを入力して、「確認する」を押してください。\n2. 入力したメールアドレス宛に確認のメールが届きます。メールに含まれるリンクを開いて、メールアドレスの変更を完了してください。',
         ),
         const SizedBox(height: 8),
-        const Text(
-          '※ 連携している Google アカウントは変更されません。\n※ 「新しいメールアドレスでログインできるようになりました」と表示されますが、現在 Google アカウント以外でログインする方法はないため、この内容は無視してください。',
-        ),
+        const Text('※ 連携している Google アカウントは変更されません。'),
         SizedBox(height: _isCompact(context) ? 24 : 48),
         TextField(
           autofocus: true,
