@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm java
       - name: Get pnpm store directory
@@ -66,7 +66,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm java
       - name: Get pnpm store directory
@@ -108,7 +108,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm java
       - name: Get pnpm store directory
@@ -150,7 +150,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: flutter
       - name: Setup pub cache
@@ -205,7 +205,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm java flutter
       - name: Get pnpm store directory
