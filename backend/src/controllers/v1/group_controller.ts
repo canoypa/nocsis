@@ -21,8 +21,10 @@ const paramSchema = z
     description: "グループのIDを指定するパラメータ",
   });
 
+// カレンダー ID は運用者が Firestore で設定する。共通のサービスアカウントで読むので、
+// 管理者が変えられると、そのアカウントが読める別のグループのカレンダーまで読めてしまう
 const patchJsonSchema = groupSchema
-  .omit({ id: true })
+  .omit({ id: true, classes_calendar_id: true, events_calendar_id: true })
   .partial()
   .refine((data) => Object.keys(data).length > 0)
   .meta({

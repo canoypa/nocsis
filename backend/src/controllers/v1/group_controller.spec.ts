@@ -176,8 +176,6 @@ describe("GroupController", () => {
         },
         body: JSON.stringify({
           name: "Updated Test Name",
-          classes_calendar_id: "updated_classes_calendar_id",
-          events_calendar_id: "updated_events_calendar_id",
           dayduty_start_date: "2099-12-31",
           slack_event_channel_id: "updated_slack_event_channel_id",
           weather_point: { lat: 99, lon: 99 },
@@ -189,8 +187,8 @@ describe("GroupController", () => {
       expect(body).toEqual({
         id: "test_group_1",
         name: "Updated Test Name",
-        classes_calendar_id: "updated_classes_calendar_id",
-        events_calendar_id: "updated_events_calendar_id",
+        classes_calendar_id: "classes_calendar_id",
+        events_calendar_id: "events_calendar_id",
         dayduty_start_date: "2099-12-31",
         slack_event_channel_id: "updated_slack_event_channel_id",
         weather_point: { lat: 99, lon: 99 },
@@ -225,6 +223,56 @@ describe("GroupController", () => {
       });
     });
 
+    describe("カレンダー ID を送った場合", () => {
+      it("ほかの項目だけ更新し、カレンダー ID は変えないこと", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name: "Updated Test Name",
+            classes_calendar_id: "other_classes_calendar_id",
+            events_calendar_id: "other_events_calendar_id",
+          }),
+        });
+        const body = await response.json();
+
+        expect(response.status).toBe(200);
+        expect(body).toMatchObject({
+          name: "Updated Test Name",
+          classes_calendar_id: "classes_calendar_id",
+          events_calendar_id: "events_calendar_id",
+        });
+
+        const snapshot = await firestore
+          .collection("groups")
+          .doc("test_group_1")
+          .get();
+        expect(snapshot.get("classes_calendar_id")).toBe("classes_calendar_id");
+        expect(snapshot.get("events_calendar_id")).toBe("events_calendar_id");
+      });
+
+      it("カレンダー ID だけなら400エラーになること", async () => {
+        const response = await app.request("/api/v1/groups/test_group_1", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${loginResult.idToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            classes_calendar_id: "other_classes_calendar_id",
+            events_calendar_id: "other_events_calendar_id",
+          }),
+        });
+
+        expect(response.status).toBe(400);
+      });
+    });
+
     describe("グループが存在しない場合", async () => {
       it("404エラーになること", async () => {
         const response = await app.request("/api/v1/groups/test_group_2", {
@@ -236,8 +284,6 @@ describe("GroupController", () => {
           },
           body: JSON.stringify({
             name: "Updated Test Name",
-            classes_calendar_id: "updated_classes_calendar_id",
-            events_calendar_id: "updated_events_calendar_id",
             dayduty_start_date: "2099-12-31",
             slack_event_channel_id: "updated_slack_event_channel_id",
             weather_point: { lat: 99, lon: 99 },
@@ -341,8 +387,6 @@ describe("GroupController", () => {
           },
           body: JSON.stringify({
             name: "Updated Test Name",
-            classes_calendar_id: "updated_classes_calendar_id",
-            events_calendar_id: "updated_events_calendar_id",
             dayduty_start_date: "2099-12-31",
             slack_event_channel_id: "updated_slack_event_channel_id",
             weather_point: { lat: 99, lon: 99 },
@@ -398,8 +442,6 @@ describe("GroupController", () => {
           },
           body: JSON.stringify({
             name: "Updated Test Name",
-            classes_calendar_id: "updated_classes_calendar_id",
-            events_calendar_id: "updated_events_calendar_id",
             dayduty_start_date: "2099-12-31",
             slack_event_channel_id: "updated_slack_event_channel_id",
             weather_point: { lat: 99, lon: 99 },
@@ -421,8 +463,6 @@ describe("GroupController", () => {
           },
           body: JSON.stringify({
             name: "Updated Test Name",
-            classes_calendar_id: "updated_classes_calendar_id",
-            events_calendar_id: "updated_events_calendar_id",
             dayduty_start_date: "2099-12-31",
             slack_event_channel_id: "updated_slack_event_channel_id",
             weather_point: { lat: 99, lon: 99 },
