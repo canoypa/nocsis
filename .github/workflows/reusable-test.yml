@@ -167,10 +167,12 @@ jobs:
         run: flutter test --coverage
       - name: Check coverage threshold
         env:
-          THRESHOLD: "15"
+          THRESHOLD: "29"
         run: |
           # 計測対象が 0 行のときは 0% ではなく計測失敗として扱う。
           pct=$(awk -F: '
+            /^SF:/ { generated = ($2 ~ /\.g\.dart$/ || $2 ~ /^lib\/generated\//) }
+            generated { next }
             /^LF:/ { lf += $2 }
             /^LH:/ { lh += $2 }
             END { if (lf == 0) exit 1; printf "%.2f", (lh / lf) * 100 }
