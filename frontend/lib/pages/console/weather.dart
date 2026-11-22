@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/components/page_title.dart';
 
 class ConsoleWeatherPage extends StatelessWidget {
   const ConsoleWeatherPage({super.key});
@@ -12,14 +13,11 @@ class ConsoleWeatherPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('気象データ連携', style: Theme.of(context).textTheme.displayMedium),
+            const PageTitle('気象データ連携'),
             const SizedBox(height: 24),
             const Text('気象データの取得に関する設定を行えます。'),
             const SizedBox(height: 48),
-            Text(
-              '気象データを取得する地点',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            const SectionTitle('気象データを取得する地点'),
             const SizedBox(height: 24),
             const Text('天気/降水確率データを取得する地点の緯度経度を入力してください。'),
             const SizedBox(height: 24),
