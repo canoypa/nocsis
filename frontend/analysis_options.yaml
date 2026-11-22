@@ -9,6 +9,10 @@ analyzer:
     - "**/*/*.g.dart"
     - build/**
     - web/**
+    # packages は同じ解析に入れない。入れるとプラグインの指摘が lib や test に出なくなる
+    - packages/**
 
 plugins:
   riverpod_lint: 3.2.0
+  nocsis_lints:
+    path: packages/nocsis_lints

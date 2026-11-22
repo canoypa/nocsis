@@ -1,0 +1,16 @@
+name: nocsis_lints
+description: nocsis の frontend の約束を検査する analyzer プラグイン
+publish_to: none
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  analysis_server_plugin: ^0.3.21
+  analyzer: ^14.3.0
+
+dev_dependencies:
+  analyzer_testing: ^0.4.1
+  lints: ^6.1.0
+  test: ^1.26.0
+  test_reflective_loader: ^0.2.0
