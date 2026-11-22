@@ -262,6 +262,69 @@ void main() {
     expect(selectedBox(tester), 2);
   });
 
+  Future<void> compose(
+    WidgetTester tester,
+    String text,
+    String composing,
+  ) async {
+    final value = text + composing;
+    tester.testTextInput.updateEditingValue(
+      TextEditingValue(
+        text: value,
+        selection: TextSelection.collapsed(offset: value.length),
+        composing: TextRange(start: text.length, end: value.length),
+      ),
+    );
+    await tester.pump();
+  }
+
+  Future<void> commit(WidgetTester tester, String text) async {
+    tester.testTextInput.updateEditingValue(
+      TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      ),
+    );
+    await tester.pump();
+  }
+
+  List<String> shownBoxes(WidgetTester tester) => [
+    for (final container in tester.widgetList<Container>(
+      find.descendant(
+        of: find.byType(CodeField),
+        matching: find.byType(Container),
+      ),
+    ))
+      if (container.decoration is BoxDecoration)
+        (container.child! as Text).data!,
+  ];
+
+  testWidgets('日本語入力で打ったかなは、変換中もマスに出さず、確定したら捨てる', (tester) async {
+    await pump(tester);
+    await type(tester, '12');
+
+    await compose(tester, '12', 'あい');
+    expect(shownBoxes(tester), ['1', '2', '', '', '', '']);
+
+    await commit(tester, '12あい');
+    expect(controller.text, '12');
+    expect(shownBoxes(tester), ['1', '2', '', '', '', '']);
+    expect(selectedBox(tester), 2);
+  });
+
+  testWidgets('日本語入力で打った数字は、変換中から選んだマスに出し、確定したら半角で入る', (tester) async {
+    await pump(tester);
+    await type(tester, '12');
+
+    await compose(tester, '12', '３４');
+    expect(shownBoxes(tester), ['1', '2', '3', '4', '', '']);
+
+    await commit(tester, '12３４');
+    expect(controller.text, '1234');
+    expect(shownBoxes(tester), ['1', '2', '3', '4', '', '']);
+    expect(selectedBox(tester), 4);
+  });
+
   testWidgets('フォーカスが入ると、入力済みの1つ後ろのマスを選ぶ', (tester) async {
     controller.text = '123';
     await pump(tester);
