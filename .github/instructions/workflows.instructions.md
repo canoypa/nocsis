@@ -16,6 +16,6 @@ paths:
 
 ## デプロイ経路自身が lint / test を待つ
 
-`deploy_prod.yml` / `deploy_stg.yml` の `needs` から lint / test を外さない。ruleset の required status check は admin が bypass できるうえ、`workflow_dispatch` は PR を経由しない。「lint / test を通ったものだけが本番に出る」をリポジトリ内で保証できるのは、この `needs` だけ。
+`deploy_prod.yml` の `needs` から lint / test を外さない。ruleset の required status check は admin が bypass できる。「lint / test を通ったものだけが本番に出る」をリポジトリ内で保証できるのは、この `needs` だけ。
 
-staging は本番と同じ経路を先に通すためのものなので、両者のゲートがずれると staging の意味が無くなる。
+`deploy_stg.yml` は速さを優先して、backend と frontend のデプロイは lint / test を待たない。ただし functions のデプロイは待つ。ここで Firestore のルールも出るので、テストを通っていないルールで本物のアカウントがある Staging のデータを開けないようにする。`workflow_dispatch` は PR を経由しないので、それを止められるのはこの `needs` だけ。
