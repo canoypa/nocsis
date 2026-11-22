@@ -24,7 +24,7 @@ class ConsoleTopPage extends ConsumerWidget {
             Text('かなり開発中です', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 48),
             OutlinedButton(
-              child: const Text('Classroom を起動する'),
+              child: const Text('教室ディスプレイを表示'),
               onPressed: () => ClassroomPageRoute(groupId).go(context),
             ),
           ],
