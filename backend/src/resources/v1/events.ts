@@ -13,7 +13,10 @@ const eventTimeSchema = z
       .optional()
       .meta({ description: "時刻のある予定の日時" }),
   })
-  .refine((time) => (time.date === undefined) !== (time.dateTime === undefined))
+  .refine(
+    (time) => (time.date === undefined) !== (time.dateTime === undefined),
+    { message: "date と dateTime のどちらか一方だけが必要です" },
+  )
   .meta({
     $id: "EventTime",
     description: "イベントの日付か日時。どちらか一方だけが入る",
