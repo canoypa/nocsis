@@ -7,18 +7,7 @@ import 'package:nocsis/components/select_group_menu.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
-
-enum _WindowSize {
-  compact,
-  medium,
-  large;
-
-  factory _WindowSize.of(double width) {
-    if (width < 600) return compact;
-    if (width < 1200) return medium;
-    return large;
-  }
-}
+import 'package:nocsis/core/window_size_class.dart';
 
 @Dependencies([currentGroupId])
 class DrawerLayout extends ConsumerWidget {
@@ -43,15 +32,15 @@ class DrawerLayout extends ConsumerWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return switch (_WindowSize.of(constraints.maxWidth)) {
-          _WindowSize.compact => _buildCompact(context, groupId),
-          _WindowSize.medium => _buildWithPane(
+        return switch (WindowSizeClass.fromWidth(constraints.maxWidth)) {
+          WindowSizeClass.compact => _buildCompact(context, groupId),
+          WindowSizeClass.medium || WindowSizeClass.expanded => _buildWithPane(
             context,
             groupId,
             navigation: _buildRail(context),
             contentPadding: 24,
           ),
-          _WindowSize.large => _buildWithPane(
+          WindowSizeClass.large => _buildWithPane(
             context,
             groupId,
             navigation: _buildDrawer(context),

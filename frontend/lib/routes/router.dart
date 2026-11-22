@@ -4,6 +4,7 @@ import 'package:animations/animations.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nocsis/core/route_access.dart';
+import 'package:nocsis/core/window_size_class.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
 import 'package:nocsis/pages/classroom.dart';
 import 'package:nocsis/pages/console/calendar.dart';

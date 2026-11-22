@@ -1,12 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter/services.dart';
+import 'package:nocsis/core/window_size_class.dart';
 
 class LoginForm extends StatefulWidget {
-  /// Material 3 の breakpoint の境目
-  static const mediumBreakpoint = 600.0;
-  static const expandedBreakpoint = 840.0;
-
   /// 大きい画面で入力欄やボタンが横に間延びしないよう、中身の幅を抑える
   static const maxWidth = 412.0;
 
@@ -92,9 +89,9 @@ class _LoginFormState extends State<LoginForm> {
   Widget _intro() {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    final width = MediaQuery.sizeOf(context).width;
-    final compact = width < LoginForm.mediumBreakpoint;
-    final expanded = width >= LoginForm.expandedBreakpoint;
+    final sizeClass = WindowSizeClass.of(context);
+    final compact = sizeClass == WindowSizeClass.compact;
+    final expanded = sizeClass >= WindowSizeClass.expanded;
     final description = widget.description;
 
     return Column(

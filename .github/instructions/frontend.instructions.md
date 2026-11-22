@@ -38,6 +38,10 @@ paths:
 
 要素のあいだに `SizedBox` を挟んで個別に調整するのは避ける。挟みたくなったら、まとまりの分け方を見直す。
 
+## 幅の判定は `WindowSizeClass` で行う
+
+幅で布置を変えるときは、`lib/core/window_size_class.dart` の `WindowSizeClass` を読む。境目の数値を画面ごとに書くと、M3 の window size class とずれたまま増える。
+
 ## 画面を足したら、本物のルーターで URL を開くテストも書く
 
 画面のウィジェットを `pumpWidget` するテストとは別に、`routerProvider` でその画面の URL を開き、その URL に留まることを確かめるテストを 1 つ書く (`test/routes/router_test.dart` の `pumpRouter`)。

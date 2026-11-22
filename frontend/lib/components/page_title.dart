@@ -1,10 +1,9 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:nocsis/core/window_size_class.dart';
 
 /// Display は大きい画面向けの役割なので、狭い幅では Headline に下げる
-const _largeWidth = 1200;
-
 bool _isLarge(BuildContext context) =>
-    MediaQuery.sizeOf(context).width >= _largeWidth;
+    WindowSizeClass.of(context) >= WindowSizeClass.large;
 
 class PageTitle extends StatelessWidget {
   final String text;
