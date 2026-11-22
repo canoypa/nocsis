@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:nocsis/generated/api_client/api.models.swagger.dart';
@@ -23,8 +25,11 @@ class DisplayPairingPage extends ConsumerStatefulWidget {
 
 class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
   static const _pollInterval = Duration(seconds: 3);
+  // QR を読んで名前を入れているあいだに切れないよう、期限より前に出し直す
+  static const _reissueMargin = Duration(minutes: 2);
 
   DisplayPairing? _pairing;
+  DateTime? _reissueAt;
   Timer? _timer;
   bool _polling = false;
 
@@ -42,19 +47,19 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
   }
 
   Future<void> _start() async {
-    final auth = ref.read(firebaseAuthProvider);
-    final user = auth.currentUser;
+    final user = ref.read(firebaseAuthProvider).currentUser;
 
     // 人のアカウントのまま表示するときは、コンソールの「この端末で表示」を使う
     if (user != null && !user.isAnonymous) {
       if (mounted) context.go('/');
       return;
     }
-    if (user == null) {
-      await auth.signInAnonymously();
-    }
+
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(displayDeviceKey, true);
 
     await _poll();
+    if (!mounted) return;
     _timer = Timer.periodic(_pollInterval, (_) => _poll());
   }
 
@@ -63,6 +68,7 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
     _polling = true;
 
     try {
+      await _signIn();
       final client = await ref.read(apiClientProvider.future);
 
       final me = await client.apiV1MeGet();
@@ -76,11 +82,15 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
         return;
       }
 
-      final pairing = _pairing;
-      if (pairing == null || !pairing.expiresAt.isAfter(DateTime.now())) {
+      final reissueAt = _reissueAt;
+      if (reissueAt == null || !DateTime.now().isBefore(reissueAt)) {
         final issued = await client.apiV1DisplayPairingsPost();
-        if (issued.isSuccessful && mounted) {
-          setState(() => _pairing = issued.body);
+        final pairing = issued.body;
+        if (issued.isSuccessful && pairing != null && mounted) {
+          setState(() {
+            _pairing = pairing;
+            _reissueAt = _localReissueAt(pairing, issued.base.headers['date']);
+          });
         }
       }
     } catch (_) {
@@ -88,6 +98,34 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
     } finally {
       _polling = false;
     }
+  }
+
+  /// 登録を解除された端末は、アカウントがサーバで消えている。消えたアカウントの
+  /// コードは登録できないので、作り直す
+  Future<void> _signIn() async {
+    final auth = ref.read(firebaseAuthProvider);
+    final user = auth.currentUser;
+
+    if (user != null) {
+      try {
+        await user.reload();
+        return;
+      } on FirebaseAuthException catch (e) {
+        if (e.code != 'user-not-found' && e.code != 'user-disabled') rethrow;
+        await auth.signOut();
+      }
+    }
+
+    await auth.signInAnonymously();
+    ref.invalidate(apiClientProvider);
+  }
+
+  /// 期限はサーバの時刻なので、端末の時計がずれていても効くよう、残り時間に直して数える
+  DateTime _localReissueAt(DisplayPairing pairing, String? serverDate) {
+    final serverNow = serverDate == null ? null : _parseHttpDate(serverDate);
+    final remaining = pairing.expiresAt.difference(serverNow ?? DateTime.now());
+
+    return DateTime.now().add(remaining - _reissueMargin);
   }
 
   @override
@@ -305,3 +343,14 @@ class _CodeDigits extends StatelessWidget {
     );
   }
 }
+
+DateTime? _parseHttpDate(String value) {
+  try {
+    return parseHttpDate(value);
+  } on FormatException {
+    return null;
+  }
+}
+
+/// 一度でも待ち受けを開いた端末。サインアウトされたら、ログインではなくここへ戻す
+const displayDeviceKey = 'display_device';
