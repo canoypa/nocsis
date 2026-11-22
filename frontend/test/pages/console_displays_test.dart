@@ -135,7 +135,7 @@ void main() {
     await tester.tap(find.text('コードで登録'));
     await tester.pumpAndSettle();
     await tester.enterText(find.widgetWithText(TextField, 'コード'), '123456');
-    await tester.enterText(find.widgetWithText(TextField, '名前'), ' 前方 ');
+    await tester.enterText(find.widgetWithText(TextField, '名前（任意）'), ' 前方 ');
     await tester.pump();
     await tester.tap(find.widgetWithText(TextButton, '登録'));
     await tester.pumpAndSettle();
@@ -147,5 +147,29 @@ void main() {
       ),
     ).called(1);
     expect(find.text('コードが違うか、期限が切れています。ディスプレイのコードを確かめてください。'), findsOneWidget);
+  });
+
+  testWidgets('名前は空のままでも登録できる', (tester) async {
+    when(
+      () => mockApi.apiV1GroupsGroupIdDisplaysPost(
+        groupId: 'g1',
+        body: any(named: 'body'),
+      ),
+    ).thenAnswer((_) async => _response(201));
+    await pumpPage(tester);
+
+    await tester.tap(find.text('コードで登録'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'コード'), '123456');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(TextButton, '登録'));
+    await tester.pumpAndSettle();
+
+    verify(
+      () => mockApi.apiV1GroupsGroupIdDisplaysPost(
+        groupId: 'g1',
+        body: const DisplayCreateJson(code: '123456', name: ''),
+      ),
+    ).called(1);
   });
 }

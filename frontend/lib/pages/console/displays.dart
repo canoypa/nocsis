@@ -318,7 +318,7 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
   bool get _canSubmit =>
       !_submitting &&
       RegExp(r'^\d{6}$').hasMatch(_code.text) &&
-      _isValidName(_name.text);
+      (_name.text.trim().isEmpty || _isValidName(_name.text));
 
   @override
   void dispose() {
@@ -393,7 +393,7 @@ class _RegisterDialogState extends ConsumerState<_RegisterDialog> {
               onSubmitted: (_) => _canSubmit ? _submit() : null,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: '名前',
+                labelText: '名前（任意）',
               ),
             ),
           ],
