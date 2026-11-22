@@ -1,12 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:nocsis/components/account_menu.dart';
 import 'package:nocsis/generated/api_client/api.enums.swagger.dart';
 import 'package:nocsis/providers/auth.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/me.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([currentGroupId])
 void main() {
   Future<void> openMenu(WidgetTester tester, Set<Permission> granted) async {
     await tester.pumpWidget(
@@ -54,5 +57,47 @@ void main() {
 
     expect(find.text('管理コンソール'), findsOneWidget);
     expect(find.text('教室ディスプレイを表示'), findsOneWidget);
+  });
+
+  testWidgets('項目を押すとメニューを閉じる', (tester) async {
+    final router = GoRouter(
+      routes: [
+        ShellRoute(
+          builder: (_, _, child) => Scaffold(
+            appBar: AppBar(actions: const [AccountMenu()]),
+            body: child,
+          ),
+          routes: [
+            GoRoute(path: '/', builder: (_, _) => const SizedBox()),
+            GoRoute(
+              path: '/groups/:groupId/settings',
+              builder: (_, _) => const SizedBox(),
+            ),
+          ],
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          currentGroupIdProvider.overrideWithValue('g1'),
+          currentUidProvider.overrideWithValue('u1'),
+          groupPermissionsProvider(
+            'u1',
+            'g1',
+          ).overrideWith((ref) async => {Permission.groupRead}),
+          authProvider.overrideWith((ref) => const Stream.empty()),
+        ],
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(IconButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('設定'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('設定'), findsNothing);
   });
 }
