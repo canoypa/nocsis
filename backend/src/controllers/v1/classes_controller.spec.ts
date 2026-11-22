@@ -95,161 +95,50 @@ describe("ClassesController", () => {
       });
     });
 
-    it("終日イベント（時刻なし授業）を正常に処理できること", async () => {
-      mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
-        items: [
-          {
-            summary: "終日授業",
-            start: { date: "2024-01-01" },
-            end: { date: "2024-01-02" },
-          },
-        ],
-      });
-
-      const response = await app.request(
-        "/api/v1/groups/test_group_1/classes?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z",
-        {
-          headers: {
-            Authorization: `Bearer ${loginResult.idToken}`,
-            Accept: "application/json",
-          },
+    it.each([
+      {
+        name: "終日の予定",
+        item: {
+          summary: "テスト期間",
+          start: { date: "2024-01-01" },
+          end: { date: "2024-01-02" },
         },
-      );
-
-      const body = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(body.items).toHaveLength(1);
-      expect(body.items[0]).toEqual({
-        startAt: "2024-01-01T00:00:00.000+09:00",
-        endAt: "2024-01-02T00:00:00.000+09:00",
-        title: "終日授業",
-        period: 1,
-      });
-    });
-
-    it("時刻指定イベントと終日イベントが混在する場合も正常に処理できること", async () => {
-      mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
-        items: [
-          {
-            summary: "1限目",
-            start: { dateTime: "2024-01-01T09:00:00+09:00" },
-            end: { dateTime: "2024-01-01T10:30:00+09:00" },
-          },
-          {
-            summary: "終日授業",
-            start: { date: "2024-01-01" },
-            end: { date: "2024-01-02" },
-          },
-        ],
-      });
-
-      const response = await app.request(
-        "/api/v1/groups/test_group_1/classes?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z",
-        {
-          headers: {
-            Authorization: `Bearer ${loginResult.idToken}`,
-            Accept: "application/json",
-          },
+      },
+      { name: "日時のない予定", item: { summary: "日時なし" } },
+      {
+        name: "タイトルのない予定",
+        item: {
+          start: { dateTime: "2024-01-01T13:00:00+09:00" },
+          end: { dateTime: "2024-01-01T14:30:00+09:00" },
         },
-      );
+      },
+    ])(
+      "授業のカレンダーに $name があると500エラーになること",
+      async ({ item }) => {
+        mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
+          items: [
+            {
+              summary: "1限目",
+              start: { dateTime: "2024-01-01T09:00:00+09:00" },
+              end: { dateTime: "2024-01-01T10:30:00+09:00" },
+            },
+            item,
+          ],
+        });
 
-      const body = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(body.items).toHaveLength(2);
-      expect(body.items[0]).toEqual({
-        startAt: "2024-01-01T09:00:00.000+09:00",
-        endAt: "2024-01-01T10:30:00.000+09:00",
-        title: "1限目",
-        period: 1,
-      });
-      expect(body.items[1]).toEqual({
-        startAt: "2024-01-01T00:00:00.000+09:00",
-        endAt: "2024-01-02T00:00:00.000+09:00",
-        title: "終日授業",
-        period: 2,
-      });
-    });
-
-    it("日時のない授業があっても、ほかの授業を元の時限のまま返すこと", async () => {
-      mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
-        items: [
+        const response = await app.request(
+          "/api/v1/groups/test_group_1/classes?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z",
           {
-            summary: "1限目",
-            start: { dateTime: "2024-01-01T09:00:00+09:00" },
-            end: { dateTime: "2024-01-01T10:30:00+09:00" },
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+              Accept: "application/json",
+            },
           },
-          { summary: "日時なし" },
-          {
-            summary: "3限目",
-            start: { dateTime: "2024-01-01T13:00:00+09:00" },
-            end: { dateTime: "2024-01-01T14:30:00+09:00" },
-          },
-        ],
-      });
+        );
 
-      const response = await app.request(
-        "/api/v1/groups/test_group_1/classes?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z",
-        {
-          headers: {
-            Authorization: `Bearer ${loginResult.idToken}`,
-            Accept: "application/json",
-          },
-        },
-      );
-
-      expect(response.status).toBe(200);
-      expect(await response.json()).toEqual({
-        items: [
-          {
-            startAt: "2024-01-01T09:00:00.000+09:00",
-            endAt: "2024-01-01T10:30:00.000+09:00",
-            title: "1限目",
-            period: 1,
-          },
-          {
-            startAt: "2024-01-01T13:00:00.000+09:00",
-            endAt: "2024-01-01T14:30:00.000+09:00",
-            title: "3限目",
-            period: 3,
-          },
-        ],
-      });
-    });
-
-    it("タイトルのない授業も返すこと", async () => {
-      mockFetchGoogleCalendarEvents.mockResolvedValueOnce({
-        items: [
-          {
-            start: { dateTime: "2024-01-01T09:00:00+09:00" },
-            end: { dateTime: "2024-01-01T10:30:00+09:00" },
-          },
-        ],
-      });
-
-      const response = await app.request(
-        "/api/v1/groups/test_group_1/classes?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z",
-        {
-          headers: {
-            Authorization: `Bearer ${loginResult.idToken}`,
-            Accept: "application/json",
-          },
-        },
-      );
-
-      expect(response.status).toBe(200);
-      expect(await response.json()).toEqual({
-        items: [
-          {
-            startAt: "2024-01-01T09:00:00.000+09:00",
-            endAt: "2024-01-01T10:30:00.000+09:00",
-            title: "",
-            period: 1,
-          },
-        ],
-      });
-    });
+        expect(response.status).toBe(500);
+      },
+    );
 
     describe("グループが存在しない場合", () => {
       it("404エラーになること", async () => {

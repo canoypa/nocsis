@@ -118,30 +118,34 @@ classesRoutes.get(
     });
     assert(events.items, "イベントが存在しません。");
 
-    // 1件の不備で、ほかの授業まで見えなくしない。時限は除いた分を詰めずに数える
-    const classes = events.items.flatMap((item, index) => {
-      const startAt = DateTime.fromISO(
-        item.start?.dateTime || item.start?.date || "",
-        { zone: AppConfig.TIMEZONE },
-      );
-      const endAt = DateTime.fromISO(
-        item.end?.dateTime || item.end?.date || "",
-        { zone: AppConfig.TIMEZONE },
-      );
+    const classes = events.items.map((item, index) => {
+      // 終日の予定を授業に数えると、後ろの時限がずれる
+      const startDate = item.start?.dateTime;
+      const endDate = item.end?.dateTime;
 
-      if (!startAt.isValid || !endAt.isValid) {
-        console.warn("授業の日時が読めないので除きます:", item.summary);
-        return [];
+      if (!startDate || !endDate) {
+        throw new HTTPException(500, {
+          message: "イベントの開始日時または終了日時が取得できませんでした。",
+        });
       }
 
-      return [
-        classSchema.parse({
-          startAt: startAt.toISO(),
-          endAt: endAt.toISO(),
-          title: item.summary || "",
-          period: index + 1,
-        }),
-      ];
+      const startAt = DateTime.fromISO(startDate, {
+        zone: AppConfig.TIMEZONE,
+      });
+      const endAt = DateTime.fromISO(endDate, { zone: AppConfig.TIMEZONE });
+
+      if (!startAt.isValid || !endAt.isValid) {
+        throw new HTTPException(500, {
+          message: "日時の変換に失敗しました。",
+        });
+      }
+
+      return classSchema.parse({
+        startAt: startAt.toISO(),
+        endAt: endAt.toISO(),
+        title: item.summary,
+        period: index + 1,
+      });
     });
 
     return c.json<ClassesResponse>({
