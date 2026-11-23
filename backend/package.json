@@ -16,7 +16,7 @@
   "dependencies": {
     "@google-cloud/secret-manager": "^8.0.0",
     "@googleapis/calendar": "^20.2.0",
-    "@hono/node-server": "^2.1.9",
+    "@hono/node-server": "^2.1.11",
     "@hono/standard-validator": "^0.4.1",
     "@jridgewell/trace-mapping": "^0.3.31",
     "@scalar/hono-api-reference": "^0.12.23",
