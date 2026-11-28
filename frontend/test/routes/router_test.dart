@@ -89,7 +89,7 @@ void main() {
           meProvider(auth.currentUser!.uid).overrideWith((ref) async => me),
         // 教室の画面の時計は、止められない待ちで回り続ける
         for (final format in ['* * * * *', '*/15 * * * *', '0 0 * * *'])
-          cronProvider(format).overrideWith((ref) => const Stream.empty()),
+          cronProvider(format).overrideWithValue(DateTime(2026)),
       ],
     );
     addTearDown(container.dispose);
