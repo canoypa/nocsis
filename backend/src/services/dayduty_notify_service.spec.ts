@@ -130,9 +130,12 @@ describe("日直の通知", () => {
     it("トークンはキャッシュせずに読むこと", async () => {
       await notifyDayduty(GROUP_ID, jst("2025-01-02"));
 
+      // キャッシュは Secret Manager を読む関数の中にあり、ここでは差し替えているので、渡す指定を見る
       expect(fetchSecret).toHaveBeenCalledWith(
         `group_${GROUP_ID}-slack_token`,
-        { cache: false },
+        {
+          cache: false,
+        },
       );
     });
 

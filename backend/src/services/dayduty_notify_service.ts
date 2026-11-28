@@ -3,7 +3,10 @@ import type { DateTime } from "luxon";
 
 import { firestore } from "../clients/firebase.js";
 import { AppConfig } from "../config/app_config.js";
-import { getDaydutyOfDay } from "./dayduty_service.js";
+import {
+  DaydutyNotConfiguredError,
+  getDaydutyOfDay,
+} from "./dayduty_service.js";
 import { fetchSecret } from "./secret_manager_service.js";
 
 /** gRPC の NOT_FOUND。Secret がない */
@@ -50,9 +53,11 @@ export const notifyDayduty = async (
       .flatMap(slackUserOf),
   );
 
-  // 呼び手の Scheduler と Hosting は 60 秒で切るので、Slack の再試行で待たない
+  // 呼び手の Scheduler と Hosting は 60 秒で切るので、Slack の再試行や rate limit の解除を待たない
   const slack = new WebClient(await slackToken(groupId), {
     retryConfig: { retries: 0 },
+    rejectRateLimitedCalls: true,
+    timeout: 10_000,
   });
   const names = members.map((m) => `${m.name}さん`).join("、");
   const results = await Promise.allSettled(
@@ -102,7 +107,16 @@ export const notifyAllDayduty = async (
         await notifyDayduty(group.id, today);
         return [];
       } catch (err) {
-        if (err instanceof SlackNotConfiguredError) return [];
+        if (
+          err instanceof DaydutyNotConfiguredError ||
+          err instanceof SlackNotConfiguredError
+        ) {
+          console.warn("日直を知らせられないグループを飛ばしました", {
+            group: group.id,
+            reason: err.message,
+          });
+          return [];
+        }
         console.error("日直の通知に失敗しました", { group: group.id, err });
         return [group.id];
       }
