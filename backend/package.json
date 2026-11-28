@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsup src/main.ts --clean --format esm --sourcemap",
+    "build": "tsup --entry.main src/main.ts --entry.source_map_worker src/services/source_map_worker.ts --clean --format esm --sourcemap",
     "generate-openapi": "tsx scripts/generate_openapi.ts",
     "grant": "tsx scripts/grant.ts",
     "revoke": "tsx scripts/revoke.ts",
