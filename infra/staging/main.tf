@@ -19,6 +19,8 @@ module "nocsis" {
 
   project_id = "nocsis-development"
 
+  backend_url = "https://nocsis-development.web.app"
+
   auth_authorized_domains      = ["nocsis-development.firebaseapp.com", "nocsis-development.web.app"]
   auth_email_password_required = true
   auth_google_client_id        = "862064818225-50oucenghkua7qb7hqlpm6vfqp20b6h7.apps.googleusercontent.com"

@@ -13,6 +13,16 @@ export const AppConfig = {
   REPOSITORY_URL: "https://github.com/canoypa/nocsis",
 
   /**
+   * Cloud Scheduler がジョブを呼ぶときに使う SA の account_id。infra の Terraform と合わせる
+   */
+  JOB_SERVICE_ACCOUNT: "backend-jobs",
+
+  /**
+   * ジョブを呼ぶ OIDC トークンの audience。infra の Terraform と合わせる
+   */
+  JOB_TOKEN_AUDIENCE: "nocsis-backend-jobs",
+
+  /**
    * フロントエンドのソースマップを置くバケットの名前の末尾。`<プロジェクト ID>-` に続ける
    */
   SOURCE_MAP_BUCKET_SUFFIX: "frontend-source-maps",
