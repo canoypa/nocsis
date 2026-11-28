@@ -21,7 +21,7 @@
     "@hono/node-server": "^2.1.11",
     "@hono/standard-validator": "^0.4.1",
     "@jridgewell/trace-mapping": "^0.3.31",
-    "@scalar/hono-api-reference": "^0.12.24",
+    "@scalar/hono-api-reference": "^0.12.25",
     "firebase-admin": "^14.5.1",
     "google-auth-library": "^11.3.4",
     "hono": "^4.13.22",
@@ -32,8 +32,8 @@
   "devDependencies": {
     "@firebase/rules-unit-testing": "^6.0.0",
     "@types/luxon": "^3.7.6",
-    "@types/node": "^24.19.3",
-    "@vitest/coverage-v8": "5.1.1",
+    "@types/node": "^24.19.4",
+    "@vitest/coverage-v8": "5.1.2",
     "firebase": "^13.4.0",
     "firebase-tools": "^15.37.0",
     "msw": "^3.0.7",
@@ -43,7 +43,7 @@
     "tsup": "^9.0.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.0",
-    "vitest": "^5.1.1"
+    "vitest": "^5.1.2"
   },
   "packageManager": "pnpm@12.20.0"
 }

@@ -125,7 +125,6 @@ class _DisplayPairingPageState extends ConsumerState<DisplayPairingPage> {
     // やめた直後に問い合わせが終わると、消したアカウントを作り直してしまう
     if (_leaving) return;
     await auth.signInAnonymously();
-    ref.invalidate(apiClientProvider);
   }
 
   Future<void> _cancel() async {

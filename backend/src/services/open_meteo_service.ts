@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { createPromiseCache } from "./promise_cache.js";
+
 export type WeatherData = {
   current: { temp: number; weatherCode: number };
   /** 3時間ごと、24時間先までの予報 */
@@ -31,38 +33,22 @@ const FORECAST_SLOTS = 8;
 
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const FAILURE_CACHE_TTL_MS = 60 * 1000;
+const CACHE_MAX_ENTRIES = 500;
 const FETCH_TIMEOUT_MS = 10 * 1000;
 
-const cache = new Map<
-  string,
-  { expiresAt: number; data: Promise<WeatherData> }
->();
+const cache = createPromiseCache<WeatherData>({
+  ttlMs: CACHE_TTL_MS,
+  failureTtlMs: FAILURE_CACHE_TTL_MS,
+  maxEntries: CACHE_MAX_ENTRIES,
+});
 
 /**
  * 天気情報を地点ごとにキャッシュして返す
  */
 export const fetchWeather = (
   params: FetchWeatherParams,
-): Promise<WeatherData> => {
-  const key = `${params.lat},${params.lon}`;
-  const now = Date.now();
-
-  const hit = cache.get(key);
-  if (hit && hit.expiresAt > now) return hit.data;
-
-  const data = fetchWeatherFromApi(params);
-  const entry = { expiresAt: now + CACHE_TTL_MS, data };
-  cache.set(key, entry);
-  // 失敗を TTL いっぱい残すと復旧後も長くエラーを返し、すぐ消すと API が制限中でも呼び続ける
-  data.catch(() => {
-    entry.expiresAt = Math.min(
-      entry.expiresAt,
-      Date.now() + FAILURE_CACHE_TTL_MS,
-    );
-  });
-
-  return data;
-};
+): Promise<WeatherData> =>
+  cache.get(`${params.lat},${params.lon}`, () => fetchWeatherFromApi(params));
 
 /**
  * テスト用: 天気のキャッシュを空にする

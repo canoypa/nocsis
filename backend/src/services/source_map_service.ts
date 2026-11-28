@@ -31,8 +31,6 @@ const MISS_LIMIT = 100;
 const misses = new Map<string, number>();
 
 const FETCH_TIMEOUT_MS = 5_000;
-// 3.5MB の解析は 1 vCPU で 1 秒もかからない。これを超えたら止まったとみなす
-const WORKER_TIMEOUT_MS = 10_000;
 
 /**
  * フロントエンドのソースマップを置くバケットの名前
@@ -55,8 +53,7 @@ type SourceMapWorker = {
   terminate: () => Promise<number>;
 };
 
-// 解析と引き当てはメインスレッドでしない。数 MB の JSON の解析と mappings の
-// 展開で 1 秒近く止まり、そのあいだほかの要求が待たされる。
+// 解析と引き当てはメインスレッドでしない。メインスレッドで解析すると、そのあいだほかの要求が待たされる。
 // src から動かすとき (テスト、tsx) は .ts を、ビルドしたものは dist の .js を読む。
 const WORKER_URL = new URL(
   import.meta.url.endsWith(".ts")
@@ -69,7 +66,6 @@ let currentWorker: SourceMapWorker | undefined;
 
 const startWorker = (): SourceMapWorker => {
   const worker = new Worker(WORKER_URL);
-  // 返事を待っていないあいだは、プロセスの終了を止めない
   worker.unref();
 
   let nextId = 0;
@@ -99,7 +95,6 @@ const startWorker = (): SourceMapWorker => {
     );
   });
   worker.on("exit", () => {
-    // 読み込んだソースマップはワーカーと一緒に消える。次の要求は新しいワーカーで読み込み直す
     if (currentWorker === self) currentWorker = undefined;
 
     for (const request of pending.values()) {
@@ -114,16 +109,9 @@ const startWorker = (): SourceMapWorker => {
       worker.postMessage({ id, command } satisfies SourceMapRequest, transfer);
       worker.ref();
 
-      // 返事が来ないまま要求を待たせない。止めれば、待っている要求はすべて exit で断る
-      const timeout = setTimeout(
-        worker.terminate.bind(worker),
-        WORKER_TIMEOUT_MS,
-      );
-      timeout.unref();
-
       return new Promise<OriginalPosition[] | null>((resolve, reject) => {
         pending.set(id, { resolve, reject });
-      }).finally(() => clearTimeout(timeout));
+      });
     },
     terminate: () => worker.terminate(),
   };
@@ -177,7 +165,7 @@ const load = async (
 ): Promise<OriginalPosition[] | null> => {
   try {
     const bytes = await download(commit, file);
-    // 読み込みと引き当てを 1 回で頼む。分けると、そのあいだにほかの読み込みで捨てられることがある
+    // 読み込みと引き当てを分けて頼まない。そのあいだに、ほかの読み込みで捨てられることがある
     return await sourceMapWorker().request(
       { type: "load", key, bytes, positions },
       [bytes],
