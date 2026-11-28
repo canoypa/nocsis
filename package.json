@@ -4,7 +4,8 @@
     "emulators:start": "firebase emulators:start --project demo-nocsis --import ./emulator_data --export-on-exit ./emulator_data"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.6.9",
-    "firebase-tools": "^15.37.0"
+    "firebase-tools": "^15.37.0",
+    "oxfmt": "^0.80.0",
+    "oxlint": "^1.95.0"
   }
 }
