@@ -193,6 +193,9 @@ importers:
       '@scalar/hono-api-reference':
         specifier: ^0.12.25
         version: 0.12.26(hono@4.13.23)
+      '@slack/web-api':
+        specifier: ^8.5.0
+        version: 8.5.0
       firebase-admin:
         specifier: ^14.5.1
         version: 14.5.1(@firebase/app-compat@0.5.23)(@firebase/app@0.16.7)(supports-color@7.2.0)
@@ -1776,6 +1779,18 @@ packages:
     resolution: {integrity: sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==}
     engines: {node: '>=10'}
 
+  '@slack/logger@5.0.0':
+    resolution: {integrity: sha512-VGXhmmgsAo9shdQYh4tFDndd+7nsgp0Y5h0UPDaUp8K359pBasI6YdkMqFW3mCOxLQkq09qj7o7cq6f3DuXcJQ==}
+    engines: {node: '>= 20', npm: '>=9.6.4'}
+
+  '@slack/types@3.3.1':
+    resolution: {integrity: sha512-F4JJd1SY5Nro1O6O4izMrBv0/IOpr+a8GGewr23tnP8zO1t9mWFLBjpNPv6nxuxhhw4JVRM9CPltBnLkZj7Ucw==}
+    engines: {node: '>= 20', npm: '>=9.6.4'}
+
+  '@slack/web-api@8.5.0':
+    resolution: {integrity: sha512-mbqNGN/geNqV4j0VB8pq/HR5RA2KpvwPxuSe3Y0VZtel9b419hZNeIyEx4aluuIaxXSEhEZiFnp0QniBsk8/SA==}
+    engines: {node: '>= 20', npm: '>=9.6.4'}
+
   '@so-ric/colorspace@1.1.6':
     resolution: {integrity: sha512-/KiKkpHNOBgkFJwu9sh48LkHSMYGyuTcSFK/qMBdnOAlrRJzRSXAOFB5qwzaVQuDl8wAvHVMkaASQDReTahxuw==}
 
@@ -1871,6 +1886,12 @@ packages:
 
   '@types/node@24.19.4':
     resolution: {integrity: sha512-s04odlR3ksJrLu7QLi+pddkWLD0RmSbcP9KuWn2/ozQKAp/YgwBC/6x9kJj8yAzZnGPfxePm7zm7nysVPCRagw==}
+
+  '@types/retry@0.12.0':
+    resolution: {integrity: sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==}
+
+  '@types/retry@0.12.5':
+    resolution: {integrity: sha512-3xSjTp3v03X/lSQLkczaN9UIEwJMoMCA1+Nb5HfbJEQWogdeQIyVtTvxPXDQjZ5zws8rFQfVfRdz03ARihPJgw==}
 
   '@types/set-cookie-parser@2.4.10':
     resolution: {integrity: sha512-GGmQVGpQWUe5qglJozEjZV/5dyxbOOZ0LHe/lqyWssB88Y4svNfst0uqBVscdDeIKl5Jy5+aPSvy7mI9tYRguw==}
@@ -2656,6 +2677,12 @@ packages:
   event-target-shim@5.0.1:
     resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
     engines: {node: '>=6'}
+
+  eventemitter3@4.0.7:
+    resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
+
+  eventemitter3@5.0.4:
+    resolution: {integrity: sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==}
 
   events-listener@1.1.0:
     resolution: {integrity: sha512-Kd3EgYfODHueq6GzVfs/VUolh2EgJsS8hkO3KpnDrxVjU3eq63eXM2ujXkhPP+OkeUOhL8CxdfZbQXzryb5C4g==}
@@ -3679,13 +3706,29 @@ packages:
     resolution: {integrity: sha512-ugZxsxmtTln604yeYd29EGrNhazN2lywetzpKhfmQjW/VJmhpDmWbiX+h0zL8V91R0UXkhb3KtPmyq9PZw3aYw==}
     engines: {node: '>=8'}
 
+  p-finally@1.0.0:
+    resolution: {integrity: sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==}
+    engines: {node: '>=4'}
+
   p-limit@3.1.0:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}
     engines: {node: '>=10'}
 
+  p-queue@6.6.2:
+    resolution: {integrity: sha512-RwFpb72c/BhQLEXIZ5K2e+AhgNVmIejGlTgiB9MzZ0e93GRvqZ7uSi0dvRF7/XIXDeNkra2fNHBxTyPDGySpjQ==}
+    engines: {node: '>=8'}
+
+  p-retry@4.6.2:
+    resolution: {integrity: sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==}
+    engines: {node: '>=8'}
+
   p-throttle@8.1.1:
     resolution: {integrity: sha512-xxWFBUyvbrQ10XC3VAr0SoXoOCKXqCX/yvbFIkBE98upphHFwjIKR6AId13ZH3jngFfF6yK43QTOtrngYAmFMA==}
     engines: {node: '>=20'}
+
+  p-timeout@3.2.0:
+    resolution: {integrity: sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==}
+    engines: {node: '>=8'}
 
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
@@ -5974,6 +6017,23 @@ snapshots:
 
   '@sindresorhus/is@4.6.0': {}
 
+  '@slack/logger@5.0.0':
+    dependencies:
+      '@types/node': 24.19.4
+
+  '@slack/types@3.3.1': {}
+
+  '@slack/web-api@8.5.0':
+    dependencies:
+      '@slack/logger': 5.0.0
+      '@slack/types': 3.3.1
+      '@types/node': 24.19.4
+      '@types/retry': 0.12.5
+      eventemitter3: 5.0.4
+      p-queue: 6.6.2
+      p-retry: 4.6.2
+      retry: 0.13.1
+
   '@so-ric/colorspace@1.1.6':
     dependencies:
       color: 5.0.3
@@ -6030,6 +6090,10 @@ snapshots:
   '@types/node@24.19.4':
     dependencies:
       undici-types: 7.24.6
+
+  '@types/retry@0.12.0': {}
+
+  '@types/retry@0.12.5': {}
 
   '@types/set-cookie-parser@2.4.10':
     dependencies:
@@ -6742,6 +6806,10 @@ snapshots:
   etag@1.8.1: {}
 
   event-target-shim@5.0.1: {}
+
+  eventemitter3@4.0.7: {}
+
+  eventemitter3@5.0.4: {}
 
   events-listener@1.1.0: {}
 
@@ -8063,12 +8131,28 @@ snapshots:
 
   p-defer@3.0.0: {}
 
+  p-finally@1.0.0: {}
+
   p-limit@3.1.0:
     dependencies:
       yocto-queue: 0.1.0
     optional: true
 
+  p-queue@6.6.2:
+    dependencies:
+      eventemitter3: 4.0.7
+      p-timeout: 3.2.0
+
+  p-retry@4.6.2:
+    dependencies:
+      '@types/retry': 0.12.0
+      retry: 0.13.1
+
   p-throttle@8.1.1: {}
+
+  p-timeout@3.2.0:
+    dependencies:
+      p-finally: 1.0.0
 
   package-json-from-dist@1.0.1: {}
 

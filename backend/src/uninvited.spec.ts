@@ -94,6 +94,7 @@ describe("どのグループにも招かれていないアカウント", () => {
         "POST /api/v1/display-pairings",
         "DELETE /api/v1/display-pairings",
         "POST /api/v1/jobs/dayduty-finalize",
+        "POST /api/v1/jobs/dayduty-notify",
         "GET /api/api-spec",
         "GET /api/api-doc",
       ].toSorted(),

@@ -10,11 +10,9 @@ import {
   type DaydutyRule,
   isoDate,
 } from "./dayduty_calc.js";
+import { DaydutyNotConfiguredError } from "./dayduty_service.js";
 
 type Turns = Record<string, number>;
-
-/** 開始日や生徒がないなど、日直を決められないグループ */
-export class DaydutyNotConfiguredError extends Error {}
 
 const groupRef = (groupId: string) =>
   firestore.collection("groups").doc(groupId);

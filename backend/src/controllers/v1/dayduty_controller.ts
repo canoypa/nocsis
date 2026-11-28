@@ -16,7 +16,7 @@ import {
   daydutyQuerySchema,
   daydutyResponseSchema,
 } from "../../resources/v1/dayduty.js";
-import { getDaydutyStuNo } from "../../services/dayduty_service.js";
+import { getDaydutyOfDay } from "../../services/dayduty_service.js";
 
 export const daydutRoutes = new Hono<AuthorizedEnv>();
 
@@ -85,26 +85,17 @@ daydutRoutes.get(
         });
       }
 
-      // 出席番号取得
-      const stuNo = await getDaydutyStuNo(groupId, targetDate);
+      const members = await getDaydutyOfDay(groupId, targetDate);
 
-      // Classmate 取得
-      const classmateSnapshot = await firestore
-        .collection("classmates")
-        .where("group_id", "==", groupId)
-        .where("stuNo", "==", stuNo)
-        .select("name")
-        .get();
-
-      if (classmateSnapshot.empty) {
+      if (members.length === 0) {
         throw new HTTPException(500, {
           message: "学生が見つかりません。",
         });
       }
 
-      const validatedResponse = daydutyResponseSchema.parse(
-        classmateSnapshot.docs[0].data(),
-      );
+      const validatedResponse = daydutyResponseSchema.parse({
+        name: members[0].name,
+      });
 
       return c.json<DaydutyResponse>(validatedResponse, 200);
     } catch (error) {
