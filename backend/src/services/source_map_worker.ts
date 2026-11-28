@@ -35,7 +35,7 @@ export type SourceMapReply =
   | { id: number; ok: false; error: string };
 
 // 数で区切らない。ソースマップが育つと、同じ数でも使うメモリが増える。
-const LOADED_BYTES_LIMIT = 12 * 1024 * 1024;
+const LOADED_BYTES_LIMIT = 16 * 1024 * 1024;
 const maps = new Map<string, { map: TraceMap; bytes: number }>();
 
 const loadedBytes = () =>

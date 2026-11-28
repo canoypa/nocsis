@@ -184,15 +184,15 @@ describe("decodeStack", () => {
     ]);
   });
 
-  it("読み込んだソースマップが 12MB を超えるときは、いちばん前に使ったものから取り直すこと", async () => {
+  it("読み込んだソースマップが 16MB を超えるときは、いちばん前に使ったものから取り直すこと", async () => {
     const requested: string[] = [];
-    // 空白で 5MB にふくらませる。ファイルの大きさだけが変わる
-    const fiveMegabytes =
-      JSON.stringify(jsSourceMap) + " ".repeat(5 * 1024 * 1024);
+    // 空白で 6MB にふくらませる。ファイルの大きさだけが変わる
+    const sixMegabytes =
+      JSON.stringify(jsSourceMap) + " ".repeat(6 * 1024 * 1024);
     externalApiServer.use(
       http.get(CLOUD_STORAGE_OBJECT_URL, ({ params }) => {
         requested.push(decodeURIComponent(String(params.object)));
-        return HttpResponse.text(fiveMegabytes);
+        return HttpResponse.text(sixMegabytes);
       }),
     );
     const stack = "    at a (https://nocsis.app/main.dart.js:10:5)";
@@ -203,7 +203,7 @@ describe("decodeStack", () => {
       expect(frame.path).toBe("frontend/lib/main.dart");
     }
 
-    // 2 つで 10MB。third を読み込むと、いちばん前に使った second が捨てられる
+    // 2 つで 12MB。third を読み込むと、いちばん前に使った second が捨てられる
     expect(requested).toEqual(
       [first, second, third, second].map(
         (commit) => `${commit}/main.dart.js.map`,
