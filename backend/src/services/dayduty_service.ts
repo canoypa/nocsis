@@ -46,11 +46,13 @@ const daysAfter = (date: string, days: number) =>
 const loadInputs = async (groupId: string, read: Reader) => {
   const group = groupRef(groupId);
   const [classmates, last, records, rules] = await Promise.all([
+    // role でも絞ると (group_id, role, stuNo) の複合インデックスが要る。
+    // (group_id, stuNo) はあるので、それで読んで先生は後で外す
     read.query(
       firestore
         .collection("classmates")
         .where("group_id", "==", groupId)
-        .where("role", "==", "student"),
+        .orderBy("stuNo"),
     ),
     read.query(
       group.collection("dayduty_days").orderBy("date", "desc").limit(1),
@@ -60,12 +62,8 @@ const loadInputs = async (groupId: string, read: Reader) => {
   ]);
 
   const order = classmates.docs
-    .map((doc) => ({
-      id: doc.id,
-      name: doc.get("name") as string,
-      stuNo: doc.get("stuNo") as number,
-    }))
-    .sort((a, b) => a.stuNo - b.stuNo);
+    .filter((doc) => doc.get("role") === "student")
+    .map((doc) => ({ id: doc.id, name: doc.get("name") as string }));
 
   return {
     order,
