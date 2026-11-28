@@ -176,15 +176,41 @@ describe("finalizeDayduty", () => {
     expect(await membersOf()).toEqual(["B", "C", "D", "A", "B", "C", "D", "E"]);
   });
 
-  it("今の式で当たる出席番号の生徒がいなければ、決められないことを知らせること", async () => {
-    // 4人で 1・2・4・5 番。12/02 は3番を探すのでいない
-    await firestore.collection("classmates").doc("C").delete();
-    await addStudent("E", 5);
+  it.each([
+    [
+      "出席番号が欠けている",
+      async () => {
+        await firestore.collection("classmates").doc("C").delete();
+        await addStudent("E", 5);
+      },
+    ],
+    [
+      "出席番号のない生徒がいる",
+      async () => {
+        await firestore.collection("classmates").doc("E").set({
+          group_id: GROUP_ID,
+          role: "student",
+          name: "E",
+          slackUserId: "E",
+        });
+      },
+    ],
+  ])(
+    "%s グループは、今の式と同じ順にならないので決めないこと",
+    async (_, arrange) => {
+      await arrange();
 
-    await expect(finalizeDayduty(GROUP_ID, "2026-12-02")).rejects.toThrow(
-      DaydutyNotConfiguredError,
+      await expect(finalizeDayduty(GROUP_ID, "2026-12-01")).rejects.toThrow(
+        DaydutyNotConfiguredError,
+      );
+      expect(await finalizedDays()).toEqual([]);
+    },
+  );
+
+  it("開始日より前の日は、決めないこと", async () => {
+    await expect(finalizeDayduty(GROUP_ID, "2026-11-26")).rejects.toThrow(
+      "日直の開始日より前です",
     );
-    expect(await finalizedDays()).toEqual([]);
   });
 
   it("開始日がないグループは、決められないことを知らせること", async () => {
