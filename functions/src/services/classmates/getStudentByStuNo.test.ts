@@ -1,7 +1,9 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
 import type { Student } from "~/types/classmates.js";
+
 import { getStudentByStuNo } from "./getStudentByStuNo.js";
 
 describe("getStudentByStuNo", () => {

@@ -1,4 +1,5 @@
 import { parseArgs } from "node:util";
+
 import { isRoleName, ROLES, type RoleName } from "../../src/authz/roles.js";
 
 export type BindingArgs = {

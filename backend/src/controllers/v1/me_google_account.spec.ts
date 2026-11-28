@@ -1,5 +1,6 @@
 import type { UserRecord } from "firebase-admin/auth";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { LoginResult } from "../../../tests/helpers/users.js";
 import { login, loginAnonymously } from "../../../tests/helpers/users.js";
 import { auth, firestore } from "../../clients/firebase.js";
@@ -81,7 +82,7 @@ describe("PUT /api/v1/me/google-account", () => {
     const providers = (await auth.getUser(user.uid)).providerData.map(
       (provider) => provider.providerId,
     );
-    expect(providers.sort()).toEqual(["google.com", "password"]);
+    expect(providers.toSorted()).toEqual(["google.com", "password"]);
   });
 
   it("すでに連携している同じアカウントなら、何も変えない", async () => {

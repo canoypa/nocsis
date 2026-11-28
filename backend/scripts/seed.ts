@@ -7,6 +7,7 @@
 //
 // 公開リポジトリの Actions のログは誰でも読めるので、メールアドレスや uid はログに出さない。
 import assert from "node:assert";
+
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
@@ -148,7 +149,9 @@ const findUidByEmail = async (email: string) => {
   } catch (error) {
     const code = errorCode(error);
     if (code === "auth/user-not-found") return undefined;
-    throw new Error(`ユーザーを引けませんでした (${code ?? "unknown"})`);
+    throw new Error(`ユーザーを引けませんでした (${code ?? "unknown"})`, {
+      cause: error,
+    });
   }
 };
 

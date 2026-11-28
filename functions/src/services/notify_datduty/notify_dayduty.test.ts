@@ -1,7 +1,9 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
+
 import { notifyDayDuty } from "./notify_dayduty.js";
 import * as notifyDayDutyPerGroupModule from "./notify_dayduty_per_group.js";
 

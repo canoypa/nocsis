@@ -1,8 +1,10 @@
 // 使い方: tsx --import ./e2e/fake_external_apis.ts src/main.ts
 import { generateKeyPairSync } from "node:crypto";
 import { registerHooks } from "node:module";
+
 import { DateTime } from "luxon";
 import { getResponse, HttpResponse, http } from "msw";
+
 import { secretManagerClient } from "../src/clients/secret_manager.js";
 
 // 鍵をリポジトリに置かない。JWT の署名に本物の RSA 鍵が要るので起動のたびに作る。
@@ -50,7 +52,7 @@ const calendarEvents = (calendarId: string, url: URL) => {
   const last = to.isValid ? to : first.plus({ days: 7 });
 
   const items = [];
-  for (let day = first; day < last && items.length < 100; ) {
+  for (let day = first; day < last && items.length < 100;) {
     for (const [i, summary] of (calendarTitles[calendarId] ?? []).entries()) {
       const start = day.set({ hour: 9 + i });
       items.push({

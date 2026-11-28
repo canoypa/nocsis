@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { firestore } from "../clients/firebase.js";
 import { bindingId, COLLECTION, grant, revoke } from "./binding.js";
 import { user } from "./principal.js";

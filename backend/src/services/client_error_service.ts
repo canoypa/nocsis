@@ -3,6 +3,7 @@ import {
   originalPositionFor,
   type TraceMap,
 } from "@jridgewell/trace-mapping";
+
 import { AppConfig } from "../config/app_config.js";
 import { fetchSourceMap, type SourceMapFile } from "./source_map_service.js";
 

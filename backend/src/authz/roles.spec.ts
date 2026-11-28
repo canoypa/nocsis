@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { isRoleName, PERMISSIONS, permissionsOf, ROLES } from "./roles.js";
 
 describe("roles", () => {

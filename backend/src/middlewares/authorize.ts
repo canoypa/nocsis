@@ -1,8 +1,10 @@
 import assert from "node:assert";
+
 import type { Context, MiddlewareHandler } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { COMPOSED_HANDLER } from "hono/utils/constants";
+
 import { can } from "../authz/check.js";
 import { type Principal, subject, user } from "../authz/principal.js";
 import { group, type ResourceRef, serialize } from "../authz/resource.js";

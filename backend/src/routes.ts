@@ -1,7 +1,8 @@
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
-import { cors } from "hono/cors";
 import { openAPIRouteHandler } from "hono-openapi";
+import { cors } from "hono/cors";
+
 import { v1Routes } from "./controllers/v1_controller.js";
 import { skipAuthorization } from "./middlewares/authorize.js";
 import { CLIENT_COMMIT_HEADER, logRequest } from "./middlewares/log_request.js";

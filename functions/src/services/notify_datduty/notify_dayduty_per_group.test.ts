@@ -1,8 +1,10 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
 import type { Student, Teacher } from "~/types/classmates.js";
+
 import * as fetchSecretModule from "../fetch_secret.js";
 import { notifyDayDutyPerGroup } from "./notify_dayduty_per_group.js";
 

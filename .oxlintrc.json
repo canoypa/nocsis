@@ -1,0 +1,59 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "promise",
+    "node",
+    "vitest"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "options": {
+    "typeAware": true
+  },
+  "ignorePatterns": ["**/coverage/**", "**/dist/**", "frontend/**"],
+  "rules": {
+    "typescript/no-explicit-any": "warn",
+    "typescript/prefer-optional-chain": "warn",
+    "unicorn/no-array-for-each": "warn",
+
+    // 文字列リテラルの union (keyof typeof ROLES など) でも落ちる
+    "typescript/restrict-template-expressions": "off",
+    // Hono のインスタンスを、型引数の違う Hono として渡すだけで落ちる
+    "typescript/no-unsafe-class-instance-assignment": "off",
+    // Firestore の data() と JSON.parse の結果に型を付ける手段が、今は as しかない
+    "typescript/no-unsafe-type-assertion": "off",
+    // 網羅した switch の後ろに return を書かせる。足りないと型エラーになるほうを使う
+    "typescript/consistent-return": "off",
+    // Slack の chat.postMessage を window.postMessage と取り違える
+    "unicorn/require-post-message-target-origin": "off",
+    // functions の main.ts は、設定を読み込むためだけに import する
+    "import/no-unassigned-import": "off",
+    // 書き方の好みで、バグは見つけない
+    "eslint/no-shadow": "off",
+    "unicorn/consistent-function-scoping": "off",
+    "vitest/require-mock-type-parameters": "off",
+    "vitest/require-to-throw-message": "off",
+    // 書いておきたい未実装のテストを .todo で残している
+    "vitest/warn-todo": "off",
+    // beforeEach で前提を確かめる expect まで落ちる
+    "vitest/no-standalone-expect": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.spec.ts", "**/*.test.ts"],
+      "rules": {
+        "vitest/expect-expect": "error",
+        "vitest/no-conditional-expect": "error",
+        "vitest/no-focused-tests": "error",
+        "vitest/no-disabled-tests": "error"
+      }
+    }
+  ]
+}

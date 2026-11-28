@@ -1,6 +1,7 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/identity";
 import { DateTime } from "luxon";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
 
 /**
