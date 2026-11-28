@@ -53,7 +53,7 @@ type SourceMapWorker = {
   terminate: () => Promise<number>;
 };
 
-// 解析と引き当てはメインスレッドでしない。そのあいだ、ほかの要求が待たされる。
+// 解析と引き当てはメインスレッドでしない。メインスレッドで解析すると、そのあいだほかの要求が待たされる。
 // src から動かすとき (テスト、tsx) は .ts を、ビルドしたものは dist の .js を読む。
 const WORKER_URL = new URL(
   import.meta.url.endsWith(".ts")
