@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:chopper/chopper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nocsis/core/client_commit.dart';
 import 'package:nocsis/generated/api_client/api.swagger.dart';
-import 'package:nocsis/providers/user.dart';
+import 'package:nocsis/providers/firebase.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'api_client.g.dart';
@@ -20,15 +21,27 @@ final String apiBaseUrl = _apiBaseUrlOverride.isNotEmpty
     ? 'http://localhost:8080'
     : Uri.base.origin;
 
-class BearerAuthInterceptor implements Interceptor {
-  final String token;
+// 作るときに取ったトークンを持ち続けない。持つとトークンが替わるたびに API クライアントを
+// 作り直すことになり、それを watch している一覧が読み直される
+class FirebaseAuthInterceptor implements Interceptor {
+  final FirebaseAuth auth;
 
-  BearerAuthInterceptor(this.token);
+  FirebaseAuthInterceptor(this.auth);
 
   @override
   FutureOr<Response<BodyType>> intercept<BodyType>(
     Chain<BodyType> chain,
   ) async {
+    final user = auth.currentUser;
+    if (user == null) {
+      throw Exception('User not authenticated');
+    }
+
+    final token = await user.getIdToken();
+    if (token == null) {
+      throw Exception('Failed to get auth token');
+    }
+
     final request = chain.request.copyWith(
       headers: {...chain.request.headers, 'Authorization': 'Bearer $token'},
     );
@@ -37,23 +50,14 @@ class BearerAuthInterceptor implements Interceptor {
 }
 
 @riverpod
-Future<BearerAuthInterceptor> firebaseAuthInterceptor(Ref ref) async {
-  final user = ref.watch(authenticatedUserProvider);
-
-  final token = await user.getIdToken();
-  if (token == null) {
-    throw Exception('Failed to get auth token');
-  }
-
-  return BearerAuthInterceptor(token);
-}
-
-@riverpod
 Future<Api> apiClient(Ref ref) async {
-  final interceptor = await ref.watch(firebaseAuthInterceptorProvider.future);
+  final auth = ref.watch(firebaseAuthProvider);
 
   return Api.create(
     baseUrl: Uri.parse(apiBaseUrl),
-    interceptors: [interceptor, clientCommitInterceptor(buildCommit)],
+    interceptors: [
+      FirebaseAuthInterceptor(auth),
+      clientCommitInterceptor(buildCommit),
+    ],
   );
 }

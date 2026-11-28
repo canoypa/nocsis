@@ -562,9 +562,7 @@ class ReplaceGoogleAccountDialogState
   bool reauthenticating = true;
 
   Future<void> _onReauthenticated(User user) async {
-    // API クライアントは作ったときのトークンを使い続けるので、再認証した時刻の入ったトークンで作り直す
     await user.getIdToken(true);
-    ref.invalidate(firebaseAuthInterceptorProvider);
     if (!mounted) return;
     setState(() => reauthenticating = false);
   }
