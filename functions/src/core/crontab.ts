@@ -2,7 +2,7 @@ import { CronExpressionParser } from "cron-parser";
 import { DateTime } from "luxon";
 
 export type CrontabHandler<T = void> = (
-  timestamp: DateTime<true>,
+  timestamp: DateTime,
 ) => T | Promise<T>;
 
 /**

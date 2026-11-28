@@ -16,8 +16,10 @@ const authorize = async () => {
   let key: { client_email?: string; private_key?: string };
   try {
     key = JSON.parse(keyJson);
-  } catch (_error) {
-    throw new Error("Failed to parse CALENDAR_ACCOUNT_KEY as JSON");
+  } catch (error) {
+    throw new Error("Failed to parse CALENDAR_ACCOUNT_KEY as JSON", {
+      cause: error,
+    });
   }
 
   if (!key.client_email || !key.private_key) {

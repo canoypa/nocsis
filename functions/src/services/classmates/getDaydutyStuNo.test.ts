@@ -42,18 +42,18 @@ describe("getDaydutyStuNo", () => {
   it("指定した日時の日直の出席番号を取得できる", async () => {
     await expect(
       getDaydutyStuNo("group_1", DateTime.local(2025, 1, 1)),
-    ).to.resolves.toBe(1);
+    ).resolves.toBe(1);
 
     await expect(
       getDaydutyStuNo("group_1", DateTime.local(2025, 1, 2)),
-    ).to.resolves.toBe(2);
+    ).resolves.toBe(2);
 
     await expect(
       getDaydutyStuNo("group_1", DateTime.local(2025, 1, 4)),
-    ).to.resolves.toBe(4);
+    ).resolves.toBe(4);
 
     await expect(
       getDaydutyStuNo("group_1", DateTime.local(2025, 1, 5)),
-    ).to.resolves.toBe(1);
+    ).resolves.toBe(1);
   });
 });

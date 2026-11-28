@@ -23,7 +23,7 @@ describe("getDayduty", () => {
 
     await expect(
       getDayduty("group_1", DateTime.local(2025, 3, 1)),
-    ).to.resolves.toEqual(data);
+    ).resolves.toEqual(data);
     expect(mockedGetDaydutyStuNo).toHaveBeenCalledWith(
       "group_1",
       DateTime.local(2025, 3, 1),

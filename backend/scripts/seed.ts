@@ -148,7 +148,9 @@ const findUidByEmail = async (email: string) => {
   } catch (error) {
     const code = errorCode(error);
     if (code === "auth/user-not-found") return undefined;
-    throw new Error(`ユーザーを引けませんでした (${code ?? "unknown"})`);
+    throw new Error(`ユーザーを引けませんでした (${code ?? "unknown"})`, {
+      cause: error,
+    });
   }
 };
 

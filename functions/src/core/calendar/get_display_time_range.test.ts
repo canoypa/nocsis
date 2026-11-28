@@ -3,7 +3,8 @@ import { describe, expect, test } from "vitest";
 import type { CalendarEvent } from "../../types/calendar.js";
 import { getDisplayTimeRange } from "./get_display_time_range.js";
 
-const d = DateTime.fromObject;
+const d = (...args: Parameters<typeof DateTime.fromObject>) =>
+  DateTime.fromObject(...args);
 const c = (
   startAt: DateTime,
   endAt: DateTime,

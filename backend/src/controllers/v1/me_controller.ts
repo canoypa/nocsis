@@ -60,7 +60,7 @@ meRoutes.get(
     // 並びは binding を読んだ順で決まらないよう ID 順にする。先頭が既定のグループになる
     const snapshots = await firestore.getAll(
       ...[...granted.keys()]
-        .sort()
+        .toSorted()
         .map((id) => firestore.collection("groups").doc(id)),
       { fieldMask: ["name"] },
     );

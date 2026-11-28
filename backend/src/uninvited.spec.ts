@@ -83,7 +83,7 @@ describe("どのグループにも招かれていないアカウント", () => {
       routesByDeclaration()
         .filter(({ kind }) => kind === "skip")
         .map(({ route }) => route)
-        .sort(),
+        .toSorted(),
     ).toEqual(
       [
         "GET /api/v1/me",
@@ -94,7 +94,7 @@ describe("どのグループにも招かれていないアカウント", () => {
         "DELETE /api/v1/display-pairings",
         "GET /api/api-spec",
         "GET /api/api-doc",
-      ].sort(),
+      ].toSorted(),
     );
   });
 

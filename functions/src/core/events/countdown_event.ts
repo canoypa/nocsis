@@ -48,7 +48,7 @@ export const matchCountdownPattern = (
 
 export const isCountdownTarget = (
   event: calendar_v3.Schema$Event,
-  timestampArg: DateTime<true>,
+  timestampArg: DateTime,
 ): boolean => {
   if (!event.description) return false;
 

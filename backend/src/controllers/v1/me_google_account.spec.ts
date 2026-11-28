@@ -81,7 +81,7 @@ describe("PUT /api/v1/me/google-account", () => {
     const providers = (await auth.getUser(user.uid)).providerData.map(
       (provider) => provider.providerId,
     );
-    expect(providers.sort()).toEqual(["google.com", "password"]);
+    expect(providers.toSorted()).toEqual(["google.com", "password"]);
   });
 
   it("すでに連携している同じアカウントなら、何も変えない", async () => {
