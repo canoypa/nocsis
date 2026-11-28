@@ -5,7 +5,6 @@
   "main": "dist/main.js",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "ci": "pnpm run lint && pnpm run format:check",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "lint": "oxlint",

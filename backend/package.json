@@ -7,7 +7,6 @@
     "generate-openapi": "tsx scripts/generate_openapi.ts",
     "grant": "tsx scripts/grant.ts",
     "revoke": "tsx scripts/revoke.ts",
-    "ci": "pnpm run lint && pnpm run format:check",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "lint": "oxlint",
