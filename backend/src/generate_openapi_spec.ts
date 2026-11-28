@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { resolve } from "node:path";
+
 import type { Hono } from "hono";
 import { generateSpecs } from "hono-openapi";
 

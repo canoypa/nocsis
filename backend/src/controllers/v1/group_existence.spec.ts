@@ -1,5 +1,6 @@
 import type { UserRecord } from "firebase-admin/auth";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { clearBindings, grantGroup } from "../../../tests/helpers/bindings.js";
 import { type LoginResult, login } from "../../../tests/helpers/users.js";
 import { auth } from "../../clients/firebase.js";

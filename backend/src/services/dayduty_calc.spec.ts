@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { computeDayduty, type DaydutyRule } from "./dayduty_calc.js";
 
 const order = ["A", "B", "C", "D"];

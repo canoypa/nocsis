@@ -1,7 +1,9 @@
 import { setTimeout as sleep } from "node:timers/promises";
+
 import { getAuth, type UserRecord } from "firebase-admin/auth";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import type { DateTime } from "luxon";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
 
 const UNUSED_DAYS = 30;

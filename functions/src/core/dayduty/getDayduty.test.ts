@@ -1,7 +1,9 @@
 import { DateTime } from "luxon";
 import { describe, expect, it, vi } from "vitest";
+
 import * as getStudentByStuNo from "~/services/classmates/getStudentByStuNo.js";
 import type { Student } from "~/types/classmates.js";
+
 import * as getDaydutyStuNo from "../../services/classmates/getDaydutyStuNo.js";
 import { getDayduty } from "./getDayduty.js";
 
@@ -23,7 +25,7 @@ describe("getDayduty", () => {
 
     await expect(
       getDayduty("group_1", DateTime.local(2025, 3, 1)),
-    ).to.resolves.toEqual(data);
+    ).resolves.toEqual(data);
     expect(mockedGetDaydutyStuNo).toHaveBeenCalledWith(
       "group_1",
       DateTime.local(2025, 3, 1),

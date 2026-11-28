@@ -1,5 +1,7 @@
 import { getFirestore } from "firebase-admin/firestore";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
+
 import type { CrontabHandler } from "../../core/crontab.js";
 import { notifyEventPerGroup } from "./notify_event_per_group.js";
 

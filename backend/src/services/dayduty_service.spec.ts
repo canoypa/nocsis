@@ -1,13 +1,12 @@
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { firestore } from "../clients/firebase.js";
 import { getDayduty } from "./dayduty_service.js";
 
 const GROUP_ID = "test_group_1";
 const group = firestore.collection("groups").doc(GROUP_ID);
 
-const deleteCollection = async (
-  ref: FirebaseFirestore.Query<FirebaseFirestore.DocumentData>,
-) => {
+const deleteCollection = async (ref: FirebaseFirestore.Query) => {
   const snapshot = await ref.get();
   const batch = firestore.batch();
   for (const doc of snapshot.docs) batch.delete(doc.ref);

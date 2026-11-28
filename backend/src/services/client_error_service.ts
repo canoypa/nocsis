@@ -1,10 +1,10 @@
-import {
-  GREATEST_LOWER_BOUND,
-  originalPositionFor,
-  type TraceMap,
-} from "@jridgewell/trace-mapping";
 import { AppConfig } from "../config/app_config.js";
-import { fetchSourceMap, type SourceMapFile } from "./source_map_service.js";
+import {
+  type GeneratedPosition,
+  type OriginalPosition,
+  originalPositionsFor,
+  type SourceMapFile,
+} from "./source_map_service.js";
 
 export type DecodedFrame = {
   raw: string;
@@ -65,26 +65,17 @@ export const toRepositoryPath = (source: string): string | undefined => {
   return undefined;
 };
 
-const decodeFrame = (
+// wasm のソースマップは 1 行で、列がモジュール先頭からのバイトオフセット
+const toGeneratedPosition = (position: Position): GeneratedPosition =>
+  position.file === "main.dart.wasm.map"
+    ? { line: 1, column: position.offset }
+    : { line: position.line, column: position.column - 1 };
+
+const toDecodedFrame = (
   raw: string,
-  position: Position,
-  map: TraceMap,
+  original: OriginalPosition,
   commit: string,
 ): DecodedFrame => {
-  // wasm のソースマップは 1 行で、列がモジュール先頭からのバイトオフセット
-  const original =
-    position.file === "main.dart.wasm.map"
-      ? originalPositionFor(map, {
-          line: 1,
-          column: position.offset,
-          bias: GREATEST_LOWER_BOUND,
-        })
-      : originalPositionFor(map, {
-          line: position.line,
-          column: position.column - 1,
-          bias: GREATEST_LOWER_BOUND,
-        });
-
   if (original.source === null || original.line === null) return { raw };
 
   const path = toRepositoryPath(original.source);
@@ -102,20 +93,19 @@ const decodeFrame = (
   };
 };
 
-const fetchSourceMapOrNull = async (
+const warn = (message: string) =>
+  console.warn(JSON.stringify({ severity: "WARNING", message }));
+
+const originalPositionsOrNull = async (
   commit: string,
   file: SourceMapFile,
-): Promise<TraceMap | null> => {
+  positions: GeneratedPosition[],
+): Promise<OriginalPosition[] | null> => {
   try {
-    return await fetchSourceMap(commit, file);
+    return await originalPositionsFor(commit, file, positions);
   } catch (error) {
     // 解読できなくても、エラーが起きたこと自体は残す
-    console.warn(
-      JSON.stringify({
-        severity: "WARNING",
-        message: `ソースマップを取得できなかった: ${error}`,
-      }),
-    );
+    warn(`ソースマップで位置を戻せなかった: ${error}`);
     return null;
   }
 };
@@ -136,25 +126,33 @@ export const decodeStack = async (
     .map((line) => line.trim())
     .filter((line) => line !== "");
 
-  const maps = new Map<SourceMapFile, TraceMap | null>();
-  const frames: DecodedFrame[] = [];
+  const frames: DecodedFrame[] = lines.map((raw) => ({ raw }));
 
-  for (const raw of lines) {
+  // ファイルごとにまとめ、先に出てきたファイルから取りに行く
+  const byFile = new Map<
+    SourceMapFile,
+    { index: number; position: Position }[]
+  >();
+  for (const [index, raw] of lines.entries()) {
     const position = parsePosition(raw);
-    if (!position) {
-      frames.push({ raw });
-      continue;
-    }
+    if (!position) continue;
+    byFile.set(position.file, [
+      ...(byFile.get(position.file) ?? []),
+      { index, position },
+    ]);
+  }
 
-    if (!maps.has(position.file)) {
-      maps.set(
-        position.file,
-        await fetchSourceMapOrNull(commit, position.file),
-      );
-    }
-    const map = maps.get(position.file);
+  for (const [file, entries] of byFile) {
+    const originals = await originalPositionsOrNull(
+      commit,
+      file,
+      entries.map(({ position }) => toGeneratedPosition(position)),
+    );
+    if (!originals) continue;
 
-    frames.push(map ? decodeFrame(raw, position, map, commit) : { raw });
+    for (const [i, { index }] of entries.entries()) {
+      frames[index] = toDecodedFrame(lines[index], originals[i], commit);
+    }
   }
 
   return frames;

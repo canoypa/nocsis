@@ -1,4 +1,5 @@
 import assert from "node:assert";
+
 import { DateTime } from "luxon";
 
 /** 先生の操作。その人の `turn` 回目の番を使ったことにする */
@@ -94,7 +95,7 @@ export const computeDayduty = (input: {
 
     const members = order
       .filter((m) => !isBlocked(rules, m, date))
-      .sort(
+      .toSorted(
         (a, b) =>
           turns[a] - turns[b] ||
           (position.get(a) as number) - (position.get(b) as number),

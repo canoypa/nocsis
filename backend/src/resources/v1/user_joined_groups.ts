@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { groupSchema } from "./groups.js";
 
 export const userJoinedGroupSchema = groupSchema
