@@ -50,9 +50,30 @@ export const fetchGoogleCalendarEvents = (
     q: params.q,
   };
 
-  return cache.get(JSON.stringify(options), () =>
+  return cache.get(toCacheKey(options), () =>
     fetchGoogleCalendarEventsFromApi(options),
   );
+};
+
+/**
+ * Calendar API に送る要求の URL と同じく、カレンダー ID と条件のクエリでキーを作る
+ */
+const toCacheKey = ({
+  calendarId,
+  ...query
+}: CalendarV3.Params$Resource$Events$List): string => {
+  const params = new URLSearchParams();
+  for (const [name, value] of Object.entries(query)) {
+    if (
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+    ) {
+      params.set(name, String(value));
+    }
+  }
+  params.sort();
+  return `${encodeURIComponent(calendarId ?? "")}?${params}`;
 };
 
 /**
