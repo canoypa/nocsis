@@ -1,14 +1,16 @@
 {
   "name": "backend",
   "type": "module",
-  "packageManager": "pnpm@12.20.0",
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsup src/main.ts --clean --format esm --sourcemap",
+    "build": "tsup --entry.main src/main.ts --entry.source_map_worker src/services/source_map_worker.ts --clean --format esm --sourcemap",
     "generate-openapi": "tsx scripts/generate_openapi.ts",
     "grant": "tsx scripts/grant.ts",
     "revoke": "tsx scripts/revoke.ts",
-    "ci": "biome ci",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "test": "firebase emulators:exec --project demo-nocsis 'pnpm vitest run --coverage'",
     "test:watch": "vitest watch --coverage",
     "typecheck": "tsc --noEmit"
@@ -16,29 +18,32 @@
   "dependencies": {
     "@google-cloud/secret-manager": "^8.0.0",
     "@googleapis/calendar": "^20.2.0",
-    "@hono/node-server": "^2.1.9",
+    "@hono/node-server": "^2.1.11",
     "@hono/standard-validator": "^0.4.1",
     "@jridgewell/trace-mapping": "^0.3.31",
-    "@scalar/hono-api-reference": "^0.12.22",
+    "@scalar/hono-api-reference": "^0.12.25",
     "firebase-admin": "^14.5.1",
     "google-auth-library": "^11.3.4",
-    "hono": "^4.13.19",
-    "hono-openapi": "^1.5.0",
+    "hono": "^4.13.22",
+    "hono-openapi": "^1.6.0",
     "luxon": "^3.7.2",
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.6.8",
     "@firebase/rules-unit-testing": "^6.0.0",
     "@types/luxon": "^3.7.6",
-    "@types/node": "^24.19.2",
-    "@vitest/coverage-v8": "5.1.1",
+    "@types/node": "^24.19.4",
+    "@vitest/coverage-v8": "5.1.2",
     "firebase": "^13.4.0",
-    "firebase-tools": "^15.36.0",
+    "firebase-tools": "^15.37.0",
     "msw": "^3.0.7",
+    "oxfmt": "^0.80.0",
+    "oxlint": "^1.95.0",
+    "oxlint-tsgolint": "^7.0.2009",
     "tsup": "^9.0.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.0",
-    "vitest": "^5.1.1"
-  }
+    "vitest": "^5.1.2"
+  },
+  "packageManager": "pnpm@12.20.0"
 }

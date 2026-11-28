@@ -1,7 +1,8 @@
 import { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
+import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
+
 import { firestore } from "../../clients/firebase.js";
 import { authentication } from "../../middlewares/authenticate.js";
 import {
@@ -9,7 +10,7 @@ import {
   authorize,
   groupOf,
 } from "../../middlewares/authorize.js";
-import { groupSchema } from "../../resources/v1/groups.js";
+import { groupName, groupSchema } from "../../resources/v1/groups.js";
 
 export const groupRoutes = new Hono<AuthorizedEnv>();
 
@@ -21,8 +22,11 @@ const paramSchema = z
     description: "グループのIDを指定するパラメータ",
   });
 
+// カレンダー ID は運用者が Firestore で設定する。共通のサービスアカウントで読むので、
+// 管理者が変えられると、そのアカウントが読める別のグループのカレンダーまで読めてしまう
 const patchJsonSchema = groupSchema
-  .omit({ id: true })
+  .omit({ id: true, classes_calendar_id: true, events_calendar_id: true })
+  .extend({ name: groupName.meta({ description: "名前。50文字まで" }) })
   .partial()
   .refine((data) => Object.keys(data).length > 0)
   .meta({

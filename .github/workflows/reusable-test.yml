@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm java
       - name: Get pnpm store directory
@@ -66,7 +66,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm java
       - name: Get pnpm store directory
@@ -108,7 +108,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm java
       - name: Get pnpm store directory
@@ -150,9 +150,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: flutter
+      # mise が展開した SDK では、flutter_tools の pubspec.yaml の更新時刻が pubspec.lock より新しくなる。
+      # lock の更新時刻を新しくしないと、flutter は同梱のコンパイル済みの flutter tool を古いと見てコンパイルし直す。
+      # 同梱の pub パッケージはまとめて取り込ませず、要るものだけ pub get に取らせる。
+      - name: Use bundled flutter tool
+        run: |
+          flutter_root="$(mise where flutter)"
+          touch -c "$flutter_root/packages/flutter_tools/pubspec.lock"
+          rm -rf "$flutter_root/.pub-preload-cache"
       - name: Setup pub cache
         uses: actions/cache@v6.1.0
         with:
@@ -173,6 +181,11 @@ jobs:
         run: flutter pub run build_runner build
       - name: Test
         run: flutter test --coverage
+      - name: Test nocsis_lints
+        working-directory: ./frontend/packages/nocsis_lints
+        run: |
+          dart pub get --enforce-lockfile
+          dart test
       - name: Check coverage threshold
         env:
           THRESHOLD: "51"
@@ -205,9 +218,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm java flutter
+      # mise が展開した SDK では、flutter_tools の pubspec.yaml の更新時刻が pubspec.lock より新しくなる。
+      # lock の更新時刻を新しくしないと、flutter は同梱のコンパイル済みの flutter tool を古いと見てコンパイルし直す。
+      # 同梱の pub パッケージはまとめて取り込ませず、要るものだけ pub get に取らせる。
+      - name: Use bundled flutter tool
+        run: |
+          flutter_root="$(mise where flutter)"
+          touch -c "$flutter_root/packages/flutter_tools/pubspec.lock"
+          rm -rf "$flutter_root/.pub-preload-cache"
       - name: Get pnpm store directory
         id: pnpm-cache
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"

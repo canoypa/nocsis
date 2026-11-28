@@ -3,7 +3,6 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:nocsis/components/page_title.dart';
 import 'package:nocsis/pages/console/displays/display_list.dart';
-import 'package:nocsis/pages/console/displays/register_dialog.dart';
 import 'package:nocsis/pages/console/displays/url_field.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/providers/displays.dart';
@@ -45,10 +44,8 @@ class ConsoleDisplaysPage extends ConsumerWidget {
               runSpacing: 8,
               children: [
                 FilledButton.tonalIcon(
-                  onPressed: () => showDialog<void>(
-                    context: context,
-                    builder: (_) => RegisterDisplayDialog(groupId: groupId),
-                  ),
+                  onPressed: () =>
+                      RegisterDisplayDialogRoute(groupId).push(context),
                   icon: const Icon(Symbols.keyboard),
                   label: const Text('コードで登録'),
                 ),

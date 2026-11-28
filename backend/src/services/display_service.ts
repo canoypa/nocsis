@@ -1,5 +1,7 @@
 import { randomInt } from "node:crypto";
+
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
+
 import {
   COLLECTION as BINDINGS,
   bindingDoc,

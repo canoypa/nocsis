@@ -94,6 +94,13 @@ void main() {
     expect(find.byTooltip('メニュー'), findsNothing);
   });
 
+  testWidgets('expanded の幅でも、広い幅になるまでは rail のままにする', (tester) async {
+    await pumpAt(tester, 1199);
+
+    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byType(NavigationDrawer), findsNothing);
+  });
+
   testWidgets('背の低い窓でも rail がはみ出さない', (tester) async {
     await pumpAt(tester, 800, height: 300);
 

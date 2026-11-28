@@ -2,6 +2,7 @@ import type { calendar_v3 } from "@googleapis/calendar";
 import { DateTime } from "luxon";
 import * as v from "valibot";
 import { type InferOutput, safeParse } from "valibot";
+
 import { fetchCalendar } from "../calendar.js";
 
 export const fetchCountdownEvents = async (
@@ -48,7 +49,7 @@ export const matchCountdownPattern = (
 
 export const isCountdownTarget = (
   event: calendar_v3.Schema$Event,
-  timestampArg: DateTime<true>,
+  timestampArg: DateTime,
 ): boolean => {
   if (!event.description) return false;
 

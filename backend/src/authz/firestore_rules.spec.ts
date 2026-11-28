@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+
 import {
   initializeTestEnvironment,
   type RulesTestEnvironment,

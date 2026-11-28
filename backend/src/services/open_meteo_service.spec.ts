@@ -1,6 +1,7 @@
 import { HttpResponse, http } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ZodError } from "zod";
+
 import {
   externalApiServer,
   OPEN_METEO_FORECAST_URL,
@@ -268,7 +269,11 @@ describe("fetchWeather のキャッシュ", () => {
 
       await expect(fetchWeather({ lat: 1, lon: 1 })).resolves.toEqual({
         current: { temp: 20, weatherCode: 0 },
-        hourly: Array(8).fill({ temp: 20, pop: 0, weatherCode: 0 }),
+        hourly: Array.from({ length: 8 }, () => ({
+          temp: 20,
+          pop: 0,
+          weatherCode: 0,
+        })),
       });
     });
   });

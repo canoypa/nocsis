@@ -7,6 +7,7 @@ import 'package:nocsis/components/select_group_menu.dart';
 import 'package:nocsis/providers/current_group_id.dart';
 import 'package:nocsis/routes/router.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
+import 'package:nocsis/core/window_size_class.dart';
 
 // PagePath.x.path を引数に指定できないので PagePath をそのまま入れてる
 enum Navigation {
@@ -113,7 +114,8 @@ class MainPage extends ConsumerWidget {
 
     return LayoutBuilder(
       builder: ((context, constraints) {
-        final bool isLargeScreen = constraints.minWidth >= 1200;
+        final isLargeScreen =
+            WindowSizeClass.fromWidth(constraints.minWidth) >= .large;
 
         return Scaffold(
           appBar: AppBar(actions: const [SelectGroupMenu(), AccountMenu()]),

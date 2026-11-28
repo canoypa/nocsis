@@ -3,6 +3,7 @@ import {
   type calendar_v3 as CalendarV3,
   calendar,
 } from "@googleapis/calendar";
+
 import { fetchSecret } from "../services/secret_manager_service.js";
 
 let instance: CalendarV3.Calendar | null = null;
@@ -16,8 +17,10 @@ const authorize = async () => {
   let key: { client_email?: string; private_key?: string };
   try {
     key = JSON.parse(keyJson);
-  } catch (_error) {
-    throw new Error("Failed to parse CALENDAR_ACCOUNT_KEY as JSON");
+  } catch (error) {
+    throw new Error("Failed to parse CALENDAR_ACCOUNT_KEY as JSON", {
+      cause: error,
+    });
   }
 
   if (!key.client_email || !key.private_key) {

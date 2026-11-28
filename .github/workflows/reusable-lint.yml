@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm
       - name: Get pnpm store directory
@@ -46,7 +46,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm
       - name: Get pnpm store directory
@@ -61,10 +61,15 @@ jobs:
             ${{ runner.os }}-pnpm-store-functions-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      # 並行にはしない。どれも CPU を使うので、並べると取り合って縮まない。
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
-        run: pnpm run ci
+        if: ${{ !cancelled() }}
+        run: pnpm run lint
+      - name: Format
+        if: ${{ !cancelled() }}
+        run: pnpm run format:check
 
   lint-backend:
     runs-on: ubuntu-latest
@@ -75,7 +80,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm
       - name: Get pnpm store directory
@@ -90,13 +95,19 @@ jobs:
             ${{ runner.os }}-pnpm-store-backend-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      # 並行にはしない。どれも CPU を使うので、並べると取り合って縮まない。
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
-        run: pnpm run ci
+        if: ${{ !cancelled() }}
+        run: pnpm run lint
+      - name: Format
+        if: ${{ !cancelled() }}
+        run: pnpm run format:check
       # frontend のコード生成はコミット済みの api.json を入力にするため、
       # 古いままだと backend と食い違ったクライアントが生成される。
       - name: Check OpenAPI spec
+        if: ${{ !cancelled() }}
         run: |
           pnpm run generate-openapi
           git diff --exit-code -- ../frontend/swagger/api.json || {
@@ -113,9 +124,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: flutter
+      # mise が展開した SDK では、flutter_tools の pubspec.yaml の更新時刻が pubspec.lock より新しくなる。
+      # lock の更新時刻を新しくしないと、flutter は同梱のコンパイル済みの flutter tool を古いと見てコンパイルし直す。
+      # 同梱の pub パッケージはまとめて取り込ませず、要るものだけ pub get に取らせる。
+      - name: Use bundled flutter tool
+        run: |
+          flutter_root="$(mise where flutter)"
+          touch -c "$flutter_root/packages/flutter_tools/pubspec.lock"
+          rm -rf "$flutter_root/.pub-preload-cache"
       - name: Setup pub cache
         uses: actions/cache@v6.1.0
         with:
@@ -137,4 +156,9 @@ jobs:
       - name: Lint
         run: |
           dart format --output=none --set-exit-if-changed .
+          dart analyze --fatal-infos
+      - name: Lint nocsis_lints
+        working-directory: ./frontend/packages/nocsis_lints
+        run: |
+          dart pub get --enforce-lockfile
           dart analyze --fatal-infos

@@ -1,8 +1,10 @@
 import { DateTime } from "luxon";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import * as fetchCalendarModule from "~/core/calendar.js";
 import * as fetchCountdownEventsModule from "~/core/events/countdown_event.js";
 import * as fetchSecretModule from "~/services/fetch_secret.js";
+
 import { notifyEventPerGroup } from "./notify_event_per_group.js";
 
 const { mockPostMessage } = vi.hoisted(() => ({ mockPostMessage: vi.fn() }));

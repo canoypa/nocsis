@@ -1,7 +1,9 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
+
 import { notifyEvent } from "./notify_event.js";
 import * as notifyEventPerGroupModule from "./notify_event_per_group.js";
 

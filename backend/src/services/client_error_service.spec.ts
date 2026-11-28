@@ -1,5 +1,6 @@
 import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
   jsSourceMap,
   wasmSourceMap,
@@ -33,8 +34,8 @@ const serveSourceMaps = (requested: string[] = []) =>
     }),
   );
 
-beforeEach(() => {
-  clearSourceMapCache();
+beforeEach(async () => {
+  await clearSourceMapCache();
 });
 
 describe("decodeStack", () => {
@@ -139,6 +140,97 @@ describe("decodeStack", () => {
     expect(results.map(([frame]) => frame.line)).toEqual([26, 26, 26]);
   });
 
+  it("取得の途中でワーカーが止まっても、新しいワーカーで解読すること", async () => {
+    let downloading: () => void = () => {};
+    const downloadStarted = new Promise<void>((resolve) => {
+      downloading = resolve;
+    });
+    let finishDownload: () => void = () => {};
+    externalApiServer.use(
+      http.get(CLOUD_STORAGE_OBJECT_URL, async () => {
+        downloading();
+        await new Promise<void>((resolve) => {
+          finishDownload = resolve;
+        });
+        return HttpResponse.json(jsSourceMap);
+      }),
+    );
+    const decoding = decodeStack(
+      "    at a (https://nocsis.app/main.dart.js:10:5)",
+      COMMIT,
+    );
+    await downloadStarted;
+    await clearSourceMapCache();
+    finishDownload();
+
+    const [frame] = await decoding;
+    expect(frame.path).toBe("frontend/lib/main.dart");
+  });
+
+  it("ありえない位置の行だけをそのまま返し、ほかの行は戻すこと", async () => {
+    serveSourceMaps();
+
+    const frames = await decodeStack(
+      [
+        "    at a (https://nocsis.app/main.dart.js:0:1)",
+        "    at b (https://nocsis.app/main.dart.js:10:5)",
+      ].join("\n"),
+      COMMIT,
+    );
+
+    expect(frames.map((frame) => frame.path)).toEqual([
+      undefined,
+      "frontend/lib/main.dart",
+    ]);
+  });
+
+  it("読み込んだソースマップが 16MB を超えるときは、いちばん前に使ったものから取り直すこと", async () => {
+    const requested: string[] = [];
+    // 空白で 6MB にふくらませる。ファイルの大きさだけが変わる
+    const sixMegabytes =
+      JSON.stringify(jsSourceMap) + " ".repeat(6 * 1024 * 1024);
+    externalApiServer.use(
+      http.get(CLOUD_STORAGE_OBJECT_URL, ({ params }) => {
+        requested.push(decodeURIComponent(String(params.object)));
+        return HttpResponse.text(sixMegabytes);
+      }),
+    );
+    const stack = "    at a (https://nocsis.app/main.dart.js:10:5)";
+    const [first, second, third] = ["1", "2", "3"].map((c) => c.repeat(40));
+
+    for (const commit of [first, second, first, third, first, second]) {
+      const [frame] = await decodeStack(stack, commit);
+      expect(frame.path).toBe("frontend/lib/main.dart");
+    }
+
+    // 2 つで 12MB。third を読み込むと、いちばん前に使った second が捨てられる
+    expect(requested).toEqual(
+      [first, second, third, second].map(
+        (commit) => `${commit}/main.dart.js.map`,
+      ),
+    );
+  });
+
+  it("16MB より大きいソースマップは、解読するが持たないこと", async () => {
+    const requested: string[] = [];
+    const large = JSON.stringify(jsSourceMap) + " ".repeat(17 * 1024 * 1024);
+    externalApiServer.use(
+      http.get(CLOUD_STORAGE_OBJECT_URL, ({ params }) => {
+        requested.push(decodeURIComponent(String(params.object)));
+        return HttpResponse.text(large);
+      }),
+    );
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const stack = "    at a (https://nocsis.app/main.dart.js:10:5)";
+
+    for (let i = 0; i < 2; i++) {
+      const [frame] = await decodeStack(stack, COMMIT);
+      expect(frame.path).toBe("frontend/lib/main.dart");
+    }
+
+    expect(requested).toHaveLength(2);
+  });
+
   it("見つからなかったソースマップは、5 分たつまで取りに行かないこと", async () => {
     const requested: string[] = [];
     serveSourceMaps(requested);
@@ -180,6 +272,26 @@ describe("decodeStack", () => {
     ]);
     expect(warn).toHaveBeenCalledOnce();
     expect(String(warn.mock.calls[0][0])).toContain("403");
+  });
+
+  it("ソースマップが壊れていたら、行をそのまま返し、次は取り直すこと", async () => {
+    let body: unknown = "{";
+    externalApiServer.use(
+      http.get(CLOUD_STORAGE_OBJECT_URL, () => HttpResponse.text(String(body))),
+    );
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const now = vi.spyOn(Date, "now").mockReturnValue(0);
+    const stack = "    at a (https://nocsis.app/main.dart.js:10:5)";
+
+    expect(await decodeStack(stack, COMMIT)).toEqual([
+      { raw: "at a (https://nocsis.app/main.dart.js:10:5)" },
+    ]);
+    expect(warn).toHaveBeenCalledOnce();
+
+    body = JSON.stringify(jsSourceMap);
+    now.mockReturnValue(5 * 60_000);
+    const [frame] = await decodeStack(stack, COMMIT);
+    expect(frame.path).toBe("frontend/lib/main.dart");
   });
 });
 

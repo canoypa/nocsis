@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { subject, user } from "./principal.js";
 
 describe("principal", () => {

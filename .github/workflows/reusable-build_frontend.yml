@@ -35,9 +35,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
       - name: Setup Tools
-        uses: jdx/mise-action@v5.2.9
+        uses: jdx/mise-action@v5.3.0
         with:
           install_args: flutter
+      # mise が展開した SDK では、flutter_tools の pubspec.yaml の更新時刻が pubspec.lock より新しくなる。
+      # lock の更新時刻を新しくしないと、flutter は同梱のコンパイル済みの flutter tool を古いと見てコンパイルし直す。
+      # 同梱の pub パッケージはまとめて取り込ませず、要るものだけ pub get に取らせる。
+      - name: Use bundled flutter tool
+        run: |
+          flutter_root="$(mise where flutter)"
+          touch -c "$flutter_root/packages/flutter_tools/pubspec.lock"
+          rm -rf "$flutter_root/.pub-preload-cache"
       # 本番のビルドはキャッシュを使わない。restore-keys は前の実行のキャッシュを
       # 引き継ぐので、一度書き換えられた中身は依存を戻しても残り、本番に出続ける。
       - name: Setup pub cache

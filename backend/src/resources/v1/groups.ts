@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+const graphemes = new Intl.Segmenter();
+
+// max() は UTF-16 で数えるので、絵文字や濁点を合成した文字が2文字以上になる
+const withinGroupNameLength = (name: string) =>
+  [...graphemes.segment(name)].length <= 50;
+
+export const groupName = z
+  .string()
+  .trim()
+  .min(1)
+  .refine(withinGroupNameLength, "名前は50文字まで");
+
 export const groupSchema = z
   .object({
     id: z.string().meta({ description: "ID" }),
