@@ -26,7 +26,7 @@ final _cases = <_Case>[
     name: '日直',
     cron: '0 0 * * *',
     path: '/api/v1/groups/g1/dayduty',
-    body: const Dayduty(name: 'テスト太郎').toJson(),
+    body: const Dayduty(name: 'テスト太郎', members: []).toJson(),
     provider: () => daydudyProvider('g1'),
   ),
   (
