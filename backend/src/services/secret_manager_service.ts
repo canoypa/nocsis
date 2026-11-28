@@ -8,11 +8,15 @@ const secretCache = new Map<string, string>();
  * Secret Manager からシークレットを取得する
  *
  * @param secretName シークレット名
+ * @param options.cache false なら、キャッシュを使わずに読む
  * @returns シークレット値
  */
-export const fetchSecret = async (secretName: string): Promise<string> => {
+export const fetchSecret = async (
+  secretName: string,
+  { cache = true }: { cache?: boolean } = {},
+): Promise<string> => {
   // キャッシュ済みならキャッシュから取得する
-  const cachedValue = secretCache.get(secretName);
+  const cachedValue = cache ? secretCache.get(secretName) : undefined;
   if (cachedValue) return cachedValue;
 
   // 動いているプロジェクトの Secret を読む。Staging から本番の Secret を読ませない。
@@ -33,8 +37,7 @@ export const fetchSecret = async (secretName: string): Promise<string> => {
   const secret = version.payload?.data?.toString();
   assert(secret, "シークレット値を取得できませんでした");
 
-  // キャッシュする
-  secretCache.set(secretName, secret);
+  if (cache) secretCache.set(secretName, secret);
 
   return secret;
 };

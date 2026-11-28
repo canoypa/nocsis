@@ -90,6 +90,16 @@ describe("fetchSecret", () => {
     });
   });
 
+  describe("キャッシュを使わない場合", () => {
+    it("毎回 API を呼び、後の読み出しにもキャッシュを残さないこと", async () => {
+      await fetchSecret("test-secret", { cache: false });
+      await fetchSecret("test-secret", { cache: false });
+      await fetchSecret("test-secret");
+
+      expect(requests).toHaveLength(3);
+    });
+  });
+
   describe("異なるシークレットを取得する場合", () => {
     it("別々にキャッシュされること", async () => {
       await expect(fetchSecret("test-secret")).resolves.toBe(

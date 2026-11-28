@@ -8,6 +8,7 @@ import type {
 import { DateTime } from "luxon";
 
 import { firestore } from "../clients/firebase.js";
+import { AppConfig } from "../config/app_config.js";
 import {
   computeDayduty,
   type DaydutyOp,
@@ -16,6 +17,9 @@ import {
 } from "./dayduty_calc.js";
 
 export type DaydutyMember = { id: string; name: string };
+
+/** 開始日や生徒がないなど、日直を決められないグループ */
+export class DaydutyNotConfiguredError extends Error {}
 export type DaydutyOfDay = { date: string; members: DaydutyMember[] };
 
 type Turns = Record<string, number>;
@@ -156,4 +160,16 @@ const readDayduty = async (
     });
   }
   return result;
+};
+
+/**
+ * その日の日直。画面と通知はこれだけを読む。日直がいなければ空
+ */
+export const getDaydutyOfDay = async (
+  groupId: string,
+  date: DateTime<true>,
+): Promise<DaydutyMember[]> => {
+  const day = isoDate(date.setZone(AppConfig.TIMEZONE));
+  const [{ members }] = await getDayduty(groupId, day, day);
+  return members;
 };

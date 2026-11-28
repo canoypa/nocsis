@@ -3,10 +3,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { firestore } from "../clients/firebase.js";
 import {
-  DaydutyNotConfiguredError,
   finalizeAllDayduty,
   finalizeDayduty,
 } from "./dayduty_finalize_service.js";
+import { DaydutyNotConfiguredError } from "./dayduty_service.js";
 
 const GROUP_ID = "test_group_finalize";
 const group = firestore.collection("groups").doc(GROUP_ID);

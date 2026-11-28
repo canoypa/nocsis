@@ -16,7 +16,7 @@ import {
   daydutyQuerySchema,
   daydutyResponseSchema,
 } from "../../resources/v1/dayduty.js";
-import { getDayduty } from "../../services/dayduty_service.js";
+import { getDaydutyOfDay } from "../../services/dayduty_service.js";
 
 export const daydutRoutes = new Hono<AuthorizedEnv>();
 
@@ -79,14 +79,13 @@ daydutRoutes.get(
         ? DateTime.fromISO(date, { zone: AppConfig.TIMEZONE })
         : DateTime.now().setZone(AppConfig.TIMEZONE);
 
-      const day = targetDate.toISODate();
-      if (day === null) {
+      if (!targetDate.isValid) {
         throw new HTTPException(400, {
           message: "日付のフォーマットが正しくありません。",
         });
       }
 
-      const [{ members }] = await getDayduty(groupId, day, day);
+      const members = await getDaydutyOfDay(groupId, targetDate);
 
       if (members.length === 0) {
         throw new HTTPException(500, {
