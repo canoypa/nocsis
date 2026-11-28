@@ -16,7 +16,7 @@ export type DaydutyRule =
 export type DaydutyDay = {
   date: string;
   members: string[];
-  /** この日に使った番の数が変わった人と、変わった後の値 */
+  /** この日に使った番の数が変わった人と、変わった後の値。まだ数がなかった人は最初の日に入る */
   turns: Record<string, number>;
 };
 
@@ -78,7 +78,7 @@ export const computeDayduty = (input: {
     const day = date.toISODate() as string;
 
     for (const op of ops) {
-      if (op.date === day && position.has(op.member))
+      if (op.kind === "skip" && op.date === day && position.has(op.member))
         raise(op.member, op.turn + 1);
     }
 

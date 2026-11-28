@@ -81,6 +81,31 @@ describe("getDayduty", () => {
       expect(namesOf(days)).toEqual(["D"]);
     });
 
+    it("先生が飛ばした番は、読む範囲によらず同じようになくなること", async () => {
+      await group.collection("dayduty_records").add({
+        created_by: "teacher",
+        created_at: new Date(),
+        ops: [{ date: "2025-01-02", kind: "skip", member: "B", turn: 0 }],
+      });
+
+      const all = await getDayduty(GROUP_ID, "2025-01-01", "2025-01-05");
+      const one = await getDayduty(GROUP_ID, "2025-01-03", "2025-01-03");
+
+      expect(namesOf(all)).toEqual(["A", "C", "D", "A", "B"]);
+      expect(namesOf(one)).toEqual(["D"]);
+    });
+
+    it("開始日に時刻が付いていても、日付で数えること", async () => {
+      await group.set({
+        name: "Test Group",
+        dayduty_start_date: "2025-01-01T09:00:00",
+      });
+
+      const days = await getDayduty(GROUP_ID, "2025-01-02", "2025-01-02");
+
+      expect(namesOf(days)).toEqual(["B"]);
+    });
+
     it("グループがなければエラーになること", async () => {
       await expect(
         getDayduty("non_existent_group", "2025-01-01", "2025-01-01"),
@@ -148,6 +173,12 @@ describe("getDayduty", () => {
       const days = await getDayduty(GROUP_ID, "2026-12-01", "2026-12-02");
 
       expect(namesOf(days)).toEqual(["A", "B"]);
+    });
+
+    it("確定する前の日は、開始日から数えた人が返されること", async () => {
+      const days = await getDayduty(GROUP_ID, "2026-11-30", "2026-12-01");
+
+      expect(namesOf(days)).toEqual(["C", "A"]);
     });
 
     it("名簿から消えた人は、確定した日にも出さないこと", async () => {

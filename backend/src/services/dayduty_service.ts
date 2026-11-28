@@ -35,13 +35,15 @@ const loadOrder = async (groupId: string) => {
 };
 
 /**
- * まだ確定した日がないグループは、開始日からの経過日数で決めていたときと同じ人から始める
+ * 確定した日がない日は、開始日からの経過日数で決めていたときと同じ人になるよう、開始日から数え直す
+ *
+ * 開始日より前の日を読むときは、その日から始める
  */
-const turnsFromStartDate = async (
+const startOfRotation = async (
   groupId: string,
   order: readonly string[],
-  date: string,
-): Promise<Record<string, number>> => {
+  from: string,
+): Promise<{ from: string; turns: Record<string, number> }> => {
   const group = (await groupRef(groupId).get()).data();
   if (!group) {
     throw new Error("Group not found");
@@ -59,13 +61,16 @@ const turnsFromStartDate = async (
     throw new Error("No students found in group");
   }
 
-  const elapsedDays = Math.floor(
-    DateTime.fromISO(date, { zone: AppConfig.TIMEZONE })
-      .diff(startDate)
-      .as("days"),
-  );
+  const start = startDate.toISODate() as string;
+  const seed = from < start ? from : start;
+  const elapsedDays = DateTime.fromISO(seed, { zone: "utc" })
+    .diff(DateTime.fromISO(start, { zone: "utc" }), "days")
+    .as("days");
   const first = ((elapsedDays % order.length) + order.length) % order.length;
-  return Object.fromEntries(order.map((m, i) => [m, i < first ? 1 : 0]));
+  return {
+    from: seed,
+    turns: Object.fromEntries(order.map((m, i) => [m, i < first ? 1 : 0])),
+  };
 };
 
 /**
@@ -88,50 +93,72 @@ export const getDayduty = async (
       groupRef(groupId).collection("dayduty_rules").get(),
     ]);
   const orderIds = order.map((m) => m.id);
+  const ops = recordsSnapshot.docs.flatMap(
+    (doc) => doc.get("ops") as DaydutyOp[],
+  );
+  const rules = rulesSnapshot.docs.map((doc) => doc.data() as DaydutyRule);
   const lastFinalized = lastSnapshot.docs[0]?.get("date") as string | undefined;
 
-  const finalized = new Map<string, string[]>();
+  const members = new Map<string, string[]>();
+  const compute = (
+    start: { from: string; turns: Record<string, number> },
+    until: string,
+  ) => {
+    const { days } = computeDayduty({
+      order: orderIds,
+      turns: start.turns,
+      from: start.from,
+      to: until,
+      ops,
+      rules,
+    });
+    for (const day of days) {
+      if (!members.has(day.date)) members.set(day.date, day.members);
+    }
+  };
+
   if (lastFinalized !== undefined && from <= lastFinalized) {
     const snapshot = await daysRef
       .where("date", ">=", from)
       .where("date", "<=", to)
       .get();
     for (const doc of snapshot.docs) {
-      finalized.set(doc.get("date"), doc.get("members"));
+      members.set(doc.get("date"), doc.get("members"));
     }
   }
 
-  const computed = new Map<string, string[]>();
-  if (lastFinalized === undefined || lastFinalized < to) {
-    const computeFrom =
-      lastFinalized === undefined ? from : daysAfter(lastFinalized, 1);
-    const turns =
-      lastFinalized === undefined
-        ? await turnsFromStartDate(groupId, orderIds, computeFrom)
-        : Object.fromEntries(
-            (
-              await groupRef(groupId).collection("dayduty_members").get()
-            ).docs.map((doc) => [doc.id, doc.get("turns") as number]),
-          );
+  const finalizedUntil =
+    lastFinalized !== undefined && lastFinalized < to ? lastFinalized : to;
+  let missing = false;
+  for (let date = from; date <= finalizedUntil; date = daysAfter(date, 1)) {
+    if (!members.has(date)) missing = true;
+  }
+  if (lastFinalized === undefined || missing) {
+    const until = lastFinalized === undefined ? to : finalizedUntil;
+    compute(await startOfRotation(groupId, orderIds, from), until);
+  }
 
-    const { days } = computeDayduty({
-      order: orderIds,
-      turns,
-      from: computeFrom,
+  if (lastFinalized !== undefined && lastFinalized < to) {
+    const snapshot = await groupRef(groupId)
+      .collection("dayduty_members")
+      .get();
+    compute(
+      {
+        from: daysAfter(lastFinalized, 1),
+        turns: Object.fromEntries(
+          snapshot.docs.map((doc) => [doc.id, doc.get("turns") as number]),
+        ),
+      },
       to,
-      ops: recordsSnapshot.docs.flatMap((doc) => doc.get("ops") as DaydutyOp[]),
-      rules: rulesSnapshot.docs.map((doc) => doc.data() as DaydutyRule),
-    });
-    for (const day of days) computed.set(day.date, day.members);
+    );
   }
 
   const names = new Map(order.map((m) => [m.id, m.name]));
   const result: DaydutyOfDay[] = [];
   for (let date = from; date <= to; date = daysAfter(date, 1)) {
-    const ids = finalized.get(date) ?? computed.get(date) ?? [];
     result.push({
       date,
-      members: ids.flatMap((id) => {
+      members: (members.get(date) ?? []).flatMap((id) => {
         const name = names.get(id);
         return name === undefined ? [] : [{ id, name }];
       }),
