@@ -64,9 +64,11 @@ void main() {
     group(c.name, () {
       late ProviderContainer container;
       var requests = 0;
+      var ticks = 0;
 
       setUp(() {
         requests = 0;
+        ticks = 0;
         final api = Api.create(
           baseUrl: Uri.parse('http://backend.test'),
           httpClient: MockClient((request) async {
@@ -80,7 +82,12 @@ void main() {
           }),
         );
         container = ProviderContainer(
-          overrides: [apiClientProvider.overrideWith((ref) async => api)],
+          overrides: [
+            apiClientProvider.overrideWith((ref) async => api),
+            cronProvider(c.cron).overrideWith(
+              (ref) => DateTime(2026).add(Duration(days: ticks++)),
+            ),
+          ],
           retry: (_, _) => null,
         );
         container.listen(c.provider(), (_, _) {});

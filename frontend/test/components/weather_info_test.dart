@@ -21,6 +21,7 @@ void main() {
     final mockApi = MockApi();
     final reloaded = Completer<chopper.Response<WeatherData>>();
     var failing = true;
+    var ticks = 0;
     when(() => mockApi.apiV1GroupsGroupIdWeatherNowGet(groupId: 'g1'))
         .thenAnswer((_) {
           return failing
@@ -30,7 +31,9 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         apiClientProvider.overrideWith((ref) async => mockApi),
-        cronProvider('*/15 * * * *').overrideWith((ref) => DateTime.now()),
+        cronProvider('*/15 * * * *').overrideWith(
+          (ref) => DateTime(2026).add(Duration(minutes: 15 * ticks++)),
+        ),
       ],
       retry: (_, _) => null,
     );
