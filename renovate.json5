@@ -126,6 +126,12 @@
       "enabled": false
     },
     {
+      "description": "root・backend・functions の oxlint と oxfmt をまとめる。設定は root の1つを共有している",
+      "matchManagers": ["npm"],
+      "matchDepNames": ["oxlint", "oxfmt", "oxlint-tsgolint"],
+      "groupName": "oxc"
+    },
+    {
       "description": "npm の依存の範囲指定を最新に追従させる",
       "matchManagers": ["npm"],
       // 範囲内の更新でも package.json の下限を上げる。

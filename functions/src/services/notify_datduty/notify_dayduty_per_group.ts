@@ -3,7 +3,9 @@ import {
   WebClient as SlackWebClient,
 } from "@slack/web-api";
 import type { DateTime } from "luxon";
+
 import { fetchSecret } from "~/services/fetch_secret.js";
+
 import { getDayduty } from "../../core/dayduty/getDayduty.js";
 import { getTeacher } from "../classmates/getTeacher.js";
 

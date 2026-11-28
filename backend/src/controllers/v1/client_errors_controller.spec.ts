@@ -1,5 +1,6 @@
 import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { jsSourceMap } from "../../../tests/fixtures/source_maps.js";
 import {
   CLOUD_STORAGE_OBJECT_URL,
@@ -35,8 +36,8 @@ const reportedErrors = (spy: { mock: { calls: unknown[][] } }) =>
     .map((call) => JSON.parse(String(call[0])))
     .filter((entry) => entry.severity === "ERROR");
 
-beforeEach(() => {
-  clearSourceMapCache();
+beforeEach(async () => {
+  await clearSourceMapCache();
   resetClientErrorRateLimit();
   externalApiServer.use(
     http.get(CLOUD_STORAGE_OBJECT_URL, () => HttpResponse.json(jsSourceMap)),

@@ -2,7 +2,9 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
+
 import { cleanupAnonymousUsers } from "./index.js";
 
 process.env.FIREBASE_AUTH_EMULATOR_HOST ??= "localhost:9099";

@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
+
 import { FieldValue } from "firebase-admin/firestore";
+
 import { firestore } from "../clients/firebase.js";
 import { isAlreadyExists } from "../clients/firestore_errors.js";
 import { type Principal, subject } from "./principal.js";

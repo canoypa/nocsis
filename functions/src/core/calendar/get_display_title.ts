@@ -1,4 +1,5 @@
 import { type DateTime, Interval } from "luxon";
+
 import type { CalendarEvent } from "../../types/calendar.js";
 import { isMultipleDays } from "./utils.js";
 

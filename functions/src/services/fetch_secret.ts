@@ -1,4 +1,5 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
 
 export const fetchSecret = async (secretName: string) => {

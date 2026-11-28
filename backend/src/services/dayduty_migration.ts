@@ -1,5 +1,6 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
+
 import { firestore } from "../clients/firebase.js";
 import { isoDate } from "./dayduty_calc.js";
 
@@ -51,7 +52,7 @@ export const planDaydutyMigration = async (
       name: doc.get("name") as string,
       stuNo: doc.get("stuNo") as number,
     }))
-    .sort((a, b) => a.stuNo - b.stuNo);
+    .toSorted((a, b) => a.stuNo - b.stuNo);
   if (students.length === 0) return skip("生徒がいません");
 
   const date = isoDate(

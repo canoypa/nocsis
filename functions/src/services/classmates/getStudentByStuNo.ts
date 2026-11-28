@@ -1,4 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
+
 import { firebaseApp } from "../../client/firebaseApp.js";
 import type { Student } from "../../types/classmates.js";
 

@@ -1,6 +1,8 @@
 import assert from "node:assert";
+
 import { FieldValue } from "firebase-admin/firestore";
 import { OAuth2Client } from "google-auth-library";
+
 import { auth, firestore } from "../clients/firebase.js";
 import { AppConfig } from "../config/app_config.js";
 

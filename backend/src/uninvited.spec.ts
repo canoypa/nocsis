@@ -8,6 +8,7 @@ import {
   it,
   vi,
 } from "vitest";
+
 import { type LoginResult, login } from "../tests/helpers/users.js";
 import { auth, firestore } from "./clients/firebase.js";
 import { declarationOf } from "./middlewares/authorize.js";
@@ -83,7 +84,7 @@ describe("どのグループにも招かれていないアカウント", () => {
       routesByDeclaration()
         .filter(({ kind }) => kind === "skip")
         .map(({ route }) => route)
-        .sort(),
+        .toSorted(),
     ).toEqual(
       [
         "GET /api/v1/me",
@@ -95,7 +96,7 @@ describe("どのグループにも招かれていないアカウント", () => {
         "POST /api/v1/jobs/dayduty-finalize",
         "GET /api/api-spec",
         "GET /api/api-doc",
-      ].sort(),
+      ].toSorted(),
     );
   });
 

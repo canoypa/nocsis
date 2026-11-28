@@ -1,7 +1,8 @@
 import { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
+import { HTTPException } from "hono/http-exception";
 import type { z } from "zod";
+
 import { permissionsByResource } from "../../authz/check.js";
 import { user } from "../../authz/principal.js";
 import { firestore } from "../../clients/firebase.js";
@@ -60,7 +61,7 @@ meRoutes.get(
     // 並びは binding を読んだ順で決まらないよう ID 順にする。先頭が既定のグループになる
     const snapshots = await firestore.getAll(
       ...[...granted.keys()]
-        .sort()
+        .toSorted()
         .map((id) => firestore.collection("groups").doc(id)),
       { fieldMask: ["name"] },
     );
