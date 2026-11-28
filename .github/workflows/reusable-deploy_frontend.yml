@@ -29,7 +29,12 @@ jobs:
         uses: jdx/mise-action@v5.3.0
         with:
           install_args: node pnpm
+      # install は取得を待つ時間が長いので、成果物のダウンロードの裏で進める。
+      # 認証より前に待ち合わせる。依存のインストールスクリプトを、デプロイの
+      # 認証情報がある状態で走らせないため。
       - name: Install dependencies
+        id: install
+        background: true
         run: pnpm install --frozen-lockfile
       - name: Download Artifacts
         uses: actions/download-artifact@v8.0.2
@@ -41,6 +46,8 @@ jobs:
         with:
           name: frontend-source-maps
           path: ./frontend/source-maps
+      - name: Wait for dependencies
+        wait: install
       # ビルドの向き先はデプロイ先と同じでなければならない。違えば、staging の
       # Hosting に本番を向いたアプリが載る(逆も同じ)。設定はビルド側の入力、
       # デプロイ先は environment の変数で決まるため、両者は自動では一致しない。
