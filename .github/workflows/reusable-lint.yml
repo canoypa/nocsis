@@ -61,9 +61,11 @@ jobs:
             ${{ runner.os }}-pnpm-store-functions-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      # 並行にはしない。どれも CPU を使うので、並べると取り合って縮まない。
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
+        if: ${{ !cancelled() }}
         run: pnpm run lint
       - name: Format
         if: ${{ !cancelled() }}
@@ -93,9 +95,11 @@ jobs:
             ${{ runner.os }}-pnpm-store-backend-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      # 並行にはしない。どれも CPU を使うので、並べると取り合って縮まない。
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
+        if: ${{ !cancelled() }}
         run: pnpm run lint
       - name: Format
         if: ${{ !cancelled() }}
@@ -103,6 +107,7 @@ jobs:
       # frontend のコード生成はコミット済みの api.json を入力にするため、
       # 古いままだと backend と食い違ったクライアントが生成される。
       - name: Check OpenAPI spec
+        if: ${{ !cancelled() }}
         run: |
           pnpm run generate-openapi
           git diff --exit-code -- ../frontend/swagger/api.json || {
