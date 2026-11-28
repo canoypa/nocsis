@@ -21,8 +21,6 @@ final String apiBaseUrl = _apiBaseUrlOverride.isNotEmpty
     ? 'http://localhost:8080'
     : Uri.base.origin;
 
-// 作るときに取ったトークンを持ち続けない。持つとトークンが替わるたびに API クライアントを
-// 作り直すことになり、それを watch している一覧が読み直される
 class FirebaseAuthInterceptor implements Interceptor {
   final FirebaseAuth auth;
 

@@ -5,7 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cron.g.dart';
 
-// Stream にしない。最初の値が届くまで読み込み中になり、watch している側が、値が届いたときにもう一度作られる
 @riverpod
 DateTime cron(Ref ref, String cronFormat) {
   final schedule = Cron.parse(cronFormat);
