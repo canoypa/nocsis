@@ -38,6 +38,13 @@ jobs:
         uses: jdx/mise-action@v5.3.0
         with:
           install_args: flutter
+      # mise は展開で mtime を残さないので、このままだと flutter は同梱の flutter tool を
+      # 古いと見て組み立て直す。同梱の pub パッケージは pub のキャッシュと重なるので取り込ませない。
+      - name: Use bundled flutter tool
+        run: |
+          flutter_root="$(mise where flutter)"
+          touch "$flutter_root/packages/flutter_tools/pubspec.lock"
+          rm -rf "$flutter_root/.pub-preload-cache"
       # 本番のビルドはキャッシュを使わない。restore-keys は前の実行のキャッシュを
       # 引き継ぐので、一度書き換えられた中身は依存を戻しても残り、本番に出続ける。
       - name: Setup pub cache
