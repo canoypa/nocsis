@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import { DateTime } from "luxon";
 
 /** 先生の操作。その人の `turn` 回目の番を使ったことにする */
@@ -22,6 +23,15 @@ export type DaydutyDay = {
 
 const MEMBERS_PER_DAY = 1;
 
+/**
+ * YYYY-MM-DD にする。この計算が扱う日付は、確かめた日付から作ったものだけ
+ */
+export const isoDate = (date: DateTime): string => {
+  const day = date.toISODate();
+  assert(day !== null, `無効な日付です: ${date.invalidExplanation}`);
+  return day;
+};
+
 const isBlocked = (
   rules: readonly DaydutyRule[],
   member: string,
@@ -30,7 +40,7 @@ const isBlocked = (
   rules.some((rule) => {
     if (rule.member !== member) return false;
     if ("weekdays" in rule) return rule.weekdays.includes(date.weekday);
-    const day = date.toISODate() as string;
+    const day = isoDate(date);
     return rule.from <= day && day <= rule.to;
   });
 
@@ -75,7 +85,7 @@ export const computeDayduty = (input: {
     date <= end;
     date = date.plus({ days: 1 })
   ) {
-    const day = date.toISODate() as string;
+    const day = isoDate(date);
 
     for (const op of ops) {
       if (op.kind === "skip" && op.date === day && position.has(op.member))

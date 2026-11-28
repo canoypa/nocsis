@@ -5,6 +5,7 @@ import {
   computeDayduty,
   type DaydutyOp,
   type DaydutyRule,
+  isoDate,
 } from "./dayduty_calc.js";
 
 export type DaydutyMember = { id: string; name: string };
@@ -14,7 +15,7 @@ const groupRef = (groupId: string) =>
   firestore.collection("groups").doc(groupId);
 
 const daysAfter = (date: string, days: number) =>
-  DateTime.fromISO(date, { zone: "utc" }).plus({ days }).toISODate() as string;
+  isoDate(DateTime.fromISO(date, { zone: "utc" }).plus({ days }));
 
 /**
  * 決めた順番に並んだ生徒。今は出席番号順
@@ -61,7 +62,7 @@ const startOfRotation = async (
     throw new Error("No students found in group");
   }
 
-  const start = startDate.toISODate() as string;
+  const start = isoDate(startDate);
   const seed = from < start ? from : start;
   const elapsedDays = DateTime.fromISO(seed, { zone: "utc" })
     .diff(DateTime.fromISO(start, { zone: "utc" }), "days")

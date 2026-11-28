@@ -78,13 +78,13 @@ daydutRoutes.get(
         ? DateTime.fromISO(date, { zone: AppConfig.TIMEZONE })
         : DateTime.now().setZone(AppConfig.TIMEZONE);
 
-      if (!targetDate.isValid) {
+      const day = targetDate.toISODate();
+      if (day === null) {
         throw new HTTPException(400, {
           message: "日付のフォーマットが正しくありません。",
         });
       }
 
-      const day = targetDate.toISODate() as string;
       const [{ members }] = await getDayduty(groupId, day, day);
 
       if (members.length === 0) {
