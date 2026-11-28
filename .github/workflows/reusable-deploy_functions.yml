@@ -27,19 +27,13 @@ jobs:
           install_args: node pnpm
       # firebase deploy は関数定義の discovery で functions のコードを実行するため、
       # デプロイするだけでも functions 配下の node_modules が要る。root 側は CLI 用。
-      # 取得を待つ時間が長いので成果物のダウンロードの裏で進め、認証より前に待ち合わせる。
-      # 依存のインストールスクリプトを、デプロイの認証情報がある状態で走らせないため。
       - name: Install dependencies
-        id: install
-        background: true
         run: pnpm install --frozen-lockfile; cd functions && pnpm install --frozen-lockfile
       - name: Download Artifacts
         uses: actions/download-artifact@v8.0.2
         with:
           name: functions-build
           path: ./functions/dist
-      - name: Wait for dependencies
-        wait: install
       - name: Auth
         uses: google-github-actions/auth@v3.0.0
         with:

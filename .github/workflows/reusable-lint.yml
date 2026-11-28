@@ -61,8 +61,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-functions-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      # 並行にしない。どれも CPU を使い切るので、並べても取り合って縮まない。
-      # 1つが落ちても残りの結果も出るよう、後ろのステップは !cancelled() で回す。
+      # 並行にはしない。どれも CPU を使うので、並べると取り合って縮まない。
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
@@ -96,8 +95,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-backend-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      # 並行にしない。どれも CPU を使い切るので、並べても取り合って縮まない。
-      # 1つが落ちても残りの結果も出るよう、後ろのステップは !cancelled() で回す。
+      # 並行にはしない。どれも CPU を使うので、並べると取り合って縮まない。
       - name: Type Check
         run: pnpm run typecheck
       - name: Lint
