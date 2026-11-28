@@ -7,8 +7,11 @@
     "generate-openapi": "tsx scripts/generate_openapi.ts",
     "grant": "tsx scripts/grant.ts",
     "revoke": "tsx scripts/revoke.ts",
-    "ci": "oxlint && oxfmt --check",
+    "ci": "pnpm run lint && pnpm run format:check",
     "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "test": "firebase emulators:exec --project demo-nocsis 'pnpm vitest run --coverage'",
     "test:watch": "vitest watch --coverage",
     "typecheck": "tsc --noEmit"

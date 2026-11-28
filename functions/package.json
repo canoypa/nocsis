@@ -5,8 +5,11 @@
   "main": "dist/main.js",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "ci": "oxlint && oxfmt --check",
+    "ci": "pnpm run lint && pnpm run format:check",
     "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "test": "firebase emulators:exec --project demo-nocsis 'pnpm vitest run --coverage'",
     "test:watch": "vitest watch --coverage",
     "build": "tsup src/main.ts -d dist --format esm --clean --sourcemap",
