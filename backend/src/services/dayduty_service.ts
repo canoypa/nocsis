@@ -21,18 +21,16 @@ const daysAfter = (date: string, days: number) =>
  * 決めた順番に並んだ生徒。今は出席番号順
  */
 const loadOrder = async (groupId: string) => {
+  // role でも絞ると (group_id, role, stuNo) の複合インデックスが要る。
+  // (group_id, stuNo) はあるので、それで読んで先生はここで外す
   const snapshot = await firestore
     .collection("classmates")
     .where("group_id", "==", groupId)
-    .where("role", "==", "student")
+    .orderBy("stuNo")
     .get();
   return snapshot.docs
-    .map((doc) => ({
-      id: doc.id,
-      name: doc.get("name") as string,
-      stuNo: doc.get("stuNo") as number,
-    }))
-    .sort((a, b) => a.stuNo - b.stuNo);
+    .filter((doc) => doc.get("role") === "student")
+    .map((doc) => ({ id: doc.id, name: doc.get("name") as string }));
 };
 
 /**
