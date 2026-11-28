@@ -34,9 +34,20 @@ export type SourceMapReply =
   | { id: number; ok: true; positions: OriginalPosition[] | null }
   | { id: number; ok: false; error: string };
 
-// 1 つ 3.5MB ほどある。リリースは同時に 1〜2 個しか動いていないので、少しだけ持つ。
-const CACHE_LIMIT = 4;
-const maps = new Map<string, TraceMap>();
+// 数で区切らない。ソースマップが育つと、同じ数でも使うメモリが増える。
+const LOADED_BYTES_LIMIT = 12 * 1024 * 1024;
+const maps = new Map<string, { map: TraceMap; bytes: number }>();
+
+const loadedBytes = () =>
+  [...maps.values()].reduce((sum, { bytes }) => sum + bytes, 0);
+
+/** 古いものから捨てて、bytes を読み込める空きを作る */
+const makeRoom = (bytes: number) => {
+  for (const key of maps.keys()) {
+    if (loadedBytes() + bytes <= LOADED_BYTES_LIMIT) return;
+    maps.delete(key);
+  }
+};
 
 const UNKNOWN: OriginalPosition = {
   source: null,
@@ -61,23 +72,23 @@ const lookup = (map: TraceMap, position: GeneratedPosition) => {
 const run = (command: SourceMapCommand): OriginalPosition[] | null => {
   switch (command.type) {
     case "load": {
+      const bytes = command.bytes.byteLength;
+      maps.delete(command.key);
+      makeRoom(bytes);
+
       const json = JSON.parse(new TextDecoder().decode(command.bytes));
       const map = new TraceMap(json as SourceMapInput);
-      maps.delete(command.key);
-      maps.set(command.key, map);
-      if (maps.size > CACHE_LIMIT) {
-        const oldest = maps.keys().next().value;
-        if (oldest !== undefined) maps.delete(oldest);
-      }
+      maps.set(command.key, { map, bytes });
       return command.positions.map((position) => lookup(map, position));
     }
     case "lookup": {
-      const map = maps.get(command.key);
-      if (!map) return null;
+      const loaded = maps.get(command.key);
+      if (!loaded) return null;
 
       // 最近使ったものを後ろに回し、古いものから捨てる
       maps.delete(command.key);
-      maps.set(command.key, map);
+      maps.set(command.key, loaded);
+      const { map } = loaded;
       return command.positions.map((position) => lookup(map, position));
     }
   }
