@@ -9,6 +9,11 @@ variable "region" {
   default     = "asia-northeast1"
 }
 
+variable "backend_url" {
+  description = "backend の API を呼ぶ URL の先頭。Hosting の rewrite を通る (例: https://nocsis.app)"
+  type        = string
+}
+
 variable "auth_authorized_domains" {
   description = "Firebase Auth の承認済みドメイン"
   type        = list(string)

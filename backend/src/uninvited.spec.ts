@@ -92,6 +92,7 @@ describe("どのグループにも招かれていないアカウント", () => {
         "POST /api/v1/client-errors",
         "POST /api/v1/display-pairings",
         "DELETE /api/v1/display-pairings",
+        "POST /api/v1/jobs/dayduty-finalize",
         "GET /api/api-spec",
         "GET /api/api-doc",
       ].sort(),

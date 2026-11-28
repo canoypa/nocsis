@@ -11,6 +11,7 @@ locals {
     # Secret の値は Terraform に置かない。roles/secretmanager.admin は値を読む権限まで含むので使わない。
     "projects/${var.project_id}/roles/secretConfigManager",
     "projects/${var.project_id}/roles/bucketConfigManager",
+    "roles/cloudscheduler.admin",
   ]
 
   # tf-plan も、管理するリソースの設定を読めないと plan が落ちる。
@@ -18,6 +19,7 @@ locals {
   tf_plan_member = "serviceAccount:tf-plan@${var.project_id}.iam.gserviceaccount.com"
 
   tf_plan_roles = [
+    "roles/cloudscheduler.viewer",
     "roles/storage.bucketViewer",
   ]
 }

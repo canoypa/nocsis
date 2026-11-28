@@ -6,6 +6,7 @@ import { displayPairingsRoutes } from "./v1/display_pairings_controller.js";
 import { displaysRoutes } from "./v1/displays_controller.js";
 import { eventsRoutes } from "./v1/events_controller.js";
 import { groupRoutes } from "./v1/group_controller.js";
+import { jobsRoutes } from "./v1/jobs_controller.js";
 import { meRoutes } from "./v1/me_controller.js";
 import { userRoutes } from "./v1/user_controller.js";
 import { weatherRoutes } from "./v1/weather_controller.js";
@@ -22,5 +23,6 @@ v1Routes.route("/display-pairings", displayPairingsRoutes);
 v1Routes.route("/me", meRoutes);
 v1Routes.route("/users", userRoutes);
 v1Routes.route("/client-errors", clientErrorsRoutes);
+v1Routes.route("/jobs", jobsRoutes);
 
 export { v1Routes };
