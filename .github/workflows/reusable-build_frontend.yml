@@ -38,8 +38,9 @@ jobs:
         uses: jdx/mise-action@v5.3.0
         with:
           install_args: flutter
-      # mise は展開で mtime を残さないので、このままだと flutter は同梱のコンパイル済みの
-      # flutter tool を古いと見てコンパイルし直す。同梱の pub パッケージはまとめて取り込ませず、要るものだけ pub get に取らせる。
+      # mise が展開した SDK では、flutter_tools の pubspec.yaml の更新時刻が pubspec.lock より新しくなる。
+      # lock の更新時刻を新しくしないと、flutter は同梱のコンパイル済みの flutter tool を古いと見てコンパイルし直す。
+      # 同梱の pub パッケージはまとめて取り込ませず、要るものだけ pub get に取らせる。
       - name: Use bundled flutter tool
         run: |
           flutter_root="$(mise where flutter)"
