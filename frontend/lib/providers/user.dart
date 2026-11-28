@@ -5,7 +5,9 @@ import 'firebase.dart';
 
 part 'user.g.dart';
 
-@riverpod
+// 購読を止めない。firebase_auth_web は userChanges と idTokenChanges の購読を止める順番によって、
+// 止めるところで null を参照して落ちる
+@Riverpod(keepAlive: true)
 Stream<User?> userChangesStream(Ref ref) {
   final auth = ref.watch(firebaseAuthProvider);
   return auth.userChanges();

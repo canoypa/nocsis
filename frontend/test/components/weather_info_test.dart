@@ -21,7 +21,7 @@ void main() {
     final mockApi = MockApi();
     final reloaded = Completer<chopper.Response<WeatherData>>();
     var failing = true;
-    final cron = StreamController<DateTime>();
+    var ticks = 0;
     when(() => mockApi.apiV1GroupsGroupIdWeatherNowGet(groupId: 'g1'))
         .thenAnswer((_) {
           return failing
@@ -31,7 +31,9 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         apiClientProvider.overrideWith((ref) async => mockApi),
-        cronProvider('*/15 * * * *').overrideWith((ref) => cron.stream),
+        cronProvider('*/15 * * * *').overrideWith(
+          (ref) => DateTime(2026).add(Duration(minutes: 15 * ticks++)),
+        ),
       ],
       retry: (_, _) => null,
     );
@@ -54,7 +56,7 @@ void main() {
     expect(container.read(weatherProvider('g1')).hasError, isTrue);
 
     failing = false;
-    cron.add(DateTime(2026, 11, 22, 9, 15));
+    container.invalidate(cronProvider('*/15 * * * *'));
     await tester.pump();
     await tester.pump();
 
