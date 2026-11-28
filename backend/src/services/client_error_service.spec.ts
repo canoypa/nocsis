@@ -184,24 +184,51 @@ describe("decodeStack", () => {
     ]);
   });
 
-  it("5 つ目の commit が届いたら、いちばん前に使ったソースマップを取り直すこと", async () => {
+  it("読み込んだソースマップが 16MB を超えるときは、いちばん前に使ったものから取り直すこと", async () => {
     const requested: string[] = [];
+    // 空白で 6MB にふくらませる。ファイルの大きさだけが変わる
+    const sixMegabytes =
+      JSON.stringify(jsSourceMap) + " ".repeat(6 * 1024 * 1024);
     externalApiServer.use(
       http.get(CLOUD_STORAGE_OBJECT_URL, ({ params }) => {
         requested.push(decodeURIComponent(String(params.object)));
-        return HttpResponse.json(jsSourceMap);
+        return HttpResponse.text(sixMegabytes);
       }),
     );
     const stack = "    at a (https://nocsis.app/main.dart.js:10:5)";
-    const commits = ["1", "2", "3", "4", "5"].map((c) => c.repeat(40));
+    const [first, second, third] = ["1", "2", "3"].map((c) => c.repeat(40));
 
-    for (const commit of commits) await decodeStack(stack, commit);
-    const [frame] = await decodeStack(stack, commits[0]);
+    for (const commit of [first, second, first, third, first, second]) {
+      const [frame] = await decodeStack(stack, commit);
+      expect(frame.path).toBe("frontend/lib/main.dart");
+    }
 
+    // 2 つで 12MB。third を読み込むと、いちばん前に使った second が捨てられる
     expect(requested).toEqual(
-      [...commits, commits[0]].map((commit) => `${commit}/main.dart.js.map`),
+      [first, second, third, second].map(
+        (commit) => `${commit}/main.dart.js.map`,
+      ),
     );
-    expect(frame.path).toBe("frontend/lib/main.dart");
+  });
+
+  it("16MB より大きいソースマップは、解読するが持たないこと", async () => {
+    const requested: string[] = [];
+    const large = JSON.stringify(jsSourceMap) + " ".repeat(17 * 1024 * 1024);
+    externalApiServer.use(
+      http.get(CLOUD_STORAGE_OBJECT_URL, ({ params }) => {
+        requested.push(decodeURIComponent(String(params.object)));
+        return HttpResponse.text(large);
+      }),
+    );
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const stack = "    at a (https://nocsis.app/main.dart.js:10:5)";
+
+    for (let i = 0; i < 2; i++) {
+      const [frame] = await decodeStack(stack, COMMIT);
+      expect(frame.path).toBe("frontend/lib/main.dart");
+    }
+
+    expect(requested).toHaveLength(2);
   });
 
   it("見つからなかったソースマップは、5 分たつまで取りに行かないこと", async () => {
