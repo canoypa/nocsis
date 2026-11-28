@@ -61,15 +61,27 @@ describe("日直の通知", () => {
     vi.mocked(fetchSecret).mockImplementation(async (name) => `token:${name}`);
     postMessage.mockResolvedValue({ ok: true });
 
-    await group.set({ name: "Test Group", dayduty_start_date: "2025-01-01" });
+    await group.set({ name: "Test Group" });
+    // 2025-01-01 に A が務めた
+    await group
+      .collection("dayduty_days")
+      .doc("2025-01-01")
+      .set({
+        date: "2025-01-01",
+        members: ["notify_A"],
+        turns: { notify_A: 1, notify_B: 0 },
+      });
+    for (const [id, turns] of [
+      ["notify_A", 1],
+      ["notify_B", 0],
+    ] as const) {
+      await group.collection("dayduty_members").doc(id).set({ turns });
+    }
     await addClassmate("notify_A", GROUP_ID, { role: "student", stuNo: 1 });
     await addClassmate("notify_B", GROUP_ID, { role: "student", stuNo: 2 });
     await addClassmate("notify_T", GROUP_ID, { role: "teacher" });
 
-    await otherGroup.set({
-      name: "Other Group",
-      dayduty_start_date: "2025-01-01",
-    });
+    await otherGroup.set({ name: "Other Group" });
     await addClassmate("notify_X", OTHER_GROUP_ID, {
       role: "student",
       stuNo: 1,
@@ -79,6 +91,10 @@ describe("日直の通知", () => {
   afterEach(async () => {
     vi.mocked(fetchSecret).mockReset();
     postMessage.mockReset();
+    for (const sub of ["dayduty_rules", "dayduty_days", "dayduty_members"]) {
+      const docs = await group.collection(sub).get();
+      for (const doc of docs.docs) await doc.ref.delete();
+    }
     await group.delete();
     await otherGroup.delete();
     for (const id of ["notify_A", "notify_B", "notify_T", "notify_X"]) {
@@ -88,7 +104,7 @@ describe("日直の通知", () => {
 
   describe("notifyDayduty", () => {
     it("その日の日直と先生に、グループの Slack で送ること", async () => {
-      // 2025-01-02 は2日目なので B
+      // 2025-01-01 の A の次なので B
       await notifyDayduty(GROUP_ID, jst("2025-01-02"));
 
       const token = `token:group_${GROUP_ID}-slack_token`;
@@ -140,8 +156,11 @@ describe("日直の通知", () => {
     });
 
     it("その日の日直がいなければ、送らないこと", async () => {
-      // 生徒は2番だけなので、1番を探してもいない
-      await firestore.collection("classmates").doc("notify_A").delete();
+      for (const member of ["notify_A", "notify_B"]) {
+        await group
+          .collection("dayduty_rules")
+          .add({ member, weekdays: [1, 2, 3, 4, 5, 6, 7] });
+      }
 
       await notifyDayduty(GROUP_ID, jst("2025-01-02"));
 
@@ -168,16 +187,6 @@ describe("日直の通知", () => {
 
       await notifyAllDayduty(jst("2025-01-01T15:30:00Z"));
 
-      expect(channels()).not.toContain("slack_notify_B");
-      expect(channels()).toContain("slack_notify_X");
-    });
-
-    it("日直の開始日がないグループには、送らないこと", async () => {
-      await group.set({ name: "Test Group" });
-
-      const failed = await notifyAllDayduty(jst("2025-01-01T15:30:00Z"));
-
-      expect(failed).not.toContain(GROUP_ID);
       expect(channels()).not.toContain("slack_notify_B");
       expect(channels()).toContain("slack_notify_X");
     });

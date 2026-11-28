@@ -95,11 +95,8 @@ export const notifyAllDayduty = async (
     throw new Error(`無効な日時です: ${today.invalidExplanation}`);
   const groups = await firestore.collection("groups").get();
 
-  // 日直の開始日がないグループは、日直を使っていない
   const targets = groups.docs.filter(
-    (group) =>
-      group.get("dayduty_notification_enabled") !== false &&
-      Boolean(group.get("dayduty_start_date")),
+    (group) => group.get("dayduty_notification_enabled") !== false,
   );
   const results = await Promise.all(
     targets.map(async (group) => {

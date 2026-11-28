@@ -95,6 +95,7 @@ daydutRoutes.get(
 
       const validatedResponse = daydutyResponseSchema.parse({
         name: members[0].name,
+        members,
       });
 
       return c.json<DaydutyResponse>(validatedResponse, 200);

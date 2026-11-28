@@ -145,10 +145,33 @@
           "name": {
             "type": "string",
             "description": "名前"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "生徒の ID"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "名前"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "additionalProperties": false
+            },
+            "description": "その日の日直。いない日は空"
           }
         },
         "required": [
-          "name"
+          "name",
+          "members"
         ],
         "additionalProperties": false,
         "description": "日直"

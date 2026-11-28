@@ -1,181 +1,169 @@
-import { DateTime } from "luxon";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { firestore } from "../clients/firebase.js";
-import { getDaydutyStuNo } from "./dayduty_service.js";
+import { getDayduty } from "./dayduty_service.js";
 
-describe("getDaydutyStuNo", () => {
+const GROUP_ID = "test_group_1";
+const group = firestore.collection("groups").doc(GROUP_ID);
+
+const deleteCollection = async (ref: FirebaseFirestore.Query) => {
+  const snapshot = await ref.get();
+  const batch = firestore.batch();
+  for (const doc of snapshot.docs) batch.delete(doc.ref);
+  await batch.commit();
+};
+
+const namesOf = (days: Awaited<ReturnType<typeof getDayduty>>) =>
+  days.map((day) => day.members.map((m) => m.name).join(""));
+
+describe("getDayduty", () => {
   beforeEach(async () => {
-    await firestore.collection("groups").doc("test_group_1").set({
-      name: "Test Group",
-      dayduty_start_date: "2025-01-01",
+    await group.set({ name: "Test Group" });
+
+    // 出席番号順に並べるのを確かめるため、順不同で入れる
+    for (const [stuNo, name] of [
+      [3, "C"],
+      [1, "A"],
+      [4, "D"],
+      [2, "B"],
+    ] as const) {
+      await firestore.collection("classmates").doc(name).set({
+        group_id: GROUP_ID,
+        role: "student",
+        stuNo,
+        name,
+        slackUserId: name,
+      });
+    }
+    await firestore.collection("classmates").doc("T").set({
+      group_id: GROUP_ID,
+      role: "teacher",
+      stuNo: 99,
+      name: "T",
+      slackUserId: "T",
     });
 
-    const classmates = [
-      {
-        group_id: "test_group_1",
-        role: "student",
-        stuNo: 1,
-        name: "Test Student 1",
-        email: "student1@example.com",
-        slackUserId: "student1",
-      },
-      {
-        group_id: "test_group_1",
-        role: "student",
-        stuNo: 2,
-        name: "Test Student 2",
-        email: "student2@example.com",
-        slackUserId: "student2",
-      },
-      {
-        group_id: "test_group_1",
-        role: "student",
-        stuNo: 3,
-        name: "Test Student 3",
-        email: "student3@example.com",
-        slackUserId: "student3",
-      },
-      {
-        group_id: "test_group_1",
-        role: "student",
-        stuNo: 4,
-        name: "Test Student 4",
-        email: "student4@example.com",
-        slackUserId: "student4",
-      },
-    ];
-
-    const batch = firestore.batch();
-    for (const classmate of classmates) {
-      const ref = firestore.collection("classmates").doc();
-      batch.set(ref, classmate);
-    }
-    await batch.commit();
-
     return async () => {
-      await firestore.collection("groups").doc("test_group_1").delete();
-
-      const classmatesSnapshot = await firestore
-        .collection("classmates")
-        .where("group_id", "==", "test_group_1")
-        .get();
-
-      const batch = firestore.batch();
-      for (const doc of classmatesSnapshot.docs) {
-        batch.delete(doc.ref);
+      await group.delete();
+      await deleteCollection(
+        firestore.collection("classmates").where("group_id", "==", GROUP_ID),
+      );
+      for (const sub of [
+        "dayduty_days",
+        "dayduty_members",
+        "dayduty_records",
+        "dayduty_rules",
+      ]) {
+        await deleteCollection(group.collection(sub));
       }
-      await batch.commit();
     };
   });
 
-  it("開始日（2025-01-01）は出席番号1が返されること", async () => {
-    const result = await getDaydutyStuNo(
-      "test_group_1",
-      DateTime.local(2025, 1, 1) as DateTime<true>,
-    );
-    expect(result).toBe(1);
-  });
+  describe("確定した日がない場合", () => {
+    it("全員 0 回から、読む最初の日に出席番号順で始めること", async () => {
+      const days = await getDayduty(GROUP_ID, "2025-01-01", "2025-01-06");
 
-  it("開始日の翌日（2025-01-02）は出席番号2が返されること", async () => {
-    const result = await getDaydutyStuNo(
-      "test_group_1",
-      DateTime.local(2025, 1, 2) as DateTime<true>,
-    );
-    expect(result).toBe(2);
-  });
-
-  it("開始日の4日後（2025-01-05）は出席番号1が返されること（4人なので周回）", async () => {
-    const result = await getDaydutyStuNo(
-      "test_group_1",
-      DateTime.local(2025, 1, 5) as DateTime<true>,
-    );
-    expect(result).toBe(1);
-  });
-
-  describe("教師ロールが混在している場合", () => {
-    beforeEach(async () => {
-      // 教師を追加
-      await firestore.collection("classmates").add({
-        group_id: "test_group_1",
-        role: "teacher",
-        stuNo: 99,
-        name: "Teacher",
-        email: "teacher@example.com",
-        slackUserId: "teacher",
-      });
-
-      return async () => {
-        const teacherSnapshot = await firestore
-          .collection("classmates")
-          .where("group_id", "==", "test_group_1")
-          .where("role", "==", "teacher")
-          .get();
-
-        const batch = firestore.batch();
-        for (const doc of teacherSnapshot.docs) {
-          batch.delete(doc.ref);
-        }
-        await batch.commit();
-      };
+      expect(namesOf(days)).toEqual(["A", "B", "C", "D", "A", "B"]);
     });
 
-    it("学生のみがカウントされること", async () => {
-      // 学生が4人なので、5日目（4 % 4 + 1 = 1）は出席番号1が返される
-      const result = await getDaydutyStuNo(
-        "test_group_1",
-        DateTime.local(2025, 1, 5) as DateTime<true>,
+    it("生徒がいなければ、日直なしで返されること", async () => {
+      await deleteCollection(
+        firestore.collection("classmates").where("group_id", "==", GROUP_ID),
       );
-      expect(result).toBe(1);
+
+      const days = await getDayduty(GROUP_ID, "2025-01-01", "2025-01-01");
+
+      expect(days).toEqual([{ date: "2025-01-01", members: [] }]);
     });
   });
 
-  describe("グループが存在しない場合", () => {
-    it("エラーが発生すること", async () => {
-      await expect(
-        getDaydutyStuNo(
-          "non_existent_group",
-          DateTime.local(2025, 1, 1) as DateTime<true>,
-        ),
-      ).rejects.toThrow("Group not found");
+  describe("確定した日がある場合", () => {
+    beforeEach(async () => {
+      // 12/1 に A、12/2 に B が務めた
+      await group
+        .collection("dayduty_days")
+        .doc("2026-12-01")
+        .set({ date: "2026-12-01", members: ["A"], turns: { A: 1 } });
+      await group
+        .collection("dayduty_days")
+        .doc("2026-12-02")
+        .set({ date: "2026-12-02", members: ["B"], turns: { B: 1 } });
+      for (const [id, turns] of [
+        ["A", 1],
+        ["B", 1],
+        ["C", 0],
+        ["D", 0],
+      ] as const) {
+        await group.collection("dayduty_members").doc(id).set({ turns });
+      }
     });
-  });
 
-  describe("dayduty_start_dateが設定されていない場合", () => {
-    it("エラーが発生すること", async () => {
-      await firestore.collection("groups").doc("test_group_no_start").set({
-        name: "Test Group No Start",
+    it("確定した日は書いてあるとおりに、その先は続きから返されること", async () => {
+      const days = await getDayduty(GROUP_ID, "2026-12-01", "2026-12-05");
+
+      expect(namesOf(days)).toEqual(["A", "B", "C", "D", "A"]);
+    });
+
+    it("確定した日は、名簿が変わっても変わらないこと", async () => {
+      await firestore.collection("classmates").doc("A").update({ stuNo: 5 });
+
+      const days = await getDayduty(GROUP_ID, "2026-12-01", "2026-12-02");
+
+      expect(namesOf(days)).toEqual(["A", "B"]);
+    });
+
+    it("最初の確定より前の日は、日直なしで返されること", async () => {
+      const days = await getDayduty(GROUP_ID, "2026-11-30", "2026-12-01");
+
+      expect(namesOf(days)).toEqual(["", "A"]);
+    });
+
+    it("名簿から消えた人は、確定した日にも出さないこと", async () => {
+      await firestore.collection("classmates").doc("A").delete();
+
+      const days = await getDayduty(GROUP_ID, "2026-12-01", "2026-12-01");
+
+      expect(days).toEqual([{ date: "2026-12-01", members: [] }]);
+    });
+
+    it("先生が飛ばした番は、なくなること", async () => {
+      await group.collection("dayduty_records").add({
+        created_by: "teacher",
+        created_at: new Date(),
+        ops: [{ date: "2026-12-03", kind: "skip", member: "C", turn: 0 }],
       });
 
-      await expect(
-        getDaydutyStuNo(
-          "test_group_no_start",
-          DateTime.local(2025, 1, 1) as DateTime<true>,
-        ),
-      ).rejects.toThrow("dayduty_start_date is not set");
+      const days = await getDayduty(GROUP_ID, "2026-12-03", "2026-12-05");
 
-      await firestore.collection("groups").doc("test_group_no_start").delete();
+      expect(namesOf(days)).toEqual(["D", "A", "B"]);
     });
-  });
 
-  describe("学生が存在しない場合", () => {
-    it("エラーが発生すること", async () => {
-      await firestore.collection("groups").doc("test_group_no_students").set({
-        name: "Test Group No Students",
-        dayduty_start_date: "2025-01-01",
-      });
+    it("選ばれない日に回ってきた番は、なくなること", async () => {
+      // 2026-12-03 は木曜
+      await group
+        .collection("dayduty_rules")
+        .add({ member: "C", weekdays: [4] });
 
-      await expect(
-        getDaydutyStuNo(
-          "test_group_no_students",
-          DateTime.local(2025, 1, 1) as DateTime<true>,
-        ),
-      ).rejects.toThrow("No students found in group");
+      const days = await getDayduty(GROUP_ID, "2026-12-03", "2026-12-05");
 
-      await firestore
-        .collection("groups")
-        .doc("test_group_no_students")
-        .delete();
+      expect(namesOf(days)).toEqual(["D", "A", "B"]);
+    });
+
+    it("読んでも何も書かないこと", async () => {
+      const snapshot = async () =>
+        Promise.all(
+          ["dayduty_days", "dayduty_members"].map(async (sub) =>
+            (await group.collection(sub).get()).docs.map((doc) => [
+              doc.id,
+              doc.data(),
+            ]),
+          ),
+        );
+      const before = await snapshot();
+
+      await getDayduty(GROUP_ID, "2026-12-01", "2026-12-10");
+
+      expect(await snapshot()).toEqual(before);
     });
   });
 });

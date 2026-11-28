@@ -6,10 +6,7 @@ import {
   finalizeAllDayduty,
   finalizeDayduty,
 } from "./dayduty_finalize_service.js";
-import {
-  DaydutyNotConfiguredError,
-  getDaydutyStuNo,
-} from "./dayduty_service.js";
+import { DaydutyNotConfiguredError } from "./dayduty_service.js";
 
 const GROUP_ID = "test_group_finalize";
 const group = firestore.collection("groups").doc(GROUP_ID);
@@ -135,18 +132,8 @@ describe("finalizeDayduty", () => {
     await finalizeDayduty(GROUP_ID, "2026-12-01");
     await finalizeDayduty(GROUP_ID, "2026-12-08");
 
-    const days = await finalizedDays();
-    const byFormula = await Promise.all(
-      days.map(async (day) => {
-        const date = DateTime.fromISO(day.date as string, {
-          zone: "Asia/Tokyo",
-        }) as DateTime<true>;
-        const stuNo = await getDaydutyStuNo(GROUP_ID, date);
-        return ["A", "B", "C", "D"][stuNo - 1];
-      }),
-    );
-    expect(await membersOf()).toEqual(byFormula);
-    expect(byFormula).toEqual(["B", "C", "D", "A", "B", "C", "D", "A"]);
+    // 2026-11-30 の A から、1日ごとに出席番号順
+    expect(await membersOf()).toEqual(["B", "C", "D", "A", "B", "C", "D", "A"]);
   });
 
   it("先生が飛ばした番と、選ばれない日に回ってきた番は、使ったことにすること", async () => {
