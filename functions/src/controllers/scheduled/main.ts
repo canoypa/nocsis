@@ -10,10 +10,6 @@ const main = async (event: ScheduledEvent) => {
   const results = await Promise.allSettled([
     crontab(
       "0 7 * * *",
-      () => import("../../services/notify_datduty/index.js"),
-    )(timestamp),
-    crontab(
-      "0 7 * * *",
       () => import("../../services/notify_events/index.js"),
     )(timestamp),
     crontab(

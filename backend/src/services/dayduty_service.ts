@@ -51,3 +51,24 @@ export const getDaydutyStuNo = async (
 
   return stuNo;
 };
+
+export type DaydutyMember = { id: string; name: string };
+
+/**
+ * その日の日直。画面と通知はこれだけを読む。当たる出席番号の人がいなければ空
+ */
+export const getDaydutyOfDay = async (
+  groupId: string,
+  date: DateTime<true>,
+): Promise<DaydutyMember[]> => {
+  const stuNo = await getDaydutyStuNo(groupId, date);
+  const snapshot = await firestore
+    .collection("classmates")
+    .where("group_id", "==", groupId)
+    .where("stuNo", "==", stuNo)
+    .select("name")
+    .get();
+  return snapshot.docs
+    .slice(0, 1)
+    .map((doc) => ({ id: doc.id, name: doc.get("name") as string }));
+};
