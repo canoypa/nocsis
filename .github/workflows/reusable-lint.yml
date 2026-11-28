@@ -61,13 +61,13 @@ jobs:
             ${{ runner.os }}-pnpm-store-functions-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Type Check
-        run: pnpm run typecheck
-      - name: Lint
-        run: pnpm run lint
-      - name: Format
-        if: ${{ !cancelled() }}
-        run: pnpm run format:check
+      - parallel:
+          - name: Type Check
+            run: pnpm run typecheck
+          - name: Lint
+            run: pnpm run lint
+          - name: Format
+            run: pnpm run format:check
 
   lint-backend:
     runs-on: ubuntu-latest
@@ -93,13 +93,13 @@ jobs:
             ${{ runner.os }}-pnpm-store-backend-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Type Check
-        run: pnpm run typecheck
-      - name: Lint
-        run: pnpm run lint
-      - name: Format
-        if: ${{ !cancelled() }}
-        run: pnpm run format:check
+      - parallel:
+          - name: Type Check
+            run: pnpm run typecheck
+          - name: Lint
+            run: pnpm run lint
+          - name: Format
+            run: pnpm run format:check
       # frontend のコード生成はコミット済みの api.json を入力にするため、
       # 古いままだと backend と食い違ったクライアントが生成される。
       - name: Check OpenAPI spec
