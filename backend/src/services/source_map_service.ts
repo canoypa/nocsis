@@ -66,7 +66,6 @@ let currentWorker: SourceMapWorker | undefined;
 
 const startWorker = (): SourceMapWorker => {
   const worker = new Worker(WORKER_URL);
-  // 返事を待っていないあいだは、プロセスの終了を止めない
   worker.unref();
 
   let nextId = 0;
@@ -96,7 +95,6 @@ const startWorker = (): SourceMapWorker => {
     );
   });
   worker.on("exit", () => {
-    // 読み込んだソースマップはワーカーと一緒に消える。次の要求は新しいワーカーで読み込み直す
     if (currentWorker === self) currentWorker = undefined;
 
     for (const request of pending.values()) {
