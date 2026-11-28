@@ -211,6 +211,26 @@ describe("decodeStack", () => {
     );
   });
 
+  it("16MB より大きいソースマップは、解読するが持たないこと", async () => {
+    const requested: string[] = [];
+    const large = JSON.stringify(jsSourceMap) + " ".repeat(17 * 1024 * 1024);
+    externalApiServer.use(
+      http.get(CLOUD_STORAGE_OBJECT_URL, ({ params }) => {
+        requested.push(decodeURIComponent(String(params.object)));
+        return HttpResponse.text(large);
+      }),
+    );
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const stack = "    at a (https://nocsis.app/main.dart.js:10:5)";
+
+    for (let i = 0; i < 2; i++) {
+      const [frame] = await decodeStack(stack, COMMIT);
+      expect(frame.path).toBe("frontend/lib/main.dart");
+    }
+
+    expect(requested).toHaveLength(2);
+  });
+
   it("見つからなかったソースマップは、5 分たつまで取りに行かないこと", async () => {
     const requested: string[] = [];
     serveSourceMaps(requested);

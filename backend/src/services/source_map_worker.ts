@@ -73,12 +73,21 @@ const run = (command: SourceMapCommand): OriginalPosition[] | null => {
   switch (command.type) {
     case "load": {
       const bytes = command.bytes.byteLength;
-      maps.delete(command.key);
-      makeRoom(bytes);
-
       const json = JSON.parse(new TextDecoder().decode(command.bytes));
       const map = new TraceMap(json as SourceMapInput);
-      maps.set(command.key, { map, bytes });
+
+      maps.delete(command.key);
+      if (bytes <= LOADED_BYTES_LIMIT) {
+        makeRoom(bytes);
+        maps.set(command.key, { map, bytes });
+      } else {
+        console.warn(
+          JSON.stringify({
+            severity: "WARNING",
+            message: `ソースマップが上限より大きいので持たない: ${command.key} (${bytes} バイト)`,
+          }),
+        );
+      }
       return command.positions.map((position) => lookup(map, position));
     }
     case "lookup": {
