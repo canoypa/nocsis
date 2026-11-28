@@ -1,6 +1,7 @@
 import type { DocumentReference } from "firebase-admin/firestore";
 import { Hono } from "hono";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { firestore } from "../clients/firebase.js";
 import {
   type AuthorizedEnv,

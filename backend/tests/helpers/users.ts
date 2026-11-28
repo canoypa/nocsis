@@ -1,5 +1,6 @@
 import type { UserRecord } from "firebase-admin/auth";
 import { z } from "zod";
+
 import { auth } from "../../src/clients/firebase.js";
 
 const LoginResultSchema = z.object({

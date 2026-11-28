@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+
 import { classesRoutes } from "./v1/classes_controller.js";
 import { clientErrorsRoutes } from "./v1/client_errors_controller.js";
 import { daydutRoutes } from "./v1/dayduty_controller.js";

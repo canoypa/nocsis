@@ -8,6 +8,7 @@ import {
   it,
   vi,
 } from "vitest";
+
 import { type LoginResult, login } from "../tests/helpers/users.js";
 import { auth, firestore } from "./clients/firebase.js";
 import { declarationOf } from "./middlewares/authorize.js";

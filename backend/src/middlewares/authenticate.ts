@@ -1,6 +1,8 @@
 import assert from "node:assert";
+
 import type { Context } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
+
 import { auth } from "../clients/firebase.js";
 
 export type AuthenticatedEnv = {

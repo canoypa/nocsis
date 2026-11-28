@@ -3,6 +3,7 @@ import {
   type calendar_v3 as CalendarV3,
   calendar,
 } from "@googleapis/calendar";
+
 import { fetchSecret } from "../services/secret_manager_service.js";
 
 let instance: CalendarV3.Calendar | null = null;

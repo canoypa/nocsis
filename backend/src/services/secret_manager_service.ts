@@ -1,4 +1,5 @@
 import assert from "node:assert";
+
 import { secretManagerClient } from "../clients/secret_manager.js";
 
 const secretCache = new Map<string, string>();

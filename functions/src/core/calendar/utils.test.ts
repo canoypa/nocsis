@@ -1,6 +1,8 @@
 import { DateTime } from "luxon";
 import { describe, expect, it } from "vitest";
+
 import type { CalendarEvent } from "~/types/calendar.js";
+
 import { isAllDay, isMultipleDays } from "./utils.js";
 
 const EXAMPLE_ONE_DAY_EVENT: CalendarEvent = {

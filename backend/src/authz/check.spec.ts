@@ -1,5 +1,6 @@
 import type { DocumentReference } from "firebase-admin/firestore";
 import { afterEach, describe, expect, it } from "vitest";
+
 import { firestore } from "../clients/firebase.js";
 import { can, permissionsByResource, resourceIdsWith } from "./check.js";
 import { user } from "./principal.js";

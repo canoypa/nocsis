@@ -1,5 +1,4 @@
 {
-  "packageManager": "pnpm@12.20.0",
   "scripts": {
     "emulators:start": "firebase emulators:start --project demo-nocsis --import ./emulator_data --export-on-exit ./emulator_data"
   },
@@ -7,5 +6,6 @@
     "firebase-tools": "^15.37.0",
     "oxfmt": "^0.80.0",
     "oxlint": "^1.95.0"
-  }
+  },
+  "packageManager": "pnpm@12.20.0"
 }

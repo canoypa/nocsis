@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { ancestors, group, serialize } from "./resource.js";
 
 describe("resource", () => {

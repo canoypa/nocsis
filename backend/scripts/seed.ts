@@ -7,6 +7,7 @@
 //
 // 公開リポジトリの Actions のログは誰でも読めるので、メールアドレスや uid はログに出さない。
 import assert from "node:assert";
+
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";

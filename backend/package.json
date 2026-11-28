@@ -1,7 +1,6 @@
 {
   "name": "backend",
   "type": "module",
-  "packageManager": "pnpm@12.20.0",
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "build": "tsup src/main.ts --clean --format esm --sourcemap",
@@ -43,5 +42,6 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.0",
     "vitest": "^5.1.1"
-  }
+  },
+  "packageManager": "pnpm@12.20.0"
 }

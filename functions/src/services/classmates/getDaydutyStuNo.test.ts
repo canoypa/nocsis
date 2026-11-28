@@ -1,8 +1,10 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { DateTime } from "luxon";
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { firebaseApp } from "~/client/firebaseApp.js";
 import type { Student, Teacher } from "~/types/classmates.js";
+
 import { getDaydutyStuNo } from "./getDaydutyStuNo.js";
 
 describe("getDaydutyStuNo", () => {

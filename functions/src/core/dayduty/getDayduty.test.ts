@@ -1,7 +1,9 @@
 import { DateTime } from "luxon";
 import { describe, expect, it, vi } from "vitest";
+
 import * as getStudentByStuNo from "~/services/classmates/getStudentByStuNo.js";
 import type { Student } from "~/types/classmates.js";
+
 import * as getDaydutyStuNo from "../../services/classmates/getDaydutyStuNo.js";
 import { getDayduty } from "./getDayduty.js";
 

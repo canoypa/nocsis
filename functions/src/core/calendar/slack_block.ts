@@ -10,6 +10,7 @@ import type {
   SectionBlock,
 } from "@slack/web-api";
 import type { DateTime } from "luxon";
+
 import type { CalendarEvent } from "../../types/calendar.js";
 import { getDisplayTimeRange } from "./get_display_time_range.js";
 import { getDisplayTitle } from "./get_display_title.js";

@@ -1,9 +1,8 @@
 {
-  "private": true,
   "name": "nocsis-functions",
+  "private": true,
   "type": "module",
   "main": "dist/main.js",
-  "packageManager": "pnpm@12.20.0",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "ci": "oxlint && oxfmt --check",
@@ -43,5 +42,6 @@
     "tsup": "^9.0.0",
     "typescript": "^7.0.0",
     "vitest": "^5.1.1"
-  }
+  },
+  "packageManager": "pnpm@12.20.0"
 }

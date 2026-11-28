@@ -1,7 +1,8 @@
 import { Hono } from "hono";
-import { HTTPException } from "hono/http-exception";
 import { describeRoute, resolver, validator } from "hono-openapi";
+import { HTTPException } from "hono/http-exception";
 import type { z } from "zod";
+
 import { permissionsByResource } from "../../authz/check.js";
 import { user } from "../../authz/principal.js";
 import { firestore } from "../../clients/firebase.js";

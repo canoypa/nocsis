@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { describe, expect, test } from "vitest";
+
 import type { CalendarEvent } from "../../types/calendar.js";
 import { eventsToSlackBlock } from "./slack_block.js";
 

@@ -1,5 +1,6 @@
 import type { calendar_v3 as CalendarV3 } from "@googleapis/calendar";
 import type { DateTime } from "luxon";
+
 import { getCalendarClient } from "../clients/google_calendar_client.js";
 
 export type FetchCalendarParams = Partial<{

@@ -1,6 +1,8 @@
 import assert from "node:assert";
+
 import { type SourceMapInput, TraceMap } from "@jridgewell/trace-mapping";
 import { GoogleAuth } from "google-auth-library";
+
 import { AppConfig } from "../config/app_config.js";
 
 export type SourceMapFile = "main.dart.js.map" | "main.dart.wasm.map";

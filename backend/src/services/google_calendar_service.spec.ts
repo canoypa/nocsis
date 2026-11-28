@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { HttpResponse, http } from "msw";
 import { describe, expect, it } from "vitest";
+
 import {
   CALENDAR_EVENTS_URL,
   externalApiServer,

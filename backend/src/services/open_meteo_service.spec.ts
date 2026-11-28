@@ -1,6 +1,7 @@
 import { HttpResponse, http } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ZodError } from "zod";
+
 import {
   externalApiServer,
   OPEN_METEO_FORECAST_URL,

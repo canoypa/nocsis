@@ -1,5 +1,6 @@
 import type { UserRecord } from "firebase-admin/auth";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { LoginResult } from "../../../tests/helpers/users.js";
 import { login, loginAnonymously } from "../../../tests/helpers/users.js";
 import { auth, firestore } from "../../clients/firebase.js";
