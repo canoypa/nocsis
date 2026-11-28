@@ -30,7 +30,7 @@ describe("Dayduty Controller", () => {
 
     await grantGroup(user.uid, "test_group_1");
 
-    await firestore.collection("classmates").add({
+    await firestore.collection("classmates").doc("student_1").set({
       group_id: "test_group_1",
       role: "student",
       stuNo: 1,
@@ -194,6 +194,30 @@ describe("Dayduty Controller", () => {
       });
     });
 
+    describe("その日の日直がいない場合", () => {
+      it("500が返されること", async () => {
+        const rule = await firestore
+          .collection("groups")
+          .doc("test_group_1")
+          .collection("dayduty_rules")
+          .add({ member: "student_1", weekdays: [1, 2, 3, 4, 5, 6, 7] });
+
+        const response = await app.request(
+          "/api/v1/groups/test_group_1/dayduty",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${loginResult.idToken}`,
+            },
+          },
+        );
+
+        expect(response.status).toBe(500);
+
+        await rule.delete();
+      });
+    });
+
     describe("不正な日付フォーマットの場合", () => {
       it("400が返されること", async () => {
         const response = await app.request(
@@ -224,7 +248,10 @@ describe("Dayduty Controller", () => {
 
         expect(response.status).toBe(200);
         const json = await response.json();
-        expect(json).toEqual({ name: "Test Student" });
+        expect(json).toEqual({
+          name: "Test Student",
+          members: [{ id: "student_1", name: "Test Student" }],
+        });
       });
     });
 
@@ -242,7 +269,10 @@ describe("Dayduty Controller", () => {
 
         expect(response.status).toBe(200);
         const json = await response.json();
-        expect(json).toEqual({ name: expect.any(String) });
+        expect(json).toEqual({
+          name: "Test Student",
+          members: [{ id: "student_1", name: "Test Student" }],
+        });
       });
     });
   });

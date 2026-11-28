@@ -15,7 +15,7 @@ import {
   daydutyQuerySchema,
   daydutyResponseSchema,
 } from "../../resources/v1/dayduty.js";
-import { getDaydutyStuNo } from "../../services/dayduty_service.js";
+import { getDayduty } from "../../services/dayduty_service.js";
 
 export const daydutRoutes = new Hono<AuthorizedEnv>();
 
@@ -84,32 +84,19 @@ daydutRoutes.get(
         });
       }
 
-      // 出席番号取得
-      // @types/luxon 3.7.4 で fromISO/now().setZone() の戻り値型が
-      // DateTimeMaybeValid から DateTime に簡略化され、isValid による
-      // narrowing が効かなくなったため明示的にキャストする
-      const stuNo = await getDaydutyStuNo(
-        groupId,
-        targetDate as DateTime<true>,
-      );
+      const day = targetDate.toISODate() as string;
+      const [{ members }] = await getDayduty(groupId, day, day);
 
-      // Classmate 取得
-      const classmateSnapshot = await firestore
-        .collection("classmates")
-        .where("group_id", "==", groupId)
-        .where("stuNo", "==", stuNo)
-        .select("name")
-        .get();
-
-      if (classmateSnapshot.empty) {
+      if (members.length === 0) {
         throw new HTTPException(500, {
           message: "学生が見つかりません。",
         });
       }
 
-      const validatedResponse = daydutyResponseSchema.parse(
-        classmateSnapshot.docs[0].data(),
-      );
+      const validatedResponse = daydutyResponseSchema.parse({
+        name: members[0].name,
+        members,
+      });
 
       return c.json<DaydutyResponse>(validatedResponse, 200);
     } catch (error) {

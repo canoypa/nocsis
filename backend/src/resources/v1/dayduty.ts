@@ -10,6 +10,14 @@ export const daydutyQuerySchema = z.object({
 export const daydutyResponseSchema = z
   .object({
     name: z.string().meta({ description: "名前" }),
+    members: z
+      .array(
+        z.object({
+          id: z.string().meta({ description: "生徒の ID" }),
+          name: z.string().meta({ description: "名前" }),
+        }),
+      )
+      .meta({ description: "その日の日直。いない日は空" }),
   })
   .meta({
     $id: "Dayduty",

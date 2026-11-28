@@ -19,7 +19,7 @@ void main() {
 
     test('日直情報を取得できる', () async {
       // Arrange
-      const dayduty = Dayduty(name: 'テスト太郎');
+      const dayduty = Dayduty(name: 'テスト太郎', members: []);
       when(
         () => mockApi.apiV1GroupsGroupIdDaydutyGet(
           groupId: 'group-1',
