@@ -19,9 +19,6 @@ import {
 export type DaydutyMember = { id: string; name: string };
 export type DaydutyOfDay = { date: string; members: DaydutyMember[] };
 
-/** 開始日も確定した日もないなど、日直を決められないグループ */
-export class DaydutyNotConfiguredError extends Error {}
-
 type Turns = Record<string, number>;
 
 type Reader = {
@@ -83,51 +80,11 @@ const loadTurns = async (groupId: string, read: Reader): Promise<Turns> => {
 };
 
 /**
- * 確定した日がない日は、開始日からの経過日数で決めていたときと同じ人になるよう、開始日から数え直す
- *
- * 開始日より前の日を読むときは、その日から始める
- */
-const startOfRotation = async (
-  groupId: string,
-  order: readonly string[],
-  from: string,
-  read: Reader,
-): Promise<{ from: string; turns: Turns }> => {
-  const group = (await read.doc(groupRef(groupId))).data();
-  if (!group) {
-    throw new Error("Group not found");
-  }
-  if (!group.dayduty_start_date) {
-    throw new DaydutyNotConfiguredError("dayduty_start_date is not set");
-  }
-  const startDate = DateTime.fromISO(group.dayduty_start_date, {
-    zone: AppConfig.TIMEZONE,
-  });
-  if (!startDate.isValid) {
-    throw new DaydutyNotConfiguredError(
-      "日直開始日のフォーマットが正しくありません",
-    );
-  }
-  if (order.length === 0) {
-    throw new DaydutyNotConfiguredError("No students found in group");
-  }
-
-  const start = isoDate(startDate);
-  const seed = from < start ? from : start;
-  const elapsedDays = DateTime.fromISO(seed, { zone: "utc" })
-    .diff(DateTime.fromISO(start, { zone: "utc" }), "days")
-    .as("days");
-  const first = ((elapsedDays % order.length) + order.length) % order.length;
-  return {
-    from: seed,
-    turns: Object.fromEntries(order.map((m, i) => [m, i < first ? 1 : 0])),
-  };
-};
-
-/**
  * from から to まで (YYYY-MM-DD、どちらも含む) の日直
  *
  * 確定した日は書いてあるとおりに返し、その先は最後の確定から計算する。何も書かない
+ *
+ * 最初の確定より前の日は、日直なしとして返す。確定がひとつもなければ、全員 0 回から from の日に始める
  */
 export const getDayduty = async (
   groupId: string,
@@ -176,18 +133,9 @@ const readDayduty = async (
     }
   }
 
-  const finalizedUntil =
-    lastFinalized !== undefined && lastFinalized < to ? lastFinalized : to;
-  let missing = false;
-  for (let date = from; date <= finalizedUntil; date = daysAfter(date, 1)) {
-    if (!members.has(date)) missing = true;
-  }
-  if (lastFinalized === undefined || missing) {
-    const until = lastFinalized === undefined ? to : finalizedUntil;
-    compute(await startOfRotation(groupId, orderIds, from, read), until);
-  }
-
-  if (lastFinalized !== undefined && lastFinalized < to) {
+  if (lastFinalized === undefined) {
+    compute({ from, turns: {} }, to);
+  } else if (lastFinalized < to) {
     compute(
       {
         from: daysAfter(lastFinalized, 1),
@@ -214,7 +162,7 @@ const readDayduty = async (
 /**
  * 最後に確定した日の翌日から until (YYYY-MM-DD) までを確定する。確定した日の数を返す
  *
- * まだ確定した日がなければ until の日だけを書く。それより前の日は、読むときに開始日から数え直す
+ * まだ確定した日がなければ、全員 0 回から until の日だけを書く。ふつうは移行で前日の確定が入っている
  */
 export const finalizeDayduty = async (
   groupId: string,
@@ -245,16 +193,15 @@ export const finalizeDayduty = async (
     };
 
     if (lastFinalized === undefined) {
-      const start = await startOfRotation(groupId, orderIds, until, read);
       const { days, turns } = computeDayduty({
         order: orderIds,
-        turns: start.turns,
-        from: start.from,
+        turns: {},
+        from: until,
         to: until,
         ops,
         rules,
       });
-      writeDay(until, (days.at(-1) as (typeof days)[number]).members, turns);
+      writeDay(until, days[0].members, turns);
       writeTurns(turns);
       return 1;
     }
@@ -288,7 +235,6 @@ export const finalizeAllDayduty = async (now: DateTime): Promise<string[]> => {
     try {
       await finalizeDayduty(group.id, yesterday);
     } catch (err) {
-      if (err instanceof DaydutyNotConfiguredError) continue;
       console.error("日直の確定に失敗しました", { group: group.id, err });
       failed.push(group.id);
     }

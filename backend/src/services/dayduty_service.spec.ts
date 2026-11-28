@@ -19,7 +19,7 @@ const namesOf = (days: Awaited<ReturnType<typeof getDayduty>>) =>
 
 describe("getDayduty", () => {
   beforeEach(async () => {
-    await group.set({ name: "Test Group", dayduty_start_date: "2025-01-01" });
+    await group.set({ name: "Test Group" });
 
     // 出席番号順に並べるのを確かめるため、順不同で入れる
     for (const [stuNo, name] of [
@@ -61,81 +61,20 @@ describe("getDayduty", () => {
   });
 
   describe("確定した日がない場合", () => {
-    it("開始日からの経過日数で決めていたときと同じ人が返されること", async () => {
+    it("全員 0 回から、読む最初の日に出席番号順で始めること", async () => {
       const days = await getDayduty(GROUP_ID, "2025-01-01", "2025-01-06");
 
       expect(namesOf(days)).toEqual(["A", "B", "C", "D", "A", "B"]);
     });
 
-    it("途中の日から読んでも、同じ人が返されること", async () => {
-      const days = await getDayduty(GROUP_ID, "2025-01-03", "2025-01-03");
-
-      expect(days).toEqual([
-        { date: "2025-01-03", members: [{ id: "C", name: "C" }] },
-      ]);
-    });
-
-    it("開始日より前の日も、順番どおりに返されること", async () => {
-      const days = await getDayduty(GROUP_ID, "2024-12-31", "2024-12-31");
-
-      expect(namesOf(days)).toEqual(["D"]);
-    });
-
-    it("先生が飛ばした番は、読む範囲によらず同じようになくなること", async () => {
-      await group.collection("dayduty_records").add({
-        created_by: "teacher",
-        created_at: new Date(),
-        ops: [{ date: "2025-01-02", kind: "skip", member: "B", turn: 0 }],
-      });
-
-      const all = await getDayduty(GROUP_ID, "2025-01-01", "2025-01-05");
-      const one = await getDayduty(GROUP_ID, "2025-01-03", "2025-01-03");
-
-      expect(namesOf(all)).toEqual(["A", "C", "D", "A", "B"]);
-      expect(namesOf(one)).toEqual(["D"]);
-    });
-
-    it("開始日に時刻が付いていても、日付で数えること", async () => {
-      await group.set({
-        name: "Test Group",
-        dayduty_start_date: "2025-01-01T09:00:00",
-      });
-
-      const days = await getDayduty(GROUP_ID, "2025-01-02", "2025-01-02");
-
-      expect(namesOf(days)).toEqual(["B"]);
-    });
-
-    it("グループがなければエラーになること", async () => {
-      await expect(
-        getDayduty("non_existent_group", "2025-01-01", "2025-01-01"),
-      ).rejects.toThrow("Group not found");
-    });
-
-    it("開始日が設定されていなければエラーになること", async () => {
-      await group.set({ name: "Test Group" });
-
-      await expect(
-        getDayduty(GROUP_ID, "2025-01-01", "2025-01-01"),
-      ).rejects.toThrow("dayduty_start_date is not set");
-    });
-
-    it("開始日の形が正しくなければエラーになること", async () => {
-      await group.set({ name: "Test Group", dayduty_start_date: "invalid" });
-
-      await expect(
-        getDayduty(GROUP_ID, "2025-01-01", "2025-01-01"),
-      ).rejects.toThrow("日直開始日のフォーマットが正しくありません");
-    });
-
-    it("生徒がいなければエラーになること", async () => {
+    it("生徒がいなければ、日直なしで返されること", async () => {
       await deleteCollection(
         firestore.collection("classmates").where("group_id", "==", GROUP_ID),
       );
 
-      await expect(
-        getDayduty(GROUP_ID, "2025-01-01", "2025-01-01"),
-      ).rejects.toThrow("No students found in group");
+      const days = await getDayduty(GROUP_ID, "2025-01-01", "2025-01-01");
+
+      expect(days).toEqual([{ date: "2025-01-01", members: [] }]);
     });
   });
 
@@ -166,8 +105,7 @@ describe("getDayduty", () => {
       expect(namesOf(days)).toEqual(["A", "B", "C", "D", "A"]);
     });
 
-    it("確定した日は、名簿や開始日が変わっても変わらないこと", async () => {
-      await group.set({ name: "Test Group", dayduty_start_date: "2026-12-02" });
+    it("確定した日は、名簿が変わっても変わらないこと", async () => {
       await firestore.collection("classmates").doc("A").update({ stuNo: 5 });
 
       const days = await getDayduty(GROUP_ID, "2026-12-01", "2026-12-02");
@@ -175,10 +113,10 @@ describe("getDayduty", () => {
       expect(namesOf(days)).toEqual(["A", "B"]);
     });
 
-    it("確定する前の日は、開始日から数えた人が返されること", async () => {
+    it("最初の確定より前の日は、日直なしで返されること", async () => {
       const days = await getDayduty(GROUP_ID, "2026-11-30", "2026-12-01");
 
-      expect(namesOf(days)).toEqual(["C", "A"]);
+      expect(namesOf(days)).toEqual(["", "A"]);
     });
 
     it("名簿から消えた人は、確定した日にも出さないこと", async () => {
