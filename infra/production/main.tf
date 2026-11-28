@@ -19,6 +19,8 @@ module "nocsis" {
 
   project_id = "class-clock-40088"
 
+  backend_url = "https://nocsis.app"
+
   auth_authorized_domains      = ["class-clock-40088.firebaseapp.com", "class-clock-40088.web.app", "nocsis.app"]
   auth_email_password_required = false
   auth_google_client_id        = "219141289630-1duqb26tbk7dte61804hjqg64qmhfsc2.apps.googleusercontent.com"
