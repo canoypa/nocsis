@@ -1,5 +1,7 @@
 import assert from "node:assert";
+
 import { OAuth2Client, type TokenPayload } from "google-auth-library";
+
 import { AppConfig } from "../config/app_config.js";
 
 const oauth2Client = new OAuth2Client();

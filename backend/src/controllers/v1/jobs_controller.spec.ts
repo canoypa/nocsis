@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { firestore } from "../../clients/firebase.js";
 import { app } from "../../routes.js";
 import { verifySchedulerToken } from "../../services/scheduler_token_service.js";
